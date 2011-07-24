@@ -50,8 +50,7 @@ public class MergeServlet extends HttpServlet {
 			log.error(ex.getMessage(), ex);
 		}
 		response.setContentLength(content.length());
-		// response.setContentType(contentType);
-		response.setContentType("text/plain");
+		response.setContentType(this.mode.getContentType());
 
 		PrintWriter w = response.getWriter();
 		w.println(content);
