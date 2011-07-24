@@ -18,7 +18,8 @@
 		</fileset>
 		<pathelement path="${build.dir}"/>
 	</path>
-
+	
+	<!-- This cleans the build -->
 	<target name="clean" description="Clean">
 		<delete dir="${build.dir}"/>
 		<delete dir="${lib.dir}"/>
