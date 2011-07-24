@@ -1,2 +1,4 @@
 /bin/
 /lib/
+
+tmp/org/mozilla/javascript/xmlimpl/XmlProcessor.class
