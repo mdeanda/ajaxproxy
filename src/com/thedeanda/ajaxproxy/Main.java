@@ -34,6 +34,7 @@ public class Main {
 
 			String config = cmd.getOptionValue('c', null);
 			String merge = cmd.getOptionValue('m', null);
+			boolean run = cmd.hasOption("r");
 			boolean rm = cmd.hasOption("rm");
 			boolean ignore = cmd.hasOption("i");
 
@@ -48,6 +49,9 @@ public class Main {
 			if (config != null && merge != null) {
 				runMerge(config, merge, rm, ignore);
 				return;
+			} else if (config != null && run) {
+				AjaxProxy ap = new AjaxProxy(config);
+				ap.run();
 			} else if (merge != null && config == null) {
 				printHelp(options);
 				return;
@@ -117,6 +121,7 @@ public class Main {
 	private static Options initOptions() {
 		Options options = new Options();
 
+		options.addOption("r", "run", false, "run ajaxproxy in headless mode");
 		options.addOption("h", "help", false, "print this message");
 		options.addOption("c", "config", true, "the config file");
 		options.addOption("m", "merge", true,
