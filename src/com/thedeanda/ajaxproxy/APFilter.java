@@ -21,6 +21,7 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
@@ -64,7 +65,7 @@ public class APFilter implements Filter {
 			boolean stillLogRequests = logRequests;
 			String url = httpRequest.getRequestURI();
 
-			//TODO: duration
+			// TODO: track duration
 			trackAccess(url, 0);
 
 			if (stillLogRequests) {
@@ -107,6 +108,21 @@ public class APFilter implements Filter {
 			chain.doFilter(reqWrapper, wrapper);
 			throttledCopy(wrapper.getNewInputStream(),
 					response.getOutputStream());
+
+			if (extendedLogging && stillLogRequests) {
+				// TODO: add "log cookies" flag
+				Cookie[] cookies = ((HttpServletRequest) request).getCookies();
+				if (cookies != null && cookies.length > 0) {
+					sb.append("\nCookies:");
+					for (Cookie c : cookies) {
+						sb.append("\n    name: " + c.getName() + ", domain: "
+								+ c.getDomain() + ", path: " + c.getPath()
+								+ ", value: " + c.getValue());
+					}
+				} else {
+					sb.append("\nCookies: no cookies for you\n");
+				}
+			}
 
 			if (stillLogRequests) {
 				StringBuffer outputBuffer = null;
@@ -366,7 +382,7 @@ public class APFilter implements Filter {
 			trackBuffer.notify();
 		}
 	}
-	
+
 	private class TrackItem {
 		public String file;
 		public int duration;
