@@ -82,9 +82,10 @@ public class APFilter implements Filter {
 				String qs = httpRequest.getQueryString();
 				if (null != qs && !"".equals(qs))
 					sb.append("?" + qs);
+				sb.append("\n");
 				if (("POST".equals(method) || "PUT".equals(method))
 						&& extendedLogging) {
-					sb.append("\nInput:\n");
+					sb.append("Input:\n");
 					StringBuffer inputBuffer = new StringBuffer();
 					@SuppressWarnings("unchecked")
 					List<String> lines = IOUtils.readLines(reqWrapper
@@ -94,6 +95,7 @@ public class APFilter implements Filter {
 						inputBuffer.append("\n");
 					}
 					sb.append(inputBuffer.toString().trim());
+					sb.append("\n");
 				}
 			}
 
@@ -113,14 +115,14 @@ public class APFilter implements Filter {
 				// TODO: add "log cookies" flag
 				Cookie[] cookies = ((HttpServletRequest) request).getCookies();
 				if (cookies != null && cookies.length > 0) {
-					sb.append("\nCookies:");
+					sb.append("Cookies:\n");
 					for (Cookie c : cookies) {
-						sb.append("\n    name: " + c.getName() + ", domain: "
+						sb.append("    name: " + c.getName() + ", domain: "
 								+ c.getDomain() + ", path: " + c.getPath()
-								+ ", value: " + c.getValue());
+								+ ", value: " + c.getValue() + "\n");
 					}
 				} else {
-					sb.append("\nCookies: no cookies for you\n");
+					sb.append("Cookies: none\n");
 				}
 			}
 
@@ -142,7 +144,7 @@ public class APFilter implements Filter {
 					stillLogRequests = matcher.matches();
 				}
 				if (extendedLogging) {
-					sb.append("\nOutput:\n");
+					sb.append("Output:\n");
 					sb.append(outputBuffer.toString().trim());
 					sb.append("\n"); // extra line to make it easier to read
 				}
