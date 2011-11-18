@@ -35,7 +35,6 @@ public class APFilter implements Filter {
 	private int maxBitrate = 0; // in KBps
 	private int forcedLatency = 50;
 	private boolean logRequests = false;
-	private boolean extendedLogging = false;
 	private String appendToPath = "";
 	private Semaphore throttleLock;
 	private Pattern logExpression;
@@ -43,6 +42,9 @@ public class APFilter implements Filter {
 	private List<AccessTracker> trackers = new ArrayList<AccessTracker>();
 	private Thread trackerThread;
 	private List<TrackItem> trackBuffer = new LinkedList<TrackItem>();
+	private boolean logInput;
+	private boolean logOutput;
+	private boolean logCookies;
 
 	@Override
 	public void destroy() {
@@ -83,8 +85,7 @@ public class APFilter implements Filter {
 				if (null != qs && !"".equals(qs))
 					sb.append("?" + qs);
 				sb.append("\n");
-				if (("POST".equals(method) || "PUT".equals(method))
-						&& extendedLogging) {
+				if (("POST".equals(method) || "PUT".equals(method)) && logInput) {
 					sb.append("Input:\n");
 					StringBuffer inputBuffer = new StringBuffer();
 					@SuppressWarnings("unchecked")
@@ -111,7 +112,7 @@ public class APFilter implements Filter {
 			throttledCopy(wrapper.getNewInputStream(),
 					response.getOutputStream());
 
-			if (extendedLogging && stillLogRequests) {
+			if (logCookies && stillLogRequests) {
 				// TODO: add "log cookies" flag
 				Cookie[] cookies = ((HttpServletRequest) request).getCookies();
 				if (cookies != null && cookies.length > 0) {
@@ -128,7 +129,7 @@ public class APFilter implements Filter {
 
 			if (stillLogRequests) {
 				StringBuffer outputBuffer = null;
-				if (extendedLogging || contentExpression != null) {
+				if (logOutput || contentExpression != null) {
 					@SuppressWarnings("unchecked")
 					List<String> lines = IOUtils.readLines(wrapper
 							.getNewInputStream());
@@ -143,7 +144,7 @@ public class APFilter implements Filter {
 							.toString());
 					stillLogRequests = matcher.matches();
 				}
-				if (extendedLogging) {
+				if (logOutput) {
 					sb.append("Output:\n");
 					sb.append(outputBuffer.toString().trim());
 					sb.append("\n"); // extra line to make it easier to read
@@ -351,14 +352,6 @@ public class APFilter implements Filter {
 		this.appendToPath = appendToPath;
 	}
 
-	public boolean isExtendedLogging() {
-		return extendedLogging;
-	}
-
-	public void setExtendedLogging(boolean extendedLogging) {
-		this.extendedLogging = extendedLogging;
-	}
-
 	public void setLogExpression(Pattern logExpression) {
 		this.logExpression = logExpression;
 	}
@@ -388,5 +381,29 @@ public class APFilter implements Filter {
 	private class TrackItem {
 		public String file;
 		public int duration;
+	}
+
+	public boolean isLogInput() {
+		return logInput;
+	}
+
+	public void setLogInput(boolean logInput) {
+		this.logInput = logInput;
+	}
+
+	public boolean isLogOutput() {
+		return logOutput;
+	}
+
+	public void setLogOutput(boolean logOutput) {
+		this.logOutput = logOutput;
+	}
+
+	public boolean isLogCookies() {
+		return logCookies;
+	}
+
+	public void setLogCookies(boolean logCookies) {
+		this.logCookies = logCookies;
 	}
 }

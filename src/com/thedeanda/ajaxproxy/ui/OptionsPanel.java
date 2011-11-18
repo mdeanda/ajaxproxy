@@ -28,7 +28,9 @@ public class OptionsPanel extends JPanel implements ActionListener,
 	private JSlider maxBitrate;
 	private AjaxProxy proxy;
 	private JSlider forcedLatency;
-	private JCheckBox extendedLogging;
+	private JCheckBox logInput;
+	private JCheckBox logCookies;
+	private JCheckBox logOutput;
 	private JLabel logExpressionLabel;
 	private JTextField logExpression;
 	private JLabel contentExpressionLabel;
@@ -43,7 +45,9 @@ public class OptionsPanel extends JPanel implements ActionListener,
 		appendToPath = new JTextField();
 		forcedLatency = createSlider(500, 100, 10);
 		logRequests = new JCheckBox("Log Requests");
-		extendedLogging = new JCheckBox("Extended Logging");
+		logInput = new JCheckBox("Log Input");
+		logCookies = new JCheckBox("Log Cookies");
+		logOutput = new JCheckBox("Log Output");
 		logExpressionLabel = new JLabel("URL RegExp");
 		logExpression = new JTextField();
 		contentExpressionLabel = new JLabel("Content RegExp");
@@ -51,7 +55,9 @@ public class OptionsPanel extends JPanel implements ActionListener,
 
 		appendToPath.addPropertyChangeListener(this);
 		logRequests.addActionListener(this);
-		extendedLogging.addActionListener(this);
+		logInput.addActionListener(this);
+		logOutput.addActionListener(this);
+		logCookies.addActionListener(this);
 		logExpression.addPropertyChangeListener(this);
 		contentExpression.addPropertyChangeListener(this);
 
@@ -65,11 +71,13 @@ public class OptionsPanel extends JPanel implements ActionListener,
 		add(appendToPath, "growx, wrap");
 
 		add(logRequests, "skip, wrap");
-		add(extendedLogging, "skip, wrap");
+		add(logInput, "skip, wrap");
+		add(logCookies, "skip, wrap");
+		add(logOutput, "skip, wrap");
 
 		add(logExpressionLabel);
 		add(logExpression, "growx, wrap");
-		
+
 		add(contentExpressionLabel);
 		add(contentExpression, "growx, wrap");
 	}
@@ -92,12 +100,13 @@ public class OptionsPanel extends JPanel implements ActionListener,
 
 	private void applyOptions() {
 		boolean enable = logRequests.isSelected();
-		extendedLogging.setEnabled(enable);
+		logInput.setEnabled(enable);
+		logOutput.setEnabled(enable);
+		logCookies.setEnabled(enable);
 		logExpressionLabel.setEnabled(enable);
 		logExpression.setEnabled(enable);
 		contentExpressionLabel.setEnabled(enable);
 		contentExpression.setEnabled(enable);
-		
 
 		Pattern urlPattern = null;
 		try {
@@ -113,7 +122,8 @@ public class OptionsPanel extends JPanel implements ActionListener,
 		try {
 			String exp = contentExpression.getText();
 			if (exp != null && !"".equals(exp.trim()))
-				contentPattern = Pattern.compile(exp, Pattern.MULTILINE|Pattern.DOTALL);
+				contentPattern = Pattern.compile(exp, Pattern.MULTILINE
+						| Pattern.DOTALL);
 		} catch (PatternSyntaxException pse) {
 			contentExpression.setText("");
 			contentPattern = null;
@@ -130,7 +140,9 @@ public class OptionsPanel extends JPanel implements ActionListener,
 		filter.setForcedLatency(forcedLatency.getValue());
 		filter.setLogRequests(logRequests.isSelected());
 		filter.setMaxBitrate(maxBitrate.getValue());
-		filter.setExtendedLogging(extendedLogging.isSelected());
+		filter.setLogCookies(logCookies.isSelected());
+		filter.setLogInput(logInput.isSelected());
+		filter.setLogOutput(logOutput.isSelected());
 		filter.setLogExpression(urlPattern);
 		filter.setContentExpression(contentPattern);
 
