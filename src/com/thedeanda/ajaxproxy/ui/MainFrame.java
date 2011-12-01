@@ -34,6 +34,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
+import net.sourceforge.javajson.JsonArray;
 import net.sourceforge.javajson.JsonException;
 import net.sourceforge.javajson.JsonObject;
 import net.sourceforge.javajson.JsonValue;
@@ -172,7 +173,6 @@ public class MainFrame extends JFrame implements ProxyListener {
 					if (self.isVisible()) {
 						self.requestFocus();
 					}
-					
 
 					// trayIcon.displayMessage("Action Event",
 					// "An Action Event Has Been Performed!",
@@ -413,11 +413,13 @@ public class MainFrame extends JFrame implements ProxyListener {
 		recentMenu.removeAll();
 		recentFiles.clear();
 		if (settings != null) {
-			JsonObject json = settings;
-			for (JsonValue v : json.getJsonArray("recentFiles")) {
-				File rf = new File(v.getString());
-				if (rf.exists())
-					recentFiles.add(rf);
+			JsonArray array = settings.getJsonArray("recentFiles");
+			if (array != null) {
+				for (JsonValue v : array) {
+					File rf = new File(v.getString());
+					if (rf.exists())
+						recentFiles.add(rf);
+				}
 			}
 		}
 
