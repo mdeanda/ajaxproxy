@@ -7,6 +7,8 @@ import java.io.OutputStream;
 import java.io.StringReader;
 import java.util.List;
 
+import javax.swing.UIManager;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
@@ -57,6 +59,14 @@ public class Main {
 				return;
 			} else {
 				// show normal ui
+				try {
+					// Set System L&F
+					UIManager.setLookAndFeel(UIManager
+							.getSystemLookAndFeelClassName());
+				} catch (Exception ex) {
+
+				}
+
 				MainFrame f = new MainFrame();
 				f.setVisible(true);
 			}

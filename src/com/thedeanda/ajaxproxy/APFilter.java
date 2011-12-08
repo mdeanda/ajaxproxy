@@ -10,8 +10,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -37,14 +35,9 @@ public class APFilter implements Filter {
 	private boolean logRequests = false;
 	private String appendToPath = "";
 	private Semaphore throttleLock;
-	private Pattern logExpression;
-	private Pattern contentExpression;
 	private List<AccessTracker> trackers = new ArrayList<AccessTracker>();
 	private Thread trackerThread;
-	private List<TrackItem> trackBuffer = new LinkedList<TrackItem>();
-	private boolean logInput;
-	private boolean logOutput;
-	private boolean logCookies;
+	private List<LoadedResource> trackBuffer = new LinkedList<LoadedResource>();
 
 	@Override
 	public void destroy() {
@@ -57,106 +50,70 @@ public class APFilter implements Filter {
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain chain) throws IOException, ServletException {
 		if (request instanceof HttpServletRequest) {
-			HttpServletRequest httpRequest = (HttpServletRequest) request;
-			HttpServletResponse httpResponse = (HttpServletResponse) response;
-			MyServletRequestWrapper reqWrapper = new MyServletRequestWrapper(
-					httpRequest);
-			MyServletResponseWrapper wrapper = new MyServletResponseWrapper(
-					httpResponse);
-			StringBuffer sb = new StringBuffer();
-			boolean stillLogRequests = logRequests;
-			String url = httpRequest.getRequestURI();
-
-			// TODO: track duration
-			trackAccess(url, 0);
-
-			if (stillLogRequests) {
-				if (logExpression != null) {
-					Matcher matcher = logExpression.matcher(url);
-					stillLogRequests = matcher.matches();
-				}
-			}
-			if (stillLogRequests) {
-				String method = httpRequest.getMethod();
-				sb.append(method);
-				sb.append(" ");
-				sb.append(url);
-				String qs = httpRequest.getQueryString();
-				if (null != qs && !"".equals(qs))
-					sb.append("?" + qs);
-				sb.append("\n");
-				if (("POST".equals(method) || "PUT".equals(method)) && logInput) {
-					sb.append("Input:\n");
-					StringBuffer inputBuffer = new StringBuffer();
-					@SuppressWarnings("unchecked")
-					List<String> lines = IOUtils.readLines(reqWrapper
-							.getClonedInputStream());
-					for (String line : lines) {
-						inputBuffer.append(line);
-						inputBuffer.append("\n");
-					}
-					sb.append(inputBuffer.toString().trim());
-					sb.append("\n");
-				}
-			}
-
-			if (forcedLatency > 0) {
-				try {
-					Thread.sleep(this.forcedLatency);
-				} catch (InterruptedException e) {
-					// we probably don't need to continue processing
-					return;
-				}
-			}
-			chain.doFilter(reqWrapper, wrapper);
-			throttledCopy(wrapper.getNewInputStream(),
-					response.getOutputStream());
-
-			if (logCookies && stillLogRequests) {
-				// TODO: add "log cookies" flag
-				Cookie[] cookies = ((HttpServletRequest) request).getCookies();
-				if (cookies != null && cookies.length > 0) {
-					sb.append("Cookies:\n");
-					for (Cookie c : cookies) {
-						sb.append("    name: " + c.getName() + ", domain: "
-								+ c.getDomain() + ", path: " + c.getPath()
-								+ ", value: " + c.getValue() + "\n");
-					}
-				} else {
-					sb.append("Cookies: none\n");
-				}
-			}
-
-			if (stillLogRequests) {
-				StringBuffer outputBuffer = null;
-				if (logOutput || contentExpression != null) {
-					@SuppressWarnings("unchecked")
-					List<String> lines = IOUtils.readLines(wrapper
-							.getNewInputStream());
-					outputBuffer = new StringBuffer();
-					for (String line : lines) {
-						outputBuffer.append(line);
-						outputBuffer.append("\n");
-					}
-				}
-				if (contentExpression != null) {
-					Matcher matcher = contentExpression.matcher(outputBuffer
-							.toString());
-					stillLogRequests = matcher.matches();
-				}
-				if (logOutput) {
-					sb.append("Output:\n");
-					sb.append(outputBuffer.toString().trim());
-					sb.append("\n"); // extra line to make it easier to read
-				}
-			}
-
-			if (stillLogRequests) {
-				log.info(sb.toString());
-			}
+			doFilterInternal(request, response, chain);
 		} else {
 			chain.doFilter(request, response);
 		}
+	}
+
+	public void doFilterInternal(ServletRequest request,
+			ServletResponse response, FilterChain chain) throws IOException,
+			ServletException {
+		LoadedResource resource = new LoadedResource();
+		long start = System.currentTimeMillis();
+
+		HttpServletRequest httpRequest = (HttpServletRequest) request;
+		HttpServletResponse httpResponse = (HttpServletResponse) response;
+		MyServletRequestWrapper reqWrapper = new MyServletRequestWrapper(
+				httpRequest);
+		MyServletResponseWrapper wrapper = new MyServletResponseWrapper(
+				httpResponse);
+		String url = httpRequest.getRequestURI();
+		String qs = httpRequest.getQueryString();
+		if (null != qs && !"".equals(qs))
+			url += "?" + qs;
+		resource.setUrl(url);
+
+		String method = httpRequest.getMethod();
+		resource.setMethod(method);
+
+		// read input
+		if (("POST".equals(method) || "PUT".equals(method))) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			IOUtils.copy(reqWrapper.getClonedInputStream(), baos);
+			resource.setInput(baos.toByteArray());
+		}
+
+		if (forcedLatency > 0) {
+			try {
+				Thread.sleep(this.forcedLatency);
+			} catch (InterruptedException e) {
+				// we probably don't need to continue processing
+				return;
+			}
+		}
+		chain.doFilter(reqWrapper, wrapper);
+		throttledCopy(wrapper.getNewInputStream(), response.getOutputStream());
+
+		// read cookies
+		Cookie[] cookies = ((HttpServletRequest) request).getCookies();
+		if (cookies != null && cookies.length > 0) {
+			ArrayList<Cookie> cs = new ArrayList<Cookie>();
+			for (Cookie c : cookies) {
+				cs.add(c);
+			}
+			resource.setCookies(new ArrayList<Cookie>());
+		}
+
+		// read output
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		IOUtils.copy(wrapper.getNewInputStream(), baos);
+		resource.setOutput(baos.toByteArray());
+
+		resource.setDuration(System.currentTimeMillis() - start);
+
+		// TODO: track duration
+		trackAccess(resource);
 	}
 
 	@Override
@@ -167,7 +124,7 @@ public class APFilter implements Filter {
 			public void run() {
 				try {
 					while (!Thread.interrupted()) {
-						List<TrackItem> localBuffer = new ArrayList<TrackItem>();
+						List<LoadedResource> localBuffer = new ArrayList<LoadedResource>();
 						synchronized (trackBuffer) {
 							if (trackBuffer.isEmpty())
 								trackBuffer.wait();
@@ -175,9 +132,13 @@ public class APFilter implements Filter {
 								localBuffer.add(trackBuffer.remove(0));
 						}
 
-						for (TrackItem ti : localBuffer) {
+						for (LoadedResource ti : localBuffer) {
 							for (AccessTracker at : trackers) {
-								at.trackFile(ti.file, ti.duration);
+								try {
+									at.trackFile(ti);
+								} catch (Exception e) {
+									log.error(e.getMessage(), e);
+								}
 							}
 						}
 					}
@@ -352,58 +313,15 @@ public class APFilter implements Filter {
 		this.appendToPath = appendToPath;
 	}
 
-	public void setLogExpression(Pattern logExpression) {
-		this.logExpression = logExpression;
-	}
-
-	public Pattern getContentExpression() {
-		return contentExpression;
-	}
-
-	public void setContentExpression(Pattern contentExpression) {
-		this.contentExpression = contentExpression;
-	}
-
 	public void add(AccessTracker tracker) {
 		trackers.add(tracker);
 	}
 
-	private void trackAccess(String path, int duration) {
-		TrackItem ti = new TrackItem();
-		ti.file = path;
-		ti.duration = duration;
+	private void trackAccess(LoadedResource resource) {
 		synchronized (trackBuffer) {
-			trackBuffer.add(ti);
+			trackBuffer.add(resource);
 			trackBuffer.notify();
 		}
 	}
 
-	private class TrackItem {
-		public String file;
-		public int duration;
-	}
-
-	public boolean isLogInput() {
-		return logInput;
-	}
-
-	public void setLogInput(boolean logInput) {
-		this.logInput = logInput;
-	}
-
-	public boolean isLogOutput() {
-		return logOutput;
-	}
-
-	public void setLogOutput(boolean logOutput) {
-		this.logOutput = logOutput;
-	}
-
-	public boolean isLogCookies() {
-		return logCookies;
-	}
-
-	public void setLogCookies(boolean logCookies) {
-		this.logCookies = logCookies;
-	}
 }

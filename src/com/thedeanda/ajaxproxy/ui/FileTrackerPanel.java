@@ -13,6 +13,7 @@ import net.miginfocom.swing.MigLayout;
 
 import com.thedeanda.ajaxproxy.AccessTracker;
 import com.thedeanda.ajaxproxy.AjaxProxy;
+import com.thedeanda.ajaxproxy.LoadedResource;
 
 /** tracks files that get loaded */
 public class FileTrackerPanel extends JPanel implements AccessTracker {
@@ -47,9 +48,9 @@ public class FileTrackerPanel extends JPanel implements AccessTracker {
 	}
 
 	@Override
-	public void trackFile(String url, int duration) {
+	public void trackFile(LoadedResource res) {
 		if (toggleBtn.isSelected()) {
-			model.trackFile(url, duration);
+			model.trackFile(res.getUrl(), res.getDuration());
 		}
 	}
 

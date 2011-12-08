@@ -62,7 +62,7 @@ public class FileTrackerTableModel extends AbstractTableModel {
 			return files.get(row);
 	}
 
-	public void trackFile(String url, int duration) {
+	public void trackFile(String url, long duration) {
 		int indexAdded = -1;
 		int indexMod = -1;
 		synchronized (files) {

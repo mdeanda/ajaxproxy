@@ -55,6 +55,7 @@ public class MainPanel extends JPanel implements ProxyListener {
 	private static final String STOP = "Stop";
 
 	private List<ProxyListener> listeners = new ArrayList<ProxyListener>();
+	private ResourceViewerPanel resourceViewerPanel;
 
 	public MainPanel() {
 		MigLayout layout = new MigLayout("insets 10", "[right,100][600, grow]",
@@ -102,6 +103,9 @@ public class MainPanel extends JPanel implements ProxyListener {
 
 		trackerPanel = new FileTrackerPanel();
 		tabs.add("Tracker", trackerPanel);
+
+		resourceViewerPanel = new ResourceViewerPanel();
+		tabs.add("Resource Viewer", resourceViewerPanel);
 
 		JTextArea ta = new JTextArea();
 		ta.setWrapStyleWord(true);
@@ -182,6 +186,7 @@ public class MainPanel extends JPanel implements ProxyListener {
 			new Thread(proxy).start();
 			optionsPanel.setProxy(proxy);
 			trackerPanel.setProxy(proxy);
+			resourceViewerPanel.setProxy(proxy);
 			started = true;
 			fireProxyStarted();
 		} catch (Exception e) {
@@ -212,6 +217,7 @@ public class MainPanel extends JPanel implements ProxyListener {
 				p.stop();
 				optionsPanel.setProxy(null);
 				trackerPanel.setProxy(null);
+				resourceViewerPanel.setProxy(null);
 			}
 		} finally {
 			proxy = null;
