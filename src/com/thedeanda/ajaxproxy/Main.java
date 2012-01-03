@@ -7,6 +7,7 @@ import java.io.OutputStream;
 import java.io.StringReader;
 import java.util.List;
 
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import org.apache.commons.cli.CommandLine;
@@ -58,7 +59,19 @@ public class Main {
 				printHelp(options);
 				return;
 			} else {
-				// show normal ui
+				showUi();
+			}
+
+		} catch (ParseException exp) {
+			// oops, something went wrong
+			System.err.println("Parsing failed.  Reason: " + exp.getMessage());
+			printHelp(options);
+		}
+	}
+
+	private static void showUi() {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
 				try {
 					// Set System L&F
 					UIManager.setLookAndFeel(UIManager
@@ -70,12 +83,7 @@ public class Main {
 				MainFrame f = new MainFrame();
 				f.setVisible(true);
 			}
-
-		} catch (ParseException exp) {
-			// oops, something went wrong
-			System.err.println("Parsing failed.  Reason: " + exp.getMessage());
-			printHelp(options);
-		}
+		});
 	}
 
 	private static void printHelp(Options options) {
