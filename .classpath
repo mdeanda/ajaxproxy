@@ -6,7 +6,6 @@
 	<classpathentry kind="lib" path="lib/commons-io-1.4.jar"/>
 	<classpathentry kind="lib" path="lib/commons-lang-2.1.jar"/>
 	<classpathentry kind="lib" path="lib/commons-logging-1.0.4.jar"/>
-	<classpathentry kind="lib" path="lib/javajson-20110708.jar"/>
 	<classpathentry kind="lib" path="lib/jetty-6.1.26.jar"/>
 	<classpathentry kind="lib" path="lib/jetty-client-6.1.15.jar"/>
 	<classpathentry kind="lib" path="lib/jetty-sslengine-6.1.15.jar"/>
@@ -16,5 +15,6 @@
 	<classpathentry kind="lib" path="lib/swingmiglayout-3.0.3.jar"/>
 	<classpathentry kind="lib" path="lib/yuicompressor-2.4.2.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/javajson-20120103.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
