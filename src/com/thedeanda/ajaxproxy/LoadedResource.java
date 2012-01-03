@@ -3,6 +3,8 @@ package com.thedeanda.ajaxproxy;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import javax.servlet.http.Cookie;
 
@@ -14,7 +16,9 @@ public class LoadedResource {
 	private byte[] input;
 	private byte[] output;
 	private String method;
+	private int statusCode;
 	private List<Cookie> cookies;
+	private Map<String, String> headers = new TreeMap<String, String>();
 
 	@Override
 	public String toString() {
@@ -92,5 +96,25 @@ public class LoadedResource {
 			}
 		}
 		return sb.toString();
+	}
+
+	public Map<String, String> getHeaders() {
+		return headers;
+	}
+
+	public void setHeaders(Map<String, String> headers) {
+		this.headers = headers;
+	}
+
+	public void addHeader(String name, String header) {
+		headers.put(name, header);
+	}
+
+	public int getStatusCode() {
+		return statusCode;
+	}
+
+	public void setStatusCode(int statusCode) {
+		this.statusCode = statusCode;
 	}
 }

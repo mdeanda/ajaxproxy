@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
@@ -84,6 +85,12 @@ public class APFilter implements Filter {
 			resource.setInput(baos.toByteArray());
 		}
 
+		Enumeration<?> headerNames = reqWrapper.getHeaderNames();
+		while (headerNames.hasMoreElements()) {
+			String name = (String) headerNames.nextElement();
+			resource.addHeader(name, reqWrapper.getHeader(name));
+		}
+
 		if (forcedLatency > 0) {
 			try {
 				Thread.sleep(this.forcedLatency);
@@ -94,6 +101,8 @@ public class APFilter implements Filter {
 		}
 		chain.doFilter(reqWrapper, wrapper);
 		throttledCopy(wrapper.getNewInputStream(), response.getOutputStream());
+
+		resource.setStatusCode(wrapper.getStatus());
 
 		// read cookies
 		Cookie[] cookies = ((HttpServletRequest) request).getCookies();
@@ -111,8 +120,6 @@ public class APFilter implements Filter {
 		resource.setOutput(baos.toByteArray());
 
 		resource.setDuration(System.currentTimeMillis() - start);
-
-		// TODO: track duration
 		trackAccess(resource);
 	}
 
@@ -255,6 +262,7 @@ public class APFilter implements Filter {
 		private ByteArrayOutputStream baos;
 		private PrintWriter writer;
 		private MyServletOutputStream os;
+		private int httpStatus = 200;
 
 		public MyServletResponseWrapper(HttpServletResponse response) {
 			super(response);
@@ -281,6 +289,40 @@ public class APFilter implements Filter {
 
 		public ByteArrayInputStream getNewInputStream() {
 			return new ByteArrayInputStream(baos.toByteArray());
+		}
+
+		@Override
+		public void reset() {
+			super.reset();
+			this.httpStatus = SC_OK;
+		}
+
+		@Override
+		public void sendError(int sc) throws IOException {
+			httpStatus = sc;
+			super.sendError(sc);
+		}
+
+		@Override
+		public void sendRedirect(String location) throws IOException {
+			httpStatus = 302;
+			super.sendRedirect(location);
+		}
+
+		@Override
+		public void sendError(int sc, String msg) throws IOException {
+			httpStatus = sc;
+			super.sendError(sc, msg);
+		}
+
+		@Override
+		public void setStatus(int sc) {
+			httpStatus = sc;
+			super.setStatus(sc);
+		}
+
+		public int getStatus() {
+			return httpStatus;
 		}
 	}
 

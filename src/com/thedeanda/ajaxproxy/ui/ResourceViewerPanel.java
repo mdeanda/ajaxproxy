@@ -2,11 +2,13 @@ package com.thedeanda.ajaxproxy.ui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JEditorPane;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -19,8 +21,13 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
+import javax.swing.text.Document;
+import javax.swing.text.html.HTMLEditorKit;
+import javax.swing.text.html.StyleSheet;
 
 import net.miginfocom.swing.MigLayout;
+import net.sourceforge.javajson.JsonException;
+import net.sourceforge.javajson.JsonObject;
 
 import com.thedeanda.ajaxproxy.AccessTracker;
 import com.thedeanda.ajaxproxy.AjaxProxy;
@@ -38,6 +45,8 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker {
 	private JScrollPane outputScroll;
 	private JTextArea inputContent;
 	private JScrollPane inputScroll;
+	private JEditorPane headersContent;
+	private JScrollPane headersScroll;
 
 	public ResourceViewerPanel() {
 		this.setLayout(new MigLayout("fill", "", "[][fill]"));
@@ -64,16 +73,31 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker {
 			}
 		});
 
+		HTMLEditorKit kit = new HTMLEditorKit();
+		StyleSheet styleSheet = kit.getStyleSheet();
+		styleSheet.addRule("body {color:#000000; margin: 4px; font-size: 10px; font-family: sans-serif; }");
+		styleSheet.addRule("h1 { margin: 4px 0; font-size: 12px; }");
+		styleSheet.addRule("div.items { margin-left: 10px;}");
+		styleSheet.addRule("p { margin: 0; font-family: monospace;}");
+		styleSheet.addRule("b { font-family: sans-serif; color: #444444;}");
+
+		headersContent = new JEditorPane();
+		headersContent.setEditable(false);
+		headersScroll = new JScrollPane(headersContent);
+		headersContent.setEditorKit(kit);
+		Document doc = kit.createDefaultDocument();
+		headersContent.setDocument(doc);
+
 		inputContent = new JTextArea();
 		inputContent.setEditable(false);
 		inputScroll = new JScrollPane(inputContent);
-		
+
 		outputContent = new JTextArea();
 		outputContent.setEditable(false);
 		outputScroll = new JScrollPane(outputContent);
 
 		tabs = new JTabbedPane();
-		tabs.add("Overview", new JPanel());
+		tabs.add("Headers", headersScroll);
 		tabs.add("Input", inputScroll);
 		tabs.add("Output", outputScroll);
 		tabs.setBorder(BorderFactory.createEmptyBorder());
@@ -105,10 +129,56 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker {
 		if (!evt.getValueIsAdjusting()) {
 			LoadedResource lr = (LoadedResource) list.getSelectedValue();
 			if (lr != null) {
-				outputContent.setText(lr.getOutputAsText());
-				inputContent.setText(lr.getInputAsText());
+				showResource(lr);
 			}
 		}
+	}
+
+	private void showResource(LoadedResource lr) {
+		outputContent.setText(lr.getOutputAsText());
+		inputContent.setText(lr.getInputAsText());
+
+		StringBuffer headers = new StringBuffer();
+		Map<String, String> map = lr.getHeaders();
+		headers.append("<html><body>");
+		headers.append("<p><b>URL:</b> ");
+		headers.append(lr.getUrl());
+		headers.append("</p>");
+		headers.append("<p><b>Method:</b> ");
+		headers.append(lr.getMethod());
+		headers.append("</p>");
+		headers.append("<p><b>Duration:</b> ");
+		headers.append(lr.getDuration());
+		headers.append("</p>");
+		writeField(headers, "Status", String.valueOf(lr.getStatusCode()));
+		headers.append("<h1>Headers</h1><div class=\"items\">");
+		for (String name : map.keySet()) {
+			headers.append("<p><b>");
+			headers.append(name);
+			headers.append(":</b> ");
+			headers.append(map.get(name));
+			headers.append("</p>");
+		}
+		headers.append("</div></body></html>");
+		headersContent.setText(headers.toString());
+	}
+	
+	private void writeField(StringBuffer headers, String name, String value) {
+		headers.append("<p><b>");
+		headers.append(name);
+		headers.append(":</b> ");
+		headers.append(value);
+		headers.append("</p>");
+	}
+
+	private String tryFormatting(String str) {
+		String ret = str;
+		try {
+			ret = JsonObject.parse(ret).toString(4);
+		} catch (JsonException je) {
+			ret = str;
+		}
+		return ret;
 	}
 
 	public void setProxy(AjaxProxy proxy) {
