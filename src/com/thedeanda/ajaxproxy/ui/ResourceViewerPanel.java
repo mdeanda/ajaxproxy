@@ -58,6 +58,7 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				model.clear();
+				showResource(null);
 			}
 		});
 
@@ -75,7 +76,8 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker {
 
 		HTMLEditorKit kit = new HTMLEditorKit();
 		StyleSheet styleSheet = kit.getStyleSheet();
-		styleSheet.addRule("body {color:#000000; margin: 4px; font-size: 10px; font-family: sans-serif; }");
+		styleSheet
+				.addRule("body {color:#000000; margin: 4px; font-size: 10px; font-family: sans-serif; }");
 		styleSheet.addRule("h1 { margin: 4px 0; font-size: 12px; }");
 		styleSheet.addRule("div.items { margin-left: 10px;}");
 		styleSheet.addRule("p { margin: 0; font-family: monospace;}");
@@ -135,34 +137,42 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker {
 	}
 
 	private void showResource(LoadedResource lr) {
-		outputContent.setText(lr.getOutputAsText());
-		inputContent.setText(lr.getInputAsText());
+		if (lr == null) {
+			outputContent.setText("");
+			inputContent.setText("");
+			headersContent.setText("");
+		} else {
+			outputContent.setText(tryFormatting(lr.getOutputAsText()));
+			inputContent.setText(tryFormatting(lr.getInputAsText()));
 
-		StringBuffer headers = new StringBuffer();
-		Map<String, String> map = lr.getHeaders();
-		headers.append("<html><body>");
-		headers.append("<p><b>URL:</b> ");
-		headers.append(lr.getUrl());
-		headers.append("</p>");
-		headers.append("<p><b>Method:</b> ");
-		headers.append(lr.getMethod());
-		headers.append("</p>");
-		headers.append("<p><b>Duration:</b> ");
-		headers.append(lr.getDuration());
-		headers.append("</p>");
-		writeField(headers, "Status", String.valueOf(lr.getStatusCode()));
-		headers.append("<h1>Headers</h1><div class=\"items\">");
-		for (String name : map.keySet()) {
-			headers.append("<p><b>");
-			headers.append(name);
-			headers.append(":</b> ");
-			headers.append(map.get(name));
+			StringBuffer headers = new StringBuffer();
+
+			Map<String, String> map = lr.getHeaders();
+			headers.append("<html><body>");
+			headers.append("<p><b>URL:</b> ");
+			headers.append(lr.getUrl());
 			headers.append("</p>");
+			headers.append("<p><b>Method:</b> ");
+			headers.append(lr.getMethod());
+			headers.append("</p>");
+			headers.append("<p><b>Duration:</b> ");
+			headers.append(lr.getDuration());
+			headers.append("</p>");
+			writeField(headers, "Status", String.valueOf(lr.getStatusCode()));
+			headers.append("<h1>Headers</h1><div class=\"items\">");
+			for (String name : map.keySet()) {
+				headers.append("<p><b>");
+				headers.append(name);
+				headers.append(":</b> ");
+				headers.append(map.get(name));
+				headers.append("</p>");
+			}
+			headers.append("</div></body></html>");
+
+			headersContent.setText(headers.toString());
 		}
-		headers.append("</div></body></html>");
-		headersContent.setText(headers.toString());
 	}
-	
+
 	private void writeField(StringBuffer headers, String name, String value) {
 		headers.append("<p><b>");
 		headers.append(name);
@@ -173,10 +183,19 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker {
 
 	private String tryFormatting(String str) {
 		String ret = str;
-		try {
-			ret = JsonObject.parse(ret).toString(4);
-		} catch (JsonException je) {
-			ret = str;
+		if (str == null)
+			return null;
+
+		str = str.trim();
+		if (str.startsWith("{") || str.startsWith("[")) {
+			// try json parsing
+			try {
+				ret = JsonObject.parse(ret).toString(4);
+			} catch (JsonException je) {
+				ret = str;
+			}
+		} else if (str.startsWith("<")) {
+			// try xml parsing
 		}
 		return ret;
 	}
