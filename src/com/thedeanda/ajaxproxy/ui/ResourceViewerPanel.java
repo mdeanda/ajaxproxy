@@ -1,6 +1,5 @@
 package com.thedeanda.ajaxproxy.ui;
 
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Map;
@@ -57,7 +56,6 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker {
 	private JScrollPane inputFormattedScroll;
 	private JTextArea outputFormattedContent;
 	private JScrollPane outputFormattedScroll;
-	private Component inputFormattedTab;
 
 	public ResourceViewerPanel() {
 		this.setLayout(new MigLayout("fill", "", "[][fill]"));
@@ -119,7 +117,7 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker {
 		tabs = new JTabbedPane();
 		tabs.add("Headers", headersScroll);
 		tabs.add("Input", inputScroll);
-		inputFormattedTab = tabs.add("Input (formatted)", inputFormattedScroll);
+		tabs.add("Input (formatted)", inputFormattedScroll);
 		tabs.add("Output", outputScroll);
 		tabs.add("Output (formatted)", outputFormattedScroll);
 		tabs.setBorder(BorderFactory.createEmptyBorder());
@@ -202,7 +200,7 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker {
 					if (holder.input != null && holder.input.trim().equals(""))
 						holder.input = null;
 					holder.inputFormatted = tryFormatting(holder.input);
-					
+
 					holder.output = lr.getOutputAsText();
 					if (holder.output != null
 							&& holder.output.trim().equals(""))
