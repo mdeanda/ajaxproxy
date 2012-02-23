@@ -1,5 +1,6 @@
 package com.thedeanda.ajaxproxy.ui;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Map;
@@ -16,6 +17,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -36,6 +38,10 @@ import com.thedeanda.ajaxproxy.LoadedResource;
 /** tracks files that get loaded */
 public class ResourceViewerPanel extends JPanel implements AccessTracker {
 	private static final long serialVersionUID = 1L;
+	private static final int INPUT_TAB = 1;
+	private static final int INPUT_FORMATTED_TAB = 2;
+	private static final int OUTPUT_TAB = 3;
+	private static final int OUTPUT_FORMATTED_TAB = 4;
 	private JButton clearBtn;
 	private JCheckBox toggleBtn;
 	private DefaultListModel model;
@@ -47,6 +53,11 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker {
 	private JScrollPane inputScroll;
 	private JEditorPane headersContent;
 	private JScrollPane headersScroll;
+	private JTextArea inputFormattedContent;
+	private JScrollPane inputFormattedScroll;
+	private JTextArea outputFormattedContent;
+	private JScrollPane outputFormattedScroll;
+	private Component inputFormattedTab;
 
 	public ResourceViewerPanel() {
 		this.setLayout(new MigLayout("fill", "", "[][fill]"));
@@ -93,15 +104,24 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker {
 		inputContent = new JTextArea();
 		inputContent.setEditable(false);
 		inputScroll = new JScrollPane(inputContent);
+		inputFormattedContent = new JTextArea();
+		inputFormattedContent.setEditable(false);
+		inputFormattedScroll = new JScrollPane(inputFormattedContent);
 
 		outputContent = new JTextArea();
 		outputContent.setEditable(false);
 		outputScroll = new JScrollPane(outputContent);
 
+		outputFormattedContent = new JTextArea();
+		outputFormattedContent.setEditable(false);
+		outputFormattedScroll = new JScrollPane(outputFormattedContent);
+
 		tabs = new JTabbedPane();
 		tabs.add("Headers", headersScroll);
 		tabs.add("Input", inputScroll);
+		inputFormattedTab = tabs.add("Input (formatted)", inputFormattedScroll);
 		tabs.add("Output", outputScroll);
+		tabs.add("Output (formatted)", outputFormattedScroll);
 		tabs.setBorder(BorderFactory.createEmptyBorder());
 
 		JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
@@ -136,40 +156,87 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker {
 		}
 	}
 
-	private void showResource(LoadedResource lr) {
-		if (lr == null) {
-			outputContent.setText("");
-			inputContent.setText("");
-			headersContent.setText("");
-		} else {
-			outputContent.setText(tryFormatting(lr.getOutputAsText()));
-			inputContent.setText(tryFormatting(lr.getInputAsText()));
+	private void showResource(final LoadedResource lr) {
+		outputContent.setText("");
+		inputContent.setText("");
+		headersContent.setText("");
+		inputFormattedContent.setText("");
+		outputFormattedContent.setText("");
 
-			StringBuffer headers = new StringBuffer();
+		if (lr != null) {
+			final DataHolder holder = new DataHolder();
+			final Runnable uiupdate = new Runnable() {
+				@Override
+				public void run() {
+					headersContent.setText(holder.headers);
 
-			Map<String, String> map = lr.getHeaders();
-			headers.append("<html><body>");
-			headers.append("<p><b>URL:</b> ");
-			headers.append(lr.getUrl());
-			headers.append("</p>");
-			headers.append("<p><b>Method:</b> ");
-			headers.append(lr.getMethod());
-			headers.append("</p>");
-			headers.append("<p><b>Duration:</b> ");
-			headers.append(lr.getDuration());
-			headers.append("</p>");
-			writeField(headers, "Status", String.valueOf(lr.getStatusCode()));
-			headers.append("<h1>Headers</h1><div class=\"items\">");
-			for (String name : map.keySet()) {
-				headers.append("<p><b>");
-				headers.append(name);
-				headers.append(":</b> ");
-				headers.append(map.get(name));
-				headers.append("</p>");
-			}
-			headers.append("</div></body></html>");
+					inputContent.setText(holder.input);
+					if (holder.input == null)
+						tabs.setEnabledAt(INPUT_TAB, false);
+					else
+						tabs.setEnabledAt(INPUT_TAB, true);
+					if (holder.inputFormatted != null) {
+						inputFormattedContent.setText(holder.inputFormatted);
+						tabs.setEnabledAt(INPUT_FORMATTED_TAB, true);
+					} else {
+						tabs.setEnabledAt(INPUT_FORMATTED_TAB, false);
+					}
 
-			headersContent.setText(headers.toString());
+					outputContent.setText(holder.output);
+					if (holder.output == null)
+						tabs.setEnabledAt(OUTPUT_TAB, false);
+					else
+						tabs.setEnabledAt(OUTPUT_TAB, true);
+					if (holder.outputFormatted != null) {
+						outputFormattedContent.setText(holder.outputFormatted);
+						tabs.setEnabledAt(OUTPUT_FORMATTED_TAB, true);
+					} else {
+						tabs.setEnabledAt(OUTPUT_FORMATTED_TAB, false);
+					}
+				}
+			};
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					holder.input = lr.getInputAsText();
+					if (holder.input != null && holder.input.trim().equals(""))
+						holder.input = null;
+					holder.inputFormatted = tryFormatting(holder.input);
+					
+					holder.output = lr.getOutputAsText();
+					if (holder.output != null
+							&& holder.output.trim().equals(""))
+						holder.output = null;
+					holder.outputFormatted = tryFormatting(holder.output);
+
+					StringBuffer headers = new StringBuffer();
+					Map<String, String> map = lr.getHeaders();
+					headers.append("<html><body>");
+					headers.append("<p><b>URL:</b> ");
+					headers.append(lr.getUrl());
+					headers.append("</p>");
+					headers.append("<p><b>Method:</b> ");
+					headers.append(lr.getMethod());
+					headers.append("</p>");
+					headers.append("<p><b>Duration:</b> ");
+					headers.append(lr.getDuration());
+					headers.append("</p>");
+					writeField(headers, "Status",
+							String.valueOf(lr.getStatusCode()));
+					headers.append("<h1>Headers</h1><div class=\"items\">");
+					for (String name : map.keySet()) {
+						headers.append("<p><b>");
+						headers.append(name);
+						headers.append(":</b> ");
+						headers.append(map.get(name));
+						headers.append("</p>");
+					}
+					headers.append("</div></body></html>");
+
+					holder.headers = headers.toString();
+					SwingUtilities.invokeLater(uiupdate);
+				}
+			}).start();
 		}
 	}
 
@@ -182,7 +249,7 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker {
 	}
 
 	private String tryFormatting(String str) {
-		String ret = str;
+		String ret = null;
 		if (str == null)
 			return null;
 
@@ -190,12 +257,13 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker {
 		if (str.startsWith("{") || str.startsWith("[")) {
 			// try json parsing
 			try {
-				ret = JsonObject.parse(ret).toString(4);
+				ret = JsonObject.parse(str).toString(4);
 			} catch (JsonException je) {
-				ret = str;
+				ret = null;
 			}
 		} else if (str.startsWith("<")) {
 			// try xml parsing
+			ret = null;
 		}
 		return ret;
 	}
@@ -212,4 +280,11 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker {
 		}
 	}
 
+	class DataHolder {
+		public String input;
+		public String inputFormatted;
+		public String output;
+		public String outputFormatted;
+		public String headers;
+	}
 }
