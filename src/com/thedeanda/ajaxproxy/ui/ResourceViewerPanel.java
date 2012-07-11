@@ -1,8 +1,11 @@
 package com.thedeanda.ajaxproxy.ui;
 
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Map;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
@@ -15,9 +18,12 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
@@ -56,6 +62,10 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker {
 	private JScrollPane inputFormattedScroll;
 	private JTextArea outputFormattedContent;
 	private JScrollPane outputFormattedScroll;
+	private JTextField filter;
+	private Color okColor;
+	private Color badColor;
+	private Pattern filterRegEx;
 
 	public ResourceViewerPanel() {
 		this.setLayout(new MigLayout("fill", "", "[][fill]"));
@@ -74,6 +84,29 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker {
 		add(clearBtn);
 		add(toggleBtn, "align right, wrap");
 
+		JPanel leftPanel = new JPanel(new MigLayout("insets 0, fill", "[fill]",
+				""));
+		leftPanel.setBorder(BorderFactory.createEmptyBorder());
+
+		filter = new JTextField();
+		leftPanel.add(filter, "growx, wrap");
+		// Listen for changes in the text
+		okColor = filter.getBackground();
+		badColor = new Color(240, 220, 200);
+		filter.getDocument().addDocumentListener(new DocumentListener() {
+			public void changedUpdate(DocumentEvent e) {
+				resetFilter();
+			}
+
+			public void removeUpdate(DocumentEvent e) {
+				resetFilter();
+			}
+
+			public void insertUpdate(DocumentEvent e) {
+				resetFilter();
+			}
+		});
+
 		list = new JList(model);
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		list.addListSelectionListener(new ListSelectionListener() {
@@ -82,6 +115,8 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker {
 				listItemSelected(evt);
 			}
 		});
+		list.setBorder(BorderFactory.createEmptyBorder());
+		leftPanel.add(new JScrollPane(list), "grow");
 
 		HTMLEditorKit kit = new HTMLEditorKit();
 		StyleSheet styleSheet = kit.getStyleSheet();
@@ -123,7 +158,7 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker {
 		tabs.setBorder(BorderFactory.createEmptyBorder());
 
 		JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-		split.setLeftComponent(new JScrollPane(list));
+		split.setLeftComponent(leftPanel);
 		split.setRightComponent(tabs);
 		split.setDividerLocation(200);
 		split.setBorder(BorderFactory.createEmptyBorder());
@@ -275,6 +310,16 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker {
 	public void trackFile(LoadedResource res) {
 		if (toggleBtn.isSelected()) {
 			model.addElement(res);
+		}
+	}
+
+	private void resetFilter() {
+		try {
+			filterRegEx = Pattern.compile(filter.getText());
+			filter.setBackground(okColor);
+		} catch (PatternSyntaxException ex) {
+			filterRegEx = null;
+			filter.setBackground(badColor);
 		}
 	}
 
