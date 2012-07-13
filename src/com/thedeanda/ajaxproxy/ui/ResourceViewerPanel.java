@@ -3,6 +3,9 @@ package com.thedeanda.ajaxproxy.ui;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -13,7 +16,9 @@ import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JEditorPane;
+import javax.swing.JFileChooser;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -37,6 +42,8 @@ import net.miginfocom.swing.MigLayout;
 import net.sourceforge.javajson.JsonException;
 import net.sourceforge.javajson.JsonObject;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.thedeanda.ajaxproxy.AccessTracker;
 import com.thedeanda.ajaxproxy.AjaxProxy;
 import com.thedeanda.ajaxproxy.LoadedResource;
@@ -49,6 +56,7 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker {
 	private static final int OUTPUT_TAB = 3;
 	private static final int OUTPUT_FORMATTED_TAB = 4;
 	private JButton clearBtn;
+	private JButton exportBtn;
 	private JCheckBox toggleBtn;
 	private DefaultListModel model;
 	private JList list;
@@ -69,10 +77,11 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker {
 	private Pattern filterRegEx;
 
 	public ResourceViewerPanel() {
-		this.setLayout(new MigLayout("fill", "", "[][fill]"));
+		setLayout(new MigLayout("fill", "[][][grow]", "[][fill]"));
 		model = new DefaultListModel();
 
-		this.clearBtn = new JButton("Clear");
+		clearBtn = new JButton("Clear");
+		exportBtn = new JButton("Export");
 		toggleBtn = new JCheckBox("Monitor Resources");
 		clearBtn.addActionListener(new ActionListener() {
 			@Override
@@ -81,8 +90,15 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker {
 				showResource(null);
 			}
 		});
+		exportBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				export();
+			}
+		});
 
 		add(clearBtn);
+		add(exportBtn);
 		add(toggleBtn, "align right, wrap");
 
 		JPanel leftPanel = new JPanel(new MigLayout("insets 0, fill", "[fill]",
@@ -164,7 +180,7 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker {
 		split.setDividerLocation(200);
 		split.setBorder(BorderFactory.createEmptyBorder());
 		flattenSplitPane(split);
-		add(split, "span 2, growx, growy");
+		add(split, "span 3, growx, growy");
 	}
 
 	public static void flattenSplitPane(JSplitPane jSplitPane) {
@@ -330,6 +346,64 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker {
 		} catch (PatternSyntaxException ex) {
 			filterRegEx = null;
 			filter.setBackground(badColor);
+		}
+	}
+
+	private void export() {
+		String urlPrefix = JOptionPane.showInputDialog("URL Prefix",
+				"http://localhost");
+
+		final JFileChooser fc = new JFileChooser();
+		fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		int returnVal = fc.showSaveDialog(this);
+		if (returnVal == JFileChooser.APPROVE_OPTION) {
+			File folder = fc.getSelectedFile();
+			String path = folder.getAbsolutePath();
+			for (int i = 0; i < model.getSize(); i++) {
+				LoadedResource obj = (LoadedResource) model.get(i);
+				String fn = StringUtils.leftPad(String.valueOf(i), 8, "0");
+				JsonObject json = new JsonObject();
+				json.put("url", urlPrefix + obj.getUrl());
+				try {
+					json.put("input", JsonObject.parse(obj.getInputAsText()));
+				} catch (JsonException e1) {
+					json.put("input", obj.getInputAsText());
+					e1.printStackTrace();
+				}
+				try {
+					json.put("output", JsonObject.parse(obj.getOutputAsText()));
+				} catch (JsonException e1) {
+					json.put("output", obj.getOutputAsText());
+					e1.printStackTrace();
+				}
+				json.put("status", obj.getStatusCode());
+				json.put("duration", obj.getDuration());
+				json.put("method", obj.getMethod());
+				JsonObject headers = new JsonObject();
+				json.put("headers", headers);
+				Map<String, String> hdrs = obj.getHeaders();
+				for (String key : hdrs.keySet()) {
+					headers.put(key, hdrs.get(key));
+				}
+
+				FileWriter writer = null;
+				try {
+					writer = new FileWriter(new File(path + File.separator + fn
+							+ ".txt"));
+					writer.write(json.toString(4));
+				} catch (Exception e) {
+					e.printStackTrace();
+				} finally {
+					if (writer != null) {
+						try {
+							writer.close();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+
+			}
 		}
 	}
 
