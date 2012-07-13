@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -308,7 +309,16 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker {
 
 	@Override
 	public void trackFile(LoadedResource res) {
-		if (toggleBtn.isSelected()) {
+		boolean show = toggleBtn.isSelected();
+		if (show && filterRegEx != null) {
+			Matcher matcher = filterRegEx.matcher(res.getUrl());
+			if (matcher.matches())
+				show = true;
+			else
+				show = false;
+		}
+
+		if (show) {
 			model.addElement(res);
 		}
 	}
