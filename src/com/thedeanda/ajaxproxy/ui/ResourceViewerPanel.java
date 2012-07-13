@@ -3,6 +3,8 @@ package com.thedeanda.ajaxproxy.ui;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -18,8 +20,10 @@ import javax.swing.JCheckBox;
 import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JList;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
@@ -49,7 +53,8 @@ import com.thedeanda.ajaxproxy.AjaxProxy;
 import com.thedeanda.ajaxproxy.LoadedResource;
 
 /** tracks files that get loaded */
-public class ResourceViewerPanel extends JPanel implements AccessTracker {
+public class ResourceViewerPanel extends JPanel implements AccessTracker,
+		ActionListener {
 	private static final long serialVersionUID = 1L;
 	private static final int INPUT_TAB = 1;
 	private static final int INPUT_FORMATTED_TAB = 2;
@@ -75,6 +80,7 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker {
 	private Color okColor;
 	private Color badColor;
 	private Pattern filterRegEx;
+	private JMenuItem removeRequestMenuItem;
 
 	public ResourceViewerPanel() {
 		setLayout(new MigLayout("fill", "[][][grow]", "[][fill]"));
@@ -124,12 +130,36 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker {
 			}
 		});
 
+		final JPopupMenu popup = new JPopupMenu();
+		removeRequestMenuItem = new JMenuItem("Remove Request");
+		removeRequestMenuItem.addActionListener(this);
+		popup.add(removeRequestMenuItem);
+
 		list = new JList(model);
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		list.addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent evt) {
 				listItemSelected(evt);
+			}
+		});
+		list.addMouseListener(new MouseAdapter() {
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+				maybeShowPopup(e);
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				maybeShowPopup(e);
+			}
+
+			private void maybeShowPopup(MouseEvent e) {
+				list.setSelectedIndex(list.locationToIndex(e.getPoint()));
+				if (e.isPopupTrigger() && list.getSelectedIndex() >= 0) {
+					popup.show(e.getComponent(), e.getX(), e.getY());
+				}
 			}
 		});
 		list.setBorder(BorderFactory.createEmptyBorder());
@@ -219,26 +249,31 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker {
 				@Override
 				public void run() {
 					headersContent.setText(holder.headers);
+					headersContent.setCaretPosition(0);
 
 					inputContent.setText(holder.input);
+					inputContent.setCaretPosition(0);
 					if (holder.input == null)
 						tabs.setEnabledAt(INPUT_TAB, false);
 					else
 						tabs.setEnabledAt(INPUT_TAB, true);
 					if (holder.inputFormatted != null) {
 						inputFormattedContent.setText(holder.inputFormatted);
+						inputFormattedContent.setCaretPosition(0);
 						tabs.setEnabledAt(INPUT_FORMATTED_TAB, true);
 					} else {
 						tabs.setEnabledAt(INPUT_FORMATTED_TAB, false);
 					}
 
 					outputContent.setText(holder.output);
+					outputContent.setCaretPosition(0);
 					if (holder.output == null)
 						tabs.setEnabledAt(OUTPUT_TAB, false);
 					else
 						tabs.setEnabledAt(OUTPUT_TAB, true);
 					if (holder.outputFormatted != null) {
 						outputFormattedContent.setText(holder.outputFormatted);
+						outputFormattedContent.setCaretPosition(0);
 						tabs.setEnabledAt(OUTPUT_FORMATTED_TAB, true);
 					} else {
 						tabs.setEnabledAt(OUTPUT_FORMATTED_TAB, false);
@@ -413,5 +448,20 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker {
 		public String output;
 		public String outputFormatted;
 		public String headers;
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent evt) {
+		if (evt.getSource() == removeRequestMenuItem) {
+			int index = list.getSelectedIndex();
+			if (index >= 0) {
+				model.remove(index);
+				if (model.getSize() > index)
+					list.setSelectedIndex(index);
+				else if (!model.isEmpty()) {
+					list.setSelectedIndex(index - 1);
+				}
+			}
+		}
 	}
 }
