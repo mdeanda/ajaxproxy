@@ -6,8 +6,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -421,10 +424,11 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 					headers.put(key, hdrs.get(key));
 				}
 
-				FileWriter writer = null;
+				Writer writer = null;
 				try {
-					writer = new FileWriter(new File(path + File.separator + fn
-							+ ".txt"));
+					writer = new OutputStreamWriter(new FileOutputStream(
+							new File(path + File.separator + fn + ".txt")),
+							"UTF-8");
 					writer.write(json.toString(4));
 				} catch (Exception e) {
 					e.printStackTrace();
