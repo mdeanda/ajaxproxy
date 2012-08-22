@@ -7,7 +7,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
@@ -32,6 +31,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JTree;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
@@ -44,10 +44,14 @@ import javax.swing.plaf.basic.BasicSplitPaneUI;
 import javax.swing.text.Document;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 
 import net.miginfocom.swing.MigLayout;
+import net.sourceforge.javajson.JsonArray;
 import net.sourceforge.javajson.JsonException;
 import net.sourceforge.javajson.JsonObject;
+import net.sourceforge.javajson.JsonValue;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -84,6 +88,10 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 	private Color badColor;
 	private Pattern filterRegEx;
 	private JMenuItem removeRequestMenuItem;
+	private JTree outputInteractive;
+	private JScrollPane outputInteractiveScroll;
+	private DefaultTreeModel outputTreeModel;
+	private DefaultMutableTreeNode rootOutputNode;
 
 	public ResourceViewerPanel() {
 		setLayout(new MigLayout("fill", "[][][grow]", "[][fill]"));
@@ -191,6 +199,13 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 		inputFormattedContent.setEditable(false);
 		inputFormattedScroll = new JScrollPane(inputFormattedContent);
 
+		rootOutputNode = new DefaultMutableTreeNode("");
+		outputTreeModel = new DefaultTreeModel(rootOutputNode);
+		initTree(rootOutputNode, new JsonObject());
+		outputInteractive = new JTree(outputTreeModel);
+		outputInteractiveScroll = new JScrollPane(outputInteractive);
+		outputInteractive.setShowsRootHandles(true);
+
 		outputContent = new JTextArea();
 		outputContent.setEditable(false);
 		outputScroll = new JScrollPane(outputContent);
@@ -205,6 +220,7 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 		tabs.add("Input (formatted)", inputFormattedScroll);
 		tabs.add("Output", outputScroll);
 		tabs.add("Output (formatted)", outputFormattedScroll);
+		tabs.add("Output (interactive)", outputInteractiveScroll);
 		tabs.setBorder(BorderFactory.createEmptyBorder());
 
 		JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
@@ -214,6 +230,47 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 		split.setBorder(BorderFactory.createEmptyBorder());
 		flattenSplitPane(split);
 		add(split, "span 3, growx, growy");
+	}
+
+	private void initTree(DefaultMutableTreeNode top, JsonObject obj) {
+		for (String key : obj) {
+			JsonValue val = obj.get(key);
+			if (val.isJsonObject()) {
+				DefaultMutableTreeNode node = new DefaultMutableTreeNode(key);
+				top.add(node);
+				initTree(node, val.getJsonObject());
+			} else if (val.isJsonArray()) {
+				DefaultMutableTreeNode node = new DefaultMutableTreeNode(key);
+				top.add(node);
+				initTree(node, val.getJsonArray());
+			} else {
+				DefaultMutableTreeNode node = new DefaultMutableTreeNode(key
+						+ "=" + val.toString());
+				top.add(node);
+			}
+		}
+	}
+
+	private void initTree(DefaultMutableTreeNode top, JsonArray arr) {
+		int i = 0;
+		for (JsonValue val : arr) {
+			if (val.isJsonObject()) {
+				DefaultMutableTreeNode node = new DefaultMutableTreeNode("["
+						+ i + "]");
+				top.add(node);
+				initTree(node, val.getJsonObject());
+			} else if (val.isJsonArray()) {
+				DefaultMutableTreeNode node = new DefaultMutableTreeNode("["
+						+ i + "]");
+				top.add(node);
+				initTree(node, val.getJsonArray());
+			} else {
+				DefaultMutableTreeNode node = new DefaultMutableTreeNode(
+						val.toString());
+				top.add(node);
+			}
+			i++;
+		}
 	}
 
 	public static void flattenSplitPane(JSplitPane jSplitPane) {
@@ -245,6 +302,9 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 		headersContent.setText("");
 		inputFormattedContent.setText("");
 		outputFormattedContent.setText("");
+		
+		rootOutputNode.removeAllChildren();
+		outputTreeModel.reload();
 
 		if (lr != null) {
 			final DataHolder holder = new DataHolder();
@@ -266,6 +326,14 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 						tabs.setEnabledAt(INPUT_FORMATTED_TAB, true);
 					} else {
 						tabs.setEnabledAt(INPUT_FORMATTED_TAB, false);
+					}
+
+					try {
+						JsonObject obj = JsonObject.parse(holder.output);
+						initTree(rootOutputNode, obj);
+						outputTreeModel.reload();
+					} catch (JsonException e) {
+
 					}
 
 					outputContent.setText(holder.output);

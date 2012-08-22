@@ -1,6 +1,7 @@
 package com.thedeanda.ajaxproxy.ui;
 
 import java.awt.AWTException;
+import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
@@ -118,6 +119,7 @@ public class MainFrame extends JFrame implements ProxyListener {
 		URL imgUrl = ClassLoader.getSystemClassLoader().getResource("icon.png");
 		this.image = Toolkit.getDefaultToolkit().getImage(imgUrl);
 		this.setIconImage(image);
+		setPreferredSize(new Dimension(980, 700));
 	}
 
 	private void initTray() {
