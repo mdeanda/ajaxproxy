@@ -65,8 +65,10 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 	private static final long serialVersionUID = 1L;
 	private static final int INPUT_TAB = 1;
 	private static final int INPUT_FORMATTED_TAB = 2;
-	private static final int OUTPUT_TAB = 3;
-	private static final int OUTPUT_FORMATTED_TAB = 4;
+	private static final int INPUT_TREE_TAB = 3;
+	private static final int OUTPUT_TAB = 4;
+	private static final int OUTPUT_FORMATTED_TAB = 5;
+	private static final int OUTPUT_TREE_TAB = 6;
 	private JButton clearBtn;
 	private JButton exportBtn;
 	private JCheckBox toggleBtn;
@@ -92,6 +94,10 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 	private JScrollPane outputInteractiveScroll;
 	private DefaultTreeModel outputTreeModel;
 	private DefaultMutableTreeNode rootOutputNode;
+	private DefaultMutableTreeNode rootInputNode;
+	private DefaultTreeModel inputTreeModel;
+	private JTree inputInteractive;
+	private JScrollPane inputInteractiveScroll;
 
 	public ResourceViewerPanel() {
 		setLayout(new MigLayout("fill", "[][][grow]", "[][fill]"));
@@ -199,12 +205,12 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 		inputFormattedContent.setEditable(false);
 		inputFormattedScroll = new JScrollPane(inputFormattedContent);
 
-		rootOutputNode = new DefaultMutableTreeNode("");
-		outputTreeModel = new DefaultTreeModel(rootOutputNode);
-		initTree(rootOutputNode, new JsonObject());
-		outputInteractive = new JTree(outputTreeModel);
-		outputInteractiveScroll = new JScrollPane(outputInteractive);
-		outputInteractive.setShowsRootHandles(true);
+		rootInputNode = new DefaultMutableTreeNode("");
+		inputTreeModel = new DefaultTreeModel(rootInputNode);
+		initTree(rootInputNode, new JsonObject());
+		inputInteractive = new JTree(inputTreeModel);
+		inputInteractiveScroll = new JScrollPane(inputInteractive);
+		inputInteractive.setShowsRootHandles(true);
 
 		outputContent = new JTextArea();
 		outputContent.setEditable(false);
@@ -214,13 +220,21 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 		outputFormattedContent.setEditable(false);
 		outputFormattedScroll = new JScrollPane(outputFormattedContent);
 
+		rootOutputNode = new DefaultMutableTreeNode("");
+		outputTreeModel = new DefaultTreeModel(rootOutputNode);
+		initTree(rootOutputNode, new JsonObject());
+		outputInteractive = new JTree(outputTreeModel);
+		outputInteractiveScroll = new JScrollPane(outputInteractive);
+		outputInteractive.setShowsRootHandles(true);
+
 		tabs = new JTabbedPane();
 		tabs.add("Headers", headersScroll);
 		tabs.add("Input", inputScroll);
-		tabs.add("Input (formatted)", inputFormattedScroll);
+		tabs.add("Input (tabbed)", inputFormattedScroll);
+		tabs.add("Input (tree)", inputInteractiveScroll);
 		tabs.add("Output", outputScroll);
-		tabs.add("Output (formatted)", outputFormattedScroll);
-		tabs.add("Output (interactive)", outputInteractiveScroll);
+		tabs.add("Output (tabbed)", outputFormattedScroll);
+		tabs.add("Output (tree)", outputInteractiveScroll);
 		tabs.setBorder(BorderFactory.createEmptyBorder());
 
 		JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
@@ -306,6 +320,9 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 		rootOutputNode.removeAllChildren();
 		outputTreeModel.reload();
 
+		rootInputNode.removeAllChildren();
+		inputTreeModel.reload();
+
 		if (lr != null) {
 			final DataHolder holder = new DataHolder();
 			final Runnable uiupdate = new Runnable() {
@@ -329,11 +346,21 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 					}
 
 					try {
+						JsonObject obj = JsonObject.parse(holder.input);
+						initTree(rootInputNode, obj);
+						inputTreeModel.reload();
+						tabs.setEnabledAt(INPUT_TREE_TAB, true);
+					} catch (Exception e) {
+						tabs.setEnabledAt(INPUT_TREE_TAB, false);
+					}
+
+					try {
 						JsonObject obj = JsonObject.parse(holder.output);
 						initTree(rootOutputNode, obj);
 						outputTreeModel.reload();
-					} catch (JsonException e) {
-
+						tabs.setEnabledAt(OUTPUT_TREE_TAB, true);
+					} catch (Exception e) {
+						tabs.setEnabledAt(OUTPUT_TREE_TAB, false);
 					}
 
 					outputContent.setText(holder.output);
