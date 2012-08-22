@@ -41,7 +41,7 @@
 
 		<mkdir dir="${lib.dir}"/>
 		<easyget dest="${lib.dir}">
-			<mirror url="http://mini.mymetropolist.com/javalibs"/>
+			<mirror url="http://jars.thedeanda.com"/>
 
 			<get path="net/sf/javajson" file="javajson-20120103.jar"/>
 			<get path="org/apache/commons-cli" file="commons-cli-1.1.jar"/>

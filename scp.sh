@@ -1,1 +1,1 @@
-scp dist/* www@mymetropolist.com:websites/ajaxproxy.thedeanda.com/downloads/
+scp dist/* www@ajaxproxy.thedeanda.com:websites/ajaxproxy.thedeanda.com/downloads/
