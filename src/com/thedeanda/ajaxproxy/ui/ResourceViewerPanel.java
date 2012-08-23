@@ -63,41 +63,21 @@ import com.thedeanda.ajaxproxy.LoadedResource;
 public class ResourceViewerPanel extends JPanel implements AccessTracker,
 		ActionListener {
 	private static final long serialVersionUID = 1L;
-	private static final int INPUT_TAB = 1;
-	private static final int INPUT_FORMATTED_TAB = 2;
-	private static final int INPUT_TREE_TAB = 3;
-	private static final int OUTPUT_TAB = 4;
-	private static final int OUTPUT_FORMATTED_TAB = 5;
-	private static final int OUTPUT_TREE_TAB = 6;
 	private JButton clearBtn;
 	private JButton exportBtn;
 	private JCheckBox toggleBtn;
 	private DefaultListModel model;
 	private JList list;
 	private JTabbedPane tabs;
-	private JTextArea outputContent;
-	private JScrollPane outputScroll;
-	private JTextArea inputContent;
-	private JScrollPane inputScroll;
 	private JEditorPane headersContent;
 	private JScrollPane headersScroll;
-	private JTextArea inputFormattedContent;
-	private JScrollPane inputFormattedScroll;
-	private JTextArea outputFormattedContent;
-	private JScrollPane outputFormattedScroll;
 	private JTextField filter;
 	private Color okColor;
 	private Color badColor;
 	private Pattern filterRegEx;
 	private JMenuItem removeRequestMenuItem;
-	private JTree outputInteractive;
-	private JScrollPane outputInteractiveScroll;
-	private DefaultTreeModel outputTreeModel;
-	private DefaultMutableTreeNode rootOutputNode;
-	private DefaultMutableTreeNode rootInputNode;
-	private DefaultTreeModel inputTreeModel;
-	private JTree inputInteractive;
-	private JScrollPane inputInteractiveScroll;
+	private ContentViewer inputCv;
+	private ContentViewer outputCv;
 
 	public ResourceViewerPanel() {
 		setLayout(new MigLayout("fill", "[][][grow]", "[][fill]"));
@@ -198,43 +178,13 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 		Document doc = kit.createDefaultDocument();
 		headersContent.setDocument(doc);
 
-		inputContent = new JTextArea();
-		inputContent.setEditable(false);
-		inputScroll = new JScrollPane(inputContent);
-		inputFormattedContent = new JTextArea();
-		inputFormattedContent.setEditable(false);
-		inputFormattedScroll = new JScrollPane(inputFormattedContent);
-
-		rootInputNode = new DefaultMutableTreeNode("");
-		inputTreeModel = new DefaultTreeModel(rootInputNode);
-		initTree(rootInputNode, new JsonObject());
-		inputInteractive = new JTree(inputTreeModel);
-		inputInteractiveScroll = new JScrollPane(inputInteractive);
-		inputInteractive.setShowsRootHandles(true);
-
-		outputContent = new JTextArea();
-		outputContent.setEditable(false);
-		outputScroll = new JScrollPane(outputContent);
-
-		outputFormattedContent = new JTextArea();
-		outputFormattedContent.setEditable(false);
-		outputFormattedScroll = new JScrollPane(outputFormattedContent);
-
-		rootOutputNode = new DefaultMutableTreeNode("");
-		outputTreeModel = new DefaultTreeModel(rootOutputNode);
-		initTree(rootOutputNode, new JsonObject());
-		outputInteractive = new JTree(outputTreeModel);
-		outputInteractiveScroll = new JScrollPane(outputInteractive);
-		outputInteractive.setShowsRootHandles(true);
+		inputCv = new ContentViewer();
+		outputCv = new ContentViewer();
 
 		tabs = new JTabbedPane();
 		tabs.add("Headers", headersScroll);
-		tabs.add("Input", inputScroll);
-		tabs.add("Input (tabbed)", inputFormattedScroll);
-		tabs.add("Input (tree)", inputInteractiveScroll);
-		tabs.add("Output", outputScroll);
-		tabs.add("Output (tabbed)", outputFormattedScroll);
-		tabs.add("Output (tree)", outputInteractiveScroll);
+		tabs.add("Intput CV", inputCv);
+		tabs.add("Output CV", outputCv);
 		tabs.setBorder(BorderFactory.createEmptyBorder());
 
 		JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
@@ -311,88 +261,26 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 	}
 
 	private void showResource(final LoadedResource lr) {
-		outputContent.setText("");
-		inputContent.setText("");
 		headersContent.setText("");
-		inputFormattedContent.setText("");
-		outputFormattedContent.setText("");
-		
-		rootOutputNode.removeAllChildren();
-		outputTreeModel.reload();
 
-		rootInputNode.removeAllChildren();
-		inputTreeModel.reload();
+		inputCv.setContent(null);
+		outputCv.setContent(null);
 
 		if (lr != null) {
-			final DataHolder holder = new DataHolder();
+			final StringBuilder headers = new StringBuilder();
 			final Runnable uiupdate = new Runnable() {
 				@Override
 				public void run() {
-					headersContent.setText(holder.headers);
+					headersContent.setText(headers.toString());
 					headersContent.setCaretPosition(0);
-
-					inputContent.setText(holder.input);
-					inputContent.setCaretPosition(0);
-					if (holder.input == null)
-						tabs.setEnabledAt(INPUT_TAB, false);
-					else
-						tabs.setEnabledAt(INPUT_TAB, true);
-					if (holder.inputFormatted != null) {
-						inputFormattedContent.setText(holder.inputFormatted);
-						inputFormattedContent.setCaretPosition(0);
-						tabs.setEnabledAt(INPUT_FORMATTED_TAB, true);
-					} else {
-						tabs.setEnabledAt(INPUT_FORMATTED_TAB, false);
-					}
-
-					try {
-						JsonObject obj = JsonObject.parse(holder.input);
-						initTree(rootInputNode, obj);
-						inputTreeModel.reload();
-						tabs.setEnabledAt(INPUT_TREE_TAB, true);
-					} catch (Exception e) {
-						tabs.setEnabledAt(INPUT_TREE_TAB, false);
-					}
-
-					try {
-						JsonObject obj = JsonObject.parse(holder.output);
-						initTree(rootOutputNode, obj);
-						outputTreeModel.reload();
-						tabs.setEnabledAt(OUTPUT_TREE_TAB, true);
-					} catch (Exception e) {
-						tabs.setEnabledAt(OUTPUT_TREE_TAB, false);
-					}
-
-					outputContent.setText(holder.output);
-					outputContent.setCaretPosition(0);
-					if (holder.output == null)
-						tabs.setEnabledAt(OUTPUT_TAB, false);
-					else
-						tabs.setEnabledAt(OUTPUT_TAB, true);
-					if (holder.outputFormatted != null) {
-						outputFormattedContent.setText(holder.outputFormatted);
-						outputFormattedContent.setCaretPosition(0);
-						tabs.setEnabledAt(OUTPUT_FORMATTED_TAB, true);
-					} else {
-						tabs.setEnabledAt(OUTPUT_FORMATTED_TAB, false);
-					}
 				}
 			};
 			new Thread(new Runnable() {
 				@Override
 				public void run() {
-					holder.input = lr.getInputAsText();
-					if (holder.input != null && holder.input.trim().equals(""))
-						holder.input = null;
-					holder.inputFormatted = tryFormatting(holder.input);
+					inputCv.setContent(lr.getInputAsText());
+					outputCv.setContent(lr.getOutputAsText());
 
-					holder.output = lr.getOutputAsText();
-					if (holder.output != null
-							&& holder.output.trim().equals(""))
-						holder.output = null;
-					holder.outputFormatted = tryFormatting(holder.output);
-
-					StringBuffer headers = new StringBuffer();
 					Map<String, String> map = lr.getHeaders();
 					headers.append("<html><body>");
 					headers.append("<p><b>URL:</b> ");
@@ -416,39 +304,18 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 					}
 					headers.append("</div></body></html>");
 
-					holder.headers = headers.toString();
 					SwingUtilities.invokeLater(uiupdate);
 				}
 			}).start();
 		}
 	}
 
-	private void writeField(StringBuffer headers, String name, String value) {
+	private void writeField(StringBuilder headers, String name, String value) {
 		headers.append("<p><b>");
 		headers.append(name);
 		headers.append(":</b> ");
 		headers.append(value);
 		headers.append("</p>");
-	}
-
-	private String tryFormatting(String str) {
-		String ret = null;
-		if (str == null)
-			return null;
-
-		str = str.trim();
-		if (str.startsWith("{") || str.startsWith("[")) {
-			// try json parsing
-			try {
-				ret = JsonObject.parse(str).toString(4);
-			} catch (JsonException je) {
-				ret = null;
-			}
-		} else if (str.startsWith("<")) {
-			// try xml parsing
-			ret = null;
-		}
-		return ret;
 	}
 
 	public void setProxy(AjaxProxy proxy) {
@@ -542,10 +409,6 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 	}
 
 	class DataHolder {
-		public String input;
-		public String inputFormatted;
-		public String output;
-		public String outputFormatted;
 		public String headers;
 	}
 
