@@ -57,7 +57,8 @@
 			<get path="org/mortbay/servlet-api" file="servlet-api-2.5-20081211.jar"/>
 			<get path="com/yahoo" file="yuicompressor-2.4.2.jar"/>
 
-			<get path="com/miglayout" file="swingmiglayout-3.0.3.jar"/>
+			<get path="com/miglayout" file="swingmiglayout-3.0.3.jar"/>	
+			<get path="org/dom4j" file="dom4j-1.6.1.jar" />
 		</easyget>
 	</target>
 
