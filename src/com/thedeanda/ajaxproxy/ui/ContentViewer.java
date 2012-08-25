@@ -1,5 +1,6 @@
 package com.thedeanda.ajaxproxy.ui;
 
+import java.io.StringWriter;
 import java.util.Iterator;
 
 import javax.swing.BorderFactory;
@@ -26,7 +27,8 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
-import org.dom4j.swing.DocumentTreeModel;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.XMLWriter;
 
 /**
  * this is a content viewer used to show input/ouput content of http requests.
@@ -80,6 +82,7 @@ public class ContentViewer extends JPanel {
 							try {
 								doc = DocumentHelper.parseText(output);
 								node = initTree(doc);
+								formattedText = formatXml(doc);
 							} catch (DocumentException e) {
 							}
 						}
@@ -216,5 +219,18 @@ public class ContentViewer extends JPanel {
 			ret = null;
 		}
 		return ret;
+	}
+
+	private String formatXml(Document doc) {
+		StringWriter out = new StringWriter();
+		try {
+			OutputFormat outformat = OutputFormat.createPrettyPrint();
+			outformat.setEncoding("UTF-8");
+			XMLWriter writer = new XMLWriter(out, outformat);
+			writer.write(doc);
+			writer.flush();
+		} catch (Exception e) {
+		}
+		return out.toString();
 	}
 }
