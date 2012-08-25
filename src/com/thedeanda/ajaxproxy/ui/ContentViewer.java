@@ -1,5 +1,7 @@
 package com.thedeanda.ajaxproxy.ui;
 
+import java.util.Iterator;
+
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -19,6 +21,12 @@ import net.sourceforge.javajson.JsonObject;
 import net.sourceforge.javajson.JsonValue;
 
 import org.apache.log4j.Logger;
+import org.dom4j.Attribute;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
+import org.dom4j.swing.DocumentTreeModel;
 
 /**
  * this is a content viewer used to show input/ouput content of http requests.
@@ -51,17 +59,31 @@ public class ContentViewer extends JPanel {
 			public void run() {
 				TreeNode node = null;
 				String formattedText = null;
+				Document doc = null;
 				if (output != null) {
-					try {
-						JsonObject json = JsonObject.parse(output);
-						DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(
-								"");
-						initTree(rootNode, json);
-						node = rootNode;
-					} catch (Exception e) {
+					if (output.trim().startsWith("{")) {
+						try {
+							JsonObject json = JsonObject.parse(output);
+							DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(
+									"");
+							initTree(rootNode, json);
+							node = rootNode;
+						} catch (Exception e) {
+						}
 					}
 
-					formattedText = tryFormatting(output);
+					formattedText = formatJson(output);
+
+					if (formattedText == null && !"".equals(formattedText)) {
+						if (output.trim().startsWith("<")) {
+							// try xml formatting
+							try {
+								doc = DocumentHelper.parseText(output);
+								node = initTree(doc);
+							} catch (DocumentException e) {
+							}
+						}
+					}
 				}
 
 				final TreeNode rootNode = node;
@@ -93,6 +115,46 @@ public class ContentViewer extends JPanel {
 				});
 			}
 		}).start();
+	}
+
+	private DefaultMutableTreeNode initTree(Document doc) {
+		Element rootEl = doc.getRootElement();
+		DefaultMutableTreeNode rootNode = createElementNodes(rootEl);
+		initTree(rootNode, rootEl);
+		return rootNode;
+	}
+
+	private void initTree(DefaultMutableTreeNode root, Element element) {
+		for (Iterator i = element.elementIterator(); i.hasNext();) {
+			Element el = (Element) i.next();
+			DefaultMutableTreeNode tmp = createElementNodes(el);
+			if (tmp == null)
+				continue;
+			root.add(tmp);
+			initTree(tmp, el);
+
+			String txt = el.getTextTrim();
+			if (txt != null && !"".equals(txt)) {
+				DefaultMutableTreeNode txtNode = new DefaultMutableTreeNode(txt);
+				tmp.add(txtNode);
+			}
+		}
+	}
+
+	private DefaultMutableTreeNode createElementNodes(Element element) {
+		String name = element.getName();
+		if (name == null || "".equals(name))
+			return null;
+		DefaultMutableTreeNode ret = new DefaultMutableTreeNode(name);
+
+		for (Iterator i = element.attributeIterator(); i.hasNext();) {
+			Attribute attr = (Attribute) i.next();
+
+			DefaultMutableTreeNode tmp = new DefaultMutableTreeNode(
+					attr.getName() + " = " + attr.getText());
+			ret.add(tmp);
+		}
+		return ret;
 	}
 
 	private void initTree(DefaultMutableTreeNode top, JsonObject obj) {
@@ -136,7 +198,7 @@ public class ContentViewer extends JPanel {
 		}
 	}
 
-	private String tryFormatting(String str) {
+	private String formatJson(String str) {
 		String ret = null;
 		if (str == null)
 			return null;
