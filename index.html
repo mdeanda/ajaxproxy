@@ -1,0 +1,142 @@
+<!DOCTYPE HTML>
+
+<html>
+<head>
+	<title>Ajax Proxy</title>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+	<script>
+	$(document).ready(function() { return;
+		var toc = [];
+		toc.push('<ul>');
+		$('h2').each(function() {
+			var index = toc.length;
+			toc.push('<li><a href="#toc_' + index + '">' + $(this).html() + '</a></li>');
+// 			toc.push(index);
+			var bm = '<a name="toc_' + index + '></a>';
+			$(this).html(bm + $(this).html());
+		});
+		toc.push('</ul>');
+
+		$('#toc_container').html(toc.join(''));
+	});
+	</script>
+	<style>
+		body { max-width: 60em; margin: 1em auto 5em auto; }
+		h1 { border-bottom: 4px double black ; text-align: center; }
+		h2 { border-bottom: 1px solid black; }
+		code {
+			white-space: pre;
+			font-color: #444;
+			font-size: small;
+			display: block;
+			border: 1px solid #ddd;
+			padding: 1em;
+			background: #f0f0f0;
+		}
+		a {
+			color: #444;
+			font-weight: bold;
+		}
+	</style>
+</head>
+<body>
+
+<h1>Ajax Proxy</h1>
+<div id="toc_container"></div>
+
+<h2>Summary</h2>
+<p>Ajax Proxy was created to help simplify the development of ajax-based web applications. It provides a simple webserver that can be used by web and flash developers to allow them work without the burden of configuring and maintaining the real webserver that feeds them data.</p>
+
+<h2>Features</h2>
+<ul>
+	<li>Proxy requests from a given path to a different host at the same path</li>
+	<li>Proxy multiple paths to multiple different hosts</li>
+	<li>Use variable substitution for paths and host names</li>
+	<li>Merge javascript/css files to a single url</li>
+	<li>Compress merged javascript/css files</li>
+	<li>UI can add fake latency and simulate a bitrate</li>
+	<li>UI can log requests and filter by regular expression</li>
+</ul>
+
+<h2>Running</h2>
+<p>Ajax Proxy can be run as a swing application by running the following command:</p>
+<code>java -jar ajaxproxy-1234.jar</code>
+
+<p>To run as a build tool to merge files and exit, then use the following:</p>
+<code>java -jar ajaxproxy-1234.jar --c myconfigfile.json --m outputfolder</code>
+
+<p>To see a full list of command line options try the following:</p>
+<code>java -jar ajaxproxy-1234.jar --help</code>
+
+<h2>Configuration</h2>
+<p>The configuration file is a simple json file and it uses config.js in the working path as the default.</p>
+<code>{
+	port: 8080,
+	resourceBase: "/home/mdeanda/workspace/ajaxproxy/web",
+	variables: {
+		host: "ajaxproxy.thedeanda.com"
+	},
+	proxy: [
+		{
+			port: 80,
+			path: "/images/*",
+			domain: "${host}"
+		}
+	],
+	merge: [
+		{
+			path: "/js/library.js",
+			filePath: "path/to/list.file",
+			contentType: "text/plain",
+			minify: false
+		}
+	]
+}
+</code>
+<p>The full set of supported settings are described below</p>
+<ul>
+	<li>port - the port that the proxy runs on</li>
+	<li>resourceBase - the root directory that the web server uses for files not proxied or merged</li>
+	<li>variables - an array of the following structure; used to do variable substitution
+		<ul>
+			<li>variable_name - any variable can be used as a key, the value gets used to replace other portions of config</li>
+		</ul>
+	</li>
+	<li>proxy - an array of the following structure; used to proxy to a remote server
+		<ul>
+			<li>port - port number on remote server</li>
+			<li>path - the browser path to trigger the proxy</li>
+			<li>domain - the host server</li>
+			<li>prefix - a portion of the url that gets removed when requesting from remote server</li>
+		</ul>
+	</li>
+	<li>merge - an array of the following structure
+		<ul>
+			<li>path - the browser path to trigger/get merge</li>
+			<li>filePath - the path to the file that contains a list of files to merge</li>
+			<li>contentType - one of text/plain, text/javascript, text/css. this affects the minify command only</li>
+			<li>minify - a boolean to trigger minify mode. does not apply to text/plain</li>
+		</ul>
+	</li>
+</ul>
+
+<h2>Limitations / Known Issues</h2>
+<ul>
+	<li>Proxying to a remote server under a different path may lead to issues with absolute paths since the proxy does not re-write the paths</li>
+	<li>A remote server running on an https connection is not supported.</li>
+	<li>UI does not save yet</li>
+	<li>UI can't set contentType on merge items</li>
+	<li>UI doesn't apply log regexp's until you toggle any checkbox in options panel</li>
+	<li>Append to Path field is not functional yet</li>
+</ul>
+
+<h2>Source</h2>
+<p>The <a href="https://github.com/mdeanda/ajaxproxy" title="ajaxproxy source code">source code</a> to ajaxproxy is available at <a href="http://github.com/" title="github, social coding">github</a>.</p>
+
+<h2>Download</h2>
+<ul>
+	<li><a href="downloads" title="downloads area">downloads</a> - Run by double clicking or `java -jar ajaxproxy-${version}.jar`</li>
+</ul>
+
+</body>
+</html>
