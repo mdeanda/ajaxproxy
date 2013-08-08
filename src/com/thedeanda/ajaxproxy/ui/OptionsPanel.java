@@ -30,7 +30,7 @@ public class OptionsPanel extends JPanel implements ActionListener,
 				"[]15[]15[]10[]0[][]");
 		setLayout(layout);
 
-		maxBitrate = createSlider(50, 10, 1);
+		maxBitrate = createSlider(100, 10, 5);
 		appendToPath = new JTextField();
 		forcedLatency = createSlider(500, 100, 10);
 
