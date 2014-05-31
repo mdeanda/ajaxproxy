@@ -180,7 +180,7 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 
 		tabs = new JTabbedPane();
 		tabs.add("Headers", headersScroll);
-		tabs.add("Intput CV", inputCv);
+		tabs.add("Input CV", inputCv);
 		tabs.add("Output CV", outputCv);
 		tabs.setBorder(BorderFactory.createEmptyBorder());
 
