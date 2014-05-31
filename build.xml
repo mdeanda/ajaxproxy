@@ -50,15 +50,33 @@
 			<get path="org/apache/commons-lang" file="commons-lang-2.1.jar"/>
 			<get path="org/apache/commons-logging" file="commons-logging-1.0.4.jar"/>
 			<get path="org/apache/log4j" file="log4j-1.2.14.jar"/>
-			<get path="org/mortbay/jetty" file="jetty-6.1.26.jar"/>
-			<get path="org/mortbay/jetty-client" file="jetty-client-6.1.15.jar"/>
-			<get path="org/mortbay/jetty-sslengine" file="jetty-sslengine-6.1.15.jar"/>
-			<get path="org/mortbay/jetty-util" file="jetty-util-6.1.26.jar"/>
-			<get path="org/mortbay/servlet-api" file="servlet-api-2.5-20081211.jar"/>
 			<get path="com/yahoo" file="yuicompressor-2.4.2.jar"/>
 
 			<get path="com/miglayout" file="swingmiglayout-3.0.3.jar"/>	
 			<get path="org/dom4j" file="dom4j-1.6.1.jar" />
+
+			
+			<get path="org/eclipse/jetty/9.0.3.v20130506" file="jetty-annotations-9.0.3.v20130506.jar"/>
+			<get path="org/eclipse/jetty/9.0.3.v20130506" file="jetty-client-9.0.3.v20130506.jar"/>
+			<get path="org/eclipse/jetty/9.0.3.v20130506" file="jetty-continuation-9.0.3.v20130506.jar"/>
+			<get path="org/eclipse/jetty/9.0.3.v20130506" file="jetty-deploy-9.0.3.v20130506.jar"/>
+			<get path="org/eclipse/jetty/9.0.3.v20130506" file="jetty-http-9.0.3.v20130506.jar"/>
+			<get path="org/eclipse/jetty/9.0.3.v20130506" file="jetty-io-9.0.3.v20130506.jar"/>
+			<get path="org/eclipse/jetty/9.0.3.v20130506" file="jetty-jaas-9.0.3.v20130506.jar"/>
+			<get path="org/eclipse/jetty/9.0.3.v20130506" file="jetty-jmx-9.0.3.v20130506.jar"/>
+			<get path="org/eclipse/jetty/9.0.3.v20130506" file="jetty-jndi-9.0.3.v20130506.jar"/>
+			<get path="org/eclipse/jetty/9.0.3.v20130506" file="jetty-plus-9.0.3.v20130506.jar"/>
+			<get path="org/eclipse/jetty/9.0.3.v20130506" file="jetty-proxy-9.0.3.v20130506.jar"/>
+			<get path="org/eclipse/jetty/9.0.3.v20130506" file="jetty-rewrite-9.0.3.v20130506.jar"/>
+			<get path="org/eclipse/jetty/9.0.3.v20130506" file="jetty-security-9.0.3.v20130506.jar"/>
+			<get path="org/eclipse/jetty/9.0.3.v20130506" file="jetty-server-9.0.3.v20130506.jar"/>
+			<get path="org/eclipse/jetty/9.0.3.v20130506" file="jetty-servlet-9.0.3.v20130506.jar"/>
+			<get path="org/eclipse/jetty/9.0.3.v20130506" file="jetty-servlets-9.0.3.v20130506.jar"/>
+			<get path="org/eclipse/jetty/9.0.3.v20130506" file="jetty-util-9.0.3.v20130506.jar"/>
+			<get path="org/eclipse/jetty/9.0.3.v20130506" file="jetty-webapp-9.0.3.v20130506.jar"/>
+			<get path="org/eclipse/jetty/9.0.3.v20130506" file="jetty-xml-9.0.3.v20130506.jar"/>
+			<get path="org/eclipse/jetty/9.0.3.v20130506" file="servlet-api-3.0.jar"/>
+
 		</easyget>
 	</target>
 

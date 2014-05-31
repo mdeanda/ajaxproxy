@@ -18,11 +18,13 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.mortbay.log.Log;
+import org.apache.log4j.Logger;
 
 import com.thedeanda.ajaxproxy.ui.MainFrame;
 
 public class Main {
+	private static final Logger log = Logger.getLogger(Main.class);
+
 	public static void main(String[] args) throws Exception {
 		// create the parser
 		CommandLineParser parser = new GnuParser();
@@ -71,7 +73,8 @@ public class Main {
 
 	private static void showUi() {
 		System.setProperty("apple.laf.useScreenMenuBar", "true");
-        System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Ajaxproxy");
+		System.setProperty("com.apple.mrj.application.apple.menu.about.name",
+				"Ajaxproxy");
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -124,7 +127,7 @@ public class Main {
 
 	private static void writeFile(String base, String file, String contents)
 			throws IOException {
-		Log.info("Writing merged file: " + file);
+		log.info("Writing merged file: " + file);
 		File f = new File(base + File.separator + file);
 		f.getParentFile().mkdirs();
 		OutputStream os = null;

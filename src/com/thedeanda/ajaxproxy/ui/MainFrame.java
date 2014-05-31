@@ -96,6 +96,7 @@ public class MainFrame extends JFrame implements ProxyListener {
 			}
 		});
 		panel.addProxyListener(this);
+		updateSaveButtons();
 	}
 
 	private void updateTitle() {
@@ -528,6 +529,6 @@ public class MainFrame extends JFrame implements ProxyListener {
 	private void updateSaveButtons() {
 		boolean enable = file != null;
 		saveMenuItem.setEnabled(enable);
-		saveAsMenuItem.setEnabled(enable);
+		saveAsMenuItem.setEnabled(true);
 	}
 }

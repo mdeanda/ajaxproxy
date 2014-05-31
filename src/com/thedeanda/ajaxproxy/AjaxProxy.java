@@ -4,21 +4,25 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.regex.Pattern;
+
+import javax.servlet.DispatcherType;
 
 import net.sourceforge.javajson.JsonArray;
 import net.sourceforge.javajson.JsonObject;
 import net.sourceforge.javajson.JsonValue;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.handler.ContextHandlerCollection;
-import org.mortbay.jetty.servlet.Context;
-import org.mortbay.jetty.servlet.DefaultServlet;
-import org.mortbay.jetty.servlet.FilterHolder;
-import org.mortbay.jetty.servlet.ServletHolder;
-import org.mortbay.proxy.AsyncProxyServlet;
+import org.eclipse.jetty.proxy.ProxyServlet;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.ContextHandlerCollection;
+import org.eclipse.jetty.servlet.DefaultServlet;
+import org.eclipse.jetty.servlet.FilterHolder;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 
 public class AjaxProxy implements Runnable {
 	private static final Logger log = Logger.getLogger(AjaxProxy.class);
@@ -182,9 +186,11 @@ public class AjaxProxy implements Runnable {
 			ContextHandlerCollection contexts = new ContextHandlerCollection();
 			jettyServer.setHandler(contexts);
 
-			Context root = new Context(contexts, "/", Context.SESSIONS);
+			ServletContextHandler root = new ServletContextHandler(contexts,
+					"/", true, false);
 			FilterHolder filterHolder = new FilterHolder(apfilter);
-			root.addFilter(filterHolder, "/*", 1);
+			root.addFilter(filterHolder, "/*",
+					EnumSet.of(DispatcherType.REQUEST));
 
 			ServletHolder servlet;
 			DefaultServlet defaultServlet = new DefaultServlet();
@@ -195,6 +201,17 @@ public class AjaxProxy implements Runnable {
 			servlet.setName("default servlet");
 			servlet.setForcedPath("/");
 			root.addServlet(servlet, "/");
+
+			boolean test = true;
+			if (test) {
+				String proxyTo = "http://cssbox.thedeanda.com/";
+				String prefix = "/";
+				String path = "/";
+
+				ProxyServlet proxy = new ProxyServlet.Transparent(proxyTo,
+						prefix);
+				root.addServlet(new ServletHolder(proxy), path);
+			}
 
 			if (!mergeMode && config.isJsonArray(PROXY_ARRAY)) {
 				JsonArray pa = config.getJsonArray(PROXY_ARRAY);
@@ -216,11 +233,16 @@ public class AjaxProxy implements Runnable {
 						prefix = obj.getString("prefix");
 
 					if (domain != null && path != null && port > 0) {
-						log.debug("adding proxy servlet: " + domain + ":"
-								+ port + " " + path);
-						root.addServlet(new ServletHolder(
-								new AsyncProxyServlet.Transparent(prefix,
-										domain, port)), path);
+						if (StringUtils.isBlank(prefix))
+							prefix = "/";
+						String proxyTo = String.format("http://%s:%s%s",
+								domain, port, path);
+
+						log.debug("adding proxy servlet: " + proxyTo + " "
+								+ path);
+						ProxyServlet proxy = new ProxyServlet.Transparent(
+								proxyTo, prefix);
+						root.addServlet(new ServletHolder(proxy), path);
 					}
 				}
 			}
