@@ -127,6 +127,7 @@ public class ContentViewer extends JPanel {
 		return rootNode;
 	}
 
+	@SuppressWarnings("rawtypes")
 	private void initTree(DefaultMutableTreeNode root, Element element) {
 		for (Iterator i = element.elementIterator(); i.hasNext();) {
 			Element el = (Element) i.next();
@@ -144,6 +145,7 @@ public class ContentViewer extends JPanel {
 		}
 	}
 
+	@SuppressWarnings("rawtypes")
 	private DefaultMutableTreeNode createElementNodes(Element element) {
 		String name = element.getName();
 		if (name == null || "".equals(name))
