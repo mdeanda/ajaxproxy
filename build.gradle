@@ -1,0 +1,38 @@
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'eclipse'
+
+group = 'com.thedeanda'
+version = '1.0-SNAPSHOT'
+
+repositories {
+	mavenCentral()
+	mavenLocal()
+}
+
+dependencies {
+	compile 'org.mortbay.jetty:jetty-sslengine:6.1.26'
+	compile 'org.mortbay.jetty:jetty-client:6.1.26'
+	compile 'org.mortbay.jetty:jetty-util:6.1.26'
+
+	compile 'log4j:log4j:1.2.+'
+	compile 'com.yahoo.platform.yui:yuicompressor:2.4.+'
+	compile 'com.miglayout:miglayout:3.7.4'
+	compile 'commons-cli:commons-cli:1.2'
+	compile 'commons-io:commons-io:2.4'
+	compile 'org.apache.commons:commons-lang3:3.3.2'
+	compile 'dom4j:dom4j:1.6.1'
+
+	compile files('javajson-20120103.jar')
+
+}
+sourceSets {
+    main {
+        java {
+            srcDir 'src'
+        }
+        resources {
+            srcDir 'src'
+        }
+    }
+}
