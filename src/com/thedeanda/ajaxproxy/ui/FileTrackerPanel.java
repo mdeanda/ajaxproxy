@@ -53,7 +53,7 @@ public class FileTrackerPanel extends JPanel implements AccessTracker {
 
 		layout.putConstraint(SpringLayout.NORTH, scroll, 30,
 				SpringLayout.SOUTH, clearBtn);
-		layout.putConstraint(SpringLayout.SOUTH, scroll, 10,
+		layout.putConstraint(SpringLayout.SOUTH, scroll, 0,
 				SpringLayout.SOUTH, this);
 		layout.putConstraint(SpringLayout.WEST, scroll, 0, SpringLayout.WEST,
 				this);

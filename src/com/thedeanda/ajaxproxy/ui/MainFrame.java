@@ -177,10 +177,6 @@ public class MainFrame extends JFrame implements ProxyListener {
 					if (self.isVisible()) {
 						self.requestFocus();
 					}
-
-					// trayIcon.displayMessage("Action Event",
-					// "An Action Event Has Been Performed!",
-					// TrayIcon.MessageType.INFO);
 				}
 			};
 
