@@ -14,11 +14,11 @@ import com.thedeanda.ajaxproxy.MergeMode;
 public class MergeModeCellEditor extends AbstractCellEditor implements
 		TableCellEditor, TableCellRenderer {
 	private static final long serialVersionUID = 1L;
-	private JComboBox comp;
-	private DefaultComboBoxModel model;
+	private JComboBox<Object> comp;
+	private DefaultComboBoxModel<Object> model;
 
 	public MergeModeCellEditor() {
-		model = new DefaultComboBoxModel();
+		model = new DefaultComboBoxModel<Object>();
 		model.addElement("");
 		for (MergeMode mm : MergeMode.values()) {
 			model.addElement(mm);
