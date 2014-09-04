@@ -71,13 +71,16 @@ public class Main {
 
 	private static void showUi() {
 		System.setProperty("apple.laf.useScreenMenuBar", "true");
-        System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Ajaxproxy");
+		System.setProperty("com.apple.mrj.application.apple.menu.about.name",
+				"Ajaxproxy");
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				try {
 					// Set System L&F
+
 					UIManager.setLookAndFeel(UIManager
 							.getSystemLookAndFeelClassName());
+
 				} catch (Exception ex) {
 
 				}
