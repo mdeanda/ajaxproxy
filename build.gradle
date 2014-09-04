@@ -1,6 +1,7 @@
 apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'eclipse'
+apply plugin: "com.github.johnrengelman.shadow"
 
 group = 'com.thedeanda'
 version = '1.0-SNAPSHOT'
@@ -35,4 +36,18 @@ sourceSets {
             srcDir 'src'
         }
     }
+}
+jar {
+    manifest {
+        attributes 'Main-Class': 'com.thedeanda.ajaxproxy.Main'
+    }
+}
+
+buildscript {
+  repositories {
+    jcenter()
+  }
+  dependencies {
+    classpath "com.github.jengelman.gradle.plugins:shadow:1.1.1"
+  }
 }
