@@ -31,7 +31,7 @@ public class OptionsPanel extends JPanel implements ActionListener,
 		setLayout(layout);
 
 		maxBitrate = createSlider(100, 10, 5);
-		appendToPath = new JTextField();
+		appendToPath = SwingUtils.newJTextField();
 		forcedLatency = createSlider(500, 100, 10);
 
 		appendToPath.addPropertyChangeListener(this);

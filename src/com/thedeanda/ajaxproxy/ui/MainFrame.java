@@ -112,7 +112,6 @@ public class MainFrame extends JFrame implements ProxyListener {
 		updateTitle();
 		panel.setConfigFile(file);
 		saveRecent();
-		updateSaveButtons();
 	}
 
 	private void initWindow() {
@@ -253,7 +252,6 @@ public class MainFrame extends JFrame implements ProxyListener {
 				handleSave();
 			}
 		});
-		mi.setEnabled(false);
 		menu.add(mi);
 
 		mi = new JMenuItem("Save As");
@@ -264,7 +262,6 @@ public class MainFrame extends JFrame implements ProxyListener {
 				handleSaveAs();
 			}
 		});
-		mi.setEnabled(false);
 		menu.add(mi);
 
 		menu.addSeparator();
@@ -521,9 +518,4 @@ public class MainFrame extends JFrame implements ProxyListener {
 		stopped();
 	}
 
-	private void updateSaveButtons() {
-		boolean enable = file != null;
-		saveMenuItem.setEnabled(enable);
-		saveAsMenuItem.setEnabled(enable);
-	}
 }
