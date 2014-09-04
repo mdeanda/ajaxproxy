@@ -1,0 +1,53 @@
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'eclipse'
+apply plugin: "com.github.johnrengelman.shadow"
+
+group = 'com.thedeanda'
+version = '1.0-SNAPSHOT'
+
+repositories {
+	mavenCentral()
+	mavenLocal()
+}
+
+dependencies {
+	compile 'org.mortbay.jetty:jetty-sslengine:6.1.+'
+	compile 'org.mortbay.jetty:jetty-client:6.1.+'
+	compile 'org.mortbay.jetty:jetty-util:6.1.+'
+
+	compile 'log4j:log4j:1.2.+'
+	compile 'com.yahoo.platform.yui:yuicompressor:2.4.+'
+	compile 'com.miglayout:miglayout:3.+'
+	compile 'commons-cli:commons-cli:1.+'
+	compile 'commons-io:commons-io:2.+'
+	compile 'org.apache.commons:commons-lang3:3.+'
+	compile 'dom4j:dom4j:1.+'
+
+	compile files('javajson-20120103.jar')
+
+}
+sourceSets {
+    main {
+        java {
+            srcDir 'src'
+        }
+        resources {
+            srcDir 'src'
+        }
+    }
+}
+jar {
+    manifest {
+        attributes 'Main-Class': 'com.thedeanda.ajaxproxy.Main'
+    }
+}
+
+buildscript {
+  repositories {
+    jcenter()
+  }
+  dependencies {
+    classpath "com.github.jengelman.gradle.plugins:shadow:1.1.1"
+  }
+}

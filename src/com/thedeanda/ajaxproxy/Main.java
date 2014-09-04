@@ -79,8 +79,10 @@ public class Main {
 			public void run() {
 				try {
 					// Set System L&F
+
 					UIManager.setLookAndFeel(UIManager
 							.getSystemLookAndFeelClassName());
+
 				} catch (Exception ex) {
 
 				}
