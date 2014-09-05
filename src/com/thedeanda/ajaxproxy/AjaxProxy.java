@@ -189,6 +189,7 @@ public class AjaxProxy implements Runnable {
 			ServletHolder servlet;
 			DefaultServlet defaultServlet = new DefaultServlet();
 			servlet = new ServletHolder(defaultServlet);
+			//TODO: set dirAllowed as a param for "security"
 			servlet.setInitParameter("dirAllowed", "true");
 			servlet.setInitParameter("resourceBase", resourceBase);
 			servlet.setInitParameter("maxCacheSize", "0");
@@ -236,6 +237,7 @@ public class AjaxProxy implements Runnable {
 						if (!fPath.exists()) {
 							log.warn("file not found: "
 									+ fPath.getCanonicalPath());
+							//TODO: this throws exception if filePath is null and its hard to identify
 							fPath = new File(filePath);
 						}
 						if (!fPath.exists()) {

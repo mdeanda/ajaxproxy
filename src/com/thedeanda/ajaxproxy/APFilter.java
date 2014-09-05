@@ -99,6 +99,7 @@ public class APFilter implements Filter {
 				return;
 			}
 		}
+		// TODO: catch errors into loaded resource
 		chain.doFilter(reqWrapper, wrapper);
 		throttledCopy(wrapper.getNewInputStream(), response.getOutputStream());
 
@@ -270,6 +271,8 @@ public class APFilter implements Filter {
 			baos = new ByteArrayOutputStream();
 			writer = new PrintWriter(baos);
 			os = new MyServletOutputStream(baos);
+			
+			
 		}
 
 		@Override
@@ -283,12 +286,20 @@ public class APFilter implements Filter {
 		}
 
 		@Override
+		public ServletResponse getResponse() {
+			log.warn("get response!!!");
+			return null;
+		}
+
+		@Override
 		public PrintWriter getWriter() {
 			return writer;
 		}
 
 		public ByteArrayInputStream getNewInputStream() {
-			return new ByteArrayInputStream(baos.toByteArray());
+			ByteArrayInputStream ret = new ByteArrayInputStream(
+					baos.toByteArray());
+			return ret;
 		}
 
 		@Override
