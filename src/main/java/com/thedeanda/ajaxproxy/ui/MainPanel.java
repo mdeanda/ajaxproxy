@@ -17,22 +17,22 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
+import javax.swing.SpringLayout;
 
-import net.miginfocom.swing.MigLayout;
 import net.sourceforge.javajson.JsonException;
 import net.sourceforge.javajson.JsonObject;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
-import org.apache.log4j.WriterAppender;
-import org.apache.log4j.lf5.viewer.LF5SwingUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.impl.ListenerSupportedSimpleLoggerFactory;
+import org.slf4j.impl.LogListener;
 
 import com.thedeanda.ajaxproxy.AjaxProxy;
 import com.thedeanda.ajaxproxy.ProxyListener;
 
-public class MainPanel extends JPanel implements ProxyListener {
+public class MainPanel extends JPanel implements ProxyListener, LogListener {
 	private static final long serialVersionUID = 1L;
-	private static final Logger log = Logger.getLogger(MainPanel.class);
+	private static final Logger log = LoggerFactory.getLogger(MainPanel.class);
 	private JButton btn;
 	private boolean started = false;
 	private AjaxProxy proxy = null;
@@ -56,15 +56,13 @@ public class MainPanel extends JPanel implements ProxyListener {
 
 	private List<ProxyListener> listeners = new ArrayList<ProxyListener>();
 	private ResourceViewerPanel resourceViewerPanel;
+	private JTextArea logTextArea;
 
 	public MainPanel() {
-		MigLayout layout = new MigLayout("insets 10", "[right,100][600, grow]",
-				"[grow, 300]10[]");
+		SpringLayout layout = new SpringLayout();
 		setLayout(layout);
-		TextAreaWriter taw = new TextAreaWriter();
-		WriterAppender wa = new WriterAppender(new PatternLayout(
-				"%5.5r %5p %m%n"), taw);
-		Logger.getRootLogger().addAppender(wa);
+
+		ListenerSupportedSimpleLoggerFactory.addListener(this);
 
 		btn = new JButton(START);
 		btn.addActionListener(new ActionListener() {
@@ -78,24 +76,24 @@ public class MainPanel extends JPanel implements ProxyListener {
 		});
 
 		this.tabs = new JTabbedPane();
-		add(tabs, "grow, span 2, wrap");
+		add(tabs);
 
 		generalPanel = new GeneralPanel();
 		tabs.add("General", generalPanel);
 
-		//TODO: move proxy to its own panel so code is easier to maintain
+		// TODO: move proxy to its own panel so code is easier to maintain
 		proxyModel = new ProxyTableModel();
 		proxyTable = new JTable(proxyModel);
 		proxyTable.setColumnModel(new ProxyColumnModel());
 		tabs.add("Proxy", new JScrollPane(proxyTable));
 
-		//TODO: move merge table to its own panel so code is easier to maintain
+		// TODO: move merge table to its own panel so code is easier to maintain
 		mergeModel = new MergeTableModel();
 		mergeTable = new JTable(mergeModel);
 		mergeTable.setColumnModel(new MergeColumnModel());
 		tabs.add("Merge", new JScrollPane(mergeTable));
 
-		//TODO: move proxy to its own panel so code is easier to maintain
+		// TODO: move proxy to its own panel so code is easier to maintain
 		variableModel = new VariableTableModel();
 		variableTable = new JTable(variableModel);
 		variableTable.setColumnModel(new VariableColumnModel());
@@ -110,21 +108,35 @@ public class MainPanel extends JPanel implements ProxyListener {
 		resourceViewerPanel = new ResourceViewerPanel();
 		tabs.add("Resource Viewer", resourceViewerPanel);
 
-		JTextArea ta = new JTextArea();
-		ta.setWrapStyleWord(true);
-		ta.setLineWrap(true);
-		this.logBox = ta;
-		Font font = ta.getFont();
-		ta.setFont(new Font(Font.MONOSPACED, Font.PLAIN, font.getSize()));
+		logTextArea = new JTextArea();
+		logTextArea.setWrapStyleWord(true);
+		logTextArea.setLineWrap(true);
+		this.logBox = logTextArea;
+		Font font = logTextArea.getFont();
+		logTextArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, font
+				.getSize()));
 		// ta.setEditable(false);
-		taw.setTextArea(ta);
-		this.logBoxScrollPane = new JScrollPane(ta);
+		this.logBoxScrollPane = new JScrollPane(logTextArea);
 		tabs.add("Log", logBoxScrollPane);
-		LF5SwingUtils.makeVerticalScrollBarTrack(logBoxScrollPane);
+		// LF5SwingUtils.makeVerticalScrollBarTrack(logBoxScrollPane);
 
-		add(btn, "right,span 2");
+		add(btn);
 
 		clearAll();
+
+		layout.putConstraint(SpringLayout.SOUTH, btn, -10, SpringLayout.SOUTH,
+				this);
+		layout.putConstraint(SpringLayout.EAST, btn, -10, SpringLayout.EAST,
+				this);
+		layout.putConstraint(SpringLayout.NORTH, tabs, 15, SpringLayout.NORTH,
+				this);
+		layout.putConstraint(SpringLayout.WEST, tabs, 10, SpringLayout.WEST,
+				this);
+		layout.putConstraint(SpringLayout.EAST, tabs, -10, SpringLayout.EAST,
+				this);
+		layout.putConstraint(SpringLayout.SOUTH, tabs, -10, SpringLayout.NORTH,
+				btn);
+
 	}
 
 	public void addProxyListener(ProxyListener listener) {
@@ -282,5 +294,10 @@ public class MainPanel extends JPanel implements ProxyListener {
 	public void failed() {
 		log.error("failed, so calling stop");
 		this.stop();
+	}
+
+	@Override
+	public void write(String msg) {
+		logTextArea.append(msg);
 	}
 }

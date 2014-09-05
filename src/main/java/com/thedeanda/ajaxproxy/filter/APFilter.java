@@ -1,11 +1,9 @@
-package com.thedeanda.ajaxproxy;
+package com.thedeanda.ajaxproxy.filter;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.LinkedList;
@@ -16,21 +14,21 @@ import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
-import javax.servlet.ServletInputStream;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletResponseWrapper;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.thedeanda.ajaxproxy.AccessTracker;
+import com.thedeanda.ajaxproxy.LoadedResource;
 
 public class APFilter implements Filter {
-	private static final Logger log = Logger.getLogger(APFilter.class);
+	private static final Logger log = LoggerFactory.getLogger(APFilter.class);
 	private int maxBitrate = 0; // in KBps
 	private int forcedLatency = 50;
 	private boolean logRequests = false;
@@ -99,6 +97,7 @@ public class APFilter implements Filter {
 				return;
 			}
 		}
+		// TODO: catch errors into loaded resource
 		chain.doFilter(reqWrapper, wrapper);
 		throttledCopy(wrapper.getNewInputStream(), response.getOutputStream());
 
@@ -211,131 +210,6 @@ public class APFilter implements Filter {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		}
-	}
-
-	private class MyServletRequestWrapper extends HttpServletRequestWrapper {
-
-		private byte[] data;
-
-		public MyServletRequestWrapper(HttpServletRequest request) {
-			super(request);
-
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			try {
-				IOUtils.copy(request.getInputStream(), baos);
-			} catch (IOException e) {
-			} finally {
-				try {
-					baos.close();
-				} catch (IOException e) {
-				}
-			}
-
-			this.data = baos.toByteArray();
-		}
-
-		@Override
-		public ServletInputStream getInputStream() {
-			return new MyServletInputStream(getClonedInputStream());
-		}
-
-		public ByteArrayInputStream getClonedInputStream() {
-			return new ByteArrayInputStream(data);
-		}
-	}
-
-	private class MyServletInputStream extends ServletInputStream {
-		private InputStream is;
-
-		public MyServletInputStream(InputStream is) {
-			this.is = is;
-		}
-
-		@Override
-		public int read() throws IOException {
-			return is.read();
-		}
-	}
-
-	private class MyServletResponseWrapper extends HttpServletResponseWrapper {
-		private ByteArrayOutputStream baos;
-		private PrintWriter writer;
-		private MyServletOutputStream os;
-		private int httpStatus = 200;
-
-		public MyServletResponseWrapper(HttpServletResponse response) {
-			super(response);
-
-			baos = new ByteArrayOutputStream();
-			writer = new PrintWriter(baos);
-			os = new MyServletOutputStream(baos);
-		}
-
-		@Override
-		public void flushBuffer() {
-
-		}
-
-		@Override
-		public ServletOutputStream getOutputStream() {
-			return os;
-		}
-
-		@Override
-		public PrintWriter getWriter() {
-			return writer;
-		}
-
-		public ByteArrayInputStream getNewInputStream() {
-			return new ByteArrayInputStream(baos.toByteArray());
-		}
-
-		@Override
-		public void reset() {
-			super.reset();
-			this.httpStatus = SC_OK;
-		}
-
-		@Override
-		public void sendError(int sc) throws IOException {
-			httpStatus = sc;
-			super.sendError(sc);
-		}
-
-		@Override
-		public void sendRedirect(String location) throws IOException {
-			httpStatus = 302;
-			super.sendRedirect(location);
-		}
-
-		@Override
-		public void sendError(int sc, String msg) throws IOException {
-			httpStatus = sc;
-			super.sendError(sc, msg);
-		}
-
-		@Override
-		public void setStatus(int sc) {
-			httpStatus = sc;
-			super.setStatus(sc);
-		}
-
-		public int getStatus() {
-			return httpStatus;
-		}
-	}
-
-	private class MyServletOutputStream extends ServletOutputStream {
-		private OutputStream os;
-
-		public MyServletOutputStream(OutputStream os) {
-			this.os = os;
-		}
-
-		@Override
-		public void write(int bite) throws IOException {
-			os.write(bite);
 		}
 	}
 

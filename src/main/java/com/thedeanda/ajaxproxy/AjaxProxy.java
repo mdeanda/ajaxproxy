@@ -11,7 +11,6 @@ import net.sourceforge.javajson.JsonArray;
 import net.sourceforge.javajson.JsonObject;
 import net.sourceforge.javajson.JsonValue;
 
-import org.apache.log4j.Logger;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.ContextHandlerCollection;
 import org.mortbay.jetty.servlet.Context;
@@ -19,9 +18,13 @@ import org.mortbay.jetty.servlet.DefaultServlet;
 import org.mortbay.jetty.servlet.FilterHolder;
 import org.mortbay.jetty.servlet.ServletHolder;
 import org.mortbay.proxy.AsyncProxyServlet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.thedeanda.ajaxproxy.filter.APFilter;
 
 public class AjaxProxy implements Runnable {
-	private static final Logger log = Logger.getLogger(AjaxProxy.class);
+	private static final Logger log = LoggerFactory.getLogger(AjaxProxy.class);
 	private int port = 8080;
 	private String resourceBase = "";
 	private JsonObject config;
@@ -189,6 +192,7 @@ public class AjaxProxy implements Runnable {
 			ServletHolder servlet;
 			DefaultServlet defaultServlet = new DefaultServlet();
 			servlet = new ServletHolder(defaultServlet);
+			// TODO: set dirAllowed as a param for "security"
 			servlet.setInitParameter("dirAllowed", "true");
 			servlet.setInitParameter("resourceBase", resourceBase);
 			servlet.setInitParameter("maxCacheSize", "0");
@@ -236,6 +240,8 @@ public class AjaxProxy implements Runnable {
 						if (!fPath.exists()) {
 							log.warn("file not found: "
 									+ fPath.getCanonicalPath());
+							// TODO: this throws exception if filePath is null
+							// and its hard to identify
 							fPath = new File(filePath);
 						}
 						if (!fPath.exists()) {
@@ -243,7 +249,7 @@ public class AjaxProxy implements Runnable {
 									fPath.getAbsolutePath());
 						}
 						filePath = fPath.getCanonicalPath();
-						log.debug(obj);
+						log.debug("{}", obj);
 						boolean minify = obj.getBoolean(MINIFY);
 						MergeMode mode = obj.hasKey(MODE) ? MergeMode
 								.valueOf(obj.getString(MODE)) : MergeMode.PLAIN;

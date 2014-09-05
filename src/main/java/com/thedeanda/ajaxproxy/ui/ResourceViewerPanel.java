@@ -291,7 +291,7 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 
 	private void showResource(final LoadedResource lr) {
 		headersContent.setText("");
-
+		
 		inputCv.setContent(null);
 		outputCv.setContent(null);
 

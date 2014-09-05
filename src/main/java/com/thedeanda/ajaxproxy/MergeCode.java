@@ -13,15 +13,16 @@ import java.util.List;
 import net.sourceforge.javajson.JsonObject;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
 import org.mozilla.javascript.ErrorReporter;
 import org.mozilla.javascript.EvaluatorException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.yahoo.platform.yui.compressor.CssCompressor;
 import com.yahoo.platform.yui.compressor.JavaScriptCompressor;
 
 public class MergeCode {
-	private static final Logger log = Logger.getLogger(MergeCode.class);
+	private static final Logger log = LoggerFactory.getLogger(MergeCode.class);
 	private File filePath;
 	private boolean minify;
 	private MergeMode mode;

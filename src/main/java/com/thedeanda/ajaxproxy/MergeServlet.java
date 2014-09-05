@@ -9,10 +9,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MergeServlet extends HttpServlet {
-	private static final Logger log = Logger.getLogger(MergeServlet.class);
+	private static final Logger log = LoggerFactory
+			.getLogger(MergeServlet.class);
 
 	private static final long serialVersionUID = -1234617738529639393L;
 	private File filePath;

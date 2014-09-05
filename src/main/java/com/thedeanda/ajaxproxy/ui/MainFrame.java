@@ -42,13 +42,14 @@ import net.sourceforge.javajson.JsonException;
 import net.sourceforge.javajson.JsonObject;
 import net.sourceforge.javajson.JsonValue;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.thedeanda.ajaxproxy.ProxyListener;
 
 public class MainFrame extends JFrame implements ProxyListener {
 	private static final long serialVersionUID = 1L;
-	private static final Logger log = Logger.getLogger(MainFrame.class);
+	private static final Logger log = LoggerFactory.getLogger(MainFrame.class);
 	private MainPanel panel;
 	final JFileChooser fc = new JFileChooser();
 	private TrayIcon trayIcon;
