@@ -17,8 +17,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
+import javax.swing.SpringLayout;
 
-import net.miginfocom.swing.MigLayout;
 import net.sourceforge.javajson.JsonException;
 import net.sourceforge.javajson.JsonObject;
 
@@ -59,8 +59,7 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener {
 	private JTextArea logTextArea;
 
 	public MainPanel() {
-		MigLayout layout = new MigLayout("insets 10", "[right,100][600, grow]",
-				"[grow, 300]10[]");
+		SpringLayout layout = new SpringLayout();
 		setLayout(layout);
 
 		ListenerSupportedSimpleLoggerFactory.addListener(this);
@@ -77,7 +76,7 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener {
 		});
 
 		this.tabs = new JTabbedPane();
-		add(tabs, "grow, span 2, wrap");
+		add(tabs);
 
 		generalPanel = new GeneralPanel();
 		tabs.add("General", generalPanel);
@@ -121,9 +120,23 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener {
 		tabs.add("Log", logBoxScrollPane);
 		// LF5SwingUtils.makeVerticalScrollBarTrack(logBoxScrollPane);
 
-		add(btn, "right,span 2");
+		add(btn);
 
 		clearAll();
+
+		layout.putConstraint(SpringLayout.SOUTH, btn, -10, SpringLayout.SOUTH,
+				this);
+		layout.putConstraint(SpringLayout.EAST, btn, -10, SpringLayout.EAST,
+				this);
+		layout.putConstraint(SpringLayout.NORTH, tabs, 15, SpringLayout.NORTH,
+				this);
+		layout.putConstraint(SpringLayout.WEST, tabs, 10, SpringLayout.WEST,
+				this);
+		layout.putConstraint(SpringLayout.EAST, tabs, -10, SpringLayout.EAST,
+				this);
+		layout.putConstraint(SpringLayout.SOUTH, tabs, -10, SpringLayout.NORTH,
+				btn);
+
 	}
 
 	public void addProxyListener(ProxyListener listener) {

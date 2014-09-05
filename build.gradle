@@ -17,7 +17,6 @@ dependencies {
 	compile 'org.mortbay.jetty:jetty-util:6.1.+'
 
 	compile 'com.yahoo.platform.yui:yuicompressor:2.4.+'
-	compile 'com.miglayout:miglayout:3.+'
 	compile 'commons-cli:commons-cli:1.+'
 	compile 'commons-io:commons-io:2.+'
 	compile 'org.apache.commons:commons-lang3:3.+'

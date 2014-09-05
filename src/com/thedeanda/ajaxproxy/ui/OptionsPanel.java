@@ -9,10 +9,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
+import javax.swing.SpringLayout;
+import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-
-import net.miginfocom.swing.MigLayout;
 
 import com.thedeanda.ajaxproxy.AjaxProxy;
 import com.thedeanda.ajaxproxy.filter.APFilter;
@@ -25,9 +25,10 @@ public class OptionsPanel extends JPanel implements ActionListener,
 	private AjaxProxy proxy;
 	private JSlider forcedLatency;
 
+	private static final int COL_WIDTH = 200;
+
 	public OptionsPanel() {
-		MigLayout layout = new MigLayout("", "[right,150][300, grow]20",
-				"[]15[]15[]10[]0[][]");
+		SpringLayout layout = new SpringLayout();
 		setLayout(layout);
 
 		maxBitrate = createSlider(100, 10, 5);
@@ -36,14 +37,65 @@ public class OptionsPanel extends JPanel implements ActionListener,
 
 		appendToPath.addPropertyChangeListener(this);
 
-		add(new JLabel("Forced Latency (ms)"));
-		add(forcedLatency, "growx, wrap");
+		JLabel forcedLabel = new JLabel("Forced Latency (ms)");
+		forcedLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+		add(forcedLabel);
+		add(forcedLatency);
 
-		add(new JLabel("Max Bitrate (KBps)"));
-		add(maxBitrate, "growx, wrap");
+		JLabel maxBwLabel = new JLabel("Max Bitrate (KBps)");
+		maxBwLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+		add(maxBwLabel);
+		add(maxBitrate);
 
-		add(new JLabel("Append to Path"));
-		add(appendToPath, "growx, wrap");
+		JLabel appendLabel = new JLabel("Append to Path");
+		appendLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+		add(appendLabel);
+		add(appendToPath);
+
+		layout.putConstraint(SpringLayout.NORTH, forcedLatency, 60,
+				SpringLayout.NORTH, this);
+		layout.putConstraint(SpringLayout.EAST, forcedLatency, -10,
+				SpringLayout.EAST, this);
+		layout.putConstraint(SpringLayout.WEST, forcedLatency, COL_WIDTH,
+				SpringLayout.WEST, this);
+
+		layout.putConstraint(SpringLayout.NORTH, maxBitrate, 20,
+				SpringLayout.SOUTH, forcedLatency);
+		layout.putConstraint(SpringLayout.EAST, maxBitrate, 0,
+				SpringLayout.EAST, forcedLatency);
+		layout.putConstraint(SpringLayout.WEST, maxBitrate, 0,
+				SpringLayout.WEST, forcedLatency);
+
+		layout.putConstraint(SpringLayout.NORTH, appendToPath, 20,
+				SpringLayout.SOUTH, maxBitrate);
+		layout.putConstraint(SpringLayout.EAST, appendToPath, 0,
+				SpringLayout.EAST, maxBitrate);
+		layout.putConstraint(SpringLayout.WEST, appendToPath, 0,
+				SpringLayout.WEST, maxBitrate);
+
+		// labels
+
+		layout.putConstraint(SpringLayout.VERTICAL_CENTER, forcedLabel, 0,
+				SpringLayout.VERTICAL_CENTER, forcedLatency);
+		layout.putConstraint(SpringLayout.WEST, forcedLabel, 10,
+				SpringLayout.WEST, this);
+		layout.putConstraint(SpringLayout.EAST, forcedLabel, -10,
+				SpringLayout.WEST, forcedLatency);
+
+		layout.putConstraint(SpringLayout.VERTICAL_CENTER, maxBwLabel, 0,
+				SpringLayout.VERTICAL_CENTER, maxBitrate);
+		layout.putConstraint(SpringLayout.WEST, maxBwLabel, 10,
+				SpringLayout.WEST, this);
+		layout.putConstraint(SpringLayout.EAST, maxBwLabel, -10,
+				SpringLayout.WEST, maxBitrate);
+
+		layout.putConstraint(SpringLayout.VERTICAL_CENTER, appendLabel, 0,
+				SpringLayout.VERTICAL_CENTER, appendToPath);
+		layout.putConstraint(SpringLayout.WEST, appendLabel, 10,
+				SpringLayout.WEST, this);
+		layout.putConstraint(SpringLayout.EAST, appendLabel, -10,
+				SpringLayout.WEST, appendToPath);
+
 	}
 
 	private JSlider createSlider(int max, int major, int minor) {
