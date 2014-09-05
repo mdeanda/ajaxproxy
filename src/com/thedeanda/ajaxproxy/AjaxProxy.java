@@ -20,6 +20,8 @@ import org.mortbay.jetty.servlet.FilterHolder;
 import org.mortbay.jetty.servlet.ServletHolder;
 import org.mortbay.proxy.AsyncProxyServlet;
 
+import com.thedeanda.ajaxproxy.filter.APFilter;
+
 public class AjaxProxy implements Runnable {
 	private static final Logger log = Logger.getLogger(AjaxProxy.class);
 	private int port = 8080;

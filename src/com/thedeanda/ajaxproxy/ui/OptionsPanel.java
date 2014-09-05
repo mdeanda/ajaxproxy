@@ -14,8 +14,8 @@ import javax.swing.event.ChangeListener;
 
 import net.miginfocom.swing.MigLayout;
 
-import com.thedeanda.ajaxproxy.APFilter;
 import com.thedeanda.ajaxproxy.AjaxProxy;
+import com.thedeanda.ajaxproxy.filter.APFilter;
 
 public class OptionsPanel extends JPanel implements ActionListener,
 		PropertyChangeListener, ChangeListener {
