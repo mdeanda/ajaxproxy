@@ -1,5 +1,6 @@
 package com.thedeanda.ajaxproxy.ui;
 
+import java.awt.BorderLayout;
 import java.io.StringWriter;
 import java.util.Iterator;
 
@@ -15,7 +16,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 
-import net.miginfocom.swing.MigLayout;
 import net.sourceforge.javajson.JsonArray;
 import net.sourceforge.javajson.JsonException;
 import net.sourceforge.javajson.JsonObject;
@@ -43,10 +43,10 @@ public class ContentViewer extends JPanel {
 	private JTabbedPane tabs;
 
 	public ContentViewer() {
-		setLayout(new MigLayout("insets 10, fill", "[fill]", "[fill]"));
+		setLayout(new BorderLayout());
 		tabs = new JTabbedPane();
-		add(tabs);
-		tabs.add("foo", new JButton("foo"));
+		add(BorderLayout.CENTER, tabs);
+		tabs.add("", new JButton(""));
 
 		setBorder(BorderFactory.createEmptyBorder());
 		tabs.setBorder(BorderFactory.createEmptyBorder());
