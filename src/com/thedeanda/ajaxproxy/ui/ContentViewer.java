@@ -21,7 +21,6 @@ import net.sourceforge.javajson.JsonException;
 import net.sourceforge.javajson.JsonObject;
 import net.sourceforge.javajson.JsonValue;
 
-import org.apache.log4j.Logger;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -29,6 +28,8 @@ import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * this is a content viewer used to show input/ouput content of http requests.
@@ -39,7 +40,8 @@ import org.dom4j.io.XMLWriter;
  */
 public class ContentViewer extends JPanel {
 	private static final long serialVersionUID = 1L;
-	private static final Logger log = Logger.getLogger(ContentViewer.class);
+	private static final Logger log = LoggerFactory
+			.getLogger(ContentViewer.class);
 	private JTabbedPane tabs;
 
 	public ContentViewer() {

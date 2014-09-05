@@ -13,8 +13,6 @@ import javax.servlet.http.HttpServletResponseWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-
 public class MyServletResponseWrapper extends HttpServletResponseWrapper {
 	private static final Logger log = LoggerFactory
 			.getLogger(MyServletResponseWrapper.class);
@@ -29,7 +27,6 @@ public class MyServletResponseWrapper extends HttpServletResponseWrapper {
 		baos = new ByteArrayOutputStream();
 		writer = new PrintWriter(baos);
 		os = new MyServletOutputStream(baos);
-
 	}
 
 	@Override
@@ -40,12 +37,6 @@ public class MyServletResponseWrapper extends HttpServletResponseWrapper {
 	@Override
 	public ServletOutputStream getOutputStream() {
 		return os;
-	}
-
-	@Override
-	public ServletResponse getResponse() {
-		log.warn("get response!!!");
-		return null;
 	}
 
 	@Override

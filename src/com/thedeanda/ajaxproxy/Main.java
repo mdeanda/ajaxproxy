@@ -18,12 +18,13 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.thedeanda.ajaxproxy.ui.MainFrame;
 
 public class Main {
-	private static final Logger log = Logger.getLogger(Main.class);
+	private static final Logger log = LoggerFactory.getLogger(Main.class);
 
 	public static void main(String[] args) throws Exception {
 		// create the parser

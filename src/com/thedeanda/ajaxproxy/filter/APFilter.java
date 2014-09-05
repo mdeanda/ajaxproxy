@@ -21,13 +21,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.thedeanda.ajaxproxy.AccessTracker;
 import com.thedeanda.ajaxproxy.LoadedResource;
 
 public class APFilter implements Filter {
-	private static final Logger log = Logger.getLogger(APFilter.class);
+	private static final Logger log = LoggerFactory.getLogger(APFilter.class);
 	private int maxBitrate = 0; // in KBps
 	private int forcedLatency = 50;
 	private boolean logRequests = false;
