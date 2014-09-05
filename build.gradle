@@ -4,7 +4,7 @@ apply plugin: 'eclipse'
 apply plugin: "com.github.johnrengelman.shadow"
 
 group = 'com.thedeanda'
-version = '1.8-SNAPSHOT'
+version = '1.8'
 
 repositories {
 	mavenCentral()
@@ -23,7 +23,7 @@ dependencies {
 	compile 'dom4j:dom4j:1.+'
 	compile 'org.slf4j:slf4j-api:1.7.7'
 
-	compile files('javajson-20120103.jar')
+	compile files('javajson-20130806.jar')
 }
 jar {
     manifest {
