@@ -77,14 +77,14 @@ public class FileTrackerPanel extends JPanel implements AccessTracker {
 
 	public JsonObject getConfig() {
 		JsonObject data = new JsonObject();
-		data.put("trackFiles", toggleBtn.isSelected());
+		data.put("track", toggleBtn.isSelected());
 		return data;
 	}
 
 	public void setConfig(JsonObject config) {
 		if (config == null)
 			return;
-		toggleBtn.setSelected(config.getBoolean("trackFiles"));
+		toggleBtn.setSelected(config.getBoolean("track"));
 	}
 
 }

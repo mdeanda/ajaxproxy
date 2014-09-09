@@ -178,18 +178,20 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener,
 		json.put("merge", mergeModel.getConfig());
 		json.put("variables", variableModel.getConfig());
 		json.put("tracker", trackerPanel.getConfig());
+		json.put("resource", resourceViewerPanel.getConfig());
+
 		log.info(json.toString(2));
 		return json;
 	}
 
-	//TODO: figure out why this returns nothing
+	// TODO: figure out why this returns nothing
 	public JsonObject getSettings() {
 		JsonObject ret = new JsonObject();
 		// ret.put("port", port.getText());
 		return ret;
 	}
 
-	//TODO: figure out why this does nothing
+	// TODO: figure out why this does nothing
 	public void setSettings(JsonObject json) {
 		if (json == null)
 			return;
@@ -292,6 +294,7 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener,
 		generalPanel.setPort(config.getInt("port"));
 		generalPanel.setResourceBase(config.getString("resourceBase"));
 		trackerPanel.setConfig(json.getJsonObject("tracker"));
+		resourceViewerPanel.setConfig(json.getJsonObject("resource"));
 	}
 
 	@Override

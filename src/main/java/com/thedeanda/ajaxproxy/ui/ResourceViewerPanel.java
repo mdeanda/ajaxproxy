@@ -291,7 +291,7 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 
 	private void showResource(final LoadedResource lr) {
 		headersContent.setText("");
-		
+
 		inputCv.setContent(null);
 		outputCv.setContent(null);
 
@@ -435,6 +435,18 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 
 			}
 		}
+	}
+
+	public JsonObject getConfig() {
+		JsonObject data = new JsonObject();
+		data.put("track", toggleBtn.isSelected());
+		return data;
+	}
+
+	public void setConfig(JsonObject config) {
+		if (config == null)
+			return;
+		toggleBtn.setSelected(config.getBoolean("track"));
 	}
 
 	class DataHolder {
