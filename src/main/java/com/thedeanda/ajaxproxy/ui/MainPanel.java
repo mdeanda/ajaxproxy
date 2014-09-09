@@ -90,9 +90,7 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener,
 
 		// TODO: move proxy to its own panel so code is easier to maintain
 		variableModel = new VariableTableModel();
-		variableTable = new JTable(variableModel);
-		variableTable.setColumnModel(new VariableColumnModel());
-		tabs.add("Variables", new JScrollPane(variableTable));
+		tabs.add("Variables", new VariablesPanel(this, variableModel));
 
 		optionsPanel = new OptionsPanel();
 		tabs.add("Options", optionsPanel);
