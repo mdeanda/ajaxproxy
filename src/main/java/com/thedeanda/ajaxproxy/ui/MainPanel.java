@@ -39,7 +39,6 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener {
 	private ProxyTableModel proxyModel;
 	private MergeTableModel mergeModel;
 	private VariableTableModel variableModel;
-	private JTable proxyTable;
 	private JTable mergeTable;
 	private JTable variableTable;
 	private File configFile;
@@ -81,11 +80,8 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener {
 		generalPanel = new GeneralPanel();
 		tabs.add("General", generalPanel);
 
-		// TODO: move proxy to its own panel so code is easier to maintain
 		proxyModel = new ProxyTableModel();
-		proxyTable = new JTable(proxyModel);
-		proxyTable.setColumnModel(new ProxyColumnModel());
-		tabs.add("Proxy", new JScrollPane(proxyTable));
+		tabs.add("Proxy", new ProxyPanel(proxyModel));
 
 		// TODO: move merge table to its own panel so code is easier to maintain
 		mergeModel = new MergeTableModel();
