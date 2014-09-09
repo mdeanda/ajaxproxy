@@ -12,10 +12,12 @@ public class GeneralPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private JTextField port;
 	private JTextField resourceBase;
+	private SettingsChangedListener listener;
 
-	public GeneralPanel() {
+	public GeneralPanel(SettingsChangedListener listener) {
 		SpringLayout layout = new SpringLayout();
 		setLayout(layout);
+		this.listener = listener;
 
 		port = SwingUtils.newJTextField();
 		

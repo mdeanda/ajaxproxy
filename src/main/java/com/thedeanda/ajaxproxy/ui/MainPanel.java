@@ -30,7 +30,8 @@ import org.slf4j.impl.LogListener;
 import com.thedeanda.ajaxproxy.AjaxProxy;
 import com.thedeanda.ajaxproxy.ProxyListener;
 
-public class MainPanel extends JPanel implements ProxyListener, LogListener {
+public class MainPanel extends JPanel implements ProxyListener, LogListener,
+		SettingsChangedListener {
 	private static final long serialVersionUID = 1L;
 	private static final Logger log = LoggerFactory.getLogger(MainPanel.class);
 	private JButton btn;
@@ -56,6 +57,7 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener {
 	private List<ProxyListener> listeners = new ArrayList<ProxyListener>();
 	private ResourceViewerPanel resourceViewerPanel;
 	private JTextArea logTextArea;
+	private JButton restartButton;
 
 	public MainPanel() {
 		SpringLayout layout = new SpringLayout();
@@ -77,11 +79,11 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener {
 		this.tabs = new JTabbedPane();
 		add(tabs);
 
-		generalPanel = new GeneralPanel();
+		generalPanel = new GeneralPanel(this);
 		tabs.add("General", generalPanel);
 
 		proxyModel = new ProxyTableModel();
-		tabs.add("Proxy", new ProxyPanel(proxyModel));
+		tabs.add("Proxy", new ProxyPanel(this, proxyModel));
 
 		// TODO: move merge table to its own panel so code is easier to maintain
 		mergeModel = new MergeTableModel();
@@ -117,8 +119,17 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener {
 		// LF5SwingUtils.makeVerticalScrollBarTrack(logBoxScrollPane);
 
 		add(btn);
-
-		clearAll();
+		restartButton = new JButton("Restart Required");
+		add(restartButton);
+		restartButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				if (started) {
+					stop();
+					start();
+				}
+			}
+		});
 
 		layout.putConstraint(SpringLayout.SOUTH, btn, -10, SpringLayout.SOUTH,
 				this);
@@ -132,6 +143,13 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener {
 				this);
 		layout.putConstraint(SpringLayout.SOUTH, tabs, -10, SpringLayout.NORTH,
 				btn);
+
+		layout.putConstraint(SpringLayout.SOUTH, restartButton, 0,
+				SpringLayout.SOUTH, btn);
+		layout.putConstraint(SpringLayout.EAST, restartButton, -10,
+				SpringLayout.WEST, btn);
+
+		clearAll();
 
 	}
 
@@ -220,6 +238,7 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener {
 	}
 
 	public void stop() {
+		restartButton.setVisible(false);
 		try {
 			if (proxy != null) {
 				log.info("stopping server");
@@ -295,5 +314,17 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener {
 	@Override
 	public void write(String msg) {
 		logTextArea.append(msg);
+	}
+
+	@Override
+	public void restartRequired() {
+		if (started) {
+			restartButton.setVisible(true);
+		}
+	}
+
+	@Override
+	public void settingsChanged() {
+		log.debug("settings changed, possible track to warn of unsaved changes during close");
 	}
 }
