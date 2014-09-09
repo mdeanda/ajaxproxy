@@ -32,7 +32,6 @@ public class APFilter implements Filter {
 	private int maxBitrate = 0; // in KBps
 	private int forcedLatency = 50;
 	private boolean logRequests = false;
-	private String appendToPath = "";
 	private Semaphore throttleLock;
 	private List<AccessTracker> trackers = new ArrayList<AccessTracker>();
 	private Thread trackerThread;
@@ -217,16 +216,8 @@ public class APFilter implements Filter {
 		return logRequests;
 	}
 
-	public String getAppendToPath() {
-		return appendToPath;
-	}
-
 	public void setLogRequests(boolean logRequests) {
 		this.logRequests = logRequests;
-	}
-
-	public void setAppendToPath(String appendToPath) {
-		this.appendToPath = appendToPath;
 	}
 
 	public void add(AccessTracker tracker) {
