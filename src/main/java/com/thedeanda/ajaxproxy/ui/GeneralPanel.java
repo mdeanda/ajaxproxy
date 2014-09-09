@@ -17,16 +17,17 @@ public class GeneralPanel extends JPanel {
 	public GeneralPanel(SettingsChangedListener listener) {
 		SpringLayout layout = new SpringLayout();
 		setLayout(layout);
+		// TODO: track changes to text fields
 		this.listener = listener;
 
 		port = SwingUtils.newJTextField();
-		
+
 		JLabel portLabel = new JLabel("Local Port");
 		portLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		Dimension size = portLabel.getPreferredSize();
 		size.width = 150;
 		portLabel.setPreferredSize(size);
-		
+
 		add(portLabel);
 		add(port);
 
