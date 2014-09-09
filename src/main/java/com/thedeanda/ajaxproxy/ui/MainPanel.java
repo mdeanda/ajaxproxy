@@ -179,6 +179,7 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener,
 		json.put("variables", variableModel.getConfig());
 		json.put("tracker", trackerPanel.getConfig());
 		json.put("resource", resourceViewerPanel.getConfig());
+		json.put("options", optionsPanel.getConfig());
 
 		log.info(json.toString(2));
 		return json;
@@ -295,6 +296,7 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener,
 		generalPanel.setResourceBase(config.getString("resourceBase"));
 		trackerPanel.setConfig(json.getJsonObject("tracker"));
 		resourceViewerPanel.setConfig(json.getJsonObject("resource"));
+		optionsPanel.setConfig(json.getJsonObject("options"));
 	}
 
 	@Override

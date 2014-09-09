@@ -13,6 +13,8 @@ import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import net.sourceforge.javajson.JsonObject;
+
 import com.thedeanda.ajaxproxy.AjaxProxy;
 import com.thedeanda.ajaxproxy.filter.APFilter;
 
@@ -125,4 +127,17 @@ public class OptionsPanel extends JPanel implements ActionListener,
 		}
 	}
 
+	public JsonObject getConfig() {
+		JsonObject data = new JsonObject();
+		data.put("maxBitrate", maxBitrate.getValue());
+		data.put("forcedLatency", forcedLatency.getValue());
+		return data;
+	}
+
+	public void setConfig(JsonObject config) {
+		if (config == null)
+			return;
+		maxBitrate.setValue(config.getInt("maxBitrate"));
+		forcedLatency.setValue(config.getInt("forcedLatency"));
+	}
 }
