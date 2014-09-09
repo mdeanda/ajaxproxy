@@ -174,19 +174,22 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener,
 		JsonObject json = config;
 		json.put("port", generalPanel.getPort());
 		json.put("resourceBase", generalPanel.getResourceBase());
-		json.put("proxy", proxyModel.getData());
-		json.put("merge", mergeModel.getData());
-		json.put("variables", variableModel.getData());
+		json.put("proxy", proxyModel.getConfig());
+		json.put("merge", mergeModel.getConfig());
+		json.put("variables", variableModel.getConfig());
+		json.put("tracker", trackerPanel.getConfig());
 		log.info(json.toString(2));
 		return json;
 	}
 
+	//TODO: figure out why this returns nothing
 	public JsonObject getSettings() {
 		JsonObject ret = new JsonObject();
 		// ret.put("port", port.getText());
 		return ret;
 	}
 
+	//TODO: figure out why this does nothing
 	public void setSettings(JsonObject json) {
 		if (json == null)
 			return;
@@ -283,11 +286,12 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener,
 
 	public void setConfig(JsonObject json) {
 		this.config = json;
-		proxyModel.setData(config.getJsonArray("proxy"));
-		mergeModel.setData(config.getJsonArray("merge"));
-		variableModel.setData(config.getJsonObject("variables"));
+		proxyModel.setConfig(config.getJsonArray("proxy"));
+		mergeModel.setConfig(config.getJsonArray("merge"));
+		variableModel.setConfig(config.getJsonObject("variables"));
 		generalPanel.setPort(config.getInt("port"));
 		generalPanel.setResourceBase(config.getString("resourceBase"));
+		trackerPanel.setConfig(json.getJsonObject("tracker"));
 	}
 
 	@Override
