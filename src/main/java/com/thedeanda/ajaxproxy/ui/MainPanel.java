@@ -85,11 +85,8 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener,
 		proxyModel = new ProxyTableModel();
 		tabs.add("Proxy", new ProxyPanel(this, proxyModel));
 
-		// TODO: move merge table to its own panel so code is easier to maintain
 		mergeModel = new MergeTableModel();
-		mergeTable = new JTable(mergeModel);
-		mergeTable.setColumnModel(new MergeColumnModel());
-		tabs.add("Merge", new JScrollPane(mergeTable));
+		tabs.add("Merge", new MergePanel(this, mergeModel));
 
 		// TODO: move proxy to its own panel so code is easier to maintain
 		variableModel = new VariableTableModel();

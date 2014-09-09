@@ -8,20 +8,17 @@ import javax.swing.JTable;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
-public class ProxyPanel extends JPanel {
+public class MergePanel extends JPanel {
 	private static final long serialVersionUID = 1L;
-	private JTable proxyTable;
 
-	public ProxyPanel(final SettingsChangedListener listener,
-			ProxyTableModel proxyModel) {
+	public MergePanel(final SettingsChangedListener listener,
+			MergeTableModel mergeModel) {
 		setLayout(new BorderLayout());
-		proxyTable = new JTable(proxyModel);
-		proxyTable.setColumnModel(new ProxyColumnModel());
-		JScrollPane scroll = new JScrollPane(proxyTable);
-
+		JTable mergeTable = new JTable(mergeModel);
+		mergeTable.setColumnModel(new MergeColumnModel());
+		JScrollPane scroll = new JScrollPane(mergeTable);
 		add(BorderLayout.CENTER, scroll);
-
-		proxyModel.addTableModelListener(new TableModelListener() {
+		mergeModel.addTableModelListener(new TableModelListener() {
 			@Override
 			public void tableChanged(TableModelEvent e) {
 				listener.settingsChanged();
