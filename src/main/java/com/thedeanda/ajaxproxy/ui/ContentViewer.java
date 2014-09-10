@@ -215,12 +215,9 @@ public class ContentViewer extends JPanel {
 			// try json parsing
 			try {
 				ret = JsonObject.parse(str).toString(4);
-			} catch (JsonException je) {
+			} catch (Exception je) {
 				ret = null;
 			}
-		} else if (str.startsWith("<")) {
-			// try xml parsing
-			ret = null;
 		}
 		return ret;
 	}
