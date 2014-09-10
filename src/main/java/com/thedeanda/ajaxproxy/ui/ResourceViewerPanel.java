@@ -406,6 +406,10 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 		String urlPrefix = JOptionPane.showInputDialog("URL Prefix",
 				"http://localhost");
 
+		if (urlPrefix==null){
+			return;
+		}
+		
 		final JFileChooser fc = new JFileChooser();
 		fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		int returnVal = fc.showSaveDialog(this);
