@@ -9,6 +9,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -321,6 +323,11 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 					headers.append("<p><b>Duration:</b> ");
 					headers.append(lr.getDuration());
 					headers.append("</p>");
+					headers.append("<p><b>Date:</b> ");
+					headers.append(lr.getDate());
+					headers.append("<p><b>Character Encoding:</b> ");
+					headers.append(lr.getCharacterEncoding());
+					headers.append("</p>");
 					writeField(headers, "Status",
 							String.valueOf(lr.getStatusCode()));
 					headers.append("<h1>Headers</h1><div class=\"items\">");
@@ -331,7 +338,24 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 						headers.append(map.get(name));
 						headers.append("</p>");
 					}
-					headers.append("</div></body></html>");
+					headers.append("</div>");
+
+					Exception ex = lr.getFilterException();
+					if (ex != null) {
+						StringWriter sw = new StringWriter();
+						ex.printStackTrace(new PrintWriter(sw));
+						String[] lines = StringUtils.split(sw.toString(), "\n");
+
+						headers.append("<h1>Exception</h1><div class=\"items\">");
+						for (String line : lines) {
+							headers.append("<p>");
+							headers.append(line);
+							headers.append("</p>");
+						}
+						headers.append("</div>");
+					}
+
+					headers.append("</body></html>");
 
 					SwingUtilities.invokeLater(uiupdate);
 				}
