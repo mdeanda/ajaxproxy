@@ -49,10 +49,11 @@ import net.sourceforge.javajson.JsonException;
 import net.sourceforge.javajson.JsonObject;
 import net.sourceforge.javajson.JsonValue;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.thedeanda.ajaxproxy.AccessTracker;
 import com.thedeanda.ajaxproxy.AjaxProxy;
 import com.thedeanda.ajaxproxy.LoadedResource;
-import com.thedeanda.ajaxproxy.utils.StringUtils;
 
 /** tracks files that get loaded */
 public class ResourceViewerPanel extends JPanel implements AccessTracker,
@@ -349,7 +350,7 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 					if (ex != null) {
 						StringWriter sw = new StringWriter();
 						ex.printStackTrace(new PrintWriter(sw));
-						String[] lines = StringUtils.split(sw.toString());
+						String[] lines = StringUtils.split(sw.toString(), "\n");
 
 						headers.append("<h1>Exception</h1><div class=\"items\">");
 						for (String line : lines) {
