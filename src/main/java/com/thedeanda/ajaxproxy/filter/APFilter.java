@@ -22,12 +22,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.thedeanda.ajaxproxy.AccessTracker;
 import com.thedeanda.ajaxproxy.LoadedResource;
+import com.thedeanda.ajaxproxy.utils.StringUtils;
 
 public class APFilter implements Filter {
 	private static final Logger log = LoggerFactory.getLogger(APFilter.class);

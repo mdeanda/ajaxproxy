@@ -319,4 +319,10 @@ public class AjaxProxy implements Runnable {
 	public void addTracker(AccessTracker tracker) {
 		apfilter.add(tracker);
 	}
+
+	public void replay(LoadedResource item) {
+		// TODO: implement
+		log.warn("replay: {}", item.getUrl());
+
+	}
 }

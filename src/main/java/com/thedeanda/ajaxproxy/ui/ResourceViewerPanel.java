@@ -49,11 +49,10 @@ import net.sourceforge.javajson.JsonException;
 import net.sourceforge.javajson.JsonObject;
 import net.sourceforge.javajson.JsonValue;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.thedeanda.ajaxproxy.AccessTracker;
 import com.thedeanda.ajaxproxy.AjaxProxy;
 import com.thedeanda.ajaxproxy.LoadedResource;
+import com.thedeanda.ajaxproxy.utils.StringUtils;
 
 /** tracks files that get loaded */
 public class ResourceViewerPanel extends JPanel implements AccessTracker,
@@ -74,6 +73,8 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 	private JMenuItem removeRequestMenuItem;
 	private ContentViewer inputCv;
 	private ContentViewer outputCv;
+	private JMenuItem replyMenuItem;
+	private AjaxProxy ajaxProxy;
 
 	public ResourceViewerPanel() {
 		SpringLayout layout = new SpringLayout();
@@ -190,6 +191,10 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 		removeRequestMenuItem = new JMenuItem("Remove Request");
 		removeRequestMenuItem.addActionListener(this);
 		popup.add(removeRequestMenuItem);
+
+		replyMenuItem = new JMenuItem("Reply Request");
+		replyMenuItem.addActionListener(this);
+		popup.add(replyMenuItem);
 
 		list = new JList<LoadedResource>(model);
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -344,7 +349,7 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 					if (ex != null) {
 						StringWriter sw = new StringWriter();
 						ex.printStackTrace(new PrintWriter(sw));
-						String[] lines = StringUtils.split(sw.toString(), "\n");
+						String[] lines = StringUtils.split(sw.toString());
 
 						headers.append("<h1>Exception</h1><div class=\"items\">");
 						for (String line : lines) {
@@ -371,9 +376,10 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 		headers.append("</p>");
 	}
 
-	public void setProxy(AjaxProxy proxy) {
-		if (proxy != null)
-			proxy.addTracker(this);
+	public void setProxy(AjaxProxy ajaxProxy) {
+		this.ajaxProxy = ajaxProxy;
+		if (ajaxProxy != null)
+			ajaxProxy.addTracker(this);
 	}
 
 	@Override
@@ -406,10 +412,10 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 		String urlPrefix = JOptionPane.showInputDialog("URL Prefix",
 				"http://localhost");
 
-		if (urlPrefix==null){
+		if (urlPrefix == null) {
 			return;
 		}
-		
+
 		final JFileChooser fc = new JFileChooser();
 		fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		int returnVal = fc.showSaveDialog(this);
@@ -492,6 +498,12 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 				else if (!model.isEmpty()) {
 					list.setSelectedIndex(index - 1);
 				}
+			}
+		} else if (evt.getSource() == replyMenuItem) {
+			int index = list.getSelectedIndex();
+			if (index >= 0) {
+				LoadedResource item = model.get(index);
+				ajaxProxy.replay(item);
 			}
 		}
 	}
