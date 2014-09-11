@@ -2,6 +2,7 @@ package com.thedeanda.ajaxproxy;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -11,6 +12,7 @@ import javax.servlet.http.Cookie;
 import org.apache.commons.io.IOUtils;
 
 public class LoadedResource {
+	private Date date;
 	private String url;
 	private long duration;
 	private byte[] input;
@@ -19,6 +21,11 @@ public class LoadedResource {
 	private int statusCode;
 	private List<Cookie> cookies;
 	private Map<String, String> headers = new TreeMap<String, String>();
+	private String characterEncoding;
+	private Exception filterException;
+
+	transient private String inputAsText;
+	transient private String outputAsText;
 
 	@Override
 	public String toString() {
@@ -74,11 +81,17 @@ public class LoadedResource {
 	}
 
 	public String getOutputAsText() {
-		return convertToText(output);
+		if (outputAsText == null) {
+			outputAsText = convertToText(output);
+		}
+		return outputAsText;
 	}
 
 	public String getInputAsText() {
-		return convertToText(input);
+		if (inputAsText == null) {
+			inputAsText = convertToText(input);
+		}
+		return inputAsText;
 	}
 
 	private String convertToText(byte[] bytes) {
@@ -116,5 +129,29 @@ public class LoadedResource {
 
 	public void setStatusCode(int statusCode) {
 		this.statusCode = statusCode;
+	}
+
+	public Date getDate() {
+		return date;
+	}
+
+	public void setDate(Date date) {
+		this.date = date;
+	}
+
+	public String getCharacterEncoding() {
+		return characterEncoding;
+	}
+
+	public void setCharacterEncoding(String characterEncoding) {
+		this.characterEncoding = characterEncoding;
+	}
+
+	public Exception getFilterException() {
+		return filterException;
+	}
+
+	public void setFilterException(Exception filterException) {
+		this.filterException = filterException;
 	}
 }

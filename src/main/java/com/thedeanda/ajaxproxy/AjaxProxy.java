@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.thedeanda.ajaxproxy.filter.APFilter;
+import com.thedeanda.ajaxproxy.http.HttpClient;
 
 public class AjaxProxy implements Runnable {
 	private static final Logger log = LoggerFactory.getLogger(AjaxProxy.class);
@@ -34,6 +35,7 @@ public class AjaxProxy implements Runnable {
 	private APFilter apfilter = new APFilter();
 	private boolean mergeMode = false;
 	private List<MergeServlet> mergeServlets = new ArrayList<MergeServlet>();
+	private HttpClient httpClient;
 
 	private enum ProxyEvent {
 		START, STOP, FAIL
@@ -49,18 +51,10 @@ public class AjaxProxy implements Runnable {
 	private static final String MODE = "mode";
 	private static final String MINIFY = "minify";
 
-	public static void main(String[] args) throws Exception {
-		String config = "config.js";
-		if (args.length > 0) {
-			config = args[0];
-		}
-		AjaxProxy main = new AjaxProxy(config);
-		new Thread(main).start();
-	}
-
 	public AjaxProxy(JsonObject config, File workingDir) throws Exception {
 		this.config = config;
 		this.workingDir = workingDir;
+		init();
 	}
 
 	public AjaxProxy(String configFile) throws Exception {
@@ -76,6 +70,11 @@ public class AjaxProxy implements Runnable {
 		fis.close();
 		this.config = config;
 		this.workingDir = configDir;
+		init();
+	}
+
+	private void init() {
+		httpClient = new HttpClient();
 	}
 
 	public void addProxyListener(ProxyListener pl) {
@@ -318,5 +317,11 @@ public class AjaxProxy implements Runnable {
 
 	public void addTracker(AccessTracker tracker) {
 		apfilter.add(tracker);
+	}
+
+	public void replay(LoadedResource resource) {
+		log.warn("replay: {}", resource.getUrl());
+		// TODO: maybe 127.0.0.1?
+		httpClient.replay("localhost", port, resource);
 	}
 }

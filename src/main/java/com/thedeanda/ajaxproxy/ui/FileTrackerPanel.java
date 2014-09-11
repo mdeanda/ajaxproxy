@@ -10,6 +10,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SpringLayout;
 
+import net.sourceforge.javajson.JsonObject;
+
 import com.thedeanda.ajaxproxy.AccessTracker;
 import com.thedeanda.ajaxproxy.AjaxProxy;
 import com.thedeanda.ajaxproxy.LoadedResource;
@@ -53,8 +55,8 @@ public class FileTrackerPanel extends JPanel implements AccessTracker {
 
 		layout.putConstraint(SpringLayout.NORTH, scroll, 30,
 				SpringLayout.SOUTH, clearBtn);
-		layout.putConstraint(SpringLayout.SOUTH, scroll, 0,
-				SpringLayout.SOUTH, this);
+		layout.putConstraint(SpringLayout.SOUTH, scroll, 0, SpringLayout.SOUTH,
+				this);
 		layout.putConstraint(SpringLayout.WEST, scroll, 0, SpringLayout.WEST,
 				this);
 		layout.putConstraint(SpringLayout.EAST, scroll, 0, SpringLayout.EAST,
@@ -71,6 +73,18 @@ public class FileTrackerPanel extends JPanel implements AccessTracker {
 		if (toggleBtn.isSelected()) {
 			model.trackFile(res.getUrl(), res.getDuration());
 		}
+	}
+
+	public JsonObject getConfig() {
+		JsonObject data = new JsonObject();
+		data.put("track", toggleBtn.isSelected());
+		return data;
+	}
+
+	public void setConfig(JsonObject config) {
+		if (config == null)
+			return;
+		toggleBtn.setSelected(config.getBoolean("track"));
 	}
 
 }

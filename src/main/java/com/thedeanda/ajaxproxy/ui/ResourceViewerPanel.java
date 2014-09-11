@@ -9,6 +9,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -72,6 +74,8 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 	private JMenuItem removeRequestMenuItem;
 	private ContentViewer inputCv;
 	private ContentViewer outputCv;
+	private JMenuItem replyMenuItem;
+	private AjaxProxy ajaxProxy;
 
 	public ResourceViewerPanel() {
 		SpringLayout layout = new SpringLayout();
@@ -122,8 +126,8 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 
 		tabs = new JTabbedPane();
 		tabs.add("Headers", headersScroll);
-		tabs.add("Input CV", inputCv);
-		tabs.add("Output CV", outputCv);
+		tabs.add("Input", inputCv);
+		tabs.add("Output", outputCv);
 		tabs.setBorder(BorderFactory.createEmptyBorder());
 
 		JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
@@ -188,6 +192,10 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 		removeRequestMenuItem = new JMenuItem("Remove Request");
 		removeRequestMenuItem.addActionListener(this);
 		popup.add(removeRequestMenuItem);
+
+		replyMenuItem = new JMenuItem("Replay Request");
+		replyMenuItem.addActionListener(this);
+		popup.add(replyMenuItem);
 
 		list = new JList<LoadedResource>(model);
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -291,7 +299,7 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 
 	private void showResource(final LoadedResource lr) {
 		headersContent.setText("");
-		
+
 		inputCv.setContent(null);
 		outputCv.setContent(null);
 
@@ -304,7 +312,7 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 					headersContent.setCaretPosition(0);
 				}
 			};
-			new Thread(new Runnable() {
+			SwingUtils.executNonUi(new Runnable() {
 				@Override
 				public void run() {
 					inputCv.setContent(lr.getInputAsText());
@@ -321,6 +329,11 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 					headers.append("<p><b>Duration:</b> ");
 					headers.append(lr.getDuration());
 					headers.append("</p>");
+					headers.append("<p><b>Date:</b> ");
+					headers.append(lr.getDate());
+					headers.append("<p><b>Character Encoding:</b> ");
+					headers.append(lr.getCharacterEncoding());
+					headers.append("</p>");
 					writeField(headers, "Status",
 							String.valueOf(lr.getStatusCode()));
 					headers.append("<h1>Headers</h1><div class=\"items\">");
@@ -331,11 +344,28 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 						headers.append(map.get(name));
 						headers.append("</p>");
 					}
-					headers.append("</div></body></html>");
+					headers.append("</div>");
+
+					Exception ex = lr.getFilterException();
+					if (ex != null) {
+						StringWriter sw = new StringWriter();
+						ex.printStackTrace(new PrintWriter(sw));
+						String[] lines = StringUtils.split(sw.toString(), "\n");
+
+						headers.append("<h1>Exception</h1><div class=\"items\">");
+						for (String line : lines) {
+							headers.append("<p>");
+							headers.append(line);
+							headers.append("</p>");
+						}
+						headers.append("</div>");
+					}
+
+					headers.append("</body></html>");
 
 					SwingUtilities.invokeLater(uiupdate);
 				}
-			}).start();
+			});
 		}
 	}
 
@@ -347,9 +377,10 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 		headers.append("</p>");
 	}
 
-	public void setProxy(AjaxProxy proxy) {
-		if (proxy != null)
-			proxy.addTracker(this);
+	public void setProxy(AjaxProxy ajaxProxy) {
+		this.ajaxProxy = ajaxProxy;
+		if (ajaxProxy != null)
+			ajaxProxy.addTracker(this);
 	}
 
 	@Override
@@ -381,6 +412,10 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 	private void export() {
 		String urlPrefix = JOptionPane.showInputDialog("URL Prefix",
 				"http://localhost");
+
+		if (urlPrefix == null) {
+			return;
+		}
 
 		final JFileChooser fc = new JFileChooser();
 		fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -437,6 +472,18 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 		}
 	}
 
+	public JsonObject getConfig() {
+		JsonObject data = new JsonObject();
+		data.put("track", toggleBtn.isSelected());
+		return data;
+	}
+
+	public void setConfig(JsonObject config) {
+		if (config == null)
+			return;
+		toggleBtn.setSelected(config.getBoolean("track"));
+	}
+
 	class DataHolder {
 		public String headers;
 	}
@@ -452,6 +499,17 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 				else if (!model.isEmpty()) {
 					list.setSelectedIndex(index - 1);
 				}
+			}
+		} else if (evt.getSource() == replyMenuItem) {
+			int index = list.getSelectedIndex();
+			if (index >= 0) {
+				final LoadedResource resource = model.get(index);
+				SwingUtils.executNonUi(new Runnable() {
+					@Override
+					public void run() {
+						ajaxProxy.replay(resource);
+					}
+				});
 			}
 		}
 	}

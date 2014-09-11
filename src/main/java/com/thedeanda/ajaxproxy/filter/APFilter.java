@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +34,6 @@ public class APFilter implements Filter {
 	private int maxBitrate = 0; // in KBps
 	private int forcedLatency = 50;
 	private boolean logRequests = false;
-	private String appendToPath = "";
 	private Semaphore throttleLock;
 	private List<AccessTracker> trackers = new ArrayList<AccessTracker>();
 	private Thread trackerThread;
@@ -59,6 +60,7 @@ public class APFilter implements Filter {
 			ServletResponse response, FilterChain chain) throws IOException,
 			ServletException {
 		LoadedResource resource = new LoadedResource();
+		resource.setDate(new Date());
 		long start = System.currentTimeMillis();
 
 		HttpServletRequest httpRequest = (HttpServletRequest) request;
@@ -69,7 +71,7 @@ public class APFilter implements Filter {
 				httpResponse);
 		String url = httpRequest.getRequestURI();
 		String qs = httpRequest.getQueryString();
-		if (null != qs && !"".equals(qs))
+		if (!StringUtils.isBlank(qs))
 			url += "?" + qs;
 		resource.setUrl(url);
 
@@ -97,10 +99,20 @@ public class APFilter implements Filter {
 				return;
 			}
 		}
-		// TODO: catch errors into loaded resource
-		chain.doFilter(reqWrapper, wrapper);
+
+		// hold on to exception to finish our proxy tracking
+		IOException ioe = null;
+		ServletException se = null;
+		try {
+			chain.doFilter(reqWrapper, wrapper);
+		} catch (IOException e) {
+			ioe = e;
+		} catch (ServletException e) {
+			se = e;
+		}
 		throttledCopy(wrapper.getNewInputStream(), response.getOutputStream());
 
+		resource.setCharacterEncoding(wrapper.getCharacterEncoding());
 		resource.setStatusCode(wrapper.getStatus());
 
 		// read cookies
@@ -120,6 +132,14 @@ public class APFilter implements Filter {
 
 		resource.setDuration(System.currentTimeMillis() - start);
 		trackAccess(resource);
+
+		if (ioe != null) {
+			resource.setFilterException(ioe);
+			throw ioe;
+		} else if (se != null) {
+			resource.setFilterException(se);
+			throw se;
+		}
 	}
 
 	@Override
@@ -217,16 +237,8 @@ public class APFilter implements Filter {
 		return logRequests;
 	}
 
-	public String getAppendToPath() {
-		return appendToPath;
-	}
-
 	public void setLogRequests(boolean logRequests) {
 		this.logRequests = logRequests;
-	}
-
-	public void setAppendToPath(String appendToPath) {
-		this.appendToPath = appendToPath;
 	}
 
 	public void add(AccessTracker tracker) {

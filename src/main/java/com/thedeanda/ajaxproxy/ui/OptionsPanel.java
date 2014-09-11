@@ -8,11 +8,12 @@ import java.beans.PropertyChangeListener;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
-import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
+import net.sourceforge.javajson.JsonObject;
 
 import com.thedeanda.ajaxproxy.AjaxProxy;
 import com.thedeanda.ajaxproxy.filter.APFilter;
@@ -20,7 +21,6 @@ import com.thedeanda.ajaxproxy.filter.APFilter;
 public class OptionsPanel extends JPanel implements ActionListener,
 		PropertyChangeListener, ChangeListener {
 	private static final long serialVersionUID = 1L;
-	private JTextField appendToPath;
 	private JSlider maxBitrate;
 	private AjaxProxy proxy;
 	private JSlider forcedLatency;
@@ -32,10 +32,7 @@ public class OptionsPanel extends JPanel implements ActionListener,
 		setLayout(layout);
 
 		maxBitrate = createSlider(100, 10, 5);
-		appendToPath = SwingUtils.newJTextField();
 		forcedLatency = createSlider(500, 100, 10);
-
-		appendToPath.addPropertyChangeListener(this);
 
 		JLabel forcedLabel = new JLabel("Forced Latency (ms)");
 		forcedLabel.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -46,11 +43,6 @@ public class OptionsPanel extends JPanel implements ActionListener,
 		maxBwLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		add(maxBwLabel);
 		add(maxBitrate);
-
-		JLabel appendLabel = new JLabel("Append to Path");
-		appendLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-		add(appendLabel);
-		add(appendToPath);
 
 		layout.putConstraint(SpringLayout.NORTH, forcedLatency, 60,
 				SpringLayout.NORTH, this);
@@ -65,13 +57,6 @@ public class OptionsPanel extends JPanel implements ActionListener,
 				SpringLayout.EAST, forcedLatency);
 		layout.putConstraint(SpringLayout.WEST, maxBitrate, 0,
 				SpringLayout.WEST, forcedLatency);
-
-		layout.putConstraint(SpringLayout.NORTH, appendToPath, 20,
-				SpringLayout.SOUTH, maxBitrate);
-		layout.putConstraint(SpringLayout.EAST, appendToPath, 0,
-				SpringLayout.EAST, maxBitrate);
-		layout.putConstraint(SpringLayout.WEST, appendToPath, 0,
-				SpringLayout.WEST, maxBitrate);
 
 		// labels
 
@@ -88,13 +73,6 @@ public class OptionsPanel extends JPanel implements ActionListener,
 				SpringLayout.WEST, this);
 		layout.putConstraint(SpringLayout.EAST, maxBwLabel, -10,
 				SpringLayout.WEST, maxBitrate);
-
-		layout.putConstraint(SpringLayout.VERTICAL_CENTER, appendLabel, 0,
-				SpringLayout.VERTICAL_CENTER, appendToPath);
-		layout.putConstraint(SpringLayout.WEST, appendLabel, 10,
-				SpringLayout.WEST, this);
-		layout.putConstraint(SpringLayout.EAST, appendLabel, -10,
-				SpringLayout.WEST, appendToPath);
 
 	}
 
@@ -122,7 +100,6 @@ public class OptionsPanel extends JPanel implements ActionListener,
 		if (filter == null)
 			return;
 
-		filter.setAppendToPath(appendToPath.getText());
 		filter.setForcedLatency(forcedLatency.getValue());
 		filter.setMaxBitrate(maxBitrate.getValue());
 	}
@@ -150,4 +127,17 @@ public class OptionsPanel extends JPanel implements ActionListener,
 		}
 	}
 
+	public JsonObject getConfig() {
+		JsonObject data = new JsonObject();
+		data.put("maxBitrate", maxBitrate.getValue());
+		data.put("forcedLatency", forcedLatency.getValue());
+		return data;
+	}
+
+	public void setConfig(JsonObject config) {
+		if (config == null)
+			return;
+		maxBitrate.setValue(config.getInt("maxBitrate"));
+		forcedLatency.setValue(config.getInt("forcedLatency"));
+	}
 }

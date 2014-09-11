@@ -42,7 +42,7 @@ public class MergeTableModel extends AbstractTableModel {
 		}
 	}
 
-	public JsonArray getData() {
+	public JsonArray getConfig() {
 		normalizeData();
 		JsonArray arr = new JsonArray();
 		for (JsonValue v : data) {
@@ -131,7 +131,7 @@ public class MergeTableModel extends AbstractTableModel {
 		fireTableRowsInserted(data.size(), data.size());
 	}
 
-	public void setData(JsonArray data) {
+	public void setConfig(JsonArray data) {
 		if (data == null)
 			data = new JsonArray();
 		this.data = data;

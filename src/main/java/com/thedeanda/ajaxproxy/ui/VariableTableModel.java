@@ -33,7 +33,7 @@ public class VariableTableModel extends AbstractTableModel {
 		return String.class;
 	}
 
-	public JsonObject getData() {
+	public JsonObject getConfig() {
 		JsonObject ret = new JsonObject();
 		normalizeData();
 		JsonArray arr = new JsonArray();
@@ -102,7 +102,7 @@ public class VariableTableModel extends AbstractTableModel {
 		fireTableRowsInserted(data.size(), data.size());
 	}
 
-	public void setData(JsonObject jsonObject) {
+	public void setConfig(JsonObject jsonObject) {
 		if (jsonObject == null)
 			jsonObject = new JsonObject();
 		this.data = new JsonArray();

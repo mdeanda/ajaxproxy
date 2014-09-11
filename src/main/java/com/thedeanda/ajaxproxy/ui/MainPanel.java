@@ -30,7 +30,8 @@ import org.slf4j.impl.LogListener;
 import com.thedeanda.ajaxproxy.AjaxProxy;
 import com.thedeanda.ajaxproxy.ProxyListener;
 
-public class MainPanel extends JPanel implements ProxyListener, LogListener {
+public class MainPanel extends JPanel implements ProxyListener, LogListener,
+		SettingsChangedListener {
 	private static final long serialVersionUID = 1L;
 	private static final Logger log = LoggerFactory.getLogger(MainPanel.class);
 	private JButton btn;
@@ -39,7 +40,6 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener {
 	private ProxyTableModel proxyModel;
 	private MergeTableModel mergeModel;
 	private VariableTableModel variableModel;
-	private JTable proxyTable;
 	private JTable mergeTable;
 	private JTable variableTable;
 	private File configFile;
@@ -57,6 +57,7 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener {
 	private List<ProxyListener> listeners = new ArrayList<ProxyListener>();
 	private ResourceViewerPanel resourceViewerPanel;
 	private JTextArea logTextArea;
+	private JButton restartButton;
 
 	public MainPanel() {
 		SpringLayout layout = new SpringLayout();
@@ -78,26 +79,18 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener {
 		this.tabs = new JTabbedPane();
 		add(tabs);
 
-		generalPanel = new GeneralPanel();
+		generalPanel = new GeneralPanel(this);
 		tabs.add("General", generalPanel);
 
-		// TODO: move proxy to its own panel so code is easier to maintain
 		proxyModel = new ProxyTableModel();
-		proxyTable = new JTable(proxyModel);
-		proxyTable.setColumnModel(new ProxyColumnModel());
-		tabs.add("Proxy", new JScrollPane(proxyTable));
+		tabs.add("Proxy", new ProxyPanel(this, proxyModel));
 
-		// TODO: move merge table to its own panel so code is easier to maintain
 		mergeModel = new MergeTableModel();
-		mergeTable = new JTable(mergeModel);
-		mergeTable.setColumnModel(new MergeColumnModel());
-		tabs.add("Merge", new JScrollPane(mergeTable));
+		tabs.add("Merge", new MergePanel(this, mergeModel));
 
 		// TODO: move proxy to its own panel so code is easier to maintain
 		variableModel = new VariableTableModel();
-		variableTable = new JTable(variableModel);
-		variableTable.setColumnModel(new VariableColumnModel());
-		tabs.add("Variables", new JScrollPane(variableTable));
+		tabs.add("Variables", new VariablesPanel(this, variableModel));
 
 		optionsPanel = new OptionsPanel();
 		tabs.add("Options", optionsPanel);
@@ -121,8 +114,17 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener {
 		// LF5SwingUtils.makeVerticalScrollBarTrack(logBoxScrollPane);
 
 		add(btn);
-
-		clearAll();
+		restartButton = new JButton("Restart Required");
+		add(restartButton);
+		restartButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				if (started) {
+					stop();
+					start();
+				}
+			}
+		});
 
 		layout.putConstraint(SpringLayout.SOUTH, btn, -10, SpringLayout.SOUTH,
 				this);
@@ -136,6 +138,13 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener {
 				this);
 		layout.putConstraint(SpringLayout.SOUTH, tabs, -10, SpringLayout.NORTH,
 				btn);
+
+		layout.putConstraint(SpringLayout.SOUTH, restartButton, 0,
+				SpringLayout.SOUTH, btn);
+		layout.putConstraint(SpringLayout.EAST, restartButton, -10,
+				SpringLayout.WEST, btn);
+
+		clearAll();
 
 	}
 
@@ -165,19 +174,25 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener {
 		JsonObject json = config;
 		json.put("port", generalPanel.getPort());
 		json.put("resourceBase", generalPanel.getResourceBase());
-		json.put("proxy", proxyModel.getData());
-		json.put("merge", mergeModel.getData());
-		json.put("variables", variableModel.getData());
+		json.put("proxy", proxyModel.getConfig());
+		json.put("merge", mergeModel.getConfig());
+		json.put("variables", variableModel.getConfig());
+		json.put("tracker", trackerPanel.getConfig());
+		json.put("resource", resourceViewerPanel.getConfig());
+		json.put("options", optionsPanel.getConfig());
+
 		log.info(json.toString(2));
 		return json;
 	}
 
+	// TODO: figure out why this returns nothing
 	public JsonObject getSettings() {
 		JsonObject ret = new JsonObject();
 		// ret.put("port", port.getText());
 		return ret;
 	}
 
+	// TODO: figure out why this does nothing
 	public void setSettings(JsonObject json) {
 		if (json == null)
 			return;
@@ -224,6 +239,7 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener {
 	}
 
 	public void stop() {
+		restartButton.setVisible(false);
 		try {
 			if (proxy != null) {
 				log.info("stopping server");
@@ -273,11 +289,14 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener {
 
 	public void setConfig(JsonObject json) {
 		this.config = json;
-		proxyModel.setData(config.getJsonArray("proxy"));
-		mergeModel.setData(config.getJsonArray("merge"));
-		variableModel.setData(config.getJsonObject("variables"));
+		proxyModel.setConfig(config.getJsonArray("proxy"));
+		mergeModel.setConfig(config.getJsonArray("merge"));
+		variableModel.setConfig(config.getJsonObject("variables"));
 		generalPanel.setPort(config.getInt("port"));
 		generalPanel.setResourceBase(config.getString("resourceBase"));
+		trackerPanel.setConfig(json.getJsonObject("tracker"));
+		resourceViewerPanel.setConfig(json.getJsonObject("resource"));
+		optionsPanel.setConfig(json.getJsonObject("options"));
 	}
 
 	@Override
@@ -299,5 +318,17 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener {
 	@Override
 	public void write(String msg) {
 		logTextArea.append(msg);
+	}
+
+	@Override
+	public void restartRequired() {
+		if (started) {
+			restartButton.setVisible(true);
+		}
+	}
+
+	@Override
+	public void settingsChanged() {
+		log.debug("settings changed, possible track to warn of unsaved changes during close");
 	}
 }
