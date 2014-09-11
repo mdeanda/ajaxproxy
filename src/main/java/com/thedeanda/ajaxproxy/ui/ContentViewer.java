@@ -69,14 +69,28 @@ public class ContentViewer extends JPanel {
 						try {
 							JsonObject json = JsonObject.parse(output);
 							DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(
-									"");
+									"{}");
 							initTree(rootNode, json);
 							node = rootNode;
+
+							formattedText = json.toString(4);
 						} catch (Exception e) {
+							log.debug(e.getMessage(), e);
 						}
 					}
+					if (formattedText == null && output.trim().startsWith("[")) {
+						try {
+							JsonArray json = JsonArray.parse(output);
+							DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(
+									"[]");
+							initTree(rootNode, json);
+							node = rootNode;
 
-					formattedText = formatJson(output);
+							formattedText = json.toString(4);
+						} catch (Exception e) {
+							log.debug(e.getMessage(), e);
+						}
+					}
 
 					if (formattedText == null && !"".equals(formattedText)) {
 						if (output.trim().startsWith("<")) {
@@ -86,6 +100,7 @@ public class ContentViewer extends JPanel {
 								node = initTree(doc);
 								formattedText = formatXml(doc);
 							} catch (DocumentException e) {
+								log.debug(e.getMessage(), e);
 							}
 						}
 					}
@@ -168,11 +183,15 @@ public class ContentViewer extends JPanel {
 		for (String key : obj) {
 			JsonValue val = obj.get(key);
 			if (val.isJsonObject()) {
-				DefaultMutableTreeNode node = new DefaultMutableTreeNode(key);
+				String name = String.format("%s: {%d}", key, val
+						.getJsonObject().size());
+				DefaultMutableTreeNode node = new DefaultMutableTreeNode(name);
 				top.add(node);
 				initTree(node, val.getJsonObject());
 			} else if (val.isJsonArray()) {
-				DefaultMutableTreeNode node = new DefaultMutableTreeNode(key);
+				String name = String.format("%s: [%d]", key, val.getJsonArray()
+						.size());
+				DefaultMutableTreeNode node = new DefaultMutableTreeNode(name);
 				top.add(node);
 				initTree(node, val.getJsonArray());
 			} else {
@@ -187,13 +206,15 @@ public class ContentViewer extends JPanel {
 		int i = 0;
 		for (JsonValue val : arr) {
 			if (val.isJsonObject()) {
-				DefaultMutableTreeNode node = new DefaultMutableTreeNode("["
-						+ i + "]");
+				String name = String.format("%s: {%d}", String.valueOf(i), val
+						.getJsonObject().size());
+				DefaultMutableTreeNode node = new DefaultMutableTreeNode(name);
 				top.add(node);
 				initTree(node, val.getJsonObject());
 			} else if (val.isJsonArray()) {
-				DefaultMutableTreeNode node = new DefaultMutableTreeNode("["
-						+ i + "]");
+				String name = String.format("%s: [%d]", i, val.getJsonArray()
+						.size());
+				DefaultMutableTreeNode node = new DefaultMutableTreeNode(name);
 				top.add(node);
 				initTree(node, val.getJsonArray());
 			} else {
@@ -203,23 +224,6 @@ public class ContentViewer extends JPanel {
 			}
 			i++;
 		}
-	}
-
-	private String formatJson(String str) {
-		String ret = null;
-		if (str == null)
-			return null;
-
-		str = str.trim();
-		if (str.startsWith("{") || str.startsWith("[")) {
-			// try json parsing
-			try {
-				ret = JsonObject.parse(str).toString(4);
-			} catch (Exception je) {
-				ret = null;
-			}
-		}
-		return ret;
 	}
 
 	private String formatXml(Document doc) {

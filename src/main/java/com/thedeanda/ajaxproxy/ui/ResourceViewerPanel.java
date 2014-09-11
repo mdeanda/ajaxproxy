@@ -126,8 +126,8 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 
 		tabs = new JTabbedPane();
 		tabs.add("Headers", headersScroll);
-		tabs.add("Input CV", inputCv);
-		tabs.add("Output CV", outputCv);
+		tabs.add("Input", inputCv);
+		tabs.add("Output", outputCv);
 		tabs.setBorder(BorderFactory.createEmptyBorder());
 
 		JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
