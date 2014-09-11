@@ -503,8 +503,13 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 		} else if (evt.getSource() == replyMenuItem) {
 			int index = list.getSelectedIndex();
 			if (index >= 0) {
-				LoadedResource item = model.get(index);
-				ajaxProxy.replay(item);
+				final LoadedResource resource = model.get(index);
+				SwingUtilities.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						ajaxProxy.replay(resource);
+					}
+				});
 			}
 		}
 	}

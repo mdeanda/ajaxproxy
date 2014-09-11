@@ -319,9 +319,9 @@ public class AjaxProxy implements Runnable {
 		apfilter.add(tracker);
 	}
 
-	public void replay(LoadedResource item) {
-		log.warn("replay: {}", item.getUrl());
+	public void replay(LoadedResource resource) {
+		log.warn("replay: {}", resource.getUrl());
 		// TODO: maybe 127.0.0.1?
-		httpClient.replay("localhost", port, item);
+		httpClient.replay("localhost", port, resource);
 	}
 }
