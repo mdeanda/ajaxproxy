@@ -58,7 +58,7 @@ public class ContentViewer extends JPanel {
 		log.info("setting content");
 		tabs.removeAll();
 
-		new Thread(new Runnable() {
+		SwingUtils.executNonUi(new Runnable() {
 			@Override
 			public void run() {
 				TreeNode node = null;
@@ -94,6 +94,7 @@ public class ContentViewer extends JPanel {
 				final TreeNode rootNode = node;
 				final String formatted = formattedText;
 
+				// now update ui
 				SwingUtilities.invokeLater(new Runnable() {
 					@Override
 					public void run() {
@@ -115,11 +116,10 @@ public class ContentViewer extends JPanel {
 							scroll.setBorder(BorderFactory.createEmptyBorder());
 							tabs.add("Tree View", scroll);
 						}
-
 					}
 				});
 			}
-		}).start();
+		});
 	}
 
 	private DefaultMutableTreeNode initTree(Document doc) {

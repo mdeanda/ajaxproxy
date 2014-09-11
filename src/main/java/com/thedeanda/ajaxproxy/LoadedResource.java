@@ -24,6 +24,9 @@ public class LoadedResource {
 	private String characterEncoding;
 	private Exception filterException;
 
+	transient private String inputAsText;
+	transient private String outputAsText;
+
 	@Override
 	public String toString() {
 		return url;
@@ -78,11 +81,17 @@ public class LoadedResource {
 	}
 
 	public String getOutputAsText() {
-		return convertToText(output);
+		if (outputAsText == null) {
+			outputAsText = convertToText(output);
+		}
+		return outputAsText;
 	}
 
 	public String getInputAsText() {
-		return convertToText(input);
+		if (inputAsText == null) {
+			inputAsText = convertToText(input);
+		}
+		return inputAsText;
 	}
 
 	private String convertToText(byte[] bytes) {

@@ -312,7 +312,7 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 					headersContent.setCaretPosition(0);
 				}
 			};
-			new Thread(new Runnable() {
+			SwingUtils.executNonUi(new Runnable() {
 				@Override
 				public void run() {
 					inputCv.setContent(lr.getInputAsText());
@@ -365,7 +365,7 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 
 					SwingUtilities.invokeLater(uiupdate);
 				}
-			}).start();
+			});
 		}
 	}
 
@@ -504,7 +504,7 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 			int index = list.getSelectedIndex();
 			if (index >= 0) {
 				final LoadedResource resource = model.get(index);
-				SwingUtilities.invokeLater(new Runnable() {
+				SwingUtils.executNonUi(new Runnable() {
 					@Override
 					public void run() {
 						ajaxProxy.replay(resource);
