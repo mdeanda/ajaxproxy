@@ -193,7 +193,7 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 		removeRequestMenuItem.addActionListener(this);
 		popup.add(removeRequestMenuItem);
 
-		replyMenuItem = new JMenuItem("Reply Request");
+		replyMenuItem = new JMenuItem("Replay Request");
 		replyMenuItem.addActionListener(this);
 		popup.add(replyMenuItem);
 
