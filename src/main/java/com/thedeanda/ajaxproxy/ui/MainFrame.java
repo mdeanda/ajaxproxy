@@ -46,6 +46,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.thedeanda.ajaxproxy.ProxyListener;
+import com.thedeanda.ajaxproxy.ui.rest.RestClientFrame;
 
 public class MainFrame extends JFrame implements ProxyListener {
 	private static final long serialVersionUID = 1L;
@@ -267,6 +268,20 @@ public class MainFrame extends JFrame implements ProxyListener {
 
 		menu.addSeparator();
 
+		mi = new JMenuItem("Rest Client");
+		mi.setMnemonic(KeyEvent.VK_R);
+		mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R,
+				ActionEvent.CTRL_MASK));
+		mi.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent ae) {
+				handleRest();
+			}
+		});
+		menu.add(mi);
+
+		menu.addSeparator();
+
 		mi = new JMenuItem("Exit");
 		mi.setMnemonic(KeyEvent.VK_X);
 		mi.addActionListener(new ActionListener() {
@@ -303,6 +318,11 @@ public class MainFrame extends JFrame implements ProxyListener {
 		mi.addActionListener(menuItemListener);
 		menu.add(mi);
 
+	}
+
+	private void handleRest() {
+		RestClientFrame frame = new RestClientFrame(null);
+		frame.setVisible(true);
 	}
 
 	private void handleNew() {
