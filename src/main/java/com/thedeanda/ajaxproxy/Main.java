@@ -18,6 +18,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +42,7 @@ public class Main {
 			String config = cmd.getOptionValue('c', null);
 			String merge = cmd.getOptionValue('m', null);
 			boolean run = cmd.hasOption("r");
+			boolean runui = cmd.hasOption("ru");
 			boolean rm = cmd.hasOption("rm");
 			boolean ignore = cmd.hasOption("i");
 
@@ -62,7 +64,7 @@ public class Main {
 				printHelp(options);
 				return;
 			} else {
-				showUi();
+				showUi(config, runui);
 			}
 
 		} catch (ParseException exp) {
@@ -72,7 +74,7 @@ public class Main {
 		}
 	}
 
-	private static void showUi() {
+	private static void showUi(final String config, final boolean runui) {
 		System.setProperty("apple.laf.useScreenMenuBar", "true");
 		System.setProperty("com.apple.mrj.application.apple.menu.about.name",
 				"Ajaxproxy");
@@ -88,8 +90,17 @@ public class Main {
 
 				}
 
-				MainFrame f = new MainFrame();
-				f.setVisible(true);
+				MainFrame frame = new MainFrame();
+				frame.setVisible(true);
+
+				if (!StringUtils.isBlank(config)) {
+					File file = new File(config);
+					frame.loadFile(file);
+				}
+
+				if (runui) {
+					frame.startProxy();
+				}
 			}
 		});
 	}
@@ -148,6 +159,7 @@ public class Main {
 		Options options = new Options();
 
 		options.addOption("r", "run", false, "run ajaxproxy in headless mode");
+		options.addOption("ru", "runui", false, "run ajaxproxy in ui mode");
 		options.addOption("h", "help", false, "print this message");
 		options.addOption("c", "config", true, "the config file");
 		options.addOption("m", "merge", true,

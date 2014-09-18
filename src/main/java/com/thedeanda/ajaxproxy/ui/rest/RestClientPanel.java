@@ -3,6 +3,11 @@ package com.thedeanda.ajaxproxy.ui.rest;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
@@ -14,6 +19,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -99,8 +105,7 @@ public class RestClientPanel extends JPanel implements ActionListener {
 	}
 
 	private JComboBox<String> createAddHeaderDropDown() {
-		String[] predefinedHeaders = { "", "Content-Type: application/json",
-				"Cat", "Dog", "Rabbit", "Pig" };
+		String[] predefinedHeaders = getAddHeaderOptions();
 
 		addHeaderCombo = new JComboBox<String>(predefinedHeaders);
 		addHeaderCombo.addActionListener(this);
@@ -156,6 +161,23 @@ public class RestClientPanel extends JPanel implements ActionListener {
 		return panel;
 	}
 
+	private String[] getAddHeaderOptions() {
+		String[] lines = null;
+		InputStream is = getClass().getResourceAsStream(
+				"predefined-headers.txt");
+		if (is != null) {
+			try {
+				List<String> tmp = IOUtils.readLines(is);
+				lines = new String[tmp.size()];
+				tmp.toArray(lines);
+			} catch (IOException e) {
+				log.warn(e.getMessage(), e);
+			}
+
+		}
+		return lines;
+	}
+
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == addHeaderCombo) {
@@ -170,19 +192,19 @@ public class RestClientPanel extends JPanel implements ActionListener {
 	}
 
 	private String addHeader(String currentHeaders, String newHeader) {
-		log.warn("input: {}\n\n add: {}", currentHeaders, newHeader);
+		log.debug("input: {}\n\n add: {}", currentHeaders, newHeader);
 		if (currentHeaders == null) {
 			currentHeaders = "";
 		}
 
 		if (StringUtils.isBlank(newHeader)) {
-			log.warn("add empty header, abort");
+			log.debug("add empty header, abort");
 			return currentHeaders;
 		}
 
 		String[] parts = newHeader.split(":", 2);
 		if (parts.length != 2) {
-			log.warn("parts length incorrect, abort");
+			log.debug("parts length incorrect, abort");
 			return currentHeaders;
 		}
 
@@ -209,7 +231,7 @@ public class RestClientPanel extends JPanel implements ActionListener {
 		output.append(newHeader);
 		output.append("\n");
 
-		log.warn("return: {}", output);
+		log.debug("return: {}", output);
 		return output.toString();
 	}
 }

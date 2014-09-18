@@ -107,7 +107,7 @@ public class MainFrame extends JFrame implements ProxyListener {
 			setTitle("Ajax Proxy - " + file.getAbsolutePath());
 	}
 
-	private void loadFile(final File file) {
+	public void loadFile(final File file) {
 		handleStop();
 		this.file = file;
 		recentFiles.add(file);
@@ -148,7 +148,7 @@ public class MainFrame extends JFrame implements ProxyListener {
 			ActionListener menuItemListener = new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					if (e.getSource() == startServerMenuItem)
-						handleStart();
+						startProxy();
 					else if (e.getSource() == stopServerMenuItem)
 						handleStop();
 					else
@@ -295,7 +295,7 @@ public class MainFrame extends JFrame implements ProxyListener {
 		ActionListener menuItemListener = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (e.getSource() == startServerMenuItem2)
-					handleStart();
+					startProxy();
 				else if (e.getSource() == stopServerMenuItem2)
 					handleStop();
 			}
@@ -389,7 +389,7 @@ public class MainFrame extends JFrame implements ProxyListener {
 		}
 	}
 
-	private void handleStart() {
+	public void startProxy() {
 		panel.start();
 	}
 
