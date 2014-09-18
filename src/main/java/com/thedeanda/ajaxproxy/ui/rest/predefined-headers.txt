@@ -1,0 +1,7 @@
+Content-Type: application/json
+Content-Type: application/atom+xml
+Content-Type: application/x-www-form-urlencoded
+Content-Type: application/xml
+Content-Type: multipart/form-data
+Content-Type: text/html
+Content-Type: text/plain

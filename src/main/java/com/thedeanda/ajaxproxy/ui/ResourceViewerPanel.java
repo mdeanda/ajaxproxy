@@ -9,8 +9,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -21,7 +19,6 @@ import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JList;
 import javax.swing.JMenuItem;
@@ -30,18 +27,13 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpringLayout;
-import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.text.Document;
-import javax.swing.text.html.HTMLEditorKit;
-import javax.swing.text.html.StyleSheet;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import net.sourceforge.javajson.JsonArray;
@@ -64,16 +56,12 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 	private JCheckBox toggleBtn;
 	private DefaultListModel<LoadedResource> model;
 	private JList<LoadedResource> list;
-	private JTabbedPane tabs;
-	private JEditorPane headersContent;
-	private JScrollPane headersScroll;
+	private ResourcePanel resourcePanel;
 	private JTextField filter;
 	private Color okColor;
 	private Color badColor;
 	private Pattern filterRegEx;
 	private JMenuItem removeRequestMenuItem;
-	private ContentViewer inputCv;
-	private ContentViewer outputCv;
 	private JMenuItem replyMenuItem;
 	private AjaxProxy ajaxProxy;
 
@@ -105,34 +93,11 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 
 		JPanel leftPanel = initLeftPanel();
 
-		HTMLEditorKit kit = new HTMLEditorKit();
-		StyleSheet styleSheet = kit.getStyleSheet();
-		styleSheet
-				.addRule("body {color:#000000; margin: 4px; font-size: 10px; font-family: sans-serif; }");
-		styleSheet.addRule("h1 { margin: 4px 0; font-size: 12px; }");
-		styleSheet.addRule("div.items { margin-left: 10px;}");
-		styleSheet.addRule("p { margin: 0; font-family: monospace;}");
-		styleSheet.addRule("b { font-family: sans-serif; color: #444444;}");
-
-		headersContent = new JEditorPane();
-		headersContent.setEditable(false);
-		headersScroll = new JScrollPane(headersContent);
-		headersContent.setEditorKit(kit);
-		Document doc = kit.createDefaultDocument();
-		headersContent.setDocument(doc);
-
-		inputCv = new ContentViewer();
-		outputCv = new ContentViewer();
-
-		tabs = new JTabbedPane();
-		tabs.add("Headers", headersScroll);
-		tabs.add("Input", inputCv);
-		tabs.add("Output", outputCv);
-		tabs.setBorder(BorderFactory.createEmptyBorder());
+		resourcePanel = new ResourcePanel(false);
 
 		JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		split.setLeftComponent(leftPanel);
-		split.setRightComponent(tabs);
+		split.setRightComponent(resourcePanel);
 		split.setDividerLocation(200);
 		split.setBorder(BorderFactory.createEmptyBorder());
 		SwingUtils.flattenSplitPane(split);
@@ -298,83 +263,7 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 	}
 
 	private void showResource(final LoadedResource lr) {
-		headersContent.setText("");
-
-		inputCv.setContent(null);
-		outputCv.setContent(null);
-
-		if (lr != null) {
-			final StringBuilder headers = new StringBuilder();
-			final Runnable uiupdate = new Runnable() {
-				@Override
-				public void run() {
-					headersContent.setText(headers.toString());
-					headersContent.setCaretPosition(0);
-				}
-			};
-			SwingUtils.executNonUi(new Runnable() {
-				@Override
-				public void run() {
-					inputCv.setContent(lr.getInputAsText());
-					outputCv.setContent(lr.getOutputAsText());
-
-					Map<String, String> map = lr.getHeaders();
-					headers.append("<html><body>");
-					headers.append("<p><b>URL:</b> ");
-					headers.append(lr.getUrl());
-					headers.append("</p>");
-					headers.append("<p><b>Method:</b> ");
-					headers.append(lr.getMethod());
-					headers.append("</p>");
-					headers.append("<p><b>Duration:</b> ");
-					headers.append(lr.getDuration());
-					headers.append("</p>");
-					headers.append("<p><b>Date:</b> ");
-					headers.append(lr.getDate());
-					headers.append("<p><b>Character Encoding:</b> ");
-					headers.append(lr.getCharacterEncoding());
-					headers.append("</p>");
-					writeField(headers, "Status",
-							String.valueOf(lr.getStatusCode()));
-					headers.append("<h1>Headers</h1><div class=\"items\">");
-					for (String name : map.keySet()) {
-						headers.append("<p><b>");
-						headers.append(name);
-						headers.append(":</b> ");
-						headers.append(map.get(name));
-						headers.append("</p>");
-					}
-					headers.append("</div>");
-
-					Exception ex = lr.getFilterException();
-					if (ex != null) {
-						StringWriter sw = new StringWriter();
-						ex.printStackTrace(new PrintWriter(sw));
-						String[] lines = StringUtils.split(sw.toString(), "\n");
-
-						headers.append("<h1>Exception</h1><div class=\"items\">");
-						for (String line : lines) {
-							headers.append("<p>");
-							headers.append(line);
-							headers.append("</p>");
-						}
-						headers.append("</div>");
-					}
-
-					headers.append("</body></html>");
-
-					SwingUtilities.invokeLater(uiupdate);
-				}
-			});
-		}
-	}
-
-	private void writeField(StringBuilder headers, String name, String value) {
-		headers.append("<p><b>");
-		headers.append(name);
-		headers.append(":</b> ");
-		headers.append(value);
-		headers.append("</p>");
+		resourcePanel.setResource(lr);
 	}
 
 	public void setProxy(AjaxProxy ajaxProxy) {
