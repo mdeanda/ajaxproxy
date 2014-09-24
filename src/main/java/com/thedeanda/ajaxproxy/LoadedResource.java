@@ -21,6 +21,7 @@ public class LoadedResource {
 	private int statusCode;
 	private List<Cookie> cookies;
 	private Map<String, String> headers = new TreeMap<String, String>();
+	private Map<String, String> responseHeaders = new TreeMap<String, String>();
 	private String characterEncoding;
 	private Exception filterException;
 
@@ -123,6 +124,10 @@ public class LoadedResource {
 		headers.put(name, header);
 	}
 
+	public void addReponseHeader(String name, String header) {
+		responseHeaders.put(name, header);
+	}
+
 	public int getStatusCode() {
 		return statusCode;
 	}
@@ -153,5 +158,13 @@ public class LoadedResource {
 
 	public void setFilterException(Exception filterException) {
 		this.filterException = filterException;
+	}
+
+	public Map<String, String> getResponseHeaders() {
+		return responseHeaders;
+	}
+
+	public void setResponseHeaders(Map<String, String> responseHeaders) {
+		this.responseHeaders = responseHeaders;
 	}
 }
