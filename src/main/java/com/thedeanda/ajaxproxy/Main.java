@@ -5,7 +5,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringReader;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -45,6 +47,7 @@ public class Main {
 			boolean runui = cmd.hasOption("ru");
 			boolean rm = cmd.hasOption("rm");
 			boolean ignore = cmd.hasOption("i");
+			Map<String, String> vars = readVariables(cmd.getOptionValues("v"));
 
 			if (config != null) {
 				File c = new File(config);
@@ -64,7 +67,7 @@ public class Main {
 				printHelp(options);
 				return;
 			} else {
-				showUi(config, runui);
+				showUi(config, runui, vars);
 			}
 
 		} catch (ParseException exp) {
@@ -74,7 +77,26 @@ public class Main {
 		}
 	}
 
-	private static void showUi(final String config, final boolean runui) {
+	private static Map<String, String> readVariables(String[] vars) {
+		Map<String, String> map = new HashMap<>();
+		if (vars != null && vars.length > 0) {
+			for (String var : vars) {
+				if (var.contains(":")) {
+					String[] parts = var.split(":", 2);
+					map.put(parts[0], parts[1]);
+				} else {
+					throw new IllegalArgumentException(
+							String.format(
+									"invalid variable. expects varname:varvalue not {}",
+									var));
+				}
+			}
+			log.info("variable map: {}", map);
+		}
+		return map;
+	}
+
+	private static void showUi(final String config, final boolean runui, final Map<String, String> vars) {
 		System.setProperty("apple.laf.useScreenMenuBar", "true");
 		System.setProperty("com.apple.mrj.application.apple.menu.about.name",
 				"Ajaxproxy");
@@ -101,6 +123,8 @@ public class Main {
 				if (runui) {
 					frame.startProxy();
 				}
+				
+				frame.addVariables(vars);
 			}
 		});
 	}
@@ -168,6 +192,7 @@ public class Main {
 				"delete existing output folder before merge");
 		options.addOption("i", "ignoreDirectory", false,
 				"ignore existing output folder and output into existing folder");
+		options.addOption("v", true, "add variables in the form name:value");
 		return options;
 	}
 

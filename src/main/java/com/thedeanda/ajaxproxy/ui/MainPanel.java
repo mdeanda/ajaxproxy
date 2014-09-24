@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
@@ -40,8 +41,6 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener,
 	private ProxyTableModel proxyModel;
 	private MergeTableModel mergeModel;
 	private VariableTableModel variableModel;
-	private JTable mergeTable;
-	private JTable variableTable;
 	private File configFile;
 	private JsonObject config;
 	private JTextArea logBox;
@@ -330,5 +329,14 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener,
 	@Override
 	public void settingsChanged() {
 		log.debug("settings changed, possible track to warn of unsaved changes during close");
+	}
+
+	public void addVariables(Map<String, String> vars) {
+		if (vars!=null) {
+			for (String key : vars.keySet()) {
+				String value = vars.get(key);
+				variableModel.set(key, value);
+			}
+		}		
 	}
 }
