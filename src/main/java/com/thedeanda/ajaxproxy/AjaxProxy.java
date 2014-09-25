@@ -319,9 +319,11 @@ public class AjaxProxy implements Runnable {
 		apfilter.add(tracker);
 	}
 
+	// TODO: remove this from ajaxproxy and move to ui since its triggered
+	// there.
 	public void replay(LoadedResource resource) {
 		log.warn("replay: {}", resource.getUrl());
 		// TODO: maybe 127.0.0.1?
-		httpClient.replay("localhost", port, resource);
+		httpClient.replay("localhost", port, resource, null);
 	}
 }

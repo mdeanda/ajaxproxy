@@ -3,13 +3,14 @@ package com.thedeanda.ajaxproxy.ui.rest;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.io.StringWriter;
 import java.util.List;
 
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -21,22 +22,36 @@ import javax.swing.SpringLayout;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.Header;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.thedeanda.ajaxproxy.http.HttpClient;
+import com.thedeanda.ajaxproxy.http.RequestListener;
 import com.thedeanda.ajaxproxy.ui.SwingUtils;
 
 public class RestClientPanel extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 1L;
 	private static final Logger log = LoggerFactory
 			.getLogger(RestClientPanel.class);
+
+	private static final String METHOD_GET = "GET";
+	private static final String METHOD_POST = "POST";
+	private static final String[] METHODS = new String[] { METHOD_GET,
+			METHOD_POST };
+
 	private JTextField urlField;
 	private JTextArea headersField;
 	private JTextArea inputField;
 	private JTextArea outputField;
 	private JComboBox<String> addHeaderCombo;
+	private JComboBox<String> methodCombo;
+	private JButton submitButton;
+	private HttpClient httpClient;
 
 	public RestClientPanel() {
+		httpClient = new HttpClient();
+
 		SpringLayout layout = new SpringLayout();
 		setLayout(layout);
 
@@ -50,19 +65,27 @@ public class RestClientPanel extends JPanel implements ActionListener {
 		JSplitPane split = initSplit();
 
 		JComboBox<String> dropDown = createAddHeaderDropDown();
+		JComboBox<String> methods = createMethodDropDown();
 
 		add(urlLabel);
+		add(methods);
 		add(urlField);
 		add(headersLabel);
 		add(headersScroll);
 		add(split);
 		add(dropDown);
 
+		// methods
+		layout.putConstraint(SpringLayout.EAST, methods, -10,
+				SpringLayout.EAST, this);
+		layout.putConstraint(SpringLayout.NORTH, methods, 20,
+				SpringLayout.NORTH, this);
+
 		// url label
 		layout.putConstraint(SpringLayout.WEST, urlLabel, 10,
 				SpringLayout.WEST, this);
-		layout.putConstraint(SpringLayout.NORTH, urlLabel, 20,
-				SpringLayout.NORTH, this);
+		layout.putConstraint(SpringLayout.VERTICAL_CENTER, urlLabel, 0,
+				SpringLayout.VERTICAL_CENTER, methods);
 
 		// url field
 		layout.putConstraint(SpringLayout.NORTH, urlField, 10,
@@ -112,6 +135,12 @@ public class RestClientPanel extends JPanel implements ActionListener {
 		return addHeaderCombo;
 	}
 
+	private JComboBox<String> createMethodDropDown() {
+		methodCombo = new JComboBox<String>(METHODS);
+		methodCombo.addActionListener(this);
+		return methodCombo;
+	}
+
 	private JSplitPane initSplit() {
 
 		outputField = SwingUtils.newJTextArea();
@@ -141,23 +170,32 @@ public class RestClientPanel extends JPanel implements ActionListener {
 		JScrollPane inputScroll = new JScrollPane(inputField);
 		panel.add(inputScroll);
 
-		// *
+		submitButton = new JButton("Submit");
+		submitButton.addActionListener(this);
+		panel.add(submitButton);
+
+		// label
 		layout.putConstraint(SpringLayout.WEST, label, 0, SpringLayout.WEST,
 				panel);
 		layout.putConstraint(SpringLayout.NORTH, label, 0, SpringLayout.NORTH,
 				panel);
-		// */
 
+		// submit button
+		layout.putConstraint(SpringLayout.EAST, submitButton, 0,
+				SpringLayout.EAST, panel);
+		layout.putConstraint(SpringLayout.SOUTH, submitButton, 0,
+				SpringLayout.SOUTH, panel);
+
+		// input area
 		layout.putConstraint(SpringLayout.WEST, inputScroll, 0,
 				SpringLayout.WEST, panel);
 		layout.putConstraint(SpringLayout.EAST, inputScroll, 0,
 				SpringLayout.EAST, panel);
 		layout.putConstraint(SpringLayout.NORTH, inputScroll, 10,
 				SpringLayout.SOUTH, label);
-		layout.putConstraint(SpringLayout.SOUTH, inputScroll, 0,
-				SpringLayout.SOUTH, panel);
+		layout.putConstraint(SpringLayout.SOUTH, inputScroll, -10,
+				SpringLayout.NORTH, submitButton);
 
-		// panel.setPreferredSize(new Dimension(500, 150));
 		return panel;
 	}
 
@@ -187,8 +225,9 @@ public class RestClientPanel extends JPanel implements ActionListener {
 						.setText(addHeader(headersField.getText(), hdrToAdd));
 				addHeaderCombo.setSelectedIndex(0);
 			}
+		} else if (e.getSource() == submitButton) {
+			handleSubmit();
 		}
-
 	}
 
 	private String addHeader(String currentHeaders, String newHeader) {
@@ -233,5 +272,43 @@ public class RestClientPanel extends JPanel implements ActionListener {
 
 		log.debug("return: {}", output);
 		return output.toString();
+	}
+
+	private void handleSubmit() {
+		log.warn("handle submit!");
+
+		final String method = (String) methodCombo.getSelectedItem();
+		final String url = urlField.getText();
+		final String headers = headersField.getText();
+		final String input = inputField.getText();
+
+		SwingUtils.executNonUi(new Runnable() {
+			@Override
+			public void run() {
+
+				try {
+					httpClient.makeRequest(method, url, headers, input,
+							new RequestListener() {
+								@Override
+								public void requestComplete(int status,
+										Header[] headers, byte[] data) {
+
+									StringWriter writer = new StringWriter();
+									ByteArrayInputStream is = new ByteArrayInputStream(
+											data);
+									try {
+										IOUtils.copy(is, writer);
+									} catch (IOException e) {
+										log.warn(e.getMessage(), e);
+									}
+
+									outputField.setText(writer.toString());
+								}
+							});
+				} catch (Exception e) {
+					log.warn(e.getMessage(), e);
+				}
+			}
+		});
 	}
 }

@@ -1,10 +1,14 @@
 package com.thedeanda.ajaxproxy.http;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.Socket;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.ConnectionReuseStrategy;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -48,11 +52,35 @@ public class HttpClient {
 
 	}
 
-	public void replay(String host, int port, LoadedResource resource) {
+	public void makeRequest(String method, String url, String headers,
+			String input, RequestListener listener)
+			throws MalformedURLException {
+		URL urlobj = new URL(url);
+		LoadedResource res = new LoadedResource();
+
+		res.setUrl(urlobj.getPath());
+
+		Map<String, String> hds = new HashMap<>();
+		if (!StringUtils.isBlank(headers)) {
+			String[] lines = StringUtils.split(headers, "\n");
+			for (String line : lines) {
+				String[] parts = StringUtils.split(line, ":", 2);
+				hds.put(parts[0], parts[1]);
+			}
+			res.setHeaders(hds);
+		}
+
+		res.setMethod(method);
+
+		replay(urlobj.getHost(), urlobj.getPort(), res, listener);
+	}
+
+	public void replay(String host, int port, LoadedResource resource,
+			RequestListener listener) {
 		if ("GET".equalsIgnoreCase(resource.getMethod())) {
-			replayGet(host, port, resource);
+			replayGet(host, port, resource, listener);
 		} else if ("POST".equalsIgnoreCase(resource.getMethod())) {
-			replayPost(host, port, resource);
+			replayPost(host, port, resource, listener);
 		}
 	}
 
@@ -70,7 +98,8 @@ public class HttpClient {
 		request.setHeaders(val);
 	}
 
-	private void replayGet(String hostname, int port, LoadedResource resource) {
+	private void replayGet(String hostname, int port, LoadedResource resource,
+			RequestListener listener) {
 		HttpCoreContext coreContext = HttpCoreContext.create();
 		HttpHost host = new HttpHost(hostname, port);
 		coreContext.setTargetHost(host);
@@ -94,7 +123,10 @@ public class HttpClient {
 			httpexecutor.postProcess(response, httpproc, coreContext);
 
 			log.trace("<< Response: " + response.getStatusLine());
-			log.trace(EntityUtils.toString(response.getEntity()));
+			if (listener!=null) {
+				byte[] bytes = EntityUtils.toByteArray(response.getEntity());
+				listener.requestComplete(200, response.getAllHeaders(), bytes);
+			}
 			log.trace("==============");
 			if (!connStrategy.keepAlive(response, coreContext)) {
 				conn.close();
@@ -114,7 +146,8 @@ public class HttpClient {
 		}
 	}
 
-	private void replayPost(String hostname, int port, LoadedResource resource) {
+	private void replayPost(String hostname, int port, LoadedResource resource,
+			RequestListener listener) {
 		HttpCoreContext coreContext = HttpCoreContext.create();
 		HttpHost host = new HttpHost(hostname, port);
 		coreContext.setTargetHost(host);
