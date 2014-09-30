@@ -58,7 +58,12 @@ public class HttpClient {
 		URL urlobj = new URL(url);
 		LoadedResource res = new LoadedResource();
 
-		res.setUrl(urlobj.getPath());
+		String query = urlobj.getQuery();
+		String requestPath = urlobj.getPath();
+		if (!StringUtils.isBlank(query)) {
+			requestPath += "?" + query;
+		}
+		res.setUrl(requestPath);
 
 		Map<String, String> hds = new HashMap<>();
 		if (!StringUtils.isBlank(headers)) {
@@ -72,7 +77,11 @@ public class HttpClient {
 
 		res.setMethod(method);
 
-		replay(urlobj.getHost(), urlobj.getPort(), res, listener);
+		int port = urlobj.getPort();
+		if (port <= 0) {
+			port = 80;
+		}
+		replay(urlobj.getHost(), port, res, listener);
 	}
 
 	public void replay(String host, int port, LoadedResource resource,
