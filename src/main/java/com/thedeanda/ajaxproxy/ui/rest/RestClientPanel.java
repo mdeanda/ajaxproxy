@@ -281,6 +281,7 @@ public class RestClientPanel extends JPanel implements ActionListener {
 		final String url = urlField.getText();
 		final String headers = headersField.getText();
 		final String input = inputField.getText();
+		outputField.setText("");
 
 		SwingUtils.executNonUi(new Runnable() {
 			@Override
