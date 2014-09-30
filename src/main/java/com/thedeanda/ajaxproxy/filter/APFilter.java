@@ -73,7 +73,7 @@ public class APFilter implements Filter {
 		String qs = httpRequest.getQueryString();
 		if (!StringUtils.isBlank(qs))
 			url += "?" + qs;
-		resource.setUrl(url);
+		resource.setPath(url);
 
 		String method = httpRequest.getMethod();
 		resource.setMethod(method);

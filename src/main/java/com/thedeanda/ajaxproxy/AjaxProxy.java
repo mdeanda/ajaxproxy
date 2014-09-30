@@ -322,7 +322,7 @@ public class AjaxProxy implements Runnable {
 	// TODO: remove this from ajaxproxy and move to ui since its triggered
 	// there.
 	public void replay(LoadedResource resource) {
-		log.warn("replay: {}", resource.getUrl());
+		log.warn("replay: {}", resource.getPath());
 		// TODO: maybe 127.0.0.1?
 		httpClient.replay("localhost", port, resource, null);
 	}

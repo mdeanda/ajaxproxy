@@ -276,7 +276,7 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 	public void trackFile(LoadedResource res) {
 		boolean show = toggleBtn.isSelected();
 		if (show && filterRegEx != null) {
-			Matcher matcher = filterRegEx.matcher(res.getUrl());
+			Matcher matcher = filterRegEx.matcher(res.getPath());
 			if (matcher.matches())
 				show = true;
 			else
@@ -316,7 +316,7 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 				LoadedResource obj = (LoadedResource) model.get(i);
 				String fn = StringUtils.leftPad(String.valueOf(i), 8, "0");
 				JsonObject json = new JsonObject();
-				json.put("url", urlPrefix + obj.getUrl());
+				json.put("url", urlPrefix + obj.getPath());
 				try {
 					json.put("input", JsonObject.parse(obj.getInputAsText()));
 				} catch (JsonException e1) {

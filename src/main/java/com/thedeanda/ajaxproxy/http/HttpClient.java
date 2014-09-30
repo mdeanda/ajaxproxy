@@ -63,7 +63,7 @@ public class HttpClient {
 		if (!StringUtils.isBlank(query)) {
 			requestPath += "?" + query;
 		}
-		res.setUrl(requestPath);
+		res.setPath(requestPath);
 
 		Map<String, String> hds = new HashMap<>();
 		if (!StringUtils.isBlank(headers)) {
@@ -117,7 +117,7 @@ public class HttpClient {
 				8 * 1024);
 		ConnectionReuseStrategy connStrategy = DefaultConnectionReuseStrategy.INSTANCE;
 		try {
-			String target = resource.getUrl();
+			String target = resource.getPath();
 			if (!conn.isOpen()) {
 				Socket socket = new Socket(host.getHostName(), host.getPort());
 				conn.bind(socket);
@@ -165,7 +165,7 @@ public class HttpClient {
 				8 * 1024);
 		ConnectionReuseStrategy connStrategy = DefaultConnectionReuseStrategy.INSTANCE;
 		try {
-			String target = resource.getUrl();
+			String target = resource.getPath();
 			HttpEntity requestBody = new ByteArrayEntity(resource.getInput(),
 					ContentType.APPLICATION_OCTET_STREAM);
 

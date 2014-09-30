@@ -13,7 +13,7 @@ import org.apache.commons.io.IOUtils;
 
 public class LoadedResource {
 	private Date date;
-	private String url;
+	private String path;
 	private long duration;
 	private byte[] input;
 	private byte[] output;
@@ -30,15 +30,15 @@ public class LoadedResource {
 
 	@Override
 	public String toString() {
-		return url;
+		return path;
 	}
 
-	public String getUrl() {
-		return url;
+	public String getPath() {
+		return path;
 	}
 
-	public void setUrl(String url) {
-		this.url = url;
+	public void setPath(String path) {
+		this.path = path;
 	}
 
 	public long getDuration() {
