@@ -73,7 +73,7 @@ public class APFilter implements Filter {
 		String qs = httpRequest.getQueryString();
 		if (!StringUtils.isBlank(qs))
 			url += "?" + qs;
-		resource.setUrl(url);
+		resource.setPath(url);
 
 		String method = httpRequest.getMethod();
 		resource.setMethod(method);
@@ -106,8 +106,10 @@ public class APFilter implements Filter {
 		try {
 			chain.doFilter(reqWrapper, wrapper);
 		} catch (IOException e) {
+			log.warn(e.getMessage(), e);
 			ioe = e;
 		} catch (ServletException e) {
+			log.warn(e.getMessage(), e);
 			se = e;
 		}
 		throttledCopy(wrapper.getNewInputStream(), response.getOutputStream());

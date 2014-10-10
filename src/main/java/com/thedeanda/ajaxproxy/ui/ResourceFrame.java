@@ -22,7 +22,7 @@ public class ResourceFrame extends JFrame {
 		setLayout(new BorderLayout());
 		add(BorderLayout.CENTER, panel);
 		panel.setResource(resource);
-		setTitle(resource.getUrl());
+		setTitle(resource.getPath());
 		setPreferredSize(new Dimension(640, 480));
 		pack();
 	}

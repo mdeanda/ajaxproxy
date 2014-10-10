@@ -27,6 +27,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.swing.JFileChooser;
@@ -65,6 +66,7 @@ public class MainFrame extends JFrame implements ProxyListener {
 	private JMenuItem startServerMenuItem2;
 	private JMenuItem saveAsMenuItem;
 	private JMenuItem saveMenuItem;
+	private MenuItem showFrameMenuItem;
 
 	public MainFrame() {
 		this.panel = new MainPanel();
@@ -151,7 +153,9 @@ public class MainFrame extends JFrame implements ProxyListener {
 						startProxy();
 					else if (e.getSource() == stopServerMenuItem)
 						handleStop();
-					else
+					else if (e.getSource() == showFrameMenuItem) {
+						MainFrame.this.setVisible(true);
+					} else
 						handleExit();
 				}
 			};
@@ -164,6 +168,12 @@ public class MainFrame extends JFrame implements ProxyListener {
 			this.stopServerMenuItem = new MenuItem("Stop Server");
 			stopServerMenuItem.addActionListener(menuItemListener);
 			popup.add(stopServerMenuItem);
+
+			this.showFrameMenuItem = new MenuItem("Show Window");
+			showFrameMenuItem.addActionListener(menuItemListener);
+			popup.add(showFrameMenuItem);
+			
+			popup.addSeparator();
 
 			MenuItem defaultItem = new MenuItem("Exit");
 			defaultItem.addActionListener(menuItemListener);
@@ -537,6 +547,10 @@ public class MainFrame extends JFrame implements ProxyListener {
 	@Override
 	public void failed() {
 		stopped();
+	}
+
+	public void addVariables(Map<String, String> vars) {
+		panel.addVariables(vars);
 	}
 
 }

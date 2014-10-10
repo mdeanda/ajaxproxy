@@ -139,8 +139,8 @@ public class ResourcePanel extends JPanel implements ActionListener {
 
 					Map<String, String> map = resource.getHeaders();
 					headers.append("<html><body>");
-					headers.append("<p><b>URL:</b> ");
-					headers.append(resource.getUrl());
+					headers.append("<p><b>Request Path:</b> ");
+					headers.append(resource.getPath());
 					headers.append("</p>");
 					headers.append("<p><b>Method:</b> ");
 					headers.append(resource.getMethod());

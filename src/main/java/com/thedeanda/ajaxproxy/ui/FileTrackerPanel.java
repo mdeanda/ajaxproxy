@@ -71,7 +71,7 @@ public class FileTrackerPanel extends JPanel implements AccessTracker {
 	@Override
 	public void trackFile(LoadedResource res) {
 		if (toggleBtn.isSelected()) {
-			model.trackFile(res.getUrl(), res.getDuration());
+			model.trackFile(res.getPath(), res.getDuration());
 		}
 	}
 
