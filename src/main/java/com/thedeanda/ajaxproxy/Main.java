@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
@@ -25,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.thedeanda.ajaxproxy.ui.MainFrame;
+import com.thedeanda.ajaxproxy.ui.rest.RestClientFrame;
 
 public class Main {
 	private static final Logger log = LoggerFactory.getLogger(Main.class);
@@ -43,6 +45,7 @@ public class Main {
 
 			String config = cmd.getOptionValue('c', null);
 			String merge = cmd.getOptionValue('m', null);
+			boolean runrest = cmd.hasOption("rr");
 			boolean run = cmd.hasOption("r");
 			boolean runui = cmd.hasOption("ru");
 			boolean rm = cmd.hasOption("rm");
@@ -57,7 +60,9 @@ public class Main {
 				}
 			}
 
-			if (config != null && merge != null) {
+			if (runrest) {
+				runRest();
+			} else if (config != null && merge != null) {
 				runMerge(config, merge, rm, ignore);
 				return;
 			} else if (config != null && run) {
@@ -96,7 +101,8 @@ public class Main {
 		return map;
 	}
 
-	private static void showUi(final String config, final boolean runui, final Map<String, String> vars) {
+	private static void showUi(final String config, final boolean runui,
+			final Map<String, String> vars) {
 		System.setProperty("apple.laf.useScreenMenuBar", "true");
 		System.setProperty("com.apple.mrj.application.apple.menu.about.name",
 				"Ajaxproxy");
@@ -123,7 +129,7 @@ public class Main {
 				if (runui) {
 					frame.startProxy();
 				}
-				
+
 				frame.addVariables(vars);
 			}
 		});
@@ -134,6 +140,12 @@ public class Main {
 		formatter.printHelp(" ", options);
 	}
 
+	private static void runRest() {
+		RestClientFrame restFrame = new RestClientFrame(null);
+		restFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		restFrame.setVisible(true);
+	}
+	
 	private static void runMerge(String config, String output, boolean rm,
 			boolean ignore) throws Exception {
 		File dir = new File(output);
@@ -184,6 +196,7 @@ public class Main {
 
 		options.addOption("r", "run", false, "run ajaxproxy in headless mode");
 		options.addOption("ru", "runui", false, "run ajaxproxy in ui mode");
+		options.addOption("rr", "runrest", false, "run rest client only");
 		options.addOption("h", "help", false, "print this message");
 		options.addOption("c", "config", true, "the config file");
 		options.addOption("m", "merge", true,

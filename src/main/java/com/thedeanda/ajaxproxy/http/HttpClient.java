@@ -7,6 +7,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.ConnectionReuseStrategy;
@@ -42,6 +43,10 @@ public class HttpClient {
 	HttpRequestExecutor httpexecutor;
 	HttpProcessor httpproc;
 
+	public enum RequestMethod {
+		GET, POST
+	}
+
 	public HttpClient() {
 		httpproc = HttpProcessorBuilder.create().add(new RequestContent())
 				.add(new RequestTargetHost()).add(new RequestConnControl())
@@ -52,8 +57,8 @@ public class HttpClient {
 
 	}
 
-	public void makeRequest(String method, String url, String headers,
-			String input, RequestListener listener)
+	public void makeRequest(RequestMethod method, String url, String headers,
+			byte[] input, RequestListener listener)
 			throws MalformedURLException {
 		URL urlobj = new URL(url);
 		LoadedResource res = new LoadedResource();
@@ -72,125 +77,102 @@ public class HttpClient {
 				String[] parts = StringUtils.split(line, ":", 2);
 				hds.put(parts[0], parts[1]);
 			}
-			res.setHeaders(hds);
+			res.setRequestHeaders(hds);
+		}
+		Header[] requestHeaders = null;
+		if (hds.size() > 0) {
+			requestHeaders = new Header[hds.size()];
+			int i = 0;
+			for (String key : hds.keySet()) {
+				Header h = new BasicHeader(key, hds.get(key));
+				requestHeaders[i++] = h;
+			}
 		}
 
-		res.setMethod(method);
+		res.setMethod(method.name());
 
 		int port = urlobj.getPort();
 		if (port <= 0) {
 			port = 80;
 		}
-		replay(urlobj.getHost(), port, res, listener);
+
+		UUID uuid = UUID.randomUUID();
+		if (listener != null) {
+			listener.newRequest(uuid, urlobj, requestHeaders, input);
+		}
+
+		makeRequestInternal(method, uuid, urlobj, requestHeaders, input,
+				listener);
+
 	}
 
 	public void replay(String host, int port, LoadedResource resource,
 			RequestListener listener) {
+		// TODO: map to makeRequest params
+		UUID id = UUID.randomUUID();
 		if ("GET".equalsIgnoreCase(resource.getMethod())) {
-			replayGet(host, port, resource, listener);
+			// doGet(id, host, port, resource, listener);
 		} else if ("POST".equalsIgnoreCase(resource.getMethod())) {
-			replayPost(host, port, resource, listener);
+			// doPost(host, port, resource, listener);
 		}
 	}
 
-	private void addHeaders(BasicHttpRequest request, LoadedResource resource) {
-		Map<String, String> headers = resource.getHeaders();
-		ArrayList<Header> xheaders = new ArrayList<Header>();
-		for (String key : headers.keySet()) {
-			if (!"Content-Length".equalsIgnoreCase(key)) {
-				Header hdr = new BasicHeader(key, headers.get(key));
-				xheaders.add(hdr);
-			}
+	private HttpHost getHost(URL url) {
+		int port = url.getPort();
+		if (port < 0) {
+			port = 80;
 		}
-		Header[] val = new Header[xheaders.size()];
-		xheaders.toArray(val);
-		request.setHeaders(val);
+		HttpHost host = new HttpHost(url.getHost(), port);
+		return host;
 	}
 
-	private void replayGet(String hostname, int port, LoadedResource resource,
-			RequestListener listener) {
+	private void makeRequestInternal(RequestMethod method, UUID id, URL url,
+			Header[] requestHeaders, byte[] data, RequestListener listener) {
 		HttpCoreContext coreContext = HttpCoreContext.create();
-		HttpHost host = new HttpHost(hostname, port);
+		HttpHost host = getHost(url);
 		coreContext.setTargetHost(host);
 
 		DefaultBHttpClientConnection conn = new DefaultBHttpClientConnection(
 				8 * 1024);
 		ConnectionReuseStrategy connStrategy = DefaultConnectionReuseStrategy.INSTANCE;
 		try {
-			String target = resource.getPath();
+			String target = url.getPath();
 			if (!conn.isOpen()) {
 				Socket socket = new Socket(host.getHostName(), host.getPort());
 				conn.bind(socket);
 			}
-			BasicHttpRequest request = new BasicHttpRequest("GET", target);
-			addHeaders(request, resource);
-			log.trace(">> Request URI: " + request.getRequestLine().getUri());
+			BasicHttpRequest request = null;
+			switch (method) {
+			case GET:
+				request = new BasicHttpRequest("GET", target);
+				break;
+			case POST:
+				HttpEntity requestBody = new ByteArrayEntity(data,
+						ContentType.APPLICATION_OCTET_STREAM);
+				BasicHttpEntityEnclosingRequest tmpRequest = new BasicHttpEntityEnclosingRequest(
+						"POST", target);
+				tmpRequest.setEntity(requestBody);
+				request = tmpRequest;
+			}
+			request.setHeaders(requestHeaders);
+			log.info(">> Request URI: " + request.getRequestLine().getUri());
 
 			httpexecutor.preProcess(request, httpproc, coreContext);
 			HttpResponse response = httpexecutor.execute(request, conn,
 					coreContext);
 			httpexecutor.postProcess(response, httpproc, coreContext);
 
-			log.trace("<< Response: " + response.getStatusLine());
-			if (listener!=null) {
+			log.info("<< Response: " + response.getStatusLine());
+			if (listener != null) {
 				byte[] bytes = EntityUtils.toByteArray(response.getEntity());
-				listener.requestComplete(200, response.getAllHeaders(), bytes);
+				listener.requestComplete(id, response.getStatusLine()
+						.getStatusCode(), response.getAllHeaders(), bytes);
 			}
-			log.trace("==============");
+			log.info("==============");
 			if (!connStrategy.keepAlive(response, coreContext)) {
 				conn.close();
 			} else {
-				log.debug("Connection kept alive...");
-			}
-		} catch (IOException e) {
-			log.warn(e.getMessage(), e);
-		} catch (HttpException e) {
-			log.warn(e.getMessage(), e);
-		} finally {
-			try {
-				conn.close();
-			} catch (IOException e) {
-				log.warn(e.getMessage(), e);
-			}
-		}
-	}
-
-	private void replayPost(String hostname, int port, LoadedResource resource,
-			RequestListener listener) {
-		HttpCoreContext coreContext = HttpCoreContext.create();
-		HttpHost host = new HttpHost(hostname, port);
-		coreContext.setTargetHost(host);
-
-		DefaultBHttpClientConnection conn = new DefaultBHttpClientConnection(
-				8 * 1024);
-		ConnectionReuseStrategy connStrategy = DefaultConnectionReuseStrategy.INSTANCE;
-		try {
-			String target = resource.getPath();
-			HttpEntity requestBody = new ByteArrayEntity(resource.getInput(),
-					ContentType.APPLICATION_OCTET_STREAM);
-
-			if (!conn.isOpen()) {
-				Socket socket = new Socket(host.getHostName(), host.getPort());
-				conn.bind(socket);
-			}
-			BasicHttpEntityEnclosingRequest request = new BasicHttpEntityEnclosingRequest(
-					"POST", target);
-			addHeaders(request, resource);
-			request.setEntity(requestBody);
-			log.trace(">> Request URI: " + request.getRequestLine().getUri());
-
-			httpexecutor.preProcess(request, httpproc, coreContext);
-			HttpResponse response = httpexecutor.execute(request, conn,
-					coreContext);
-			httpexecutor.postProcess(response, httpproc, coreContext);
-
-			log.trace("<< Response: " + response.getStatusLine());
-			log.trace(EntityUtils.toString(response.getEntity()));
-			log.trace("==============");
-			if (!connStrategy.keepAlive(response, coreContext)) {
-				conn.close();
-			} else {
-				log.debug("Connection kept alive...");
+				log.info("Connection kept alive...");
 			}
 		} catch (IOException e) {
 			log.warn(e.getMessage(), e);

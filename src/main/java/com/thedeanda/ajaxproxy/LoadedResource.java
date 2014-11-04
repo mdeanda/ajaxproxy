@@ -15,12 +15,12 @@ public class LoadedResource {
 	private Date date;
 	private String path;
 	private long duration;
-	private byte[] input;
+	private byte[] input = new byte[0];
 	private byte[] output;
 	private String method;
 	private int statusCode;
 	private List<Cookie> cookies;
-	private Map<String, String> headers = new TreeMap<String, String>();
+	private Map<String, String> requestHeaders = new TreeMap<String, String>();
 	private Map<String, String> responseHeaders = new TreeMap<String, String>();
 	private String characterEncoding;
 	private Exception filterException;
@@ -112,16 +112,16 @@ public class LoadedResource {
 		return sb.toString();
 	}
 
-	public Map<String, String> getHeaders() {
-		return headers;
+	public Map<String, String> getRequestHeaders() {
+		return requestHeaders;
 	}
 
-	public void setHeaders(Map<String, String> headers) {
-		this.headers = headers;
+	public void setRequestHeaders(Map<String, String> headers) {
+		this.requestHeaders = headers;
 	}
 
-	public void addHeader(String name, String header) {
-		headers.put(name, header);
+	public void addRequestHeader(String name, String header) {
+		requestHeaders.put(name, header);
 	}
 
 	public void addReponseHeader(String name, String header) {

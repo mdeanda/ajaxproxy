@@ -23,11 +23,13 @@ import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.Header;
 
 import com.thedeanda.ajaxproxy.LoadedResource;
+import com.thedeanda.ajaxproxy.http.RequestListener;
 
 /**
- * panel to view a single resource
+ * panel to view a single resource.
  * 
  * @author mdeanda
  *
@@ -137,7 +139,6 @@ public class ResourcePanel extends JPanel implements ActionListener {
 					inputCv.setContent(resource.getInputAsText());
 					outputCv.setContent(resource.getOutputAsText());
 
-					Map<String, String> map = resource.getHeaders();
 					headers.append("<html><body>");
 					headers.append("<p><b>Request Path:</b> ");
 					headers.append(resource.getPath());
@@ -155,7 +156,19 @@ public class ResourcePanel extends JPanel implements ActionListener {
 					headers.append("</p>");
 					writeField(headers, "Status",
 							String.valueOf(resource.getStatusCode()));
-					headers.append("<h1>Headers</h1><div class=\"items\">");
+					headers.append("<h1>Request Headers</h1><div class=\"items\">");
+					Map<String, String> map = resource.getRequestHeaders();
+					for (String name : map.keySet()) {
+						headers.append("<p><b>");
+						headers.append(name);
+						headers.append(":</b> ");
+						headers.append(map.get(name));
+						headers.append("</p>");
+					}
+					headers.append("</div>");
+
+					headers.append("<h1>Response Headers</h1><div class=\"items\">");
+					map = resource.getResponseHeaders();
 					for (String name : map.keySet()) {
 						headers.append("<p><b>");
 						headers.append(name);
@@ -210,4 +223,5 @@ public class ResourcePanel extends JPanel implements ActionListener {
 			loadPopup();
 		}
 	}
+
 }

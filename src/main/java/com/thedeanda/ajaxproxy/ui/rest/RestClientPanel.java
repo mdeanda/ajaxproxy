@@ -1,13 +1,16 @@
 package com.thedeanda.ajaxproxy.ui.rest;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.net.URL;
 import java.util.List;
+import java.util.UUID;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -27,8 +30,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.thedeanda.ajaxproxy.http.HttpClient;
+import com.thedeanda.ajaxproxy.http.HttpClient.RequestMethod;
 import com.thedeanda.ajaxproxy.http.RequestListener;
+import com.thedeanda.ajaxproxy.ui.ResourcePanel;
 import com.thedeanda.ajaxproxy.ui.SwingUtils;
+import com.thedeanda.ajaxproxy.ui.viewer.RequestViewer;
 
 public class RestClientPanel extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 1L;
@@ -48,6 +54,7 @@ public class RestClientPanel extends JPanel implements ActionListener {
 	private JComboBox<String> methodCombo;
 	private JButton submitButton;
 	private HttpClient httpClient;
+	private RequestViewer outputPanel;
 
 	public RestClientPanel() {
 		httpClient = new HttpClient();
@@ -131,6 +138,7 @@ public class RestClientPanel extends JPanel implements ActionListener {
 		String[] predefinedHeaders = getAddHeaderOptions();
 
 		addHeaderCombo = new JComboBox<String>(predefinedHeaders);
+		addHeaderCombo.setPreferredSize(new Dimension(250, 25));
 		addHeaderCombo.addActionListener(this);
 		return addHeaderCombo;
 	}
@@ -147,9 +155,11 @@ public class RestClientPanel extends JPanel implements ActionListener {
 		outputField.setBackground(new Color(250, 250, 250));
 		JScrollPane outputScroll = new JScrollPane(outputField);
 
+		outputPanel = new RequestViewer();
+
 		JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 		split.setTopComponent(initInputPanel());
-		split.setBottomComponent(outputScroll);
+		split.setBottomComponent(outputPanel);
 		split.setDividerLocation(170);
 		split.setBorder(BorderFactory.createEmptyBorder());
 		SwingUtils.flattenSplitPane(split);
@@ -275,12 +285,13 @@ public class RestClientPanel extends JPanel implements ActionListener {
 	}
 
 	private void handleSubmit() {
-		log.warn("handle submit!");
+		log.info("handle submit!");
 
-		final String method = (String) methodCombo.getSelectedItem();
+		final RequestMethod method = RequestMethod.valueOf((String) methodCombo
+				.getSelectedItem());
 		final String url = urlField.getText();
 		final String headers = headersField.getText();
-		final String input = inputField.getText();
+		final byte[] input = inputField.getText().getBytes();
 		outputField.setText("");
 
 		SwingUtils.executNonUi(new Runnable() {
@@ -288,11 +299,15 @@ public class RestClientPanel extends JPanel implements ActionListener {
 			public void run() {
 
 				try {
+					log.info("making request");
+					httpClient.makeRequest(method, url, headers, input, outputPanel);
+					/*
 					httpClient.makeRequest(method, url, headers, input,
 							new RequestListener() {
 								@Override
-								public void requestComplete(int status,
-										Header[] headers, byte[] data) {
+								public void requestComplete(UUID id,
+										int status, Header[] headers,
+										byte[] data) {
 
 									StringWriter writer = new StringWriter();
 									ByteArrayInputStream is = new ByteArrayInputStream(
@@ -305,7 +320,15 @@ public class RestClientPanel extends JPanel implements ActionListener {
 
 									outputField.setText(writer.toString());
 								}
-							});
+
+								@Override
+								public void newRequest(UUID id, URL url,
+										Header[] requestHeaders, byte[] data) {
+									// TODO Auto-generated method stub
+
+								}
+
+							});*/
 				} catch (Exception e) {
 					log.warn(e.getMessage(), e);
 				}

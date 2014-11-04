@@ -88,7 +88,7 @@ public class APFilter implements Filter {
 		Enumeration<?> headerNames = reqWrapper.getHeaderNames();
 		while (headerNames.hasMoreElements()) {
 			String name = (String) headerNames.nextElement();
-			resource.addHeader(name, reqWrapper.getHeader(name));
+			resource.addRequestHeader(name, reqWrapper.getHeader(name));
 		}
 
 		if (forcedLatency > 0) {

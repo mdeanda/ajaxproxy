@@ -333,8 +333,14 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 				json.put("duration", obj.getDuration());
 				json.put("method", obj.getMethod());
 				JsonObject headers = new JsonObject();
-				json.put("headers", headers);
-				Map<String, String> hdrs = obj.getHeaders();
+				json.put("request headers", headers);
+				Map<String, String> hdrs = obj.getRequestHeaders();
+				for (String key : hdrs.keySet()) {
+					headers.put(key, hdrs.get(key));
+				}
+				headers = new JsonObject();
+				json.put("response headers", headers);
+				hdrs = obj.getResponseHeaders();
 				for (String key : hdrs.keySet()) {
 					headers.put(key, hdrs.get(key));
 				}
