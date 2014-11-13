@@ -1,18 +1,13 @@
 package com.thedeanda.ajaxproxy.ui.rest;
 
-import java.awt.Color;
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringWriter;
-import java.net.URL;
 import java.util.List;
-import java.util.UUID;
 
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -25,14 +20,11 @@ import javax.swing.SpringLayout;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.Header;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.thedeanda.ajaxproxy.http.HttpClient;
 import com.thedeanda.ajaxproxy.http.HttpClient.RequestMethod;
-import com.thedeanda.ajaxproxy.http.RequestListener;
-import com.thedeanda.ajaxproxy.ui.ResourcePanel;
 import com.thedeanda.ajaxproxy.ui.SwingUtils;
 import com.thedeanda.ajaxproxy.ui.viewer.RequestViewer;
 
@@ -59,8 +51,24 @@ public class RestClientPanel extends JPanel implements ActionListener {
 	public RestClientPanel() {
 		httpClient = new HttpClient();
 
+		JSplitPane mainSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+		setLayout(new BorderLayout());
+		add(BorderLayout.CENTER, mainSplit);
+
+		JPanel leftPanel = initLeftPanel();
+		mainSplit.setLeftComponent(leftPanel);
+
+		outputPanel = new RequestViewer();
+		mainSplit.setRightComponent(outputPanel);
+		mainSplit.setDividerLocation(400);
+
+	}
+
+	private JPanel initLeftPanel() {
+		JPanel panel = new JPanel();
 		SpringLayout layout = new SpringLayout();
-		setLayout(layout);
+		panel.setLayout(layout);
+		panel.setMinimumSize(new Dimension(200, 350));
 
 		JLabel urlLabel = SwingUtils.newJLabel("Request URL");
 		urlField = SwingUtils.newJTextField();
@@ -69,28 +77,38 @@ public class RestClientPanel extends JPanel implements ActionListener {
 		headersField = SwingUtils.newJTextArea();
 
 		JScrollPane headersScroll = new JScrollPane(headersField);
-		JSplitPane split = initSplit();
 
 		JComboBox<String> dropDown = createAddHeaderDropDown();
-		JComboBox<String> methods = createMethodDropDown();
+		panel.add(dropDown);
 
-		add(urlLabel);
-		add(methods);
-		add(urlField);
-		add(headersLabel);
-		add(headersScroll);
-		add(split);
-		add(dropDown);
+		JComboBox<String> methods = createMethodDropDown();
+		panel.add(methods);
+
+		JLabel inputLabel = SwingUtils.newJLabel("Input");
+		panel.add(inputLabel);
+
+		inputField = SwingUtils.newJTextArea();
+		JScrollPane inputScroll = new JScrollPane(inputField);
+		panel.add(inputScroll);
+
+		submitButton = new JButton("Submit");
+		submitButton.addActionListener(this);
+		panel.add(submitButton);
+
+		panel.add(urlLabel);
+		panel.add(urlField);
+		panel.add(headersLabel);
+		panel.add(headersScroll);
 
 		// methods
 		layout.putConstraint(SpringLayout.EAST, methods, -10,
-				SpringLayout.EAST, this);
+				SpringLayout.EAST, panel);
 		layout.putConstraint(SpringLayout.NORTH, methods, 20,
-				SpringLayout.NORTH, this);
+				SpringLayout.NORTH, panel);
 
 		// url label
 		layout.putConstraint(SpringLayout.WEST, urlLabel, 10,
-				SpringLayout.WEST, this);
+				SpringLayout.WEST, panel);
 		layout.putConstraint(SpringLayout.VERTICAL_CENTER, urlLabel, 0,
 				SpringLayout.VERTICAL_CENTER, methods);
 
@@ -98,40 +116,57 @@ public class RestClientPanel extends JPanel implements ActionListener {
 		layout.putConstraint(SpringLayout.NORTH, urlField, 10,
 				SpringLayout.SOUTH, urlLabel);
 		layout.putConstraint(SpringLayout.EAST, urlField, -10,
-				SpringLayout.EAST, this);
+				SpringLayout.EAST, panel);
 		layout.putConstraint(SpringLayout.WEST, urlField, 10,
-				SpringLayout.WEST, this);
+				SpringLayout.WEST, panel);
 
 		// headers label
 		layout.putConstraint(SpringLayout.WEST, headersLabel, 10,
-				SpringLayout.WEST, this);
+				SpringLayout.WEST, panel);
 		layout.putConstraint(SpringLayout.NORTH, headersLabel, 20,
 				SpringLayout.SOUTH, urlField);
 
 		// add header drop down
+		layout.putConstraint(SpringLayout.WEST, dropDown, 10,
+				SpringLayout.WEST, panel);
 		layout.putConstraint(SpringLayout.EAST, dropDown, -10,
-				SpringLayout.EAST, this);
-		layout.putConstraint(SpringLayout.VERTICAL_CENTER, dropDown, 0,
-				SpringLayout.VERTICAL_CENTER, headersLabel);
+				SpringLayout.EAST, panel);
+		layout.putConstraint(SpringLayout.NORTH, dropDown, 10,
+				SpringLayout.SOUTH, headersLabel);
 
 		// headers field
 		layout.putConstraint(SpringLayout.NORTH, headersScroll, 10,
-				SpringLayout.SOUTH, headersLabel);
+				SpringLayout.SOUTH, dropDown);
 		layout.putConstraint(SpringLayout.WEST, headersScroll, 10,
-				SpringLayout.WEST, this);
+				SpringLayout.WEST, panel);
 		layout.putConstraint(SpringLayout.EAST, headersScroll, -10,
-				SpringLayout.EAST, this);
+				SpringLayout.EAST, panel);
 		layout.putConstraint(SpringLayout.SOUTH, headersScroll, 115,
-				SpringLayout.NORTH, headersLabel);
+				SpringLayout.NORTH, dropDown);
 
-		layout.putConstraint(SpringLayout.NORTH, split, 20, SpringLayout.SOUTH,
-				headersScroll);
-		layout.putConstraint(SpringLayout.WEST, split, 10, SpringLayout.WEST,
-				this);
-		layout.putConstraint(SpringLayout.EAST, split, -10, SpringLayout.EAST,
-				this);
-		layout.putConstraint(SpringLayout.SOUTH, split, -10,
-				SpringLayout.SOUTH, this);
+		// input label
+		layout.putConstraint(SpringLayout.WEST, inputLabel, 10,
+				SpringLayout.WEST, panel);
+		layout.putConstraint(SpringLayout.NORTH, inputLabel, 20,
+				SpringLayout.SOUTH, headersScroll);
+
+		// input area
+		layout.putConstraint(SpringLayout.WEST, inputScroll, 10,
+				SpringLayout.WEST, panel);
+		layout.putConstraint(SpringLayout.EAST, inputScroll, -10,
+				SpringLayout.EAST, panel);
+		layout.putConstraint(SpringLayout.NORTH, inputScroll, 10,
+				SpringLayout.SOUTH, inputLabel);
+		layout.putConstraint(SpringLayout.SOUTH, inputScroll, -10,
+				SpringLayout.NORTH, submitButton);
+
+		// submit button
+		layout.putConstraint(SpringLayout.EAST, submitButton, -10,
+				SpringLayout.EAST, panel);
+		layout.putConstraint(SpringLayout.SOUTH, submitButton, -10,
+				SpringLayout.SOUTH, panel);
+
+		return panel;
 	}
 
 	private JComboBox<String> createAddHeaderDropDown() {
@@ -147,66 +182,6 @@ public class RestClientPanel extends JPanel implements ActionListener {
 		methodCombo = new JComboBox<String>(METHODS);
 		methodCombo.addActionListener(this);
 		return methodCombo;
-	}
-
-	private JSplitPane initSplit() {
-
-		outputField = SwingUtils.newJTextArea();
-		outputField.setBackground(new Color(250, 250, 250));
-		JScrollPane outputScroll = new JScrollPane(outputField);
-
-		outputPanel = new RequestViewer();
-
-		JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-		split.setTopComponent(initInputPanel());
-		split.setBottomComponent(outputPanel);
-		split.setDividerLocation(170);
-		split.setBorder(BorderFactory.createEmptyBorder());
-		SwingUtils.flattenSplitPane(split);
-		add(split);
-
-		return split;
-	}
-
-	private JPanel initInputPanel() {
-		JPanel panel = new JPanel();
-		SpringLayout layout = new SpringLayout();
-		panel.setLayout(layout);
-
-		JLabel label = SwingUtils.newJLabel("Input");
-		panel.add(label);
-
-		inputField = SwingUtils.newJTextArea();
-		JScrollPane inputScroll = new JScrollPane(inputField);
-		panel.add(inputScroll);
-
-		submitButton = new JButton("Submit");
-		submitButton.addActionListener(this);
-		panel.add(submitButton);
-
-		// label
-		layout.putConstraint(SpringLayout.WEST, label, 0, SpringLayout.WEST,
-				panel);
-		layout.putConstraint(SpringLayout.NORTH, label, 0, SpringLayout.NORTH,
-				panel);
-
-		// submit button
-		layout.putConstraint(SpringLayout.EAST, submitButton, 0,
-				SpringLayout.EAST, panel);
-		layout.putConstraint(SpringLayout.SOUTH, submitButton, 0,
-				SpringLayout.SOUTH, panel);
-
-		// input area
-		layout.putConstraint(SpringLayout.WEST, inputScroll, 0,
-				SpringLayout.WEST, panel);
-		layout.putConstraint(SpringLayout.EAST, inputScroll, 0,
-				SpringLayout.EAST, panel);
-		layout.putConstraint(SpringLayout.NORTH, inputScroll, 10,
-				SpringLayout.SOUTH, label);
-		layout.putConstraint(SpringLayout.SOUTH, inputScroll, -10,
-				SpringLayout.NORTH, submitButton);
-
-		return panel;
 	}
 
 	private String[] getAddHeaderOptions() {
@@ -300,35 +275,30 @@ public class RestClientPanel extends JPanel implements ActionListener {
 
 				try {
 					log.info("making request");
-					httpClient.makeRequest(method, url, headers, input, outputPanel);
-					/*
 					httpClient.makeRequest(method, url, headers, input,
-							new RequestListener() {
-								@Override
-								public void requestComplete(UUID id,
-										int status, Header[] headers,
-										byte[] data) {
-
-									StringWriter writer = new StringWriter();
-									ByteArrayInputStream is = new ByteArrayInputStream(
-											data);
-									try {
-										IOUtils.copy(is, writer);
-									} catch (IOException e) {
-										log.warn(e.getMessage(), e);
-									}
-
-									outputField.setText(writer.toString());
-								}
-
-								@Override
-								public void newRequest(UUID id, URL url,
-										Header[] requestHeaders, byte[] data) {
-									// TODO Auto-generated method stub
-
-								}
-
-							});*/
+							outputPanel);
+					/*
+					 * httpClient.makeRequest(method, url, headers, input, new
+					 * RequestListener() {
+					 * 
+					 * @Override public void requestComplete(UUID id, int
+					 * status, Header[] headers, byte[] data) {
+					 * 
+					 * StringWriter writer = new StringWriter();
+					 * ByteArrayInputStream is = new ByteArrayInputStream(
+					 * data); try { IOUtils.copy(is, writer); } catch
+					 * (IOException e) { log.warn(e.getMessage(), e); }
+					 * 
+					 * outputField.setText(writer.toString()); }
+					 * 
+					 * @Override public void newRequest(UUID id, URL url,
+					 * Header[] requestHeaders, byte[] data) { // TODO
+					 * Auto-generated method stub
+					 * 
+					 * }
+					 * 
+					 * });
+					 */
 				} catch (Exception e) {
 					log.warn(e.getMessage(), e);
 				}

@@ -26,7 +26,7 @@ public class RequestViewer extends JPanel implements RequestListener {
 			.getLogger(RequestViewer.class);
 
 	public RequestViewer() {
-
+		super();
 	}
 
 	@Override

@@ -18,7 +18,8 @@ public class RestClientFrame extends JFrame {
 		add(BorderLayout.CENTER, panel);
 		// panel.setResource(resource);
 		setTitle("Ajax Proxy - Rest Client");
-		setPreferredSize(new Dimension(640, 700));
+		setPreferredSize(new Dimension(900, 700));
+		setMinimumSize(new Dimension(600, 380));
 		pack();
 	}
 
