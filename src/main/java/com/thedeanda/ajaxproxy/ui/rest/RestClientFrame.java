@@ -23,4 +23,10 @@ public class RestClientFrame extends JFrame {
 		pack();
 	}
 
+	public static void main(String[] args) {
+		RestClientFrame f = new RestClientFrame(null);
+		f.pack();
+		f.setDefaultCloseOperation(EXIT_ON_CLOSE);
+		f.setVisible(true);
+	}
 }

@@ -41,7 +41,6 @@ public class RestClientPanel extends JPanel implements ActionListener {
 	private JTextField urlField;
 	private JTextArea headersField;
 	private JTextArea inputField;
-	private JTextArea outputField;
 	private JComboBox<String> addHeaderCombo;
 	private JComboBox<String> methodCombo;
 	private JButton submitButton;
@@ -267,7 +266,6 @@ public class RestClientPanel extends JPanel implements ActionListener {
 		final String url = urlField.getText();
 		final String headers = headersField.getText();
 		final byte[] input = inputField.getText().getBytes();
-		outputField.setText("");
 
 		SwingUtils.executNonUi(new Runnable() {
 			@Override
