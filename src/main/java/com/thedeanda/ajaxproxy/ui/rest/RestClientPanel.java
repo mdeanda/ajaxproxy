@@ -59,7 +59,7 @@ public class RestClientPanel extends JPanel implements ActionListener {
 
 		outputPanel = new RequestViewer();
 		mainSplit.setRightComponent(outputPanel);
-		mainSplit.setDividerLocation(400);
+		mainSplit.setDividerLocation(300);
 
 	}
 
