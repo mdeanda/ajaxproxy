@@ -16,10 +16,19 @@ import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
+import javax.swing.JTree;
 import javax.swing.SpringLayout;
 import javax.swing.SwingUtilities;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
+
+import net.sourceforge.javajson.JsonArray;
+import net.sourceforge.javajson.JsonObject;
+import net.sourceforge.javajson.JsonValue;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -114,47 +123,90 @@ public class RequestViewer extends JPanel implements RequestListener {
 			byte[] data) {
 		log.info("request complete: {} {} {}", id, status, responseHeaders);
 
+		String contentType = null;
 		final StringBuilder headers = new StringBuilder();
 		if (responseHeaders != null) {
 			for (Header h : responseHeaders) {
 				headers.append(String.format("%s: %s\n", h.getName(),
 						h.getValue()));
+
+				if ("content-type".equalsIgnoreCase(h.getName())) {
+					contentType = h.getValue();
+				}
 			}
 		}
 
-		String tmpTextData = null;
-		if (data != null) {
+		final ParsedData parsedData = new ParsedData();
+		parsedData.parse(data, contentType);
+
+		TreeNode node = null;
+		if (parsedData.json != null) {
 			try {
-				InputStreamReader isr = new InputStreamReader(
-						new ByteArrayInputStream(data), "UTF-8");
-				StringWriter sw = new StringWriter();
-				IOUtils.copy(isr, sw);
-				tmpTextData = sw.toString();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(
+						"{}");
+				initTree(rootNode, parsedData.json);
+				node = rootNode;
+
+			} catch (Exception e) {
+				log.debug(e.getMessage(), e);
+			}
+		} else if (parsedData.jsonArray != null) {
+			try {
+				DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(
+						"[]");
+				initTree(rootNode, parsedData.jsonArray);
+				node = rootNode;
+
+			} catch (Exception e) {
+				log.debug(e.getMessage(), e);
 			}
 		}
-		final String textData = tmpTextData;
+
+		final TreeNode rootNode = node;
 
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
 				headersField.setText(headers.toString().trim());
 				scrollUp(headerScroll);
-				if (textData != null) {
+
+				if (!StringUtils.isBlank(parsedData.raw)) {
 					JTextArea txtField = SwingUtils.newJTextArea();
 					JScrollPane scroll = new JScrollPane(txtField);
-					txtField.setText(textData);
+					txtField.setText(parsedData.raw);
 					txtField.setEditable(false);
 					txtField.setWrapStyleWord(true);
 					txtField.setLineWrap(true);
 					dataTabs.add("Text", scroll);
 					scrollUp(scroll);
 				}
+				if (!StringUtils.isBlank(parsedData.formattedText)) {
+					JTextArea txtField = SwingUtils.newJTextArea();
+					JScrollPane scroll = new JScrollPane(txtField);
+					txtField.setText(parsedData.formattedText);
+					txtField.setEditable(false);
+					txtField.setWrapStyleWord(true);
+					txtField.setLineWrap(true);
+					dataTabs.add("Formatted Text", scroll);
+					scrollUp(scroll);
+				}
+				if (rootNode != null) {
+					JTree tree = new JTree(new DefaultTreeModel(rootNode));
+					tree.setBorder(BorderFactory.createEmptyBorder());
+					tree.setShowsRootHandles(true);
+					JScrollPane scroll = new JScrollPane(tree);
+					scroll.setBorder(BorderFactory.createEmptyBorder());
+					dataTabs.add("Tree View", scroll);
+				}
+				if (parsedData.bufferedImage != null) {
+					ImageViewer panel = new ImageViewer(
+							parsedData.bufferedImage);
+					JScrollPane scroll = new JScrollPane(panel);
+					scroll.setBorder(BorderFactory.createEmptyBorder());
+					dataTabs.add("Image", scroll);
+				}
 			}
 		});
-
 	}
 
 	private void scrollUp(final JScrollPane scroll) {
@@ -165,5 +217,52 @@ public class RequestViewer extends JPanel implements RequestListener {
 				vscroll.setValue(vscroll.getMinimum());
 			}
 		});
+	}
+
+	private void initTree(DefaultMutableTreeNode top, JsonObject obj) {
+		for (String key : obj) {
+			JsonValue val = obj.get(key);
+			if (val.isJsonObject()) {
+				String name = String.format("%s: {%d}", key, val
+						.getJsonObject().size());
+				DefaultMutableTreeNode node = new DefaultMutableTreeNode(name);
+				top.add(node);
+				initTree(node, val.getJsonObject());
+			} else if (val.isJsonArray()) {
+				String name = String.format("%s: [%d]", key, val.getJsonArray()
+						.size());
+				DefaultMutableTreeNode node = new DefaultMutableTreeNode(name);
+				top.add(node);
+				initTree(node, val.getJsonArray());
+			} else {
+				DefaultMutableTreeNode node = new DefaultMutableTreeNode(key
+						+ "=" + val.toString());
+				top.add(node);
+			}
+		}
+	}
+
+	private void initTree(DefaultMutableTreeNode top, JsonArray arr) {
+		int i = 0;
+		for (JsonValue val : arr) {
+			if (val.isJsonObject()) {
+				String name = String.format("%s: {%d}", String.valueOf(i), val
+						.getJsonObject().size());
+				DefaultMutableTreeNode node = new DefaultMutableTreeNode(name);
+				top.add(node);
+				initTree(node, val.getJsonObject());
+			} else if (val.isJsonArray()) {
+				String name = String.format("%s: [%d]", i, val.getJsonArray()
+						.size());
+				DefaultMutableTreeNode node = new DefaultMutableTreeNode(name);
+				top.add(node);
+				initTree(node, val.getJsonArray());
+			} else {
+				DefaultMutableTreeNode node = new DefaultMutableTreeNode(
+						val.toString());
+				top.add(node);
+			}
+			i++;
+		}
 	}
 }
