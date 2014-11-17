@@ -1,11 +1,7 @@
 package com.thedeanda.ajaxproxy.ui.viewer;
 
-import java.awt.Point;
-import java.awt.Rectangle;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.StringWriter;
 import java.net.URL;
 import java.util.UUID;
 
@@ -27,9 +23,9 @@ import net.sourceforge.javajson.JsonArray;
 import net.sourceforge.javajson.JsonObject;
 import net.sourceforge.javajson.JsonValue;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
+import org.fife.ui.hex.swing.HexEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -120,7 +116,7 @@ public class RequestViewer extends JPanel implements RequestListener {
 
 	@Override
 	public void requestComplete(UUID id, int status, Header[] responseHeaders,
-			byte[] data) {
+			final byte[] data) {
 		log.info("request complete: {} {} {}", id, status, responseHeaders);
 
 		String contentType = null;
@@ -205,6 +201,15 @@ public class RequestViewer extends JPanel implements RequestListener {
 					scroll.setBorder(BorderFactory.createEmptyBorder());
 					dataTabs.add("Image", scroll);
 				}
+
+				try {
+					HexEditor hex = new HexEditor();
+					hex.open(new ByteArrayInputStream(data));
+					dataTabs.add("Hex", hex);
+				} catch (IOException e) {
+					log.warn(e.getMessage(), e);
+				}
+
 			}
 		});
 	}
