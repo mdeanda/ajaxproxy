@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -32,11 +33,6 @@ public class RestClientPanel extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 1L;
 	private static final Logger log = LoggerFactory
 			.getLogger(RestClientPanel.class);
-
-	private static final String METHOD_GET = "GET";
-	private static final String METHOD_POST = "POST";
-	private static final String[] METHODS = new String[] { METHOD_GET,
-			METHOD_POST };
 
 	private JTextField urlField;
 	private JTextArea headersField;
@@ -177,7 +173,13 @@ public class RestClientPanel extends JPanel implements ActionListener {
 	}
 
 	private JComboBox<String> createMethodDropDown() {
-		methodCombo = new JComboBox<String>(METHODS);
+		List<String> tmp = new ArrayList<String>();
+		for (RequestMethod rm : RequestMethod.values()) {
+			tmp.add(rm.name());
+		}
+		String[] stmp = new String[tmp.size()];
+		tmp.toArray(stmp);
+		methodCombo = new JComboBox<String>(stmp);
 		methodCombo.addActionListener(this);
 		return methodCombo;
 	}

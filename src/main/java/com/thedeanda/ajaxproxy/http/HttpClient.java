@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -16,13 +15,16 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpException;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.impl.DefaultBHttpClientConnection;
 import org.apache.http.impl.DefaultConnectionReuseStrategy;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicHttpEntityEnclosingRequest;
-import org.apache.http.message.BasicHttpRequest;
 import org.apache.http.protocol.HttpCoreContext;
 import org.apache.http.protocol.HttpProcessor;
 import org.apache.http.protocol.HttpProcessorBuilder;
@@ -44,7 +46,7 @@ public class HttpClient {
 	HttpProcessor httpproc;
 
 	public enum RequestMethod {
-		GET, POST
+		GET, POST, PUT
 	}
 
 	public HttpClient() {
@@ -141,18 +143,26 @@ public class HttpClient {
 				Socket socket = new Socket(host.getHostName(), host.getPort());
 				conn.bind(socket);
 			}
-			BasicHttpRequest request = null;
+			HttpRequestBase request = null;
+			HttpEntity requestBody;
 			switch (method) {
 			case GET:
-				request = new BasicHttpRequest("GET", target);
+				request = new HttpGet(target);
 				break;
 			case POST:
-				HttpEntity requestBody = new ByteArrayEntity(data,
+				requestBody = new ByteArrayEntity(data,
 						ContentType.APPLICATION_OCTET_STREAM);
-				BasicHttpEntityEnclosingRequest tmpRequest = new BasicHttpEntityEnclosingRequest(
-						"POST", target);
-				tmpRequest.setEntity(requestBody);
-				request = tmpRequest;
+				HttpPost post = new HttpPost(target);
+				post.setEntity(requestBody);
+				request = post;
+				break;
+			case PUT:
+				requestBody = new ByteArrayEntity(data,
+						ContentType.APPLICATION_OCTET_STREAM);
+				HttpPut put = new HttpPut();
+				put.setEntity(requestBody);
+				request = put;
+				break;
 			}
 			request.setHeaders(requestHeaders);
 			log.info(">> Request URI: " + request.getRequestLine().getUri());

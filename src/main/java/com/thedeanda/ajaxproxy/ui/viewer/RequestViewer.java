@@ -205,6 +205,7 @@ public class RequestViewer extends JPanel implements RequestListener {
 				try {
 					HexEditor hex = new HexEditor();
 					hex.open(new ByteArrayInputStream(data));
+					hex.setCellEditable(false);
 					dataTabs.add("Hex", hex);
 				} catch (IOException e) {
 					log.warn(e.getMessage(), e);
