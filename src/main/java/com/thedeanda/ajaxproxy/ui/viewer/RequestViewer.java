@@ -3,6 +3,8 @@ package com.thedeanda.ajaxproxy.ui.viewer;
 import java.awt.BorderLayout;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URL;
 import java.util.UUID;
 
@@ -179,7 +181,7 @@ public class RequestViewer extends JPanel implements RequestListener {
 	}
 
 	@Override
-	public void newRequest(UUID id, URL url, Header[] requestHeaders,
+	public void startRequest(UUID id, URL url, Header[] requestHeaders,
 			byte[] data) {
 		log.info("new request: {} {} {}", id, url, requestHeaders);
 		SwingUtilities.invokeLater(new Runnable() {
@@ -352,17 +354,29 @@ public class RequestViewer extends JPanel implements RequestListener {
 	}
 
 	@Override
-	public void error(UUID id, String message) {
+	public void error(UUID id, String message, Exception e) {
 		clear();
-		
-		statusPhrase.setText(message);
+
+		if (e != null) {
+			StringWriter sw = new StringWriter();
+			PrintWriter writer = new PrintWriter(sw);
+			e.printStackTrace(writer);
+			JTextArea txt = SwingUtils.newJTextArea();
+			txt.setEditable(false);
+			txt.setText(sw.toString());
+			dataTabs.add("Exception", txt);
+		}
 	}
-	
+
 	private void clear() {
 		headersField.setText("");
 		dataTabs.removeAll();
 		statusCode.setText("");
 		statusPhrase.setText("");
 		durationField.setText("");
+	}
+
+	public void newRequest(UUID id, String url) {
+		clear();
 	}
 }

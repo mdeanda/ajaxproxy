@@ -71,7 +71,6 @@ public class SwingUtils {
 								.getOrientation();
 
 						Dimension size = this.getSize();
-						log.warn(size.height + "x" + size.width);
 
 						if (orientation == JSplitPane.VERTICAL_SPLIT) {
 							int[] lines = new int[2];

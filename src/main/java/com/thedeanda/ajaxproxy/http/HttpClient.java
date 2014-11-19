@@ -6,13 +6,19 @@ import java.net.Socket;
 import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 import javax.net.SocketFactory;
+import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.ConnectionReuseStrategy;
@@ -66,10 +72,20 @@ public class HttpClient {
 	}
 
 	public void makeRequest(RequestMethod method, String url, String headers,
-			byte[] input, RequestListener listener)
-			throws MalformedURLException {
+			byte[] input, RequestListener listener) {
+		UUID uuid = UUID.randomUUID();
+		if (listener != null) {
+			listener.newRequest(uuid, url);
+		}
+
 		URL urlobj = null;
-		urlobj = new URL(url);
+		try {
+			urlobj = new URL(url);
+		} catch (MalformedURLException e) {
+			if (listener != null) {
+				listener.error(uuid, e.getMessage(), e);
+			}
+		}
 		LoadedResource res = new LoadedResource();
 
 		String query = urlobj.getQuery();
@@ -105,9 +121,8 @@ public class HttpClient {
 			port = 80;
 		}
 
-		UUID uuid = UUID.randomUUID();
 		if (listener != null) {
-			listener.newRequest(uuid, urlobj, requestHeaders, input);
+			listener.startRequest(uuid, urlobj, requestHeaders, input);
 		}
 
 		try {
@@ -166,8 +181,12 @@ public class HttpClient {
 					conn.bind(socket1);
 				} else {
 
-					SSLContext sslcontext = SSLContext.getDefault();
-					// sslcontext.init(null, null, null);
+					// SSLContext sslcontext = SSLContext.getDefault();
+					SSLContext sslcontext = SSLContext.getInstance("TLS");
+					sslcontext.init(new KeyManager[0],
+							new TrustManager[] { new DefaultTrustManager() },
+							new SecureRandom());
+
 					SocketFactory sf = sslcontext.getSocketFactory();
 					SSLSocket socket = (SSLSocket) sf.createSocket(
 							host.getHostName(), host.getPort());
@@ -222,7 +241,7 @@ public class HttpClient {
 		} catch (IOException | HttpException e) {
 			log.warn(e.getMessage(), e);
 			if (listener != null) {
-				listener.error(id, e.getMessage());
+				listener.error(id, e.getMessage(), e);
 			}
 		} finally {
 			try {
@@ -231,5 +250,29 @@ public class HttpClient {
 				log.warn(e.getMessage(), e);
 			}
 		}
+	}
+
+	private static class DefaultTrustManager implements X509TrustManager {
+
+		@Override
+		public void checkClientTrusted(X509Certificate[] arg0, String arg1)
+				throws CertificateException {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void checkServerTrusted(X509Certificate[] arg0, String arg1)
+				throws CertificateException {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public X509Certificate[] getAcceptedIssuers() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
 	}
 }
