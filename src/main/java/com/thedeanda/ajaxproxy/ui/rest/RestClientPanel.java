@@ -47,6 +47,7 @@ public class RestClientPanel extends JPanel implements ActionListener {
 		httpClient = new HttpClient();
 
 		JSplitPane mainSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+		SwingUtils.flattenSplitPane(mainSplit);
 		setLayout(new BorderLayout());
 		add(BorderLayout.CENTER, mainSplit);
 
@@ -67,23 +68,8 @@ public class RestClientPanel extends JPanel implements ActionListener {
 		JLabel urlLabel = SwingUtils.newJLabel("Request URL");
 		urlField = SwingUtils.newJTextField();
 
-		JLabel headersLabel = SwingUtils.newJLabel("Headers");
-		headersField = SwingUtils.newJTextArea();
-
-		JScrollPane headersScroll = new JScrollPane(headersField);
-
-		JComboBox<String> dropDown = createAddHeaderDropDown();
-		panel.add(dropDown);
-
 		JComboBox<String> methods = createMethodDropDown();
 		panel.add(methods);
-
-		JLabel inputLabel = SwingUtils.newJLabel("Input");
-		panel.add(inputLabel);
-
-		inputField = SwingUtils.newJTextArea();
-		JScrollPane inputScroll = new JScrollPane(inputField);
-		panel.add(inputScroll);
 
 		submitButton = new JButton("Submit");
 		submitButton.addActionListener(this);
@@ -91,8 +77,9 @@ public class RestClientPanel extends JPanel implements ActionListener {
 
 		panel.add(urlLabel);
 		panel.add(urlField);
-		panel.add(headersLabel);
-		panel.add(headersScroll);
+
+		JSplitPane split = initLeftSplit();
+		panel.add(split);
 
 		// methods
 		layout.putConstraint(SpringLayout.EAST, methods, -10,
@@ -114,11 +101,90 @@ public class RestClientPanel extends JPanel implements ActionListener {
 		layout.putConstraint(SpringLayout.WEST, urlField, 10,
 				SpringLayout.WEST, panel);
 
+		// split
+		layout.putConstraint(SpringLayout.NORTH, split, 10,
+				SpringLayout.SOUTH, urlField);
+		layout.putConstraint(SpringLayout.EAST, split, 0,
+				SpringLayout.EAST, panel);
+		layout.putConstraint(SpringLayout.WEST, split, 0,
+				SpringLayout.WEST, panel);
+		layout.putConstraint(SpringLayout.SOUTH, split, -10,
+				SpringLayout.NORTH, submitButton);
+
+		// submit button
+		layout.putConstraint(SpringLayout.EAST, submitButton, -10,
+				SpringLayout.EAST, panel);
+		layout.putConstraint(SpringLayout.SOUTH, submitButton, -10,
+				SpringLayout.SOUTH, panel);
+
+		return panel;
+	}
+
+	private JSplitPane initLeftSplit() {
+		JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+		SwingUtils.flattenSplitPane(split);
+
+		split.setTopComponent(initHeadersPanel());
+		split.setBottomComponent(initInputPanel());
+		split.setDividerLocation(150);
+
+		return split;
+	}
+
+	private JPanel initInputPanel() {
+		JPanel panel = new JPanel();
+		SpringLayout layout = new SpringLayout();
+		panel.setLayout(layout);
+
+		JLabel inputLabel = SwingUtils.newJLabel("Input");
+		panel.add(inputLabel);
+
+		inputField = SwingUtils.newJTextArea();
+		inputField.setWrapStyleWord(true);
+		inputField.setLineWrap(true);
+		JScrollPane inputScroll = new JScrollPane(inputField);
+		panel.add(inputScroll);
+
+		// input label
+		layout.putConstraint(SpringLayout.WEST, inputLabel, 10,
+				SpringLayout.WEST, panel);
+		layout.putConstraint(SpringLayout.NORTH, inputLabel, 5,
+				SpringLayout.NORTH, panel);
+
+		// input area
+		layout.putConstraint(SpringLayout.WEST, inputScroll, 10,
+				SpringLayout.WEST, panel);
+		layout.putConstraint(SpringLayout.EAST, inputScroll, -10,
+				SpringLayout.EAST, panel);
+		layout.putConstraint(SpringLayout.NORTH, inputScroll, 10,
+				SpringLayout.SOUTH, inputLabel);
+		layout.putConstraint(SpringLayout.SOUTH, inputScroll, 0,
+				SpringLayout.SOUTH, panel);
+
+		return panel;
+	}
+
+	private JPanel initHeadersPanel() {
+		JPanel panel = new JPanel();
+		SpringLayout layout = new SpringLayout();
+		panel.setLayout(layout);
+
+		JLabel headersLabel = SwingUtils.newJLabel("Headers");
+		headersField = SwingUtils.newJTextArea();
+
+		JScrollPane headersScroll = new JScrollPane(headersField);
+
+		JComboBox<String> dropDown = createAddHeaderDropDown();
+		panel.add(dropDown);
+
+		panel.add(headersLabel);
+		panel.add(headersScroll);
+
 		// headers label
 		layout.putConstraint(SpringLayout.WEST, headersLabel, 10,
 				SpringLayout.WEST, panel);
-		layout.putConstraint(SpringLayout.NORTH, headersLabel, 20,
-				SpringLayout.SOUTH, urlField);
+		layout.putConstraint(SpringLayout.NORTH, headersLabel, 0,
+				SpringLayout.NORTH, panel);
 
 		// add header drop down
 		layout.putConstraint(SpringLayout.WEST, dropDown, 10,
@@ -135,29 +201,7 @@ public class RestClientPanel extends JPanel implements ActionListener {
 				SpringLayout.WEST, panel);
 		layout.putConstraint(SpringLayout.EAST, headersScroll, -10,
 				SpringLayout.EAST, panel);
-		layout.putConstraint(SpringLayout.SOUTH, headersScroll, 115,
-				SpringLayout.NORTH, dropDown);
-
-		// input label
-		layout.putConstraint(SpringLayout.WEST, inputLabel, 10,
-				SpringLayout.WEST, panel);
-		layout.putConstraint(SpringLayout.NORTH, inputLabel, 20,
-				SpringLayout.SOUTH, headersScroll);
-
-		// input area
-		layout.putConstraint(SpringLayout.WEST, inputScroll, 10,
-				SpringLayout.WEST, panel);
-		layout.putConstraint(SpringLayout.EAST, inputScroll, -10,
-				SpringLayout.EAST, panel);
-		layout.putConstraint(SpringLayout.NORTH, inputScroll, 10,
-				SpringLayout.SOUTH, inputLabel);
-		layout.putConstraint(SpringLayout.SOUTH, inputScroll, -10,
-				SpringLayout.NORTH, submitButton);
-
-		// submit button
-		layout.putConstraint(SpringLayout.EAST, submitButton, -10,
-				SpringLayout.EAST, panel);
-		layout.putConstraint(SpringLayout.SOUTH, submitButton, -10,
+		layout.putConstraint(SpringLayout.SOUTH, headersScroll, -5,
 				SpringLayout.SOUTH, panel);
 
 		return panel;

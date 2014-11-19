@@ -1,5 +1,6 @@
 package com.thedeanda.ajaxproxy.ui.viewer;
 
+import java.awt.BorderLayout;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URL;
@@ -10,6 +11,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTree;
@@ -52,53 +54,76 @@ public class RequestViewer extends JPanel implements RequestListener {
 
 	public RequestViewer() {
 		super();
+		setLayout(new BorderLayout());
+
+		JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+		SwingUtils.flattenSplitPane(split);
+		split.setTopComponent(initHeaders());
+		split.setBottomComponent(initTabs());
+		split.setDividerLocation(250);
+		add(split, BorderLayout.CENTER);
+
+	}
+
+	private JPanel initHeaders() {
+		JPanel panel = new JPanel();
 		SpringLayout layout = new SpringLayout();
-		setLayout(layout);
+		panel.setLayout(layout);
 
 		JLabel headersLabel = SwingUtils.newJLabel("Headers");
 		headersField = SwingUtils.newJTextArea();
 		headersField.setEditable(false);
 		headerScroll = new JScrollPane(headersField);
-		add(headersLabel);
-		add(headerScroll);
-
-		dataLabel = SwingUtils.newJLabel("Data");
-		add(dataLabel);
-		dataTabs = new JTabbedPane();
-		add(dataTabs);
-		dataTabs.setBorder(BorderFactory.createEmptyBorder());
+		panel.add(headersLabel);
+		panel.add(headerScroll);
 
 		// headers label
 		layout.putConstraint(SpringLayout.WEST, headersLabel, 10,
-				SpringLayout.WEST, this);
-		layout.putConstraint(SpringLayout.NORTH, headersLabel, 20,
-				SpringLayout.NORTH, this);
+				SpringLayout.WEST, panel);
+		layout.putConstraint(SpringLayout.NORTH, headersLabel, 10,
+				SpringLayout.NORTH, panel);
 
 		// headers field
 		layout.putConstraint(SpringLayout.WEST, headerScroll, 10,
-				SpringLayout.WEST, this);
+				SpringLayout.WEST, panel);
 		layout.putConstraint(SpringLayout.EAST, headerScroll, -10,
-				SpringLayout.EAST, this);
-		layout.putConstraint(SpringLayout.NORTH, headerScroll, 20,
+				SpringLayout.EAST, panel);
+		layout.putConstraint(SpringLayout.NORTH, headerScroll, 10,
 				SpringLayout.SOUTH, headersLabel);
-		layout.putConstraint(SpringLayout.SOUTH, headerScroll, 123,
-				SpringLayout.SOUTH, headersLabel);
+		layout.putConstraint(SpringLayout.SOUTH, headerScroll, -5,
+				SpringLayout.SOUTH, panel);
+
+		return panel;
+	}
+
+	private JPanel initTabs() {
+		JPanel panel = new JPanel();
+		SpringLayout layout = new SpringLayout();
+		panel.setLayout(layout);
+
+		dataLabel = SwingUtils.newJLabel("Data");
+		panel.add(dataLabel);
+		dataTabs = new JTabbedPane();
+		panel.add(dataTabs);
+		dataTabs.setBorder(BorderFactory.createEmptyBorder());
 
 		// data label
 		layout.putConstraint(SpringLayout.WEST, dataLabel, 10,
 				SpringLayout.WEST, this);
-		layout.putConstraint(SpringLayout.NORTH, dataLabel, 20,
-				SpringLayout.SOUTH, headerScroll);
+		layout.putConstraint(SpringLayout.NORTH, dataLabel, 5,
+				SpringLayout.NORTH, panel);
 
 		// data tabs
 		layout.putConstraint(SpringLayout.WEST, dataTabs, 10,
-				SpringLayout.WEST, this);
+				SpringLayout.WEST, panel);
 		layout.putConstraint(SpringLayout.EAST, dataTabs, -10,
-				SpringLayout.EAST, this);
-		layout.putConstraint(SpringLayout.NORTH, dataTabs, 20,
+				SpringLayout.EAST, panel);
+		layout.putConstraint(SpringLayout.NORTH, dataTabs, 10,
 				SpringLayout.SOUTH, dataLabel);
 		layout.putConstraint(SpringLayout.SOUTH, dataTabs, -10,
-				SpringLayout.SOUTH, this);
+				SpringLayout.SOUTH, panel);
+
+		return panel;
 	}
 
 	@Override
