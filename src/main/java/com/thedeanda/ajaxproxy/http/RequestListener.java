@@ -9,6 +9,6 @@ public interface RequestListener {
 	public void newRequest(UUID id, URL url, Header[] requestHeaders,
 			byte[] data);
 
-	public void requestComplete(UUID id, int status, Header[] responseHeaders,
+	public void requestComplete(UUID id, int status, String reason, long duation, Header[] responseHeaders,
 			byte[] data);
 }

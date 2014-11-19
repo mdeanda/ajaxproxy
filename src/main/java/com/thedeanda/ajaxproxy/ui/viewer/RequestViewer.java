@@ -14,6 +14,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.SpringLayout;
 import javax.swing.SwingUtilities;
@@ -51,6 +52,9 @@ public class RequestViewer extends JPanel implements RequestListener {
 	private JLabel dataLabel;
 	private JTabbedPane dataTabs;
 	private JScrollPane headerScroll;
+	private JTextField statusCode;
+	private JTextField statusPhrase;
+	private JTextField durationField;
 
 	public RequestViewer() {
 		super();
@@ -70,18 +74,66 @@ public class RequestViewer extends JPanel implements RequestListener {
 		SpringLayout layout = new SpringLayout();
 		panel.setLayout(layout);
 
-		JLabel headersLabel = SwingUtils.newJLabel("Headers");
+		JLabel statusLabel = new JLabel("Status");
+		panel.add(statusLabel);
+		statusCode = SwingUtils.newJTextField();
+		statusCode.setEditable(false);
+		panel.add(statusCode);
+
+		statusPhrase = SwingUtils.newJTextField();
+		statusPhrase.setEditable(false);
+		panel.add(statusPhrase);
+
+		durationField = SwingUtils.newJTextField();
+		durationField.setEditable(false);
+		panel.add(durationField);
+
+		JLabel headersLabel = new JLabel("Headers");
 		headersField = SwingUtils.newJTextArea();
 		headersField.setEditable(false);
 		headerScroll = new JScrollPane(headersField);
 		panel.add(headersLabel);
 		panel.add(headerScroll);
 
+		// status label
+		layout.putConstraint(SpringLayout.WEST, statusLabel, 10,
+				SpringLayout.WEST, panel);
+		layout.putConstraint(SpringLayout.NORTH, statusLabel, 24,
+				SpringLayout.NORTH, panel);
+
+		// status label code
+		layout.putConstraint(SpringLayout.WEST, statusCode, 20,
+				SpringLayout.EAST, statusLabel);
+		layout.putConstraint(SpringLayout.VERTICAL_CENTER, statusCode, 0,
+				SpringLayout.VERTICAL_CENTER, statusLabel);
+		layout.putConstraint(SpringLayout.EAST, statusCode, 90,
+				SpringLayout.EAST, statusLabel);
+
+		// duration
+		layout.putConstraint(SpringLayout.WEST, durationField, -80,
+				SpringLayout.EAST, panel);
+		layout.putConstraint(SpringLayout.NORTH, durationField, 0,
+				SpringLayout.NORTH, statusCode);
+		layout.putConstraint(SpringLayout.SOUTH, durationField, 0,
+				SpringLayout.SOUTH, statusCode);
+		layout.putConstraint(SpringLayout.EAST, durationField, -10,
+				SpringLayout.EAST, panel);
+
 		// headers label
 		layout.putConstraint(SpringLayout.WEST, headersLabel, 10,
 				SpringLayout.WEST, panel);
-		layout.putConstraint(SpringLayout.NORTH, headersLabel, 10,
-				SpringLayout.NORTH, panel);
+		layout.putConstraint(SpringLayout.NORTH, headersLabel, 15,
+				SpringLayout.SOUTH, statusLabel);
+
+		// status label phrase
+		layout.putConstraint(SpringLayout.WEST, statusPhrase, 20,
+				SpringLayout.EAST, statusCode);
+		layout.putConstraint(SpringLayout.NORTH, statusPhrase, 0,
+				SpringLayout.NORTH, statusCode);
+		layout.putConstraint(SpringLayout.SOUTH, statusPhrase, 0,
+				SpringLayout.SOUTH, statusCode);
+		layout.putConstraint(SpringLayout.EAST, statusPhrase, -10,
+				SpringLayout.WEST, durationField);
 
 		// headers field
 		layout.putConstraint(SpringLayout.WEST, headerScroll, 10,
@@ -135,13 +187,16 @@ public class RequestViewer extends JPanel implements RequestListener {
 			public void run() {
 				headersField.setText("");
 				dataTabs.removeAll();
+				statusCode.setText("");
+				statusPhrase.setText("");
+				durationField.setText("");
 			}
 		});
 	}
 
 	@Override
-	public void requestComplete(UUID id, int status, Header[] responseHeaders,
-			final byte[] data) {
+	public void requestComplete(UUID id, final int status, final String reason,
+			final long duration, Header[] responseHeaders, final byte[] data) {
 		log.info("request complete: {} {} {}", id, status, responseHeaders);
 
 		String contentType = null;
@@ -190,6 +245,9 @@ public class RequestViewer extends JPanel implements RequestListener {
 			public void run() {
 				headersField.setText(headers.toString().trim());
 				scrollUp(headerScroll);
+				statusCode.setText(String.valueOf(status));
+				statusPhrase.setText(reason);
+				durationField.setText(String.format("%d ms", duration));
 
 				if (!StringUtils.isBlank(parsedData.raw)) {
 					JTextArea txtField = SwingUtils.newJTextArea();

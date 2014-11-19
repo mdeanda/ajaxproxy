@@ -21,6 +21,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpException;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
+import org.apache.http.StatusLine;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
@@ -196,16 +197,20 @@ public class HttpClient {
 			request.setHeaders(requestHeaders);
 			log.info(">> Request URI: " + request.getRequestLine().getUri());
 
+			long start = System.currentTimeMillis();
 			httpexecutor.preProcess(request, httpproc, coreContext);
 			HttpResponse response = httpexecutor.execute(request, conn,
 					coreContext);
 			httpexecutor.postProcess(response, httpproc, coreContext);
 
+			long end = System.currentTimeMillis();
+			StatusLine status = response.getStatusLine();
 			log.info("<< Response: " + response.getStatusLine());
 			if (listener != null) {
 				byte[] bytes = EntityUtils.toByteArray(response.getEntity());
-				listener.requestComplete(id, response.getStatusLine()
-						.getStatusCode(), response.getAllHeaders(), bytes);
+				listener.requestComplete(id, status.getStatusCode(),
+						status.getReasonPhrase(), (end - start),
+						response.getAllHeaders(), bytes);
 			}
 			log.info("==============");
 			if (!connStrategy.keepAlive(response, coreContext)) {
