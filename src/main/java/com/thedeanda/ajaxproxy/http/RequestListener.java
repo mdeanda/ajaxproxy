@@ -11,4 +11,6 @@ public interface RequestListener {
 
 	public void requestComplete(UUID id, int status, String reason, long duation, Header[] responseHeaders,
 			byte[] data);
+	
+	public void error(UUID id, String message);
 }

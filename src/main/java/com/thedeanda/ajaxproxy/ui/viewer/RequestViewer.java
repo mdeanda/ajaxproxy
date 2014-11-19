@@ -185,11 +185,7 @@ public class RequestViewer extends JPanel implements RequestListener {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				headersField.setText("");
-				dataTabs.removeAll();
-				statusCode.setText("");
-				statusPhrase.setText("");
-				durationField.setText("");
+				clear();
 			}
 		});
 	}
@@ -353,5 +349,20 @@ public class RequestViewer extends JPanel implements RequestListener {
 			}
 			i++;
 		}
+	}
+
+	@Override
+	public void error(UUID id, String message) {
+		clear();
+		
+		statusPhrase.setText(message);
+	}
+	
+	private void clear() {
+		headersField.setText("");
+		dataTabs.removeAll();
+		statusCode.setText("");
+		statusPhrase.setText("");
+		durationField.setText("");
 	}
 }

@@ -68,7 +68,8 @@ public class HttpClient {
 	public void makeRequest(RequestMethod method, String url, String headers,
 			byte[] input, RequestListener listener)
 			throws MalformedURLException {
-		URL urlobj = new URL(url);
+		URL urlobj = null;
+		urlobj = new URL(url);
 		LoadedResource res = new LoadedResource();
 
 		String query = urlobj.getQuery();
@@ -218,10 +219,11 @@ public class HttpClient {
 			} else {
 				log.info("Connection kept alive...");
 			}
-		} catch (IOException e) {
+		} catch (IOException | HttpException e) {
 			log.warn(e.getMessage(), e);
-		} catch (HttpException e) {
-			log.warn(e.getMessage(), e);
+			if (listener != null) {
+				listener.error(id, e.getMessage());
+			}
 		} finally {
 			try {
 				conn.close();
