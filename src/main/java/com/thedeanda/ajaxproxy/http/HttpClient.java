@@ -4,9 +4,15 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.URL;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+
+import javax.net.SocketFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocket;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.ConnectionReuseStrategy;
@@ -24,7 +30,6 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.impl.DefaultBHttpClientConnection;
 import org.apache.http.impl.DefaultConnectionReuseStrategy;
 import org.apache.http.message.BasicHeader;
-import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 import org.apache.http.protocol.HttpCoreContext;
 import org.apache.http.protocol.HttpProcessor;
 import org.apache.http.protocol.HttpProcessorBuilder;
@@ -103,8 +108,12 @@ public class HttpClient {
 			listener.newRequest(uuid, urlobj, requestHeaders, input);
 		}
 
-		makeRequestInternal(method, uuid, urlobj, requestHeaders, input,
-				listener);
+		try {
+			makeRequestInternal(method, uuid, urlobj, requestHeaders, input,
+					listener);
+		} catch (KeyManagementException | NoSuchAlgorithmException e) {
+			log.warn(e.getMessage(), e);
+		}
 
 	}
 
@@ -121,15 +130,21 @@ public class HttpClient {
 
 	private HttpHost getHost(URL url) {
 		int port = url.getPort();
+		if (port < 0)
+			port = url.getDefaultPort();
 		if (port < 0) {
-			port = 80;
+			if ("https".equals(url.getProtocol()))
+				port = 443;
+			else
+				port = 80;
 		}
 		HttpHost host = new HttpHost(url.getHost(), port);
 		return host;
 	}
 
 	private void makeRequestInternal(RequestMethod method, UUID id, URL url,
-			Header[] requestHeaders, byte[] data, RequestListener listener) {
+			Header[] requestHeaders, byte[] data, RequestListener listener)
+			throws NoSuchAlgorithmException, KeyManagementException {
 		HttpCoreContext coreContext = HttpCoreContext.create();
 		HttpHost host = getHost(url);
 		coreContext.setTargetHost(host);
@@ -139,9 +154,23 @@ public class HttpClient {
 		ConnectionReuseStrategy connStrategy = DefaultConnectionReuseStrategy.INSTANCE;
 		try {
 			String target = url.getPath();
+			if (url.getQuery() != null) {
+				target += "?" + url.getQuery();
+			}
 			if (!conn.isOpen()) {
-				Socket socket = new Socket(host.getHostName(), host.getPort());
-				conn.bind(socket);
+				if (host.getPort() != 443) {
+					Socket socket1 = new Socket(host.getHostName(),
+							host.getPort());
+					conn.bind(socket1);
+				} else {
+
+					SSLContext sslcontext = SSLContext.getDefault();
+					// sslcontext.init(null, null, null);
+					SocketFactory sf = sslcontext.getSocketFactory();
+					SSLSocket socket = (SSLSocket) sf.createSocket(
+							host.getHostName(), host.getPort());
+					conn.bind(socket);
+				}
 			}
 			HttpRequestBase request = null;
 			HttpEntity requestBody;
@@ -159,7 +188,7 @@ public class HttpClient {
 			case PUT:
 				requestBody = new ByteArrayEntity(data,
 						ContentType.APPLICATION_OCTET_STREAM);
-				HttpPut put = new HttpPut();
+				HttpPut put = new HttpPut(target);
 				put.setEntity(requestBody);
 				request = put;
 				break;
