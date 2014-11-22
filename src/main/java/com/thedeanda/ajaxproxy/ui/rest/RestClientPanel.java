@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import com.thedeanda.ajaxproxy.http.HttpClient;
 import com.thedeanda.ajaxproxy.http.HttpClient.RequestMethod;
+import com.thedeanda.ajaxproxy.http.RequestListener;
 import com.thedeanda.ajaxproxy.ui.SwingUtils;
 import com.thedeanda.ajaxproxy.ui.viewer.RequestViewer;
 
@@ -42,6 +43,7 @@ public class RestClientPanel extends JPanel implements ActionListener {
 	private JButton submitButton;
 	private HttpClient httpClient;
 	private RequestViewer outputPanel;
+	private RequestListener listener;
 
 	public RestClientPanel() {
 		httpClient = new HttpClient();
@@ -49,7 +51,7 @@ public class RestClientPanel extends JPanel implements ActionListener {
 		JSplitPane mainSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		SwingUtils.flattenSplitPane(mainSplit);
 		setLayout(new BorderLayout());
-		add(BorderLayout.CENTER, mainSplit);
+		add(mainSplit);
 
 		JPanel leftPanel = initLeftPanel();
 		mainSplit.setLeftComponent(leftPanel);
@@ -57,6 +59,11 @@ public class RestClientPanel extends JPanel implements ActionListener {
 		outputPanel = new RequestViewer();
 		mainSplit.setRightComponent(outputPanel);
 		mainSplit.setDividerLocation(260);
+
+	}
+
+	public void setDefaultButton() {
+		getRootPane().setDefaultButton(submitButton);
 	}
 
 	private JPanel initLeftPanel() {
@@ -102,12 +109,12 @@ public class RestClientPanel extends JPanel implements ActionListener {
 				SpringLayout.WEST, panel);
 
 		// split
-		layout.putConstraint(SpringLayout.NORTH, split, 10,
-				SpringLayout.SOUTH, urlField);
-		layout.putConstraint(SpringLayout.EAST, split, 0,
-				SpringLayout.EAST, panel);
-		layout.putConstraint(SpringLayout.WEST, split, 0,
-				SpringLayout.WEST, panel);
+		layout.putConstraint(SpringLayout.NORTH, split, 10, SpringLayout.SOUTH,
+				urlField);
+		layout.putConstraint(SpringLayout.EAST, split, 0, SpringLayout.EAST,
+				panel);
+		layout.putConstraint(SpringLayout.WEST, split, 0, SpringLayout.WEST,
+				panel);
 		layout.putConstraint(SpringLayout.SOUTH, split, -10,
 				SpringLayout.NORTH, submitButton);
 
@@ -316,36 +323,31 @@ public class RestClientPanel extends JPanel implements ActionListener {
 			@Override
 			public void run() {
 
+				RequestListener[] items = null;
+				if (listener != null) {
+					items = new RequestListener[2];
+					items[1] = listener;
+				} else {
+					items = new RequestListener[1];
+				}
+				items[0] = outputPanel;
+
 				try {
 					log.info("making request");
 					httpClient.makeRequest(method, url, headers, input,
-							outputPanel);
-					/*
-					 * httpClient.makeRequest(method, url, headers, input, new
-					 * RequestListener() {
-					 * 
-					 * @Override public void requestComplete(UUID id, int
-					 * status, Header[] headers, byte[] data) {
-					 * 
-					 * StringWriter writer = new StringWriter();
-					 * ByteArrayInputStream is = new ByteArrayInputStream(
-					 * data); try { IOUtils.copy(is, writer); } catch
-					 * (IOException e) { log.warn(e.getMessage(), e); }
-					 * 
-					 * outputField.setText(writer.toString()); }
-					 * 
-					 * @Override public void newRequest(UUID id, URL url,
-					 * Header[] requestHeaders, byte[] data) { // TODO
-					 * Auto-generated method stub
-					 * 
-					 * }
-					 * 
-					 * });
-					 */
+							items);
 				} catch (Exception e) {
 					log.warn(e.getMessage(), e);
 				}
 			}
 		});
+	}
+
+	public RequestListener getListener() {
+		return listener;
+	}
+
+	public void setListener(RequestListener listener) {
+		this.listener = listener;
 	}
 }

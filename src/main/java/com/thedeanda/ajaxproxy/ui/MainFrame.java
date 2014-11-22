@@ -172,7 +172,7 @@ public class MainFrame extends JFrame implements ProxyListener {
 			this.showFrameMenuItem = new MenuItem("Show Window");
 			showFrameMenuItem.addActionListener(menuItemListener);
 			popup.add(showFrameMenuItem);
-			
+
 			popup.addSeparator();
 
 			MenuItem defaultItem = new MenuItem("Exit");
@@ -331,7 +331,7 @@ public class MainFrame extends JFrame implements ProxyListener {
 	}
 
 	private void handleRest() {
-		RestClientFrame frame = new RestClientFrame(null);
+		RestClientFrame frame = new RestClientFrame();
 		frame.setVisible(true);
 	}
 

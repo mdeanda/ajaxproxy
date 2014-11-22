@@ -1,6 +1,7 @@
 package com.thedeanda.ajaxproxy.ui.viewer;
 
 import java.awt.BorderLayout;
+import java.awt.Font;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -241,6 +242,7 @@ public class RequestViewer extends JPanel implements RequestListener {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
+				int selectedTab = 0;
 				headersField.setText(headers.toString().trim());
 				scrollUp(headerScroll);
 				statusCode.setText(String.valueOf(status));
@@ -258,12 +260,14 @@ public class RequestViewer extends JPanel implements RequestListener {
 					scrollUp(scroll);
 				}
 				if (!StringUtils.isBlank(parsedData.formattedText)) {
+					selectedTab = 1;
 					JTextArea txtField = SwingUtils.newJTextArea();
 					JScrollPane scroll = new JScrollPane(txtField);
 					txtField.setText(parsedData.formattedText);
 					txtField.setEditable(false);
 					txtField.setWrapStyleWord(true);
 					txtField.setLineWrap(true);
+					txtField.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
 					dataTabs.add("Formatted Text", scroll);
 					scrollUp(scroll);
 				}
@@ -292,6 +296,9 @@ public class RequestViewer extends JPanel implements RequestListener {
 					log.warn(e.getMessage(), e);
 				}
 
+				if (selectedTab > 0) {
+					dataTabs.setSelectedIndex(selectedTab);
+				}
 			}
 		});
 	}

@@ -141,11 +141,11 @@ public class Main {
 	}
 
 	private static void runRest() {
-		RestClientFrame restFrame = new RestClientFrame(null);
+		RestClientFrame restFrame = new RestClientFrame();
 		restFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		restFrame.setVisible(true);
 	}
-	
+
 	private static void runMerge(String config, String output, boolean rm,
 			boolean ignore) throws Exception {
 		File dir = new File(output);

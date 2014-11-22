@@ -28,7 +28,9 @@ import org.apache.http.HttpException;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
@@ -58,7 +60,17 @@ public class HttpClient {
 	HttpProcessor httpproc;
 
 	public enum RequestMethod {
-		GET, POST, PUT
+		GET(false), POST(true), PUT(true), DELETE(false), HEAD(false);
+
+		private boolean acceptsPayload;
+
+		private RequestMethod(boolean accepts) {
+			this.acceptsPayload = accepts;
+		}
+
+		public boolean isAcceptsPayload() {
+			return acceptsPayload;
+		}
 	}
 
 	public HttpClient() {
@@ -71,20 +83,54 @@ public class HttpClient {
 
 	}
 
-	public void makeRequest(RequestMethod method, String url, String headers,
-			byte[] input, RequestListener listener) {
-		UUID uuid = UUID.randomUUID();
-		if (listener != null) {
-			listener.newRequest(uuid, url);
+	private void fireNewRequest(UUID uuid, String url,
+			RequestListener... listeners) {
+		if (listeners != null) {
+			for (RequestListener listener : listeners) {
+				listener.newRequest(uuid, url);
+			}
 		}
+	}
+
+	private void fireError(UUID id, String message, Exception e,
+			RequestListener... listeners) {
+		if (listeners != null) {
+			for (RequestListener listener : listeners) {
+				listener.error(id, message, e);
+			}
+		}
+	}
+
+	private void fireStartRequest(UUID id, URL url, Header[] requestHeaders,
+			byte[] data, RequestListener... listeners) {
+		if (listeners != null) {
+			for (RequestListener listener : listeners) {
+				listener.startRequest(id, url, requestHeaders, data);
+			}
+		}
+	}
+
+	private void fireRequestComplete(UUID id, int status, String reason,
+			long duation, Header[] responseHeaders, byte[] data,
+			RequestListener... listeners) {
+		if (listeners != null) {
+			for (RequestListener listener : listeners) {
+				listener.requestComplete(id, status, reason, duation,
+						responseHeaders, data);
+			}
+		}
+	}
+
+	public void makeRequest(RequestMethod method, String url, String headers,
+			byte[] input, RequestListener... listener) {
+		UUID uuid = UUID.randomUUID();
+		fireNewRequest(uuid, url, listener);
 
 		URL urlobj = null;
 		try {
 			urlobj = new URL(url);
 		} catch (MalformedURLException e) {
-			if (listener != null) {
-				listener.error(uuid, e.getMessage(), e);
-			}
+			fireError(uuid, e.getMessage(), e, listener);
 		}
 		LoadedResource res = new LoadedResource();
 
@@ -121,9 +167,7 @@ public class HttpClient {
 			port = 80;
 		}
 
-		if (listener != null) {
-			listener.startRequest(uuid, urlobj, requestHeaders, input);
-		}
+		fireStartRequest(uuid, urlobj, requestHeaders, input, listener);
 
 		try {
 			makeRequestInternal(method, uuid, urlobj, requestHeaders, input,
@@ -160,7 +204,7 @@ public class HttpClient {
 	}
 
 	private void makeRequestInternal(RequestMethod method, UUID id, URL url,
-			Header[] requestHeaders, byte[] data, RequestListener listener)
+			Header[] requestHeaders, byte[] data, RequestListener... listener)
 			throws NoSuchAlgorithmException, KeyManagementException {
 		HttpCoreContext coreContext = HttpCoreContext.create();
 		HttpHost host = getHost(url);
@@ -213,6 +257,14 @@ public class HttpClient {
 				put.setEntity(requestBody);
 				request = put;
 				break;
+			case DELETE:
+				HttpDelete del = new HttpDelete(target);
+				request = del;
+				break;
+			case HEAD:
+				HttpHead head = new HttpHead(target);
+				request = head;
+				break;
 			}
 			request.setHeaders(requestHeaders);
 			log.info(">> Request URI: " + request.getRequestLine().getUri());
@@ -226,12 +278,12 @@ public class HttpClient {
 			long end = System.currentTimeMillis();
 			StatusLine status = response.getStatusLine();
 			log.info("<< Response: " + response.getStatusLine());
-			if (listener != null) {
-				byte[] bytes = EntityUtils.toByteArray(response.getEntity());
-				listener.requestComplete(id, status.getStatusCode(),
-						status.getReasonPhrase(), (end - start),
-						response.getAllHeaders(), bytes);
-			}
+
+			byte[] bytes = EntityUtils.toByteArray(response.getEntity());
+			fireRequestComplete(id, status.getStatusCode(),
+					status.getReasonPhrase(), (end - start),
+					response.getAllHeaders(), bytes, listener);
+
 			log.info("==============");
 			if (!connStrategy.keepAlive(response, coreContext)) {
 				conn.close();
@@ -240,9 +292,7 @@ public class HttpClient {
 			}
 		} catch (IOException | HttpException e) {
 			log.warn(e.getMessage(), e);
-			if (listener != null) {
-				listener.error(id, e.getMessage(), e);
-			}
+			fireError(id, e.getMessage(), e, listener);
 		} finally {
 			try {
 				conn.close();
