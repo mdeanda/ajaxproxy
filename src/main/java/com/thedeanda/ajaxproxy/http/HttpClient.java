@@ -290,7 +290,7 @@ public class HttpClient {
 			} else {
 				log.info("Connection kept alive...");
 			}
-		} catch (IOException | HttpException e) {
+		} catch (Exception e) {
 			log.warn(e.getMessage(), e);
 			fireError(id, e.getMessage(), e, listener);
 		} finally {
