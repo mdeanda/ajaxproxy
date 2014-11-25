@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URL;
+import java.util.Iterator;
 import java.util.UUID;
 
 import javax.swing.BorderFactory;
@@ -31,6 +32,11 @@ import net.sourceforge.javajson.JsonValue;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
+import org.dom4j.Attribute;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
 import org.fife.ui.hex.swing.HexEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -221,7 +227,6 @@ public class RequestViewer extends JPanel implements RequestListener {
 						"{}");
 				initTree(rootNode, parsedData.json);
 				node = rootNode;
-
 			} catch (Exception e) {
 				log.debug(e.getMessage(), e);
 			}
@@ -231,7 +236,12 @@ public class RequestViewer extends JPanel implements RequestListener {
 						"[]");
 				initTree(rootNode, parsedData.jsonArray);
 				node = rootNode;
-
+			} catch (Exception e) {
+				log.debug(e.getMessage(), e);
+			}
+		} else if (parsedData.xml != null) {
+			try {
+				node = initTree(parsedData.xml);
 			} catch (Exception e) {
 				log.debug(e.getMessage(), e);
 			}
@@ -358,6 +368,48 @@ public class RequestViewer extends JPanel implements RequestListener {
 			}
 			i++;
 		}
+	}
+
+	private DefaultMutableTreeNode initTree(Document doc) {
+		Element rootEl = doc.getRootElement();
+		DefaultMutableTreeNode rootNode = createElementNodes(rootEl);
+		initTree(rootNode, rootEl);
+		return rootNode;
+	}
+
+	@SuppressWarnings("rawtypes")
+	private void initTree(DefaultMutableTreeNode root, Element element) {
+		for (Iterator i = element.elementIterator(); i.hasNext();) {
+			Element el = (Element) i.next();
+			DefaultMutableTreeNode tmp = createElementNodes(el);
+			if (tmp == null)
+				continue;
+			root.add(tmp);
+			initTree(tmp, el);
+
+			String txt = el.getTextTrim();
+			if (txt != null && !"".equals(txt)) {
+				DefaultMutableTreeNode txtNode = new DefaultMutableTreeNode(txt);
+				tmp.add(txtNode);
+			}
+		}
+	}
+
+	@SuppressWarnings("rawtypes")
+	private DefaultMutableTreeNode createElementNodes(Element element) {
+		String name = element.getName();
+		if (name == null || "".equals(name))
+			return null;
+		DefaultMutableTreeNode ret = new DefaultMutableTreeNode(name);
+
+		for (Iterator i = element.attributeIterator(); i.hasNext();) {
+			Attribute attr = (Attribute) i.next();
+
+			DefaultMutableTreeNode tmp = new DefaultMutableTreeNode(
+					attr.getName() + " = " + attr.getText());
+			ret.add(tmp);
+		}
+		return ret;
 	}
 
 	@Override

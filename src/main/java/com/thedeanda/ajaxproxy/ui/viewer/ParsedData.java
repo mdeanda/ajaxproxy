@@ -15,6 +15,9 @@ import net.sourceforge.javajson.JsonObject;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.DocumentHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,6 +34,7 @@ public class ParsedData {
 	public JsonArray jsonArray;
 	public String formattedText;
 	public BufferedImage bufferedImage;
+	public Document xml;
 
 	private Set<String> imageTypes = new HashSet<String>();
 
@@ -53,6 +57,7 @@ public class ParsedData {
 		if (isTextType(contentType)) {
 			loadPlain(data);
 			loadJson();
+			loadXml();
 		}
 		if (isImageType(contentType)) {
 			loadImage(data);
@@ -89,7 +94,7 @@ public class ParsedData {
 	private void loadJson() {
 		if (StringUtils.isBlank(raw) || raw.trim().length() < 2)
 			return;
-		char firstChar = raw.charAt(0);
+		char firstChar = raw.trim().charAt(0);
 
 		if (firstChar == '{') {
 			try {
@@ -104,6 +109,21 @@ public class ParsedData {
 				jsonArray = JsonArray.parse(raw);
 				formattedText = jsonArray.toString(4);
 			} catch (Exception e) {
+				log.debug(e.getMessage(), e);
+			}
+		}
+	}
+
+	private void loadXml() {
+		if (StringUtils.isBlank(raw) || raw.trim().length() < 4)
+			return;
+		char firstChar = raw.trim().charAt(0);
+
+		if (firstChar == '<') {
+			// try xml formatting
+			try {
+				xml = DocumentHelper.parseText(raw);
+			} catch (DocumentException e) {
 				log.debug(e.getMessage(), e);
 			}
 		}

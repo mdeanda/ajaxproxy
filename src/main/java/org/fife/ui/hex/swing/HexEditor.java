@@ -102,7 +102,7 @@ public class HexEditor extends JScrollPane {
 	private static final TransferHandler DEFAULT_TRANSFER_HANDLER =
 							new HexEditorTransferHandler();
 
-	static final int DUMP_COLUMN_WIDTH		= 200;
+	static final int DUMP_COLUMN_WIDTH		= 140;
 	private static final String MSG = "org.fife.ui.hex.HexEditor";
 
 
