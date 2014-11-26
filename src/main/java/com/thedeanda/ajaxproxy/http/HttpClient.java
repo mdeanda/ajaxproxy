@@ -10,6 +10,7 @@ import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -24,7 +25,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.ConnectionReuseStrategy;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpException;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
@@ -123,23 +123,15 @@ public class HttpClient {
 
 	public void makeRequest(RequestMethod method, String url, String headers,
 			byte[] input, RequestListener... listener) {
-		UUID uuid = UUID.randomUUID();
-		fireNewRequest(uuid, url, listener);
 
+		UUID uuid = UUID.randomUUID();
 		URL urlobj = null;
+		fireNewRequest(uuid, url, listener);
 		try {
 			urlobj = new URL(url);
 		} catch (MalformedURLException e) {
 			fireError(uuid, e.getMessage(), e, listener);
 		}
-		LoadedResource res = new LoadedResource();
-
-		String query = urlobj.getQuery();
-		String requestPath = urlobj.getPath();
-		if (!StringUtils.isBlank(query)) {
-			requestPath += "?" + query;
-		}
-		res.setPath(requestPath);
 
 		Map<String, String> hds = new HashMap<>();
 		if (!StringUtils.isBlank(headers)) {
@@ -148,7 +140,6 @@ public class HttpClient {
 				String[] parts = StringUtils.split(line, ":", 2);
 				hds.put(parts[0], parts[1]);
 			}
-			res.setRequestHeaders(hds);
 		}
 		Header[] requestHeaders = null;
 		if (hds.size() > 0) {
@@ -160,18 +151,24 @@ public class HttpClient {
 			}
 		}
 
-		res.setMethod(method.name());
+		makeRequest(method, urlobj, requestHeaders, input, listener);
+	}
 
-		int port = urlobj.getPort();
-		if (port <= 0) {
-			port = 80;
-		}
+	public void makeRequest(RequestMethod method, URL url, Header[] headers,
+			byte[] input, RequestListener... listener) {
 
-		fireStartRequest(uuid, urlobj, requestHeaders, input, listener);
+		UUID uuid = UUID.randomUUID();
+		fireNewRequest(uuid, url.toString(), listener);
+		makeRequest_internal(uuid, method, url, headers, input, listener);
+	}
+
+	public void makeRequest_internal(UUID uuid, RequestMethod method, URL url,
+			Header[] headers, byte[] input, RequestListener... listener) {
+
+		fireStartRequest(uuid, url, headers, input, listener);
 
 		try {
-			makeRequestInternal(method, uuid, urlobj, requestHeaders, input,
-					listener);
+			makeRequestInternal(method, uuid, url, headers, input, listener);
 		} catch (KeyManagementException | NoSuchAlgorithmException e) {
 			log.warn(e.getMessage(), e);
 		}

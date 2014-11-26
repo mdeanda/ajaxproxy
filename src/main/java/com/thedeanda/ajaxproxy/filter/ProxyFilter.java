@@ -3,6 +3,9 @@ package com.thedeanda.ajaxproxy.filter;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Enumeration;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.UUID;
 
 import javax.servlet.Filter;
@@ -16,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
+import org.apache.http.message.BasicHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,9 +65,21 @@ public class ProxyFilter implements Filter {
 		log.info("proxy filter");
 
 		String uri = request.getRequestURI();
+
 		if ("/test".equals(uri)) {
+			StringBuilder sb = new StringBuilder();
+			List<Header> hdrs = new LinkedList<Header>();
+			@SuppressWarnings("unchecked")
+			Enumeration<String> hnames = request.getHeaderNames();
+			while (hnames.hasMoreElements()) {
+				String hn = hnames.nextElement();
+				Header h = new BasicHeader(hn, request.getHeader(hn));
+				hdrs.add(h);
+				sb.append(hn + ": " + request.getHeader(hn));
+			}
+
 			client.makeRequest(RequestMethod.GET,
-					"http://www.xmlfiles.com/examples/simple.xml", null, null,
+					"http://www.xmlfiles.com/examples/simple.xml", sb.toString(), null,
 					new RequestListener() {
 
 						@Override
@@ -96,7 +112,7 @@ public class ProxyFilter implements Filter {
 
 						@Override
 						public void error(UUID id, String message, Exception e) {
-							//chain.doFilter(request, response);
+							// chain.doFilter(request, response);
 						}
 
 					});
