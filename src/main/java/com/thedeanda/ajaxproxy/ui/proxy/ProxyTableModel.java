@@ -1,4 +1,4 @@
-package com.thedeanda.ajaxproxy.ui;
+package com.thedeanda.ajaxproxy.ui.proxy;
 
 import javax.swing.table.AbstractTableModel;
 
