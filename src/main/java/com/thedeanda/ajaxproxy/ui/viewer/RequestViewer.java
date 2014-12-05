@@ -435,7 +435,8 @@ public class RequestViewer extends JPanel implements RequestListener {
 		durationField.setText("");
 	}
 
-	public void newRequest(UUID id, String url) {
+	@Override
+	public void newRequest(UUID id, String url, String method) {
 		clear();
 	}
 }

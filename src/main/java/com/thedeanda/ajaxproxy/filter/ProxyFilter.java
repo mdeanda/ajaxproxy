@@ -83,7 +83,7 @@ public class ProxyFilter implements Filter {
 					new RequestListener() {
 
 						@Override
-						public void newRequest(UUID id, String url) {
+						public void newRequest(UUID id, String url, String method) {
 							// TODO Auto-generated method stub
 
 						}

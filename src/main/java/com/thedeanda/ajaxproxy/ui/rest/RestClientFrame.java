@@ -62,7 +62,7 @@ public class RestClientFrame extends JFrame implements RequestListener {
 	}
 
 	@Override
-	public void newRequest(UUID id, String url) {
+	public void newRequest(UUID id, String url, String method) {
 		busy();
 	}
 

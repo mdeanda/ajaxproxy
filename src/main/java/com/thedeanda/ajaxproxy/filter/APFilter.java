@@ -23,6 +23,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.Header;
+import org.apache.http.message.BasicHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,10 +90,14 @@ public class APFilter implements Filter {
 		}
 
 		Enumeration<?> headerNames = reqWrapper.getHeaderNames();
+		List<Header> headerList = new ArrayList<Header>();
 		while (headerNames.hasMoreElements()) {
 			String name = (String) headerNames.nextElement();
-			resource.addRequestHeader(name, reqWrapper.getHeader(name));
+			headerList.add(new BasicHeader(name, reqWrapper.getHeader(name)));
 		}
+		Header[] headers = new Header[headerList.size()];
+		headerList.toArray(headers);
+		resource.setRequestHeaders(headers);
 
 		if (forcedLatency > 0) {
 			try {

@@ -131,6 +131,9 @@ public class ContentViewer extends JPanel {
 							scroll.setBorder(BorderFactory.createEmptyBorder());
 							tabs.add("Tree View", scroll);
 						}
+						if (tabs.getTabCount() > 1) {
+							tabs.setSelectedIndex(1);
+						}
 					}
 				});
 			}

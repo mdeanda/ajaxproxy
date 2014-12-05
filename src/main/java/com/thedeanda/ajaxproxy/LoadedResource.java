@@ -2,26 +2,35 @@ package com.thedeanda.ajaxproxy;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.UUID;
 
 import javax.servlet.http.Cookie;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.http.Header;
 
-public class LoadedResource {
-	private Date date;
-	private String path;
+import com.thedeanda.ajaxproxy.http.RequestListener;
+
+public class LoadedResource implements RequestListener {
+	private UUID id;
+	private String url;
 	private long duration;
 	private byte[] input = new byte[0];
 	private byte[] output;
-	private String method;
 	private int statusCode;
+	private String statusMessage;
+	private String method;
+	private Header[] responseHeaders;
+	private Header[] requestHeaders;
+	private Date date;
+
+	private String path;
 	private List<Cookie> cookies;
-	private Map<String, String> requestHeaders = new TreeMap<String, String>();
-	private Map<String, String> responseHeaders = new TreeMap<String, String>();
 	private String characterEncoding;
 	private Exception filterException;
 
@@ -112,20 +121,12 @@ public class LoadedResource {
 		return sb.toString();
 	}
 
-	public Map<String, String> getRequestHeaders() {
+	public Header[] getRequestHeaders() {
 		return requestHeaders;
 	}
 
-	public void setRequestHeaders(Map<String, String> headers) {
+	public void setRequestHeaders(Header[] headers) {
 		this.requestHeaders = headers;
-	}
-
-	public void addRequestHeader(String name, String header) {
-		requestHeaders.put(name, header);
-	}
-
-	public void addReponseHeader(String name, String header) {
-		responseHeaders.put(name, header);
 	}
 
 	public int getStatusCode() {
@@ -160,11 +161,42 @@ public class LoadedResource {
 		this.filterException = filterException;
 	}
 
-	public Map<String, String> getResponseHeaders() {
+	public Header[] getResponseHeaders() {
 		return responseHeaders;
 	}
 
-	public void setResponseHeaders(Map<String, String> responseHeaders) {
+	@Override
+	public void newRequest(UUID id, String url, String method) {
+		this.id = id;
+		this.url = url;
+		this.method = method;
+		this.date = new Date();
+	}
+
+	@Override
+	public void startRequest(UUID id, URL url, Header[] requestHeaders,
+			byte[] data) {
+		this.input = data;
+		this.requestHeaders = requestHeaders;
+	}
+
+	@Override
+	public void requestComplete(UUID id, int status, String reason,
+			long duration, Header[] responseHeaders, byte[] data) {
+		this.statusCode = status;
+		this.statusMessage = reason;
+		this.duration = duration;
+		this.output = data;
 		this.responseHeaders = responseHeaders;
+	}
+
+	@Override
+	public void error(UUID id, String message, Exception e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public String getStatusMessage() {
+		return statusMessage;
 	}
 }

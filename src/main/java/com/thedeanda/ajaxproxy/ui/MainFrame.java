@@ -67,6 +67,7 @@ public class MainFrame extends JFrame implements ProxyListener {
 	private JMenuItem saveAsMenuItem;
 	private JMenuItem saveMenuItem;
 	private MenuItem showFrameMenuItem;
+	private MenuItem newRestClientMenuItem;
 
 	public MainFrame() {
 		this.panel = new MainPanel();
@@ -149,12 +150,14 @@ public class MainFrame extends JFrame implements ProxyListener {
 
 			ActionListener menuItemListener = new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					if (e.getSource() == startServerMenuItem)
+					if (e.getSource() == startServerMenuItem) {
 						startProxy();
-					else if (e.getSource() == stopServerMenuItem)
+					} else if (e.getSource() == stopServerMenuItem) {
 						handleStop();
-					else if (e.getSource() == showFrameMenuItem) {
+					} else if (e.getSource() == showFrameMenuItem) {
 						MainFrame.this.setVisible(true);
+					} else if (e.getSource() == newRestClientMenuItem) {
+						handleRest();
 					} else
 						handleExit();
 				}
@@ -172,6 +175,10 @@ public class MainFrame extends JFrame implements ProxyListener {
 			this.showFrameMenuItem = new MenuItem("Show Window");
 			showFrameMenuItem.addActionListener(menuItemListener);
 			popup.add(showFrameMenuItem);
+
+			this.newRestClientMenuItem = new MenuItem("New Rest Client");
+			newRestClientMenuItem.addActionListener(menuItemListener);
+			popup.add(newRestClientMenuItem);
 
 			popup.addSeparator();
 

@@ -157,24 +157,28 @@ public class ResourcePanel extends JPanel implements ActionListener {
 					writeField(headers, "Status",
 							String.valueOf(resource.getStatusCode()));
 					headers.append("<h1>Request Headers</h1><div class=\"items\">");
-					Map<String, String> map = resource.getRequestHeaders();
-					for (String name : map.keySet()) {
-						headers.append("<p><b>");
-						headers.append(name);
-						headers.append(":</b> ");
-						headers.append(map.get(name));
-						headers.append("</p>");
+					Header[] reqHeaders = resource.getRequestHeaders();
+					if (reqHeaders != null) {
+						for (Header hdr : reqHeaders) {
+							headers.append("<p><b>");
+							headers.append(hdr.getName());
+							headers.append(":</b> ");
+							headers.append(hdr.getValue());
+							headers.append("</p>");
+						}
 					}
 					headers.append("</div>");
 
 					headers.append("<h1>Response Headers</h1><div class=\"items\">");
-					map = resource.getResponseHeaders();
-					for (String name : map.keySet()) {
-						headers.append("<p><b>");
-						headers.append(name);
-						headers.append(":</b> ");
-						headers.append(map.get(name));
-						headers.append("</p>");
+					Header[] respHeaders = resource.getResponseHeaders();
+					if (respHeaders != null) {
+						for (Header hdr : respHeaders) {
+							headers.append("<p><b>");
+							headers.append(hdr.getName());
+							headers.append(":</b> ");
+							headers.append(hdr.getValue());
+							headers.append("</p>");
+						}
 					}
 					headers.append("</div>");
 

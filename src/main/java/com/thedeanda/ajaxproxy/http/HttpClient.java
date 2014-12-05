@@ -83,11 +83,11 @@ public class HttpClient {
 
 	}
 
-	private void fireNewRequest(UUID uuid, String url,
+	private void fireNewRequest(UUID uuid, String url, String method,
 			RequestListener... listeners) {
 		if (listeners != null) {
 			for (RequestListener listener : listeners) {
-				listener.newRequest(uuid, url);
+				listener.newRequest(uuid, url, method);
 			}
 		}
 	}
@@ -126,7 +126,7 @@ public class HttpClient {
 
 		UUID uuid = UUID.randomUUID();
 		URL urlobj = null;
-		fireNewRequest(uuid, url, listener);
+		fireNewRequest(uuid, url, method.name(), listener);
 		try {
 			urlobj = new URL(url);
 		} catch (MalformedURLException e) {
@@ -158,7 +158,7 @@ public class HttpClient {
 			byte[] input, RequestListener... listener) {
 
 		UUID uuid = UUID.randomUUID();
-		fireNewRequest(uuid, url.toString(), listener);
+		fireNewRequest(uuid, url.toString(), method.toString(), listener);
 		makeRequest_internal(uuid, method, url, headers, input, listener);
 	}
 
