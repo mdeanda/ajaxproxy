@@ -2,6 +2,8 @@ package com.thedeanda.ajaxproxy.ui.proxy;
 
 import java.awt.Component;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -9,9 +11,14 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.SpringLayout;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
+
+import org.apache.commons.lang3.StringUtils;
 
 import com.thedeanda.ajaxproxy.ui.SettingsChangedListener;
 import com.thedeanda.ajaxproxy.ui.SwingUtils;
@@ -31,13 +38,27 @@ public class ProxyPanel extends JPanel {
 	private JLabel prefixLabel;
 	private JScrollPane scroll;
 	private JButton btn;
+	private ProxyTableModel proxyModel;
 
 	public ProxyPanel(final SettingsChangedListener listener,
-			ProxyTableModel proxyModel) {
+			final ProxyTableModel proxyModel) {
 		layout = new SpringLayout();
 		setLayout(layout);
+		this.proxyModel = proxyModel;
 		proxyTable = new JTable(proxyModel);
 		proxyTable.setColumnModel(new ProxyColumnModel());
+		proxyTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		final ListSelectionModel cellSelectionModel = proxyTable
+				.getSelectionModel();
+		cellSelectionModel
+				.addListSelectionListener(new ListSelectionListener() {
+					public void valueChanged(ListSelectionEvent e) {
+						if (!e.getValueIsAdjusting()) {
+							startEdit();
+						}
+					}
+
+				});
 		scroll = new JScrollPane(proxyTable);
 
 		add(scroll);
@@ -72,9 +93,47 @@ public class ProxyPanel extends JPanel {
 
 		btn = new JButton("Ok");
 		btn.setMargin(new Insets(0, 0, 0, 0));
+		btn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				commitEdit();
+			}
+		});
 		add(btn);
 
 		initLayout();
+	}
+
+	private void startEdit() {
+		int row = proxyTable.getSelectedRow();
+		String val = (String) proxyModel.getValueAt(row, 0);
+		domainField.setText(val);
+
+		val = (String) proxyModel.getValueAt(row, 1);
+		portField.setText(val);
+
+		val = (String) proxyModel.getValueAt(row, 2);
+		pathField.setText(val);
+
+		val = (String) proxyModel.getValueAt(row, 3);
+		prefixField.setText(val);
+	}
+
+	private void commitEdit() {
+		int row = proxyTable.getSelectedRow();
+		if (row < 0) {
+			row = proxyModel.getRowCount() - 1;
+		}
+		int port = 0;
+		try {
+			if (!StringUtils.isBlank(portField.getText()))
+				port = Integer.parseInt(portField.getText());
+		} catch (NumberFormatException nfe) {
+			return;
+		}
+		proxyModel.setValue(row, domainField.getText(), portField.getText(),
+				pathField.getText(), prefixField.getText());
+		proxyTable.changeSelection(row, 0, false, true);
 	}
 
 	private void initLayout() {
@@ -129,13 +188,12 @@ public class ProxyPanel extends JPanel {
 					SpringLayout.SOUTH, this);
 
 			if (lbl != null)
-				layout.putConstraint(SpringLayout.SOUTH, lbl, -10,
+				layout.putConstraint(SpringLayout.SOUTH, lbl, -5,
 						SpringLayout.NORTH, fld);
 
 		}
 		layout.putConstraint(SpringLayout.NORTH, btn, 0, SpringLayout.NORTH,
 				domainField);
-
 
 	}
 }
