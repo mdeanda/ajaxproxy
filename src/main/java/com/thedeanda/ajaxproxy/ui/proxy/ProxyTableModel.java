@@ -1,4 +1,4 @@
-package com.thedeanda.ajaxproxy.ui;
+package com.thedeanda.ajaxproxy.ui.proxy;
 
 import javax.swing.table.AbstractTableModel;
 
@@ -9,7 +9,11 @@ import net.sourceforge.javajson.JsonValue;
 public class ProxyTableModel extends AbstractTableModel {
 	private static final long serialVersionUID = 1L;
 	private JsonArray data;
-	private final static String[] COLS = { "domain", "port", "path", "prefix" };
+	private final static String DOMAIN = "domain";
+	private final static String PORT = "port";
+	private final static String PATH = "path";
+	private final static String PREFIX = "prefix";
+	private final static String[] COLS = { DOMAIN, PORT, PATH, PREFIX };
 
 	public ProxyTableModel(JsonArray data) {
 		this.data = data;
@@ -45,7 +49,7 @@ public class ProxyTableModel extends AbstractTableModel {
 
 	@Override
 	public boolean isCellEditable(int rowIndex, int columnIndex) {
-		return true;
+		return false;
 	}
 
 	@Override
@@ -60,7 +64,13 @@ public class ProxyTableModel extends AbstractTableModel {
 
 	@Override
 	public Object getValueAt(int row, int col) {
-		return data.getJsonObject(row).getString(COLS[col]);
+		if (data.size() < row || row < 0)
+			return null;
+		JsonObject json = data.getJsonObject(row);
+		if (json != null)
+			return json.getString(COLS[col]);
+		else
+			return null;
 	}
 
 	@Override
@@ -71,7 +81,21 @@ public class ProxyTableModel extends AbstractTableModel {
 		normalizeData();
 	}
 
+	public void setValue(int row, String domain, String port, String path,
+			String prefix) {
+		JsonObject json = data.getJsonObject(row);
+		if (json != null) {
+			json.put(DOMAIN, domain);
+			json.put(PORT, port);
+			json.put(PATH, path);
+			json.put(PREFIX, prefix);
+			fireTableRowsUpdated(row, row);
+			normalizeData();
+		}
+	}
+
 	private void normalizeData() {
+		boolean changed = false;
 		for (int j = 0; j < data.size(); j++) {
 			JsonObject rowObj = data.getJsonObject(j);
 			boolean keep = false;
@@ -84,13 +108,12 @@ public class ProxyTableModel extends AbstractTableModel {
 			}
 			if (!keep) {
 				data.remove(j);
-				fireTableRowsDeleted(j, j);
-				normalizeData();
-				return;
+				j--;
+				changed = true;
 			}
 		}
 		data.add(new JsonObject());
-		fireTableRowsInserted(data.size(), data.size());
+		fireTableDataChanged();
 	}
 
 	public void setConfig(JsonArray data) {

@@ -30,6 +30,8 @@ import org.slf4j.impl.LogListener;
 
 import com.thedeanda.ajaxproxy.AjaxProxy;
 import com.thedeanda.ajaxproxy.ProxyListener;
+import com.thedeanda.ajaxproxy.ui.proxy.ProxyPanel;
+import com.thedeanda.ajaxproxy.ui.proxy.ProxyTableModel;
 
 public class MainPanel extends JPanel implements ProxyListener, LogListener,
 		SettingsChangedListener {

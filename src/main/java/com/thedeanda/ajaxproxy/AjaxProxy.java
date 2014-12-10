@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.thedeanda.ajaxproxy.filter.APFilter;
+import com.thedeanda.ajaxproxy.filter.ProxyFilter;
 import com.thedeanda.ajaxproxy.http.HttpClient;
 
 public class AjaxProxy implements Runnable {
@@ -33,6 +34,7 @@ public class AjaxProxy implements Runnable {
 	private File workingDir;
 	private List<ProxyListener> listeners = new ArrayList<ProxyListener>();
 	private APFilter apfilter = new APFilter();
+	private ProxyFilter proxyFilter;
 	private boolean mergeMode = false;
 	private List<MergeServlet> mergeServlets = new ArrayList<MergeServlet>();
 	private HttpClient httpClient;
@@ -75,6 +77,7 @@ public class AjaxProxy implements Runnable {
 
 	private void init() {
 		httpClient = new HttpClient();
+		proxyFilter = new ProxyFilter(this);
 	}
 
 	public void addProxyListener(ProxyListener pl) {
@@ -185,8 +188,12 @@ public class AjaxProxy implements Runnable {
 			jettyServer.setHandler(contexts);
 
 			Context root = new Context(contexts, "/", Context.SESSIONS);
+
 			FilterHolder filterHolder = new FilterHolder(apfilter);
 			root.addFilter(filterHolder, "/*", 1);
+
+			FilterHolder proxyFilterHolder = new FilterHolder(proxyFilter);
+			root.addFilter(proxyFilterHolder, "/*", 1);
 
 			ServletHolder servlet;
 			DefaultServlet defaultServlet = new DefaultServlet();

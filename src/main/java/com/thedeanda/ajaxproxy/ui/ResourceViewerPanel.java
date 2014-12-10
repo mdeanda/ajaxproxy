@@ -42,6 +42,7 @@ import net.sourceforge.javajson.JsonObject;
 import net.sourceforge.javajson.JsonValue;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.Header;
 
 import com.thedeanda.ajaxproxy.AccessTracker;
 import com.thedeanda.ajaxproxy.AjaxProxy;
@@ -333,10 +334,18 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 				json.put("duration", obj.getDuration());
 				json.put("method", obj.getMethod());
 				JsonObject headers = new JsonObject();
-				json.put("headers", headers);
-				Map<String, String> hdrs = obj.getHeaders();
-				for (String key : hdrs.keySet()) {
-					headers.put(key, hdrs.get(key));
+				json.put("request headers", headers);
+				if (obj.getRequestHeaders() != null) {
+					for (Header hdr : obj.getRequestHeaders()) {
+						headers.put(hdr.getName(), hdr.getValue());
+					}
+				}
+				headers = new JsonObject();
+				json.put("response headers", headers);
+				if (obj.getResponseHeaders() != null) {
+					for (Header hdr : obj.getResponseHeaders()) {
+						headers.put(hdr.getName(), hdr.getValue());
+					}
 				}
 
 				Writer writer = null;
