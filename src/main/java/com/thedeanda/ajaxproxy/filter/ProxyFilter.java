@@ -52,11 +52,11 @@ public class ProxyFilter implements Filter {
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain chain) throws IOException, ServletException {
 
-		if (request instanceof HttpServletRequest) {
-			doFilterInternal((HttpServletRequest) request, response, chain);
-		} else {
+		//if (request instanceof HttpServletRequest) {
+			//doFilterInternal((HttpServletRequest) request, response, chain);
+		//} else {
 			chain.doFilter(request, response);
-		}
+		//}
 	}
 
 	private void doFilterInternal(final HttpServletRequest request,
