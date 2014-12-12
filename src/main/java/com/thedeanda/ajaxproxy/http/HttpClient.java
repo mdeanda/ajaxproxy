@@ -276,7 +276,11 @@ public class HttpClient {
 			StatusLine status = response.getStatusLine();
 			log.info("<< Response: " + response.getStatusLine());
 
-			byte[] bytes = EntityUtils.toByteArray(response.getEntity());
+			byte[] bytes = null;
+			HttpEntity entity = response.getEntity();
+			if (entity != null) {
+				bytes = EntityUtils.toByteArray(response.getEntity());
+			}
 			fireRequestComplete(id, status.getStatusCode(),
 					status.getReasonPhrase(), (end - start),
 					response.getAllHeaders(), bytes, listener);
