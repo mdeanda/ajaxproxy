@@ -6,8 +6,6 @@ import java.net.URL;
 import java.util.UUID;
 
 import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 
 import org.apache.http.Header;
 import org.slf4j.Logger;
@@ -43,7 +41,18 @@ public class RestClientFrame extends JFrame implements RequestListener {
 	}
 
 	public void fromResource(LoadedResource resource) {
+		String url = resource.getUrl();
+		panel.setUrl(url);
 
+		Header[] hdrs = resource.getRequestHeaders();
+		if (hdrs != null) {
+			StringBuilder sb = new StringBuilder();
+			for (Header h : hdrs) {
+				sb.append(h.getName() + ": " + h.getValue() + "\n");
+			}
+			panel.setHeaders(sb.toString());
+		}
+		panel.setInput(resource.getInputAsText());
 	}
 
 	public static void main(String[] args) {

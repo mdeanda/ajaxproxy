@@ -199,4 +199,12 @@ public class LoadedResource implements RequestListener {
 	public String getStatusMessage() {
 		return statusMessage;
 	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
 }

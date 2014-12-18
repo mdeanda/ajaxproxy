@@ -27,6 +27,7 @@ import org.apache.http.Header;
 
 import com.thedeanda.ajaxproxy.LoadedResource;
 import com.thedeanda.ajaxproxy.http.RequestListener;
+import com.thedeanda.ajaxproxy.ui.rest.RestClientFrame;
 
 /**
  * panel to view a single resource.
@@ -50,6 +51,7 @@ public class ResourcePanel extends JPanel implements ActionListener {
 	private JPanel generalPanel;
 
 	private JButton popupButton;
+	private JButton replayButton;
 
 	private boolean popupMode;
 
@@ -79,6 +81,9 @@ public class ResourcePanel extends JPanel implements ActionListener {
 			generalPanel.add(BorderLayout.NORTH, toolBar);
 			popupButton = makeNavigationButton("newWindow", "New Window");
 			toolBar.add(popupButton);
+
+			replayButton = makeNavigationButton("newRestWindow", "Rest Client");
+			toolBar.add(replayButton);
 		}
 
 		HTMLEditorKit kit = new HTMLEditorKit();
@@ -104,7 +109,7 @@ public class ResourcePanel extends JPanel implements ActionListener {
 	protected JButton makeNavigationButton(String imageName, String altText) {
 		// Look for the image.
 		String imgLocation = "images/" + imageName + ".gif";
-		URL imageURL = getClass().getResource(imgLocation);
+		URL imageURL = null; // getClass().getResource(imgLocation);
 
 		// Create and initialize the button.
 		JButton button = new JButton();
@@ -225,6 +230,10 @@ public class ResourcePanel extends JPanel implements ActionListener {
 		Object source = e.getSource();
 		if (source == this.popupButton) {
 			loadPopup();
+		} else if (source == this.replayButton) {
+			RestClientFrame rest = new RestClientFrame();
+			rest.fromResource(resource);
+			rest.setVisible(true);
 		}
 	}
 
