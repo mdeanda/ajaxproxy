@@ -361,4 +361,8 @@ public class RestClientPanel extends JPanel implements ActionListener {
 	public void setInput(String input) {
 		this.inputField.setText(input);
 	}
+
+	public void setMethod(String method) {
+		methodCombo.setSelectedItem(method);
+	}
 }

@@ -155,12 +155,13 @@ public class MainFrame extends JFrame implements ProxyListener {
 					} else if (e.getSource() == stopServerMenuItem) {
 						handleStop();
 					} else if (e.getSource() == showFrameMenuItem) {
-						MainFrame.this.setVisible(true);
+						handleShowWindow();
 					} else if (e.getSource() == newRestClientMenuItem) {
 						handleRest();
 					} else
 						handleExit();
 				}
+
 			};
 
 			PopupMenu popup = new PopupMenu();
@@ -558,6 +559,10 @@ public class MainFrame extends JFrame implements ProxyListener {
 
 	public void addVariables(Map<String, String> vars) {
 		panel.addVariables(vars);
+	}
+
+	private void handleShowWindow() {
+		this.setVisible(true);
 	}
 
 }

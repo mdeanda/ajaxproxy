@@ -119,7 +119,7 @@ public class RequestViewer extends JPanel implements RequestListener {
 				SpringLayout.EAST, statusLabel);
 
 		// duration
-		layout.putConstraint(SpringLayout.WEST, durationField, -80,
+		layout.putConstraint(SpringLayout.WEST, durationField, -95,
 				SpringLayout.EAST, panel);
 		layout.putConstraint(SpringLayout.NORTH, durationField, 0,
 				SpringLayout.NORTH, statusCode);
