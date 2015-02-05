@@ -58,7 +58,7 @@ public class RestClientPanel extends JPanel implements ActionListener {
 
 		outputPanel = new RequestViewer();
 		mainSplit.setRightComponent(outputPanel);
-		mainSplit.setDividerLocation(260);
+		mainSplit.setDividerLocation(340);
 
 	}
 
@@ -334,8 +334,7 @@ public class RestClientPanel extends JPanel implements ActionListener {
 
 				try {
 					log.info("making request");
-					httpClient.makeRequest(method, url, headers, input,
-							items);
+					httpClient.makeRequest(method, url, headers, input, items);
 				} catch (Exception e) {
 					log.warn(e.getMessage(), e);
 				}
@@ -349,5 +348,21 @@ public class RestClientPanel extends JPanel implements ActionListener {
 
 	public void setListener(RequestListener listener) {
 		this.listener = listener;
+	}
+
+	public void setUrl(String url) {
+		this.urlField.setText(url);
+	}
+
+	public void setHeaders(String headers) {
+		this.headersField.setText(headers);
+	}
+
+	public void setInput(String input) {
+		this.inputField.setText(input);
+	}
+
+	public void setMethod(String method) {
+		methodCombo.setSelectedItem(method);
 	}
 }

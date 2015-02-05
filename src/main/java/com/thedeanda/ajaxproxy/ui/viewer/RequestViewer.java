@@ -119,7 +119,7 @@ public class RequestViewer extends JPanel implements RequestListener {
 				SpringLayout.EAST, statusLabel);
 
 		// duration
-		layout.putConstraint(SpringLayout.WEST, durationField, -80,
+		layout.putConstraint(SpringLayout.WEST, durationField, -95,
 				SpringLayout.EAST, panel);
 		layout.putConstraint(SpringLayout.NORTH, durationField, 0,
 				SpringLayout.NORTH, statusCode);
@@ -297,15 +297,16 @@ public class RequestViewer extends JPanel implements RequestListener {
 					dataTabs.add("Image", scroll);
 				}
 
-				try {
-					HexEditor hex = new HexEditor();
-					hex.open(new ByteArrayInputStream(data));
-					hex.setCellEditable(false);
-					dataTabs.add("Hex", hex);
-				} catch (IOException e) {
-					log.warn(e.getMessage(), e);
+				if (data != null) {
+					try {
+						HexEditor hex = new HexEditor();
+						hex.open(new ByteArrayInputStream(data));
+						hex.setCellEditable(false);
+						dataTabs.add("Hex", hex);
+					} catch (IOException e) {
+						log.warn(e.getMessage(), e);
+					}
 				}
-
 				if (selectedTab > 0) {
 					dataTabs.setSelectedIndex(selectedTab);
 				}

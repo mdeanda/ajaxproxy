@@ -3,11 +3,11 @@ package com.thedeanda.ajaxproxy.ui.rest;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.net.URL;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 
 import org.apache.http.Header;
 import org.slf4j.Logger;
@@ -23,6 +23,12 @@ public class RestClientFrame extends JFrame implements RequestListener {
 			.getLogger(RestClientFrame.class);
 	private RestClientPanel panel;
 	private BusyNotification busy;
+
+	private static final Set<String> BLACKLIST_HEADERS = new HashSet<String>();
+	static {
+		BLACKLIST_HEADERS.add("Host");
+		BLACKLIST_HEADERS.add("Content-Length");
+	}
 
 	public RestClientFrame() {
 		panel = new RestClientPanel();
@@ -43,7 +49,21 @@ public class RestClientFrame extends JFrame implements RequestListener {
 	}
 
 	public void fromResource(LoadedResource resource) {
+		String url = resource.getUrl();
+		panel.setUrl(url);
 
+		Header[] hdrs = resource.getRequestHeaders();
+		if (hdrs != null) {
+			StringBuilder sb = new StringBuilder();
+			for (Header h : hdrs) {
+				if (!BLACKLIST_HEADERS.contains(h.getName())) {
+					sb.append(h.getName() + ": " + h.getValue() + "\n");
+				}
+			}
+			panel.setHeaders(sb.toString());
+		}
+		panel.setInput(resource.getInputAsText());
+		panel.setMethod(resource.getMethod());
 	}
 
 	public static void main(String[] args) {

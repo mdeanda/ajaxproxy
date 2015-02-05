@@ -10,7 +10,6 @@ import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -51,8 +50,6 @@ import org.apache.http.protocol.RequestUserAgent;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.thedeanda.ajaxproxy.LoadedResource;
 
 public class HttpClient {
 	private static final Logger log = LoggerFactory.getLogger(HttpClient.class);
@@ -175,17 +172,6 @@ public class HttpClient {
 
 	}
 
-	public void replay(String host, int port, LoadedResource resource,
-			RequestListener listener) {
-		// TODO: map to makeRequest params
-		UUID id = UUID.randomUUID();
-		if ("GET".equalsIgnoreCase(resource.getMethod())) {
-			// doGet(id, host, port, resource, listener);
-		} else if ("POST".equalsIgnoreCase(resource.getMethod())) {
-			// doPost(host, port, resource, listener);
-		}
-	}
-
 	private HttpHost getHost(URL url) {
 		int port = url.getPort();
 		if (port < 0)
@@ -276,7 +262,11 @@ public class HttpClient {
 			StatusLine status = response.getStatusLine();
 			log.info("<< Response: " + response.getStatusLine());
 
-			byte[] bytes = EntityUtils.toByteArray(response.getEntity());
+			byte[] bytes = null;
+			HttpEntity entity = response.getEntity();
+			if (entity != null) {
+				bytes = EntityUtils.toByteArray(response.getEntity());
+			}
 			fireRequestComplete(id, status.getStatusCode(),
 					status.getReasonPhrase(), (end - start),
 					response.getAllHeaders(), bytes, listener);

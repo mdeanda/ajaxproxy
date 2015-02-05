@@ -10,7 +10,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -47,6 +46,7 @@ import org.apache.http.Header;
 import com.thedeanda.ajaxproxy.AccessTracker;
 import com.thedeanda.ajaxproxy.AjaxProxy;
 import com.thedeanda.ajaxproxy.LoadedResource;
+import com.thedeanda.ajaxproxy.ui.rest.RestClientFrame;
 
 /** tracks files that get loaded */
 public class ResourceViewerPanel extends JPanel implements AccessTracker,
@@ -405,7 +405,15 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 				SwingUtils.executNonUi(new Runnable() {
 					@Override
 					public void run() {
-						ajaxProxy.replay(resource);
+						// TODO: maybe 127.0.0.1?
+						// httpClient.replay("localhost", ajaxProxy.getPort(),
+						// resource, null);
+
+						String baseUrl = "http://localhost:"
+								+ ajaxProxy.getPort();
+						RestClientFrame rest = new RestClientFrame();
+						rest.fromResource(resource);
+						rest.setVisible(true);
 					}
 				});
 			}

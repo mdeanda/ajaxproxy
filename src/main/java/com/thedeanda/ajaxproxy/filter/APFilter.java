@@ -52,7 +52,7 @@ public class APFilter implements Filter {
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain chain) throws IOException, ServletException {
 		log.info("proxy filter");
-		
+
 		if (request instanceof HttpServletRequest) {
 			doFilterInternal(request, response, chain);
 		} else {
@@ -73,11 +73,15 @@ public class APFilter implements Filter {
 				httpRequest);
 		MyServletResponseWrapper wrapper = new MyServletResponseWrapper(
 				httpResponse);
-		String url = httpRequest.getRequestURI();
+		String path = httpRequest.getRequestURI();
 		String qs = httpRequest.getQueryString();
-		if (!StringUtils.isBlank(qs))
-			url += "?" + qs;
-		resource.setPath(url);
+		String fullURL = httpRequest.getRequestURL().toString();
+		if (!StringUtils.isBlank(qs)) {
+			path += "?" + qs;
+			fullURL += "?" + qs;
+		}
+		resource.setPath(path);
+		resource.setUrl(fullURL);
 
 		String method = httpRequest.getMethod();
 		resource.setMethod(method);

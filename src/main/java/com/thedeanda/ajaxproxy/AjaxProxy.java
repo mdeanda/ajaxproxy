@@ -23,7 +23,6 @@ import org.slf4j.LoggerFactory;
 
 import com.thedeanda.ajaxproxy.filter.APFilter;
 import com.thedeanda.ajaxproxy.filter.ProxyFilter;
-import com.thedeanda.ajaxproxy.http.HttpClient;
 
 public class AjaxProxy implements Runnable {
 	private static final Logger log = LoggerFactory.getLogger(AjaxProxy.class);
@@ -37,7 +36,6 @@ public class AjaxProxy implements Runnable {
 	private ProxyFilter proxyFilter;
 	private boolean mergeMode = false;
 	private List<MergeServlet> mergeServlets = new ArrayList<MergeServlet>();
-	private HttpClient httpClient;
 
 	private enum ProxyEvent {
 		START, STOP, FAIL
@@ -76,7 +74,6 @@ public class AjaxProxy implements Runnable {
 	}
 
 	private void init() {
-		httpClient = new HttpClient();
 		proxyFilter = new ProxyFilter(this);
 	}
 
@@ -326,11 +323,8 @@ public class AjaxProxy implements Runnable {
 		apfilter.add(tracker);
 	}
 
-	// TODO: remove this from ajaxproxy and move to ui since its triggered
-	// there.
-	public void replay(LoadedResource resource) {
-		log.warn("replay: {}", resource.getPath());
-		// TODO: maybe 127.0.0.1?
-		httpClient.replay("localhost", port, resource, null);
+	public int getPort() {
+		return port;
 	}
+
 }

@@ -119,6 +119,7 @@ public class Main {
 				}
 
 				MainFrame frame = new MainFrame();
+				frame.setLocationByPlatform(true);
 				frame.setVisible(true);
 
 				if (!StringUtils.isBlank(config)) {
