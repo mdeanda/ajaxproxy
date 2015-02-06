@@ -103,9 +103,9 @@ public class Main {
 
 	private static void showUi(final String config, final boolean runui,
 			final Map<String, String> vars) {
-		System.setProperty("apple.laf.useScreenMenuBar", "true");
-		System.setProperty("com.apple.mrj.application.apple.menu.about.name",
-				"Ajaxproxy");
+		//System.setProperty("apple.laf.useScreenMenuBar", "true");
+		//System.setProperty("com.apple.mrj.application.apple.menu.about.name",
+				//"Ajaxproxy");
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				try {
