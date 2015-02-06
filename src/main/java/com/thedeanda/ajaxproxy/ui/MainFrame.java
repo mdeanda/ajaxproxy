@@ -133,7 +133,6 @@ public class MainFrame extends JFrame implements ProxyListener {
 	private void initTray() {
 		if (SystemTray.isSupported()) {
 
-			SystemTray tray = SystemTray.getSystemTray();
 			MouseListener mouseListener = new MouseListener() {
 
 				public void mouseClicked(MouseEvent e) {
@@ -209,6 +208,7 @@ public class MainFrame extends JFrame implements ProxyListener {
 
 			if (USE_TRAY) {
 				try {
+					SystemTray tray = SystemTray.getSystemTray();
 					tray.add(trayIcon);
 				} catch (AWTException e) {
 					log.error("TrayIcon could not be added.", e);
