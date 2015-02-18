@@ -4,7 +4,7 @@ apply plugin: 'eclipse'
 apply plugin: "com.github.johnrengelman.shadow"
 
 group = 'com.thedeanda'
-version = '1.13'
+version = '1.14'
 
 repositories {
 	mavenCentral()
@@ -37,6 +37,6 @@ buildscript {
     jcenter()
   }
   dependencies {
-    classpath "com.github.jengelman.gradle.plugins:shadow:1.1.1"
+    classpath "com.github.jengelman.gradle.plugins:shadow:1.2.0"
   }
 }

@@ -52,6 +52,7 @@ import com.thedeanda.ajaxproxy.ui.rest.RestClientFrame;
 public class MainFrame extends JFrame implements ProxyListener {
 	private static final long serialVersionUID = 1L;
 	private static final Logger log = LoggerFactory.getLogger(MainFrame.class);
+	private static final boolean USE_TRAY = true;
 	private MainPanel panel;
 	final JFileChooser fc = new JFileChooser();
 	private TrayIcon trayIcon;
@@ -76,6 +77,9 @@ public class MainFrame extends JFrame implements ProxyListener {
 		this.initWindow();
 		this.initMenuBar();
 		this.initTray();
+		if (!USE_TRAY) {
+			setDefaultCloseOperation(EXIT_ON_CLOSE);
+		}
 
 		JsonObject settings = loadSettings();
 		if (settings != null) {
@@ -129,7 +133,6 @@ public class MainFrame extends JFrame implements ProxyListener {
 	private void initTray() {
 		if (SystemTray.isSupported()) {
 
-			SystemTray tray = SystemTray.getSystemTray();
 			MouseListener mouseListener = new MouseListener() {
 
 				public void mouseClicked(MouseEvent e) {
@@ -203,10 +206,13 @@ public class MainFrame extends JFrame implements ProxyListener {
 			trayIcon.addActionListener(actionListener);
 			trayIcon.addMouseListener(mouseListener);
 
-			try {
-				tray.add(trayIcon);
-			} catch (AWTException e) {
-				log.error("TrayIcon could not be added.", e);
+			if (USE_TRAY) {
+				try {
+					SystemTray tray = SystemTray.getSystemTray();
+					tray.add(trayIcon);
+				} catch (AWTException e) {
+					log.error("TrayIcon could not be added.", e);
+				}
 			}
 		}
 	}

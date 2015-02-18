@@ -5,3 +5,4 @@ Content-Type: application/xml
 Content-Type: multipart/form-data
 Content-Type: text/html
 Content-Type: text/plain
+Cookie: XDEBUG_SESSION=XDEBUG_ECLIPSE
