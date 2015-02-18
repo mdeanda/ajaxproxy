@@ -52,7 +52,7 @@ import com.thedeanda.ajaxproxy.ui.rest.RestClientFrame;
 public class MainFrame extends JFrame implements ProxyListener {
 	private static final long serialVersionUID = 1L;
 	private static final Logger log = LoggerFactory.getLogger(MainFrame.class);
-	private static final boolean USE_TRAY = false;
+	private static final boolean USE_TRAY = true;
 	private MainPanel panel;
 	final JFileChooser fc = new JFileChooser();
 	private TrayIcon trayIcon;
