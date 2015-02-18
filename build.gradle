@@ -4,7 +4,7 @@ apply plugin: 'eclipse'
 apply plugin: "com.github.johnrengelman.shadow"
 
 group = 'com.thedeanda'
-version = '1.14'
+version = '1.15-snapshot'
 
 repositories {
 	mavenCentral()
