@@ -90,7 +90,7 @@ public class ProxyFilter implements Filter {
 			Enumeration<String> hnames = request.getHeaderNames();
 			while (hnames.hasMoreElements()) {
 				String hn = hnames.nextElement();
-				if (!"Host".equals(hn)) {
+				if (!"Host".equals(hn)) { //TODO: see rest client frame for a whitelist
 					Header h = new BasicHeader(hn, request.getHeader(hn));
 					hdrs.add(h);
 					sb.append(hn + ": " + request.getHeader(hn));
