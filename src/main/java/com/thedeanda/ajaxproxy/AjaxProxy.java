@@ -223,6 +223,7 @@ public class AjaxProxy implements Runnable {
 
 			FilterHolder proxyFilterHolder = new FilterHolder(proxyFilter);
 			root.addFilter(proxyFilterHolder, "/*", 1);
+			proxyFilter.reset();
 
 			ServletHolder servlet;
 			DefaultServlet defaultServlet = new DefaultServlet();
