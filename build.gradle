@@ -16,13 +16,13 @@ dependencies {
 	compile 'org.mortbay.jetty:jetty-client:6.1.+'
 	compile 'org.mortbay.jetty:jetty-util:6.1.+'
 
-	compile 'com.yahoo.platform.yui:yuicompressor:2.4.+'
+	compile 'com.yahoo.platform.yui:yuicompressor:2.+'
 	compile 'commons-cli:commons-cli:1.+'
 	compile 'commons-io:commons-io:2.+'
 	compile 'org.apache.commons:commons-lang3:3.+'
 	compile 'dom4j:dom4j:1.+'
 	compile 'org.slf4j:slf4j-api:1.7.7'
-	compile 'org.apache.httpcomponents:httpclient:4.3+'
+	compile 'org.apache.httpcomponents:httpclient:4.+'
 
 	compile files('javajson-20130806.jar')
 }
