@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import com.thedeanda.ajaxproxy.filter.APFilter;
 import com.thedeanda.ajaxproxy.filter.ProxyFilter;
+import com.thedeanda.ajaxproxy.model.ProxyPath;
 
 public class AjaxProxy implements Runnable {
 	private static final Logger log = LoggerFactory.getLogger(AjaxProxy.class);
@@ -173,6 +174,37 @@ public class AjaxProxy implements Runnable {
 		log.info("using resource base: " + resourceBase);
 	}
 
+	/** returns the list of proxy paths (after resolving variables) */
+	public List<ProxyPath> getProxyPaths() {
+		List<ProxyPath> ret = new ArrayList<ProxyPath>();
+		if (config.isJsonArray(PROXY_ARRAY)) {
+			JsonArray pa = config.getJsonArray(PROXY_ARRAY);
+			for (JsonValue val : pa) {
+				int port = 80;
+				String domain = null;
+				String path = null;
+				String prefix = "";
+				JsonObject obj = val.getJsonObject();
+				if (obj.isString(DOMAIN))
+					domain = obj.getString(DOMAIN);
+				if (obj.isString(PATH))
+					path = obj.getString(PATH);
+				if (obj.isInt(PORT))
+					port = obj.getInt(PORT);
+				else if (obj.isString(PORT))
+					port = Integer.parseInt(obj.getString(PORT));
+				if (obj.isString("prefix"))
+					prefix = obj.getString("prefix");
+
+				if (domain != null && path != null && port > 0) {
+					ProxyPath proxyPath = new ProxyPath(domain, port, path);
+					ret.add(proxyPath);
+				}
+			}
+		}
+		return ret;
+	}
+
 	public void run() {
 		log.info("starting jetty server");
 		try {
@@ -204,31 +236,13 @@ public class AjaxProxy implements Runnable {
 			root.addServlet(servlet, "/");
 
 			if (!mergeMode && config.isJsonArray(PROXY_ARRAY)) {
-				JsonArray pa = config.getJsonArray(PROXY_ARRAY);
-				for (JsonValue val : pa) {
-					int port = 80;
-					String domain = null;
-					String path = null;
-					String prefix = "";
-					JsonObject obj = val.getJsonObject();
-					if (obj.isString(DOMAIN))
-						domain = obj.getString(DOMAIN);
-					if (obj.isString(PATH))
-						path = obj.getString(PATH);
-					if (obj.isInt(PORT))
-						port = obj.getInt(PORT);
-					else if (obj.isString(PORT))
-						port = Integer.parseInt(obj.getString(PORT));
-					if (obj.isString("prefix"))
-						prefix = obj.getString("prefix");
-
-					if (domain != null && path != null && port > 0) {
-						log.debug("adding proxy servlet: " + domain + ":"
-								+ port + " " + path);
-						root.addServlet(new ServletHolder(
-								new AsyncProxyServlet.Transparent(prefix,
-										domain, port)), path);
-					}
+				List<ProxyPath> proxyPaths = getProxyPaths();
+				for (ProxyPath proxyPath : proxyPaths) {
+					log.debug("adding proxy servlet: " + proxyPath.getDomain() + ":" + proxyPath.getPort()
+							+ " " + proxyPath.getPath());
+					root.addServlet(new ServletHolder(
+							new AsyncProxyServlet.Transparent("", proxyPath.getDomain(),
+									proxyPath.getPort())), proxyPath.getPath());
 				}
 			}
 			if (config.isJsonArray(MERGE_ARRAY)) {
