@@ -16,11 +16,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 
-import net.sourceforge.javajson.JsonArray;
-import net.sourceforge.javajson.JsonException;
-import net.sourceforge.javajson.JsonObject;
-import net.sourceforge.javajson.JsonValue;
-
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -30,6 +25,10 @@ import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.thedeanda.javajson.JsonArray;
+import com.thedeanda.javajson.JsonObject;
+import com.thedeanda.javajson.JsonValue;
 
 /**
  * this is a content viewer used to show input/ouput content of http requests.

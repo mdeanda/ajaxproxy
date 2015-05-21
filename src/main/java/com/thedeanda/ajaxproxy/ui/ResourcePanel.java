@@ -6,7 +6,6 @@ import java.awt.event.ActionListener;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URL;
-import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -26,7 +25,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 
 import com.thedeanda.ajaxproxy.LoadedResource;
-import com.thedeanda.ajaxproxy.http.RequestListener;
 import com.thedeanda.ajaxproxy.ui.rest.RestClientFrame;
 
 /**

@@ -10,11 +10,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SpringLayout;
 
-import net.sourceforge.javajson.JsonObject;
-
 import com.thedeanda.ajaxproxy.AccessTracker;
 import com.thedeanda.ajaxproxy.AjaxProxy;
 import com.thedeanda.ajaxproxy.LoadedResource;
+import com.thedeanda.javajson.JsonObject;
 
 /** tracks files that get loaded */
 public class FileTrackerPanel extends JPanel implements AccessTracker {

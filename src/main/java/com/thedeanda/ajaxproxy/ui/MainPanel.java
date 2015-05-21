@@ -16,12 +16,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.SpringLayout;
-
-import net.sourceforge.javajson.JsonException;
-import net.sourceforge.javajson.JsonObject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +28,8 @@ import com.thedeanda.ajaxproxy.AjaxProxy;
 import com.thedeanda.ajaxproxy.ProxyListener;
 import com.thedeanda.ajaxproxy.ui.proxy.ProxyPanel;
 import com.thedeanda.ajaxproxy.ui.proxy.ProxyTableModel;
+import com.thedeanda.javajson.JsonException;
+import com.thedeanda.javajson.JsonObject;
 
 public class MainPanel extends JPanel implements ProxyListener, LogListener,
 		SettingsChangedListener {

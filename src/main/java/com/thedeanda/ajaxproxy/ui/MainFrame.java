@@ -38,16 +38,15 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
-import net.sourceforge.javajson.JsonArray;
-import net.sourceforge.javajson.JsonException;
-import net.sourceforge.javajson.JsonObject;
-import net.sourceforge.javajson.JsonValue;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.thedeanda.ajaxproxy.ProxyListener;
 import com.thedeanda.ajaxproxy.ui.rest.RestClientFrame;
+import com.thedeanda.javajson.JsonArray;
+import com.thedeanda.javajson.JsonException;
+import com.thedeanda.javajson.JsonObject;
+import com.thedeanda.javajson.JsonValue;
 
 public class MainFrame extends JFrame implements ProxyListener {
 	private static final long serialVersionUID = 1L;
