@@ -46,6 +46,8 @@ public class JsonViewer extends JPanel implements ActionListener {
 
 		JLabel inputLabel = SwingUtils.newJLabel("Input");
 		inputField = SwingUtils.newJTextArea();
+		inputField.setWrapStyleWord(true);
+		inputField.setLineWrap(true);
 		inputScroll = new JScrollPane(inputField);
 		panel.add(inputLabel);
 		panel.add(inputScroll);
