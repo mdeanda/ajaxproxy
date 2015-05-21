@@ -37,14 +37,22 @@ public class ParsedData {
 	public Document xml;
 
 	private Set<String> imageTypes = new HashSet<String>();
+	private byte[] data;
 
 	public ParsedData() {
 		imageTypes.add("image/jpeg");
 		imageTypes.add("image/gif");
 		imageTypes.add("image/png");
 	}
+	
+	public void parseString(String data) {
+		this.raw = data;
+		loadJson();
+		loadXml();
+	}
 
 	public void parse(byte[] data, String contentType) {
+		this.data = data;
 		if (!StringUtils.isBlank(contentType)) {
 			contentType = contentType.toLowerCase().trim();
 			int semi = contentType.indexOf(";");
@@ -56,8 +64,7 @@ public class ParsedData {
 
 		if (isTextType(contentType)) {
 			loadPlain(data);
-			loadJson();
-			loadXml();
+			parseString(this.raw);
 		}
 		if (isImageType(contentType)) {
 			loadImage(data);
@@ -136,5 +143,9 @@ public class ParsedData {
 		} catch (IOException e) {
 			log.debug(e.getMessage(), e);
 		}
+	}
+
+	public byte[] getData() {
+		return data;
 	}
 }
