@@ -5,11 +5,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.net.URL;
-import java.util.Map;
 
 import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
@@ -26,7 +23,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 
 import com.thedeanda.ajaxproxy.LoadedResource;
-import com.thedeanda.ajaxproxy.http.RequestListener;
 import com.thedeanda.ajaxproxy.ui.rest.RestClientFrame;
 
 /**
@@ -79,10 +75,10 @@ public class ResourcePanel extends JPanel implements ActionListener {
 			JToolBar toolBar = new JToolBar("Still draggable");
 			toolBar.setFloatable(false);
 			generalPanel.add(BorderLayout.NORTH, toolBar);
-			popupButton = makeNavigationButton("newWindow", "New Window");
+			popupButton = makeNavigationButton("New Window");
 			toolBar.add(popupButton);
 
-			replayButton = makeNavigationButton("newRestWindow", "Rest Client");
+			replayButton = makeNavigationButton("Rest Client");
 			toolBar.add(replayButton);
 		}
 
@@ -106,21 +102,11 @@ public class ResourcePanel extends JPanel implements ActionListener {
 		generalPanel.add(BorderLayout.CENTER, generalScroll);
 	}
 
-	protected JButton makeNavigationButton(String imageName, String altText) {
-		// Look for the image.
-		String imgLocation = "images/" + imageName + ".gif";
-		URL imageURL = null; // getClass().getResource(imgLocation);
-
+	protected JButton makeNavigationButton(String altText) {
 		// Create and initialize the button.
 		JButton button = new JButton();
 		button.addActionListener(this);
-
-		if (imageURL != null) { // image found
-			button.setIcon(new ImageIcon(imageURL, altText));
-		} else { // no image found
-			button.setText(altText);
-			System.err.println("Resource not found: " + imgLocation);
-		}
+		button.setText(altText);
 
 		return button;
 	}

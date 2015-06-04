@@ -1,8 +1,6 @@
 package com.thedeanda.ajaxproxy.http;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.Socket;
 import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -13,20 +11,19 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.net.SocketFactory;
+import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.ConnectionReuseStrategy;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
@@ -35,26 +32,18 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
-import org.apache.http.impl.DefaultBHttpClientConnection;
 import org.apache.http.impl.DefaultConnectionReuseStrategy;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHeader;
-import org.apache.http.protocol.HttpCoreContext;
-import org.apache.http.protocol.HttpProcessor;
-import org.apache.http.protocol.HttpProcessorBuilder;
-import org.apache.http.protocol.HttpRequestExecutor;
-import org.apache.http.protocol.RequestConnControl;
-import org.apache.http.protocol.RequestContent;
-import org.apache.http.protocol.RequestExpectContinue;
-import org.apache.http.protocol.RequestTargetHost;
-import org.apache.http.protocol.RequestUserAgent;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class HttpClient {
 	private static final Logger log = LoggerFactory.getLogger(HttpClient.class);
-	HttpRequestExecutor httpexecutor;
-	HttpProcessor httpproc;
+
+	private final CloseableHttpClient client;
 
 	public enum RequestMethod {
 		GET(false), POST(true), PUT(true), DELETE(false), HEAD(false);
@@ -71,13 +60,67 @@ public class HttpClient {
 	}
 
 	public HttpClient() {
-		httpproc = HttpProcessorBuilder.create().add(new RequestContent())
-				.add(new RequestTargetHost()).add(new RequestConnControl())
-				.add(new RequestUserAgent("AjaxProxy/1.1"))
-				.add(new RequestExpectContinue(true)).build();
+		final RequestConfig requestConfig = RequestConfig.custom()
+				.setConnectTimeout(5000).setConnectionRequestTimeout(60000)
+				.setSocketTimeout(60000).build();
 
-		httpexecutor = new HttpRequestExecutor();
+		HostnameVerifier verifier = new HostnameVerifier() {
+			@Override
+			public boolean verify(String hostname, SSLSession session) {
+				log.warn("verify {}", hostname);
+				return true;
+			}
+		};
+		SSLContext ctx = getSslContext();
+		client = HttpClientBuilder
+				.create()
+				.disableAuthCaching()
+				.disableAutomaticRetries()
+				.disableConnectionState()
+				.disableContentCompression()
+				.disableCookieManagement()
+				.disableRedirectHandling()
+				.setSSLHostnameVerifier(verifier)
+				.setSslcontext(ctx)
+				.setConnectionReuseStrategy(
+						DefaultConnectionReuseStrategy.INSTANCE)
+				.setDefaultRequestConfig(requestConfig)
+				.setUserAgent("AjaxProxy/1.2").build();
 
+	}
+
+	private SSLContext getSslContext() {
+		SSLContext ctx = null;
+		try {
+			ctx = SSLContext.getInstance("TLS");
+			ctx.init(new KeyManager[0],
+					new TrustManager[] { new X509TrustManager() {
+
+						@Override
+						public void checkClientTrusted(X509Certificate[] chain,
+								String authType) throws CertificateException {
+							// TODO Auto-generated method stub
+
+						}
+
+						@Override
+						public void checkServerTrusted(X509Certificate[] chain,
+								String authType) throws CertificateException {
+							// TODO Auto-generated method stub
+
+						}
+
+						@Override
+						public X509Certificate[] getAcceptedIssuers() {
+							// TODO Auto-generated method stub
+							return null;
+						}
+					} }, new SecureRandom());
+			SSLContext.setDefault(ctx);
+		} catch (Exception e) {
+			log.warn(e.getMessage(), e);
+		}
+		return ctx;
 	}
 
 	private void fireNewRequest(UUID uuid, String url, String method,
@@ -172,55 +215,13 @@ public class HttpClient {
 
 	}
 
-	private HttpHost getHost(URL url) {
-		int port = url.getPort();
-		if (port < 0)
-			port = url.getDefaultPort();
-		if (port < 0) {
-			if ("https".equals(url.getProtocol()))
-				port = 443;
-			else
-				port = 80;
-		}
-		HttpHost host = new HttpHost(url.getHost(), port);
-		return host;
-	}
-
 	private void makeRequestInternal(RequestMethod method, UUID id, URL url,
 			Header[] requestHeaders, byte[] data, RequestListener... listener)
 			throws NoSuchAlgorithmException, KeyManagementException {
-		HttpCoreContext coreContext = HttpCoreContext.create();
-		HttpHost host = getHost(url);
-		coreContext.setTargetHost(host);
 
-		DefaultBHttpClientConnection conn = new DefaultBHttpClientConnection(
-				8 * 1024);
-		ConnectionReuseStrategy connStrategy = DefaultConnectionReuseStrategy.INSTANCE;
+		HttpRequestBase request = null;
 		try {
-			String target = url.getPath();
-			if (url.getQuery() != null) {
-				target += "?" + url.getQuery();
-			}
-			if (!conn.isOpen()) {
-				if (host.getPort() != 443) {
-					Socket socket1 = new Socket(host.getHostName(),
-							host.getPort());
-					conn.bind(socket1);
-				} else {
-
-					// SSLContext sslcontext = SSLContext.getDefault();
-					SSLContext sslcontext = SSLContext.getInstance("TLS");
-					sslcontext.init(new KeyManager[0],
-							new TrustManager[] { new DefaultTrustManager() },
-							new SecureRandom());
-
-					SocketFactory sf = sslcontext.getSocketFactory();
-					SSLSocket socket = (SSLSocket) sf.createSocket(
-							host.getHostName(), host.getPort());
-					conn.bind(socket);
-				}
-			}
-			HttpRequestBase request = null;
+			String target = url.toString();
 			HttpEntity requestBody;
 			switch (method) {
 			case GET:
@@ -253,11 +254,7 @@ public class HttpClient {
 			log.info(">> Request URI: " + request.getRequestLine().getUri());
 
 			long start = System.currentTimeMillis();
-			httpexecutor.preProcess(request, httpproc, coreContext);
-			HttpResponse response = httpexecutor.execute(request, conn,
-					coreContext);
-			httpexecutor.postProcess(response, httpproc, coreContext);
-
+			HttpResponse response = client.execute(request);
 			long end = System.currentTimeMillis();
 			StatusLine status = response.getStatusLine();
 			log.info("<< Response: " + response.getStatusLine());
@@ -271,45 +268,13 @@ public class HttpClient {
 					status.getReasonPhrase(), (end - start),
 					response.getAllHeaders(), bytes, listener);
 
-			log.info("==============");
-			if (!connStrategy.keepAlive(response, coreContext)) {
-				conn.close();
-			} else {
-				log.info("Connection kept alive...");
-			}
 		} catch (Exception e) {
 			log.warn(e.getMessage(), e);
 			fireError(id, e.getMessage(), e, listener);
 		} finally {
-			try {
-				conn.close();
-			} catch (IOException e) {
-				log.warn(e.getMessage(), e);
+			if (request != null) {
+				request.releaseConnection();
 			}
 		}
-	}
-
-	private static class DefaultTrustManager implements X509TrustManager {
-
-		@Override
-		public void checkClientTrusted(X509Certificate[] arg0, String arg1)
-				throws CertificateException {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		public void checkServerTrusted(X509Certificate[] arg0, String arg1)
-				throws CertificateException {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		public X509Certificate[] getAcceptedIssuers() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
 	}
 }

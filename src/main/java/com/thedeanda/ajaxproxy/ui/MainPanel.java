@@ -16,12 +16,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.SpringLayout;
-
-import net.sourceforge.javajson.JsonException;
-import net.sourceforge.javajson.JsonObject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +28,8 @@ import com.thedeanda.ajaxproxy.AjaxProxy;
 import com.thedeanda.ajaxproxy.ProxyListener;
 import com.thedeanda.ajaxproxy.ui.proxy.ProxyPanel;
 import com.thedeanda.ajaxproxy.ui.proxy.ProxyTableModel;
+import com.thedeanda.javajson.JsonException;
+import com.thedeanda.javajson.JsonObject;
 
 public class MainPanel extends JPanel implements ProxyListener, LogListener,
 		SettingsChangedListener {
@@ -175,6 +173,7 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener,
 		JsonObject json = config;
 		json.put("port", generalPanel.getPort());
 		json.put("resourceBase", generalPanel.getResourceBase());
+		json.put(AjaxProxy.SHOW_INDEX, generalPanel.isShowIndex());
 		json.put("proxy", proxyModel.getConfig());
 		json.put("merge", mergeModel.getConfig());
 		json.put("variables", variableModel.getConfig());
@@ -211,7 +210,7 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener,
 			JsonObject json = JsonObject.parse(getConfig().toString());
 			File workingDir = configFile.getParentFile();
 			if (workingDir == null)
-				workingDir = new File("");
+				workingDir = new File(".");
 			proxy = new AjaxProxy(json, workingDir);
 			proxy.addProxyListener(this);
 			new Thread(proxy).start();
@@ -234,6 +233,7 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener,
 
 		generalPanel.setPort(0);
 		generalPanel.setResourceBase("");
+		generalPanel.setShowIndex(false);
 		proxyModel.clear();
 		mergeModel.clear();
 		variableModel.clear();
@@ -295,6 +295,7 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener,
 		variableModel.setConfig(config.getJsonObject("variables"));
 		generalPanel.setPort(config.getInt("port"));
 		generalPanel.setResourceBase(config.getString("resourceBase"));
+		generalPanel.setShowIndex(config.getBoolean(AjaxProxy.SHOW_INDEX));
 		trackerPanel.setConfig(json.getJsonObject("tracker"));
 		resourceViewerPanel.setConfig(json.getJsonObject("resource"));
 		optionsPanel.setConfig(json.getJsonObject("options"));

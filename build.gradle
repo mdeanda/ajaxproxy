@@ -1,10 +1,24 @@
+buildscript {
+	repositories {
+		maven {
+			url "http://repo.jfrog.org/artifactory/gradle"
+		}
+		jcenter()
+		mavenLocal()
+		dependencies {
+			classpath(group: 'org.jfrog.buildinfo', name: 'build-info-extractor-gradle', version: '3.0.1')
+		}
+	}
+}
+
 apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'eclipse'
 apply plugin: "com.github.johnrengelman.shadow"
+apply plugin: 'com.jfrog.artifactory-upload'
 
 group = 'com.thedeanda'
-version = '1.14'
+version = '1.15'
 
 repositories {
 	mavenCentral()
@@ -12,19 +26,20 @@ repositories {
 }
 
 dependencies {
+	compile 'com.thedeanda.javajson:javajson-parser:1.+'
 	compile 'org.mortbay.jetty:jetty-sslengine:6.1.+'
 	compile 'org.mortbay.jetty:jetty-client:6.1.+'
 	compile 'org.mortbay.jetty:jetty-util:6.1.+'
 
-	compile 'com.yahoo.platform.yui:yuicompressor:2.4.+'
+	compile 'com.yahoo.platform.yui:yuicompressor:2.+'
 	compile 'commons-cli:commons-cli:1.+'
 	compile 'commons-io:commons-io:2.+'
 	compile 'org.apache.commons:commons-lang3:3.+'
 	compile 'dom4j:dom4j:1.+'
 	compile 'org.slf4j:slf4j-api:1.7.7'
-	compile 'org.apache.httpcomponents:httpclient:4.3+'
+	compile 'org.apache.httpcomponents:httpclient:4.+'
+	compile "org.projectlombok:lombok:1.+"
 
-	compile files('javajson-20130806.jar')
 }
 jar {
     manifest {
@@ -39,4 +54,48 @@ buildscript {
   dependencies {
     classpath "com.github.jengelman.gradle.plugins:shadow:1.2.0"
   }
+}
+
+
+
+configurations {
+	published
+}
+artifactory {
+	contextUrl = "${artifactory_contextUrl}"
+	publish {
+		repository {
+			if (version.matches(/[0-9\.]+$/)) {
+				repoKey = 'libs-release-local'
+			} else {
+				repoKey = 'libs-snapshot-local'
+			}
+			username = "${artifactory_user}" //The publisher user name
+			password = "${artifactory_password}" //The publisher password
+		}
+		defaults {
+			publishConfigs('archives', 'published')
+			//properties = ['build.status': "$it.project.status".toString()]
+			publishPom = true //Publish generated POM files to Artifactory (true by default)
+			publishIvy = false //Publish generated Ivy descriptor files to Artifactory (true by default)
+		}
+	}
+	resolve {
+		repository {
+			repoKey = 'libs-release' //The Artifactory (preferably virtual) repository key to resolve from
+			username = "${artifactory_user}" //Optional resolver user name (leave out to use anonymous resolution)
+			password = "${artifactory_password}" //The resolver password
+			maven = true
+		}
+	}
+}
+task javadocJar(type: Jar, dependsOn: javadoc) {
+	classifier = 'javadoc'
+	from javadoc.destinationDir
+}
+artifactoryPublish {
+	dependsOn javadocJar
+}
+artifacts {
+	published javadocJar
 }

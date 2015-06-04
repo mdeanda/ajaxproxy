@@ -2,13 +2,13 @@ package com.thedeanda.ajaxproxy.ui;
 
 import javax.swing.table.AbstractTableModel;
 
-import net.sourceforge.javajson.JsonArray;
-import net.sourceforge.javajson.JsonObject;
-import net.sourceforge.javajson.JsonValue;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.thedeanda.javajson.JsonArray;
+import com.thedeanda.javajson.JsonObject;
+import com.thedeanda.javajson.JsonValue;
 
 public class VariableTableModel extends AbstractTableModel {
 	private static final Logger log = LoggerFactory

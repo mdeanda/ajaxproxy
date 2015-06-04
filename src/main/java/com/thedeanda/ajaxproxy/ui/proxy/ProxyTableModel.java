@@ -2,9 +2,9 @@ package com.thedeanda.ajaxproxy.ui.proxy;
 
 import javax.swing.table.AbstractTableModel;
 
-import net.sourceforge.javajson.JsonArray;
-import net.sourceforge.javajson.JsonObject;
-import net.sourceforge.javajson.JsonValue;
+import com.thedeanda.javajson.JsonArray;
+import com.thedeanda.javajson.JsonObject;
+import com.thedeanda.javajson.JsonValue;
 
 public class ProxyTableModel extends AbstractTableModel {
 	private static final long serialVersionUID = 1L;

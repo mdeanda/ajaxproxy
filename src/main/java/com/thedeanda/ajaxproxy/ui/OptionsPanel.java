@@ -13,10 +13,9 @@ import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import net.sourceforge.javajson.JsonObject;
-
 import com.thedeanda.ajaxproxy.AjaxProxy;
 import com.thedeanda.ajaxproxy.filter.APFilter;
+import com.thedeanda.javajson.JsonObject;
 
 public class OptionsPanel extends JPanel implements ActionListener,
 		PropertyChangeListener, ChangeListener {

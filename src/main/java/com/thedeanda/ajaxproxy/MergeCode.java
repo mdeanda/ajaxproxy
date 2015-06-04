@@ -10,14 +10,13 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.List;
 
-import net.sourceforge.javajson.JsonObject;
-
 import org.apache.commons.io.FileUtils;
 import org.mozilla.javascript.ErrorReporter;
 import org.mozilla.javascript.EvaluatorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.thedeanda.javajson.JsonObject;
 import com.yahoo.platform.yui.compressor.CssCompressor;
 import com.yahoo.platform.yui.compressor.JavaScriptCompressor;
 

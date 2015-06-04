@@ -7,10 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import net.sourceforge.javajson.JsonArray;
-import net.sourceforge.javajson.JsonObject;
-import net.sourceforge.javajson.JsonValue;
-
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.ContextHandlerCollection;
 import org.mortbay.jetty.servlet.Context;
@@ -23,11 +19,16 @@ import org.slf4j.LoggerFactory;
 
 import com.thedeanda.ajaxproxy.filter.APFilter;
 import com.thedeanda.ajaxproxy.filter.ProxyFilter;
+import com.thedeanda.ajaxproxy.model.ProxyPath;
+import com.thedeanda.javajson.JsonArray;
+import com.thedeanda.javajson.JsonObject;
+import com.thedeanda.javajson.JsonValue;
 
 public class AjaxProxy implements Runnable {
 	private static final Logger log = LoggerFactory.getLogger(AjaxProxy.class);
 	private int port = 8080;
 	private String resourceBase = "";
+	private boolean showIndex;
 	private JsonObject config;
 	private Server jettyServer;
 	private File workingDir;
@@ -43,6 +44,7 @@ public class AjaxProxy implements Runnable {
 
 	public static final String PORT = "port";
 	public static final String RESOURCE_BASE = "resourceBase";
+	public static final String SHOW_INDEX = "showIndex";
 	public static final String PROXY_ARRAY = "proxy";
 	public static final String DOMAIN = "domain";
 	public static final String PATH = "path";
@@ -170,7 +172,39 @@ public class AjaxProxy implements Runnable {
 		} else {
 			throw new Exception("resourceBase not defined in config file");
 		}
+		showIndex = config.getBoolean(SHOW_INDEX);
 		log.info("using resource base: " + resourceBase);
+	}
+
+	/** returns the list of proxy paths (after resolving variables) */
+	public List<ProxyPath> getProxyPaths() {
+		List<ProxyPath> ret = new ArrayList<ProxyPath>();
+		if (config.isJsonArray(PROXY_ARRAY)) {
+			JsonArray pa = config.getJsonArray(PROXY_ARRAY);
+			for (JsonValue val : pa) {
+				int port = 80;
+				String domain = null;
+				String path = null;
+				String prefix = "";
+				JsonObject obj = val.getJsonObject();
+				if (obj.isString(DOMAIN))
+					domain = obj.getString(DOMAIN);
+				if (obj.isString(PATH))
+					path = obj.getString(PATH);
+				if (obj.isInt(PORT))
+					port = obj.getInt(PORT);
+				else if (obj.isString(PORT))
+					port = Integer.parseInt(obj.getString(PORT));
+				if (obj.isString("prefix"))
+					prefix = obj.getString("prefix");
+
+				if (domain != null && path != null && port > 0) {
+					ProxyPath proxyPath = new ProxyPath(domain, port, path);
+					ret.add(proxyPath);
+				}
+			}
+		}
+		return ret;
 	}
 
 	public void run() {
@@ -191,12 +225,12 @@ public class AjaxProxy implements Runnable {
 
 			FilterHolder proxyFilterHolder = new FilterHolder(proxyFilter);
 			root.addFilter(proxyFilterHolder, "/*", 1);
+			proxyFilter.reset();
 
 			ServletHolder servlet;
 			DefaultServlet defaultServlet = new DefaultServlet();
 			servlet = new ServletHolder(defaultServlet);
-			// TODO: set dirAllowed as a param for "security"
-			servlet.setInitParameter("dirAllowed", "true");
+			servlet.setInitParameter("dirAllowed", String.valueOf(showIndex));
 			servlet.setInitParameter("resourceBase", resourceBase);
 			servlet.setInitParameter("maxCacheSize", "0");
 			servlet.setName("default servlet");
@@ -204,31 +238,13 @@ public class AjaxProxy implements Runnable {
 			root.addServlet(servlet, "/");
 
 			if (!mergeMode && config.isJsonArray(PROXY_ARRAY)) {
-				JsonArray pa = config.getJsonArray(PROXY_ARRAY);
-				for (JsonValue val : pa) {
-					int port = 80;
-					String domain = null;
-					String path = null;
-					String prefix = "";
-					JsonObject obj = val.getJsonObject();
-					if (obj.isString(DOMAIN))
-						domain = obj.getString(DOMAIN);
-					if (obj.isString(PATH))
-						path = obj.getString(PATH);
-					if (obj.isInt(PORT))
-						port = obj.getInt(PORT);
-					else if (obj.isString(PORT))
-						port = Integer.parseInt(obj.getString(PORT));
-					if (obj.isString("prefix"))
-						prefix = obj.getString("prefix");
-
-					if (domain != null && path != null && port > 0) {
-						log.debug("adding proxy servlet: " + domain + ":"
-								+ port + " " + path);
-						root.addServlet(new ServletHolder(
-								new AsyncProxyServlet.Transparent(prefix,
-										domain, port)), path);
-					}
+				List<ProxyPath> proxyPaths = getProxyPaths();
+				for (ProxyPath proxyPath : proxyPaths) {
+					log.debug("adding proxy servlet: " + proxyPath.getDomain() + ":" + proxyPath.getPort()
+							+ " " + proxyPath.getPath());
+					root.addServlet(new ServletHolder(
+							new AsyncProxyServlet.Transparent("", proxyPath.getDomain(),
+									proxyPath.getPort())), proxyPath.getPath());
 				}
 			}
 			if (config.isJsonArray(MERGE_ARRAY)) {

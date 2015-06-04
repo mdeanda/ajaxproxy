@@ -2,6 +2,8 @@ package com.thedeanda.ajaxproxy.ui.rest;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
@@ -44,8 +46,11 @@ public class RestClientFrame extends JFrame implements RequestListener {
 		busy = new BusyNotification();
 		setGlassPane(busy);
 
-		pack();
+		URL imgUrl = ClassLoader.getSystemClassLoader().getResource("icon.png");
+		Image image = Toolkit.getDefaultToolkit().getImage(imgUrl);
+		this.setIconImage(image);
 
+		pack();
 	}
 
 	public void fromResource(LoadedResource resource) {

@@ -38,16 +38,16 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
-import net.sourceforge.javajson.JsonArray;
-import net.sourceforge.javajson.JsonException;
-import net.sourceforge.javajson.JsonObject;
-import net.sourceforge.javajson.JsonValue;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.thedeanda.ajaxproxy.ProxyListener;
+import com.thedeanda.ajaxproxy.ui.json.JsonViewerFrame;
 import com.thedeanda.ajaxproxy.ui.rest.RestClientFrame;
+import com.thedeanda.javajson.JsonArray;
+import com.thedeanda.javajson.JsonException;
+import com.thedeanda.javajson.JsonObject;
+import com.thedeanda.javajson.JsonValue;
 
 public class MainFrame extends JFrame implements ProxyListener {
 	private static final long serialVersionUID = 1L;
@@ -69,6 +69,7 @@ public class MainFrame extends JFrame implements ProxyListener {
 	private JMenuItem saveMenuItem;
 	private MenuItem showFrameMenuItem;
 	private MenuItem newRestClientMenuItem;
+	private MenuItem newJsonViewerMenuItem;
 
 	public MainFrame() {
 		this.panel = new MainPanel();
@@ -161,6 +162,8 @@ public class MainFrame extends JFrame implements ProxyListener {
 						handleShowWindow();
 					} else if (e.getSource() == newRestClientMenuItem) {
 						handleRest();
+					} else if (e.getSource() == newJsonViewerMenuItem) {
+						handleJson();
 					} else
 						handleExit();
 				}
@@ -183,6 +186,10 @@ public class MainFrame extends JFrame implements ProxyListener {
 			this.newRestClientMenuItem = new MenuItem("New Rest Client");
 			newRestClientMenuItem.addActionListener(menuItemListener);
 			popup.add(newRestClientMenuItem);
+
+			this.newJsonViewerMenuItem = new MenuItem("New Json Viewer");
+			newJsonViewerMenuItem.addActionListener(menuItemListener);
+			popup.add(newJsonViewerMenuItem);
 
 			popup.addSeparator();
 
@@ -304,6 +311,18 @@ public class MainFrame extends JFrame implements ProxyListener {
 		});
 		menu.add(mi);
 
+		mi = new JMenuItem("Json Viewer");
+		mi.setMnemonic(KeyEvent.VK_J);
+		mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_J,
+				ActionEvent.CTRL_MASK));
+		mi.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent ae) {
+				handleJson();
+			}
+		});
+		menu.add(mi);
+
 		menu.addSeparator();
 
 		mi = new JMenuItem("Exit");
@@ -346,6 +365,11 @@ public class MainFrame extends JFrame implements ProxyListener {
 
 	private void handleRest() {
 		RestClientFrame frame = new RestClientFrame();
+		frame.setVisible(true);
+	}
+
+	private void handleJson() {
+		JsonViewerFrame frame = new JsonViewerFrame();
 		frame.setVisible(true);
 	}
 
