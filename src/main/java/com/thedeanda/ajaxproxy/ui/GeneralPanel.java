@@ -16,14 +16,13 @@ public class GeneralPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private JTextField port;
 	private JTextField resourceBase;
-	private SettingsChangedListener listener;
 	private JCheckBox indexCheck;
 
 	public GeneralPanel(final SettingsChangedListener listener) {
 		SpringLayout layout = new SpringLayout();
 		setLayout(layout);
+
 		// TODO: track changes to text fields
-		this.listener = listener;
 
 		port = SwingUtils.newJTextField();
 
