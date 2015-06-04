@@ -2,19 +2,24 @@ package com.thedeanda.ajaxproxy.ui;
 
 import java.awt.Dimension;
 
+import javax.swing.ButtonModel;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 import javax.swing.SwingConstants;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 public class GeneralPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private JTextField port;
 	private JTextField resourceBase;
 	private SettingsChangedListener listener;
+	private JCheckBox indexCheck;
 
-	public GeneralPanel(SettingsChangedListener listener) {
+	public GeneralPanel(final SettingsChangedListener listener) {
 		SpringLayout layout = new SpringLayout();
 		setLayout(layout);
 		// TODO: track changes to text fields
@@ -35,6 +40,18 @@ public class GeneralPanel extends JPanel {
 		JLabel baseLabel = new JLabel("Resource Base");
 		add(baseLabel);
 		add(resourceBase);
+
+		indexCheck = new JCheckBox("Show Directory Index");
+		add(indexCheck);
+		indexCheck.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				ButtonModel model = ((JCheckBox) e.getSource()).getModel();
+				if (model.isPressed()) {
+					listener.restartRequired();
+				}
+			}
+		});
 
 		layout.putConstraint(SpringLayout.WEST, portLabel, 10,
 				SpringLayout.WEST, this);
@@ -58,6 +75,11 @@ public class GeneralPanel extends JPanel {
 		layout.putConstraint(SpringLayout.EAST, baseLabel, 0,
 				SpringLayout.EAST, portLabel);
 
+		layout.putConstraint(SpringLayout.NORTH, indexCheck, 20,
+				SpringLayout.SOUTH, resourceBase);
+		layout.putConstraint(SpringLayout.WEST, indexCheck, 0,
+				SpringLayout.WEST, resourceBase);
+
 	}
 
 	public String getResourceBase() {
@@ -74,5 +96,13 @@ public class GeneralPanel extends JPanel {
 
 	public void setPort(int port) {
 		this.port.setText(String.valueOf(port));
+	}
+
+	public void setShowIndex(boolean showIndex) {
+		indexCheck.setSelected(showIndex);
+	}
+
+	public boolean isShowIndex() {
+		return indexCheck.isSelected();
 	}
 }

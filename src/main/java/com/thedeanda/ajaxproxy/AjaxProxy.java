@@ -28,6 +28,7 @@ public class AjaxProxy implements Runnable {
 	private static final Logger log = LoggerFactory.getLogger(AjaxProxy.class);
 	private int port = 8080;
 	private String resourceBase = "";
+	private boolean showIndex;
 	private JsonObject config;
 	private Server jettyServer;
 	private File workingDir;
@@ -43,6 +44,7 @@ public class AjaxProxy implements Runnable {
 
 	public static final String PORT = "port";
 	public static final String RESOURCE_BASE = "resourceBase";
+	public static final String SHOW_INDEX = "showIndex";
 	public static final String PROXY_ARRAY = "proxy";
 	public static final String DOMAIN = "domain";
 	public static final String PATH = "path";
@@ -170,6 +172,7 @@ public class AjaxProxy implements Runnable {
 		} else {
 			throw new Exception("resourceBase not defined in config file");
 		}
+		showIndex = config.getBoolean(SHOW_INDEX);
 		log.info("using resource base: " + resourceBase);
 	}
 
@@ -227,8 +230,7 @@ public class AjaxProxy implements Runnable {
 			ServletHolder servlet;
 			DefaultServlet defaultServlet = new DefaultServlet();
 			servlet = new ServletHolder(defaultServlet);
-			// TODO: set dirAllowed as a param for "security"
-			servlet.setInitParameter("dirAllowed", "true");
+			servlet.setInitParameter("dirAllowed", String.valueOf(showIndex));
 			servlet.setInitParameter("resourceBase", resourceBase);
 			servlet.setInitParameter("maxCacheSize", "0");
 			servlet.setName("default servlet");

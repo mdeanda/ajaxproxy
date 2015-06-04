@@ -173,6 +173,7 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener,
 		JsonObject json = config;
 		json.put("port", generalPanel.getPort());
 		json.put("resourceBase", generalPanel.getResourceBase());
+		json.put(AjaxProxy.SHOW_INDEX, generalPanel.isShowIndex());
 		json.put("proxy", proxyModel.getConfig());
 		json.put("merge", mergeModel.getConfig());
 		json.put("variables", variableModel.getConfig());
@@ -209,7 +210,7 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener,
 			JsonObject json = JsonObject.parse(getConfig().toString());
 			File workingDir = configFile.getParentFile();
 			if (workingDir == null)
-				workingDir = new File("");
+				workingDir = new File(".");
 			proxy = new AjaxProxy(json, workingDir);
 			proxy.addProxyListener(this);
 			new Thread(proxy).start();
@@ -232,6 +233,7 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener,
 
 		generalPanel.setPort(0);
 		generalPanel.setResourceBase("");
+		generalPanel.setShowIndex(false);
 		proxyModel.clear();
 		mergeModel.clear();
 		variableModel.clear();
@@ -293,6 +295,7 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener,
 		variableModel.setConfig(config.getJsonObject("variables"));
 		generalPanel.setPort(config.getInt("port"));
 		generalPanel.setResourceBase(config.getString("resourceBase"));
+		generalPanel.setShowIndex(config.getBoolean(AjaxProxy.SHOW_INDEX));
 		trackerPanel.setConfig(json.getJsonObject("tracker"));
 		resourceViewerPanel.setConfig(json.getJsonObject("resource"));
 		optionsPanel.setConfig(json.getJsonObject("options"));
