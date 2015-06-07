@@ -52,9 +52,12 @@ public class ProxyFilter implements Filter {
 
 	private Set<ProxyPathMatcher> matchers;
 
+	private RequestListener listener;
+
 	public ProxyFilter(AjaxProxy ajaxProxy) {
 		this.ajaxProxy = ajaxProxy;
 		client = new HttpClient();
+		this.listener = ajaxProxy.getRequestListener();
 	}
 
 	@Override
@@ -90,7 +93,8 @@ public class ProxyFilter implements Filter {
 			Enumeration<String> hnames = request.getHeaderNames();
 			while (hnames.hasMoreElements()) {
 				String hn = hnames.nextElement();
-				if (!"Host".equals(hn)) { //TODO: see rest client frame for a whitelist
+				if (!"Host".equals(hn)) { // TODO: see rest client frame for a
+											// whitelist
 					Header h = new BasicHeader(hn, request.getHeader(hn));
 					hdrs.add(h);
 					sb.append(hn + ": " + request.getHeader(hn));
@@ -112,20 +116,18 @@ public class ProxyFilter implements Filter {
 						@Override
 						public void newRequest(UUID id, String url,
 								String method) {
-							// TODO Auto-generated method stub
-
+							listener.newRequest(id, url, method);
 						}
 
 						@Override
 						public void startRequest(UUID id, URL url,
 								Header[] requestHeaders, byte[] data) {
-							// TODO Auto-generated method stub
-
+							listener.startRequest(id, url, requestHeaders, data);
 						}
 
 						@Override
 						public void requestComplete(UUID id, int status,
-								String reason, long duation,
+								String reason, long duration,
 								Header[] responseHeaders, byte[] data) {
 
 							try {
@@ -136,11 +138,16 @@ public class ProxyFilter implements Filter {
 
 							}
 
+							listener.requestComplete(id, status, reason,
+									duration, responseHeaders, data);
 						}
 
 						@Override
 						public void error(UUID id, String message, Exception e) {
 							// chain.doFilter(request, response);
+							log.debug("error: id/message/ex - {}, {}, {}", id,
+									message, e);
+							listener.error(id, message, e);
 						}
 
 					});

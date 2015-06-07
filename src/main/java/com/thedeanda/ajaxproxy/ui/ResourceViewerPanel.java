@@ -10,6 +10,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.net.URL;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -41,6 +43,7 @@ import org.apache.http.Header;
 import com.thedeanda.ajaxproxy.AccessTracker;
 import com.thedeanda.ajaxproxy.AjaxProxy;
 import com.thedeanda.ajaxproxy.LoadedResource;
+import com.thedeanda.ajaxproxy.http.RequestListener;
 import com.thedeanda.ajaxproxy.ui.rest.RestClientFrame;
 import com.thedeanda.javajson.JsonArray;
 import com.thedeanda.javajson.JsonException;
@@ -49,7 +52,7 @@ import com.thedeanda.javajson.JsonValue;
 
 /** tracks files that get loaded */
 public class ResourceViewerPanel extends JPanel implements AccessTracker,
-		ActionListener {
+		ActionListener, RequestListener {
 	private static final long serialVersionUID = 1L;
 	private JButton clearBtn;
 	private JButton exportBtn;
@@ -268,8 +271,10 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 
 	public void setProxy(AjaxProxy ajaxProxy) {
 		this.ajaxProxy = ajaxProxy;
-		if (ajaxProxy != null)
+		if (ajaxProxy != null) {
 			ajaxProxy.addTracker(this);
+			ajaxProxy.addRequestListener(this);
+		}
 	}
 
 	@Override
@@ -417,5 +422,31 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 				});
 			}
 		}
+	}
+
+	@Override
+	public void newRequest(UUID id, String url, String method) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void startRequest(UUID id, URL url, Header[] requestHeaders,
+			byte[] data) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void requestComplete(UUID id, int status, String reason,
+			long duration, Header[] responseHeaders, byte[] data) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void error(UUID id, String message, Exception e) {
+		// TODO Auto-generated method stub
+
 	}
 }
