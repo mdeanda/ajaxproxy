@@ -17,7 +17,6 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import javax.swing.BorderFactory;
-import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
@@ -44,7 +43,10 @@ import com.thedeanda.ajaxproxy.AccessTracker;
 import com.thedeanda.ajaxproxy.AjaxProxy;
 import com.thedeanda.ajaxproxy.LoadedResource;
 import com.thedeanda.ajaxproxy.http.RequestListener;
+import com.thedeanda.ajaxproxy.ui.model.Resource;
+import com.thedeanda.ajaxproxy.ui.model.ResourceListModel;
 import com.thedeanda.ajaxproxy.ui.rest.RestClientFrame;
+import com.thedeanda.ajaxproxy.ui.viewer.ResourceCellRenderer;
 import com.thedeanda.javajson.JsonArray;
 import com.thedeanda.javajson.JsonException;
 import com.thedeanda.javajson.JsonObject;
@@ -57,8 +59,8 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 	private JButton clearBtn;
 	private JButton exportBtn;
 	private JCheckBox toggleBtn;
-	private DefaultListModel<LoadedResource> model;
-	private JList<LoadedResource> list;
+	private ResourceListModel model;
+	private JList<Resource> list;
 	private ResourcePanel resourcePanel;
 	private JTextField filter;
 	private Color okColor;
@@ -71,7 +73,7 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 	public ResourceViewerPanel() {
 		SpringLayout layout = new SpringLayout();
 		setLayout(layout);
-		model = new DefaultListModel<LoadedResource>();
+		model = new ResourceListModel();
 
 		clearBtn = new JButton("Clear");
 		exportBtn = new JButton("Export");
@@ -165,7 +167,8 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 		replyMenuItem.addActionListener(this);
 		popup.add(replyMenuItem);
 
-		list = new JList<LoadedResource>(model);
+		list = new JList<Resource>(model);
+		list.setCellRenderer(new ResourceCellRenderer());
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		list.addListSelectionListener(new ListSelectionListener() {
 			@Override
@@ -258,9 +261,12 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 
 	private void listItemSelected(ListSelectionEvent evt) {
 		if (!evt.getValueIsAdjusting()) {
-			LoadedResource lr = (LoadedResource) list.getSelectedValue();
-			if (lr != null) {
-				showResource(lr);
+			Resource resource = (Resource) list.getSelectedValue();
+			if (resource != null) {
+				LoadedResource lr = resource.getLoadedResource();
+				if (lr != null) {
+					showResource(lr);
+				}
 			}
 		}
 	}
@@ -289,7 +295,7 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 		}
 
 		if (show) {
-			model.addElement(res);
+			model.add(new Resource(res));
 		}
 	}
 
@@ -318,7 +324,8 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 			File folder = fc.getSelectedFile();
 			String path = folder.getAbsolutePath();
 			for (int i = 0; i < model.getSize(); i++) {
-				LoadedResource obj = (LoadedResource) model.get(i);
+				Resource resource = (Resource) model.get(i);
+				LoadedResource obj = resource.getLoadedResource();
 				String fn = StringUtils.leftPad(String.valueOf(i), 8, "0");
 				JsonObject json = new JsonObject();
 				json.put("url", urlPrefix + obj.getPath());
@@ -405,7 +412,7 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 		} else if (evt.getSource() == replyMenuItem) {
 			int index = list.getSelectedIndex();
 			if (index >= 0) {
-				final LoadedResource resource = model.get(index);
+				final Resource resource = model.get(index);
 				SwingUtils.executNonUi(new Runnable() {
 					@Override
 					public void run() {
@@ -413,11 +420,13 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 						// httpClient.replay("localhost", ajaxProxy.getPort(),
 						// resource, null);
 
-						String baseUrl = "http://localhost:"
-								+ ajaxProxy.getPort();
-						RestClientFrame rest = new RestClientFrame();
-						rest.fromResource(resource);
-						rest.setVisible(true);
+						if (resource.getLoadedResource() != null) {
+							String baseUrl = "http://localhost:"
+									+ ajaxProxy.getPort();
+							RestClientFrame rest = new RestClientFrame();
+							rest.fromResource(resource.getLoadedResource());
+							rest.setVisible(true);
+						}
 					}
 				});
 			}
