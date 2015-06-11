@@ -460,15 +460,14 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 	@Override
 	public void startRequest(UUID id, URL url, Header[] requestHeaders,
 			byte[] data) {
-		// TODO Auto-generated method stub
-
+		model.startRequest(id, url, requestHeaders, data);
 	}
 
 	@Override
 	public void requestComplete(UUID id, int status, String reason,
 			long duration, Header[] responseHeaders, byte[] data) {
-		// TODO Auto-generated method stub
-
+		model.requestComplete(id, status, reason, duration, responseHeaders,
+				data);
 	}
 
 	@Override

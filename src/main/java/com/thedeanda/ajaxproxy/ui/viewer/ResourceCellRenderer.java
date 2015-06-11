@@ -3,6 +3,7 @@ package com.thedeanda.ajaxproxy.ui.viewer;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.net.URL;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -74,7 +75,7 @@ public class ResourceCellRenderer extends JPanel implements
 			if (index % 2 == 0) {
 				setBackground(list.getBackground());
 			} else {
-				Color lightColor = new Color(245, 240, 245);
+				Color lightColor = new Color(250, 250, 255);
 				setBackground(lightColor);
 			}
 			setForeground(list.getForeground());
@@ -87,13 +88,27 @@ public class ResourceCellRenderer extends JPanel implements
 			method.setText(lr.getMethod());
 			dur.setText(lr.getDuration() + "ms");
 		} else {
-			path.setText(resource.getUrl());
-			status.setText("xx");
+			String url = resource.getUrl();
+			if (resource.getUrlObject() != null) {
+				URL uo = resource.getUrlObject();
+				url = uo.getPath();
+			}
+			path.setText(url);
+
+			String statusText = "";
+			if (resource.getStatus() > 0) {
+				statusText = String.valueOf(resource.getStatus());
+			}
+			status.setText(statusText);
 			method.setText(resource.getMethod());
-			dur.setText("");
+
+			String durText = "";
+			if (resource.getDuration() > 0) {
+				durText = String.valueOf(resource.getDuration());
+			}
+			dur.setText(durText);
 		}
 
 		return this;
 	}
-
 }

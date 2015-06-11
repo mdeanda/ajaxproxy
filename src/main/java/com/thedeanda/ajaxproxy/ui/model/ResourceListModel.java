@@ -1,5 +1,6 @@
 package com.thedeanda.ajaxproxy.ui.model;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -7,6 +8,8 @@ import java.util.UUID;
 import javax.swing.ListModel;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
+
+import org.apache.http.Header;
 
 public class ResourceListModel implements ListModel<Resource> {
 	private static final long serialVersionUID = -1203515236578998042L;
@@ -49,7 +52,7 @@ public class ResourceListModel implements ListModel<Resource> {
 			return items.get(index);
 	}
 
-	public void notifyUpdated(UUID id) {
+	private void notifyUpdated(UUID id) {
 		int index = -1;
 		for (int i = 0; i < items.size(); i++) {
 			Resource r = items.get(i);
@@ -110,4 +113,39 @@ public class ResourceListModel implements ListModel<Resource> {
 	public void removeListDataListener(ListDataListener l) {
 		listeners.remove(l);
 	}
+
+	public void startRequest(UUID id, URL url, Header[] requestHeaders,
+			byte[] data) {
+
+		Resource resource = get(id);
+		if (resource != null) {
+			resource.setUrlObject(url);
+			resource.setInputData(data);
+			resource.setRequestHeaders(requestHeaders);
+
+			notifyUpdated(id);
+		}
+	}
+	
+	public void requestComplete(UUID id, int status, String reason,
+			long duration, Header[] responseHeaders, byte[] data) {
+		Resource resource = get(id);
+		if (resource != null) {
+			resource.setStatus(status);
+			resource.setReason(reason);
+			resource.setDuration(duration);
+			resource.setResponseHeaders(responseHeaders);
+			resource.setOutputData(data);
+			notifyUpdated(id);
+		}
+	}
+	
+	public void error(UUID id, String message, Exception e) {
+		Resource resource = get(id);
+		if (resource != null) {
+
+			notifyUpdated(id);
+		}
+	}
+
 }
