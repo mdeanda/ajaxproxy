@@ -2,6 +2,7 @@ package com.thedeanda.ajaxproxy.ui.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.swing.ListModel;
 import javax.swing.event.ListDataEvent;
@@ -46,6 +47,34 @@ public class ResourceListModel implements ListModel<Resource> {
 			return null;
 		else
 			return items.get(index);
+	}
+
+	public void notifyUpdated(UUID id) {
+		int index = -1;
+		for (int i = 0; i < items.size(); i++) {
+			Resource r = items.get(i);
+			if (r.getId() == id) {
+				index = i;
+				break;
+			}
+		}
+
+		if (index >= 0) {
+			for (ListDataListener listener : listeners) {
+				listener.contentsChanged(new ListDataEvent(this,
+						ListDataEvent.CONTENTS_CHANGED, index, index));
+			}
+		}
+	}
+
+	public Resource get(UUID id) {
+		// TODO: use a map
+		for (Resource r : items) {
+			if (r.getId() == id) {
+				return r;
+			}
+		}
+		return null;
 	}
 
 	@Override

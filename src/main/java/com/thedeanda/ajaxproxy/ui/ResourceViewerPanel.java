@@ -75,6 +75,7 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 		setLayout(layout);
 		model = new ResourceListModel();
 
+		resourcePanel = new ResourcePanel(false);
 		clearBtn = new JButton("Clear");
 		exportBtn = new JButton("Export");
 		toggleBtn = new JCheckBox("Monitor Resources");
@@ -97,13 +98,12 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 		add(toggleBtn);
 
 		JPanel leftPanel = initLeftPanel();
-
-		resourcePanel = new ResourcePanel(false);
+		JPanel rightPanel = initRightPanel();
 
 		JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		split.setLeftComponent(leftPanel);
-		split.setRightComponent(resourcePanel);
-		split.setDividerLocation(200);
+		split.setRightComponent(rightPanel);
+		split.setDividerLocation(300);
 		split.setBorder(BorderFactory.createEmptyBorder());
 		SwingUtils.flattenSplitPane(split);
 		add(split);
@@ -132,14 +132,33 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 
 	}
 
+	private JPanel initRightPanel() {
+		SpringLayout layout = new SpringLayout();
+		JPanel panel = new JPanel(layout);
+		panel.setBorder(BorderFactory.createEmptyBorder());
+
+		panel.add(resourcePanel);
+
+		layout.putConstraint(SpringLayout.NORTH, resourcePanel, 0,
+				SpringLayout.NORTH, panel);
+		layout.putConstraint(SpringLayout.WEST, resourcePanel, 10,
+				SpringLayout.WEST, panel);
+		layout.putConstraint(SpringLayout.EAST, resourcePanel, -10,
+				SpringLayout.EAST, panel);
+		layout.putConstraint(SpringLayout.SOUTH, resourcePanel, 0,
+				SpringLayout.SOUTH, panel);
+
+		return panel;
+	}
+
 	private JPanel initLeftPanel() {
 		SpringLayout layout = new SpringLayout();
-		JPanel leftPanel = new JPanel(layout);
-		leftPanel.setBorder(BorderFactory.createEmptyBorder());
+		JPanel panel = new JPanel(layout);
+		panel.setBorder(BorderFactory.createEmptyBorder());
 
 		filter = new JTextField();
 		SwingUtils.prepJTextField(filter);
-		leftPanel.add(filter);
+		panel.add(filter);
 
 		// Listen for changes in the text
 		okColor = filter.getBackground();
@@ -197,25 +216,25 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 		});
 		list.setBorder(BorderFactory.createEmptyBorder());
 		JScrollPane scroll = new JScrollPane(list);
-		leftPanel.add(scroll);
+		panel.add(scroll);
 
 		layout.putConstraint(SpringLayout.NORTH, filter, 0, SpringLayout.NORTH,
-				leftPanel);
+				panel);
 		layout.putConstraint(SpringLayout.WEST, filter, 10, SpringLayout.WEST,
-				leftPanel);
-		layout.putConstraint(SpringLayout.EAST, filter, 0, SpringLayout.EAST,
-				leftPanel);
+				panel);
+		layout.putConstraint(SpringLayout.EAST, filter, -10, SpringLayout.EAST,
+				panel);
 
 		layout.putConstraint(SpringLayout.NORTH, scroll, 10,
 				SpringLayout.SOUTH, filter);
 		layout.putConstraint(SpringLayout.WEST, scroll, 10, SpringLayout.WEST,
-				leftPanel);
-		layout.putConstraint(SpringLayout.EAST, scroll, 0, SpringLayout.EAST,
-				leftPanel);
+				panel);
+		layout.putConstraint(SpringLayout.EAST, scroll, -10, SpringLayout.EAST,
+				panel);
 		layout.putConstraint(SpringLayout.SOUTH, scroll, 0, SpringLayout.SOUTH,
-				leftPanel);
+				panel);
 
-		return leftPanel;
+		return panel;
 	}
 
 	private void initTree(DefaultMutableTreeNode top, JsonObject obj) {
@@ -435,8 +454,7 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 
 	@Override
 	public void newRequest(UUID id, String url, String method) {
-		// TODO Auto-generated method stub
-
+		model.add(new Resource(id, url, method));
 	}
 
 	@Override

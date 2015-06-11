@@ -43,6 +43,7 @@ public class AjaxProxy implements Runnable {
 	private List<MergeServlet> mergeServlets = new ArrayList<MergeServlet>();
 	private boolean newProxy = false;
 	private ArrayList<RequestListener> proxyListeners;
+	private RequestListener listener;
 
 	private enum ProxyEvent {
 		START, STOP, FAIL
@@ -85,6 +86,7 @@ public class AjaxProxy implements Runnable {
 	private void init() {
 		this.proxyListeners = new ArrayList<RequestListener>();
 		proxyFilter = new ProxyFilter(this);
+		getRequestListener();
 	}
 
 	public void addProxyListener(ProxyListener pl) {
@@ -363,57 +365,59 @@ public class AjaxProxy implements Runnable {
 	}
 
 	public RequestListener getRequestListener() {
-		// TODO: single instance initialized at ctor
-		return new RequestListener() {
+		if (listener == null) {
+			listener = new RequestListener() {
 
-			@Override
-			public void newRequest(UUID id, String url, String method) {
-				for (RequestListener listener : proxyListeners) {
-					try {
-						listener.newRequest(id, url, method);
-					} catch (Exception e) {
-						log.warn(e.getMessage(), e);
+				@Override
+				public void newRequest(UUID id, String url, String method) {
+					for (RequestListener listener : proxyListeners) {
+						try {
+							listener.newRequest(id, url, method);
+						} catch (Exception e) {
+							log.warn(e.getMessage(), e);
+						}
 					}
 				}
-			}
 
-			@Override
-			public void startRequest(UUID id, URL url, Header[] requestHeaders,
-					byte[] data) {
-				for (RequestListener listener : proxyListeners) {
-					try {
-						listener.startRequest(id, url, requestHeaders, data);
-					} catch (Exception e) {
-						log.warn(e.getMessage(), e);
+				@Override
+				public void startRequest(UUID id, URL url,
+						Header[] requestHeaders, byte[] data) {
+					for (RequestListener listener : proxyListeners) {
+						try {
+							listener.startRequest(id, url, requestHeaders, data);
+						} catch (Exception e) {
+							log.warn(e.getMessage(), e);
+						}
 					}
 				}
-			}
 
-			@Override
-			public void requestComplete(UUID id, int status, String reason,
-					long duration, Header[] responseHeaders, byte[] data) {
-				for (RequestListener listener : proxyListeners) {
-					try {
-						listener.requestComplete(id, status, reason, duration,
-								responseHeaders, data);
-					} catch (Exception e) {
-						log.warn(e.getMessage(), e);
+				@Override
+				public void requestComplete(UUID id, int status, String reason,
+						long duration, Header[] responseHeaders, byte[] data) {
+					for (RequestListener listener : proxyListeners) {
+						try {
+							listener.requestComplete(id, status, reason,
+									duration, responseHeaders, data);
+						} catch (Exception e) {
+							log.warn(e.getMessage(), e);
+						}
 					}
 				}
-			}
 
-			@Override
-			public void error(UUID id, String message, Exception e) {
-				for (RequestListener listener : proxyListeners) {
-					try {
-						listener.error(id, message, e);
-					} catch (Exception ex) {
-						log.warn(ex.getMessage(), ex);
+				@Override
+				public void error(UUID id, String message, Exception e) {
+					for (RequestListener listener : proxyListeners) {
+						try {
+							listener.error(id, message, e);
+						} catch (Exception ex) {
+							log.warn(ex.getMessage(), ex);
+						}
 					}
 				}
-			}
 
-		};
+			};
+		}
+		return listener;
 	}
 
 }
