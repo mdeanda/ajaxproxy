@@ -1,5 +1,7 @@
 package com.thedeanda.ajaxproxy.ui.model;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -126,7 +128,7 @@ public class ResourceListModel implements ListModel<Resource> {
 			notifyUpdated(id);
 		}
 	}
-	
+
 	public void requestComplete(UUID id, int status, String reason,
 			long duration, Header[] responseHeaders, byte[] data) {
 		Resource resource = get(id);
@@ -139,13 +141,15 @@ public class ResourceListModel implements ListModel<Resource> {
 			notifyUpdated(id);
 		}
 	}
-	
+
 	public void error(UUID id, String message, Exception e) {
 		Resource resource = get(id);
 		if (resource != null) {
-
+			StringWriter sw = new StringWriter();
+			e.printStackTrace(new PrintWriter(sw));
+			resource.setErrorReason(message);
+			resource.setException(sw.toString());
 			notifyUpdated(id);
 		}
 	}
-
 }

@@ -1,5 +1,6 @@
 package com.thedeanda.ajaxproxy.ui.model;
 
+import java.io.Serializable;
 import java.net.URL;
 import java.util.UUID;
 
@@ -7,11 +8,14 @@ import org.apache.http.Header;
 
 import com.thedeanda.ajaxproxy.LoadedResource;
 
-public class Resource {
+public class Resource implements Serializable {
+	private static final long serialVersionUID = -2666007600337135608L;
+
 	/**
 	 * old stuff, should go away if new proxy works
 	 */
 	private LoadedResource loadedResource;
+
 	private UUID id;
 	private String url;
 	private String method;
@@ -19,13 +23,15 @@ public class Resource {
 	private URL urlObject;
 	private Header[] requestHeaders;
 	private byte[] inputData;
-	
+
 	private int status;
 	private String reason;
 	private long duration;
 	private Header[] responseHeaders;
 	private byte[] outputData;
-	
+
+	private String errorReason;
+	private String exception;
 
 	public Resource(LoadedResource lr) {
 		loadedResource = lr;
@@ -131,6 +137,22 @@ public class Resource {
 
 	public void setMethod(String method) {
 		this.method = method;
+	}
+
+	public String getErrorReason() {
+		return errorReason;
+	}
+
+	public void setErrorReason(String errorReason) {
+		this.errorReason = errorReason;
+	}
+
+	public String getException() {
+		return exception;
+	}
+
+	public void setException(String exception) {
+		this.exception = exception;
 	}
 
 }

@@ -472,7 +472,6 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 
 	@Override
 	public void error(UUID id, String message, Exception e) {
-		// TODO Auto-generated method stub
-
+		model.error(id, message, e);
 	}
 }

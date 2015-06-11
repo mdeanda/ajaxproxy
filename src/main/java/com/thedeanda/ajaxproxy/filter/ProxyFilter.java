@@ -1,6 +1,7 @@
 package com.thedeanda.ajaxproxy.filter;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
@@ -87,20 +88,21 @@ public class ProxyFilter implements Filter {
 		if (matcher != null) {
 			ProxyPath proxyPath = matcher.getProxyPath();
 			log.warn("found matcher for new proxy method {}", matcher);
-			StringBuilder sb = new StringBuilder();
+			StringBuilder inputHeaders = new StringBuilder();
 			List<Header> hdrs = new LinkedList<Header>();
 			@SuppressWarnings("unchecked")
 			Enumeration<String> hnames = request.getHeaderNames();
 			while (hnames.hasMoreElements()) {
 				String hn = hnames.nextElement();
-				if (!"Host".equals(hn)) { // TODO: see rest client frame for a
-											// whitelist
+				if (!"Host".equals(hn)) {
+					// TODO: see rest client frame for a whitelist
+					// TODO: consider allowing header replacement via config
 					Header h = new BasicHeader(hn, request.getHeader(hn));
 					hdrs.add(h);
-					sb.append(hn + ": " + request.getHeader(hn));
+					inputHeaders.append(hn + ": " + request.getHeader(hn));
 				}
 			}
-			log.info("headers: {}", sb);
+			log.info("headers: {}", inputHeaders);
 
 			StringBuilder proxyUrl = new StringBuilder();
 			proxyUrl.append("http://" + proxyPath.getDomain());
@@ -110,8 +112,13 @@ public class ProxyFilter implements Filter {
 			proxyUrl.append(uri);
 			log.info("new proxy method to: {}", proxyUrl);
 
-			client.makeRequest(RequestMethod.GET, proxyUrl.toString(),
-					sb.toString(), null, new RequestListener() {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			IOUtils.copy(request.getInputStream(), baos);
+			byte[] inputData = baos.toByteArray();
+
+			client.makeRequest(RequestMethod.valueOf(request.getMethod()),
+					proxyUrl.toString(), inputHeaders.toString(), inputData,
+					new RequestListener() {
 
 						@Override
 						public void newRequest(UUID id, String url,
@@ -131,6 +138,8 @@ public class ProxyFilter implements Filter {
 								Header[] responseHeaders, byte[] data) {
 
 							try {
+								//TODO: add response headers here to pass them along too!
+								
 								ServletOutputStream os = response
 										.getOutputStream();
 								IOUtils.copy(new ByteArrayInputStream(data), os);
