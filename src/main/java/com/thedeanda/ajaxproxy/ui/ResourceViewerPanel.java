@@ -65,7 +65,6 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 	private JTextField filter;
 	private Color okColor;
 	private Color badColor;
-	private Pattern filterRegEx;
 	private JMenuItem removeRequestMenuItem;
 	private JMenuItem replyMenuItem;
 	private AjaxProxy ajaxProxy;
@@ -156,13 +155,13 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 		JPanel panel = new JPanel(layout);
 		panel.setBorder(BorderFactory.createEmptyBorder());
 
-		filter = new JTextField();
+		filter = new JTextField(".*");
 		SwingUtils.prepJTextField(filter);
 		panel.add(filter);
 
 		// Listen for changes in the text
 		okColor = filter.getBackground();
-		badColor = new Color(240, 220, 200);
+		badColor = new Color(250, 210, 200);
 		filter.getDocument().addDocumentListener(new DocumentListener() {
 			public void changedUpdate(DocumentEvent e) {
 				resetFilter();
@@ -305,13 +304,6 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 	@Override
 	public void trackFile(LoadedResource res) {
 		boolean show = toggleBtn.isSelected();
-		if (show && filterRegEx != null) {
-			Matcher matcher = filterRegEx.matcher(res.getPath());
-			if (matcher.matches())
-				show = true;
-			else
-				show = false;
-		}
 
 		if (show) {
 			model.add(new Resource(res));
@@ -319,13 +311,23 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 	}
 
 	private void resetFilter() {
-		try {
-			filterRegEx = Pattern.compile(filter.getText());
-			filter.setBackground(okColor);
-		} catch (PatternSyntaxException ex) {
-			filterRegEx = null;
-			filter.setBackground(badColor);
+		Pattern filterRegEx = null;
+		if (!StringUtils.isBlank(filter.getText())) {
+			try {
+				filterRegEx = Pattern.compile(filter.getText());
+				filter.setBackground(okColor);
+			} catch (PatternSyntaxException ex) {
+				filterRegEx = null;
+				filter.setBackground(badColor);
+			}
 		}
+		final Pattern filter = filterRegEx;
+		SwingUtils.executNonUi(new Runnable() {
+			@Override
+			public void run() {
+				model.setFilter(filter);
+			}
+		});
 	}
 
 	private void export() {

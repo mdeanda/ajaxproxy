@@ -33,14 +33,24 @@ public class Resource implements Serializable {
 	private String errorReason;
 	private String exception;
 
+	/**
+	 * calculated fields
+	 */
+	private String path;
+	
 	public Resource(LoadedResource lr) {
 		loadedResource = lr;
+		
+		setUrl(loadedResource.getUrl());
+		setPath(lr.getPath());
 	}
 
 	public Resource(UUID id, String url, String method) {
 		this.id = id;
 		this.url = url;
 		this.method = method;
+		
+		//TODO: calculate path from url
 	}
 
 	public LoadedResource getLoadedResource() {
@@ -153,6 +163,14 @@ public class Resource implements Serializable {
 
 	public void setException(String exception) {
 		this.exception = exception;
+	}
+
+	public String getPath() {
+		return path;
+	}
+
+	public void setPath(String path) {
+		this.path = path;
 	}
 
 }

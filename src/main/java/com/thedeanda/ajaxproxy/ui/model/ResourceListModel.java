@@ -6,6 +6,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.ListModel;
 import javax.swing.event.ListDataEvent;
@@ -17,16 +19,53 @@ public class ResourceListModel implements ListModel<Resource> {
 	private static final long serialVersionUID = -1203515236578998042L;
 
 	private List<ListDataListener> listeners = new ArrayList<>();
+	private List<Resource> unfilteredItems = new ArrayList<>();
 	private List<Resource> items = new ArrayList<>();
 
+	private Pattern filterRegEx;
+
 	public void add(Resource item) {
-		items.add(item);
+		unfilteredItems.add(item);
+		if (filterRegEx == null || filterRegEx.matcher(item.getPath()).matches()) {
+			items.add(item);
+		}
 
 		for (ListDataListener listener : listeners) {
 			listener.intervalAdded(new ListDataEvent(this,
 					ListDataEvent.INTERVAL_ADDED, items.size() - 1, items
 							.size()));
 		}
+	}
+	
+	private void resetFilter() {
+		int size = items.size();
+		items.clear();
+		if (size > 0) {
+			for (ListDataListener listener : listeners) {
+				listener.intervalRemoved(new ListDataEvent(this,
+						ListDataEvent.INTERVAL_REMOVED, 0, size - 1));
+			}
+		}
+		
+		if (filterRegEx==null) {
+			//just add all
+			items.addAll(unfilteredItems);
+		} else {
+			for (Resource item : unfilteredItems) {
+				if (filterRegEx.matcher(item.getPath()).matches()) {
+					items.add(item);
+				}
+			}
+		}
+		
+		size = items.size();
+		if (size > 0) {
+			for (ListDataListener listener : listeners) {
+				listener.intervalAdded(new ListDataEvent(this,
+						ListDataEvent.INTERVAL_ADDED, 0, size - 1));
+			}
+		}
+		
 	}
 
 	@Override
@@ -37,6 +76,7 @@ public class ResourceListModel implements ListModel<Resource> {
 	public void clear() {
 		int size = items.size();
 		items.clear();
+		unfilteredItems.clear();
 
 		if (size > 0) {
 			for (ListDataListener listener : listeners) {
@@ -74,7 +114,7 @@ public class ResourceListModel implements ListModel<Resource> {
 
 	public Resource get(UUID id) {
 		// TODO: use a map
-		for (Resource r : items) {
+		for (Resource r : unfilteredItems) {
 			if (r.getId() == id) {
 				return r;
 			}
@@ -103,7 +143,10 @@ public class ResourceListModel implements ListModel<Resource> {
 		if (index > items.size())
 			return;
 
-		items.remove(index);
+		Resource resource = items.remove(index);
+		if (resource != null) {
+			unfilteredItems.remove(resource);
+		}
 
 		for (ListDataListener listener : listeners) {
 			listener.intervalRemoved(new ListDataEvent(this,
@@ -151,5 +194,10 @@ public class ResourceListModel implements ListModel<Resource> {
 			resource.setException(sw.toString());
 			notifyUpdated(id);
 		}
+	}
+
+	public void setFilter(Pattern filterRegEx) {
+		this.filterRegEx = filterRegEx;
+		resetFilter();
 	}
 }
