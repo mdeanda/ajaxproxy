@@ -67,6 +67,7 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 	private Color badColor;
 	private JMenuItem removeRequestMenuItem;
 	private JMenuItem replyMenuItem;
+	private JMenuItem clearMenuItem;
 	private AjaxProxy ajaxProxy;
 
 	public ResourceViewerPanel() {
@@ -81,8 +82,7 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 		clearBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				model.clear();
-				showResource(null);
+				clear();
 			}
 		});
 		exportBtn.addActionListener(new ActionListener() {
@@ -177,6 +177,11 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 		});
 
 		final JPopupMenu popup = new JPopupMenu();
+
+		clearMenuItem = new JMenuItem("Clear");
+		clearMenuItem.addActionListener(this);
+		popup.add(clearMenuItem);
+
 		removeRequestMenuItem = new JMenuItem("Remove Request");
 		removeRequestMenuItem.addActionListener(this);
 		popup.add(removeRequestMenuItem);
@@ -451,6 +456,8 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 					}
 				});
 			}
+		} else if (evt.getSource() == clearMenuItem) {
+			clear();
 		}
 	}
 
@@ -475,5 +482,10 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 	@Override
 	public void error(UUID id, String message, Exception e) {
 		model.error(id, message, e);
+	}
+
+	private void clear() {
+		model.clear();
+		showResource(null);
 	}
 }
