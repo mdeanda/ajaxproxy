@@ -3,10 +3,13 @@ package com.thedeanda.ajaxproxy;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
+import org.apache.http.Header;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.ContextHandlerCollection;
 import org.mortbay.jetty.servlet.Context;
@@ -19,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import com.thedeanda.ajaxproxy.filter.APFilter;
 import com.thedeanda.ajaxproxy.filter.ProxyFilter;
+import com.thedeanda.ajaxproxy.http.RequestListener;
 import com.thedeanda.ajaxproxy.model.ProxyPath;
 import com.thedeanda.javajson.JsonArray;
 import com.thedeanda.javajson.JsonObject;
@@ -37,6 +41,9 @@ public class AjaxProxy implements Runnable {
 	private ProxyFilter proxyFilter;
 	private boolean mergeMode = false;
 	private List<MergeServlet> mergeServlets = new ArrayList<MergeServlet>();
+	private boolean newProxy = false;
+	private ArrayList<RequestListener> proxyListeners;
+	private RequestListener listener;
 
 	private enum ProxyEvent {
 		START, STOP, FAIL
@@ -45,6 +52,7 @@ public class AjaxProxy implements Runnable {
 	public static final String PORT = "port";
 	public static final String RESOURCE_BASE = "resourceBase";
 	public static final String SHOW_INDEX = "showIndex";
+	public static final String NEW_PROXY = "newProxy";
 	public static final String PROXY_ARRAY = "proxy";
 	public static final String DOMAIN = "domain";
 	public static final String PATH = "path";
@@ -76,7 +84,9 @@ public class AjaxProxy implements Runnable {
 	}
 
 	private void init() {
+		this.proxyListeners = new ArrayList<RequestListener>();
 		proxyFilter = new ProxyFilter(this);
+		getRequestListener();
 	}
 
 	public void addProxyListener(ProxyListener pl) {
@@ -173,6 +183,7 @@ public class AjaxProxy implements Runnable {
 			throw new Exception("resourceBase not defined in config file");
 		}
 		showIndex = config.getBoolean(SHOW_INDEX);
+		newProxy = config.getBoolean(NEW_PROXY);
 		log.info("using resource base: " + resourceBase);
 	}
 
@@ -220,12 +231,14 @@ public class AjaxProxy implements Runnable {
 
 			Context root = new Context(contexts, "/", Context.SESSIONS);
 
-			FilterHolder filterHolder = new FilterHolder(apfilter);
-			root.addFilter(filterHolder, "/*", 1);
-
-			FilterHolder proxyFilterHolder = new FilterHolder(proxyFilter);
-			root.addFilter(proxyFilterHolder, "/*", 1);
-			proxyFilter.reset();
+			if (!newProxy) {
+				FilterHolder filterHolder = new FilterHolder(apfilter);
+				root.addFilter(filterHolder, "/*", 1);
+			} else {
+				FilterHolder proxyFilterHolder = new FilterHolder(proxyFilter);
+				root.addFilter(proxyFilterHolder, "/*", 1);
+				proxyFilter.reset();
+			}
 
 			ServletHolder servlet;
 			DefaultServlet defaultServlet = new DefaultServlet();
@@ -240,11 +253,15 @@ public class AjaxProxy implements Runnable {
 			if (!mergeMode && config.isJsonArray(PROXY_ARRAY)) {
 				List<ProxyPath> proxyPaths = getProxyPaths();
 				for (ProxyPath proxyPath : proxyPaths) {
-					log.debug("adding proxy servlet: " + proxyPath.getDomain() + ":" + proxyPath.getPort()
-							+ " " + proxyPath.getPath());
-					root.addServlet(new ServletHolder(
-							new AsyncProxyServlet.Transparent("", proxyPath.getDomain(),
-									proxyPath.getPort())), proxyPath.getPath());
+					log.debug("adding proxy servlet: " + proxyPath.getDomain()
+							+ ":" + proxyPath.getPort() + " "
+							+ proxyPath.getPath());
+					root.addServlet(
+							new ServletHolder(
+									new AsyncProxyServlet.Transparent("",
+											proxyPath.getDomain(), proxyPath
+													.getPort())), proxyPath
+									.getPath());
 				}
 			}
 			if (config.isJsonArray(MERGE_ARRAY)) {
@@ -339,8 +356,68 @@ public class AjaxProxy implements Runnable {
 		apfilter.add(tracker);
 	}
 
+	public void addRequestListener(RequestListener listener) {
+		this.proxyListeners.add(listener);
+	}
+
 	public int getPort() {
 		return port;
+	}
+
+	public RequestListener getRequestListener() {
+		if (listener == null) {
+			listener = new RequestListener() {
+
+				@Override
+				public void newRequest(UUID id, String url, String method) {
+					for (RequestListener listener : proxyListeners) {
+						try {
+							listener.newRequest(id, url, method);
+						} catch (Exception e) {
+							log.warn(e.getMessage(), e);
+						}
+					}
+				}
+
+				@Override
+				public void startRequest(UUID id, URL url,
+						Header[] requestHeaders, byte[] data) {
+					for (RequestListener listener : proxyListeners) {
+						try {
+							listener.startRequest(id, url, requestHeaders, data);
+						} catch (Exception e) {
+							log.warn(e.getMessage(), e);
+						}
+					}
+				}
+
+				@Override
+				public void requestComplete(UUID id, int status, String reason,
+						long duration, Header[] responseHeaders, byte[] data) {
+					for (RequestListener listener : proxyListeners) {
+						try {
+							listener.requestComplete(id, status, reason,
+									duration, responseHeaders, data);
+						} catch (Exception e) {
+							log.warn(e.getMessage(), e);
+						}
+					}
+				}
+
+				@Override
+				public void error(UUID id, String message, Exception e) {
+					for (RequestListener listener : proxyListeners) {
+						try {
+							listener.error(id, message, e);
+						} catch (Exception ex) {
+							log.warn(ex.getMessage(), ex);
+						}
+					}
+				}
+
+			};
+		}
+		return listener;
 	}
 
 }

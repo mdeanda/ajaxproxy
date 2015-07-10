@@ -51,8 +51,6 @@ public class APFilter implements Filter {
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain chain) throws IOException, ServletException {
-		log.info("proxy filter");
-
 		if (request instanceof HttpServletRequest) {
 			doFilterInternal(request, response, chain);
 		} else {

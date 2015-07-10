@@ -10,12 +10,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.net.URL;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import javax.swing.BorderFactory;
-import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
@@ -41,7 +42,11 @@ import org.apache.http.Header;
 import com.thedeanda.ajaxproxy.AccessTracker;
 import com.thedeanda.ajaxproxy.AjaxProxy;
 import com.thedeanda.ajaxproxy.LoadedResource;
+import com.thedeanda.ajaxproxy.http.RequestListener;
+import com.thedeanda.ajaxproxy.ui.model.Resource;
+import com.thedeanda.ajaxproxy.ui.model.ResourceListModel;
 import com.thedeanda.ajaxproxy.ui.rest.RestClientFrame;
+import com.thedeanda.ajaxproxy.ui.viewer.ResourceCellRenderer;
 import com.thedeanda.javajson.JsonArray;
 import com.thedeanda.javajson.JsonException;
 import com.thedeanda.javajson.JsonObject;
@@ -49,35 +54,35 @@ import com.thedeanda.javajson.JsonValue;
 
 /** tracks files that get loaded */
 public class ResourceViewerPanel extends JPanel implements AccessTracker,
-		ActionListener {
+		ActionListener, RequestListener {
 	private static final long serialVersionUID = 1L;
 	private JButton clearBtn;
 	private JButton exportBtn;
 	private JCheckBox toggleBtn;
-	private DefaultListModel<LoadedResource> model;
-	private JList<LoadedResource> list;
+	private ResourceListModel model;
+	private JList<Resource> list;
 	private ResourcePanel resourcePanel;
 	private JTextField filter;
 	private Color okColor;
 	private Color badColor;
-	private Pattern filterRegEx;
 	private JMenuItem removeRequestMenuItem;
 	private JMenuItem replyMenuItem;
+	private JMenuItem clearMenuItem;
 	private AjaxProxy ajaxProxy;
 
 	public ResourceViewerPanel() {
 		SpringLayout layout = new SpringLayout();
 		setLayout(layout);
-		model = new DefaultListModel<LoadedResource>();
+		model = new ResourceListModel();
 
+		resourcePanel = new ResourcePanel(false);
 		clearBtn = new JButton("Clear");
 		exportBtn = new JButton("Export");
 		toggleBtn = new JCheckBox("Monitor Resources");
 		clearBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				model.clear();
-				showResource(null);
+				clear();
 			}
 		});
 		exportBtn.addActionListener(new ActionListener() {
@@ -92,13 +97,12 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 		add(toggleBtn);
 
 		JPanel leftPanel = initLeftPanel();
-
-		resourcePanel = new ResourcePanel(false);
+		JPanel rightPanel = initRightPanel();
 
 		JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		split.setLeftComponent(leftPanel);
-		split.setRightComponent(resourcePanel);
-		split.setDividerLocation(200);
+		split.setRightComponent(rightPanel);
+		split.setDividerLocation(300);
 		split.setBorder(BorderFactory.createEmptyBorder());
 		SwingUtils.flattenSplitPane(split);
 		add(split);
@@ -127,18 +131,37 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 
 	}
 
+	private JPanel initRightPanel() {
+		SpringLayout layout = new SpringLayout();
+		JPanel panel = new JPanel(layout);
+		panel.setBorder(BorderFactory.createEmptyBorder());
+
+		panel.add(resourcePanel);
+
+		layout.putConstraint(SpringLayout.NORTH, resourcePanel, 0,
+				SpringLayout.NORTH, panel);
+		layout.putConstraint(SpringLayout.WEST, resourcePanel, 10,
+				SpringLayout.WEST, panel);
+		layout.putConstraint(SpringLayout.EAST, resourcePanel, -10,
+				SpringLayout.EAST, panel);
+		layout.putConstraint(SpringLayout.SOUTH, resourcePanel, 0,
+				SpringLayout.SOUTH, panel);
+
+		return panel;
+	}
+
 	private JPanel initLeftPanel() {
 		SpringLayout layout = new SpringLayout();
-		JPanel leftPanel = new JPanel(layout);
-		leftPanel.setBorder(BorderFactory.createEmptyBorder());
+		JPanel panel = new JPanel(layout);
+		panel.setBorder(BorderFactory.createEmptyBorder());
 
-		filter = new JTextField();
+		filter = new JTextField(".*");
 		SwingUtils.prepJTextField(filter);
-		leftPanel.add(filter);
+		panel.add(filter);
 
 		// Listen for changes in the text
 		okColor = filter.getBackground();
-		badColor = new Color(240, 220, 200);
+		badColor = new Color(250, 210, 200);
 		filter.getDocument().addDocumentListener(new DocumentListener() {
 			public void changedUpdate(DocumentEvent e) {
 				resetFilter();
@@ -154,6 +177,11 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 		});
 
 		final JPopupMenu popup = new JPopupMenu();
+
+		clearMenuItem = new JMenuItem("Clear");
+		clearMenuItem.addActionListener(this);
+		popup.add(clearMenuItem);
+
 		removeRequestMenuItem = new JMenuItem("Remove Request");
 		removeRequestMenuItem.addActionListener(this);
 		popup.add(removeRequestMenuItem);
@@ -162,7 +190,8 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 		replyMenuItem.addActionListener(this);
 		popup.add(replyMenuItem);
 
-		list = new JList<LoadedResource>(model);
+		list = new JList<Resource>(model);
+		list.setCellRenderer(new ResourceCellRenderer());
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		list.addListSelectionListener(new ListSelectionListener() {
 			@Override
@@ -191,25 +220,25 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 		});
 		list.setBorder(BorderFactory.createEmptyBorder());
 		JScrollPane scroll = new JScrollPane(list);
-		leftPanel.add(scroll);
+		panel.add(scroll);
 
 		layout.putConstraint(SpringLayout.NORTH, filter, 0, SpringLayout.NORTH,
-				leftPanel);
+				panel);
 		layout.putConstraint(SpringLayout.WEST, filter, 10, SpringLayout.WEST,
-				leftPanel);
-		layout.putConstraint(SpringLayout.EAST, filter, 0, SpringLayout.EAST,
-				leftPanel);
+				panel);
+		layout.putConstraint(SpringLayout.EAST, filter, -10, SpringLayout.EAST,
+				panel);
 
 		layout.putConstraint(SpringLayout.NORTH, scroll, 10,
 				SpringLayout.SOUTH, filter);
 		layout.putConstraint(SpringLayout.WEST, scroll, 10, SpringLayout.WEST,
-				leftPanel);
-		layout.putConstraint(SpringLayout.EAST, scroll, 0, SpringLayout.EAST,
-				leftPanel);
+				panel);
+		layout.putConstraint(SpringLayout.EAST, scroll, -10, SpringLayout.EAST,
+				panel);
 		layout.putConstraint(SpringLayout.SOUTH, scroll, 0, SpringLayout.SOUTH,
-				leftPanel);
+				panel);
 
-		return leftPanel;
+		return panel;
 	}
 
 	private void initTree(DefaultMutableTreeNode top, JsonObject obj) {
@@ -255,9 +284,12 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 
 	private void listItemSelected(ListSelectionEvent evt) {
 		if (!evt.getValueIsAdjusting()) {
-			LoadedResource lr = (LoadedResource) list.getSelectedValue();
-			if (lr != null) {
-				showResource(lr);
+			Resource resource = (Resource) list.getSelectedValue();
+			if (resource != null) {
+				LoadedResource lr = resource.getLoadedResource();
+				if (lr != null) {
+					showResource(lr);
+				}
 			}
 		}
 	}
@@ -268,34 +300,39 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 
 	public void setProxy(AjaxProxy ajaxProxy) {
 		this.ajaxProxy = ajaxProxy;
-		if (ajaxProxy != null)
+		if (ajaxProxy != null) {
 			ajaxProxy.addTracker(this);
+			ajaxProxy.addRequestListener(this);
+		}
 	}
 
 	@Override
 	public void trackFile(LoadedResource res) {
 		boolean show = toggleBtn.isSelected();
-		if (show && filterRegEx != null) {
-			Matcher matcher = filterRegEx.matcher(res.getPath());
-			if (matcher.matches())
-				show = true;
-			else
-				show = false;
-		}
 
 		if (show) {
-			model.addElement(res);
+			model.add(new Resource(res));
 		}
 	}
 
 	private void resetFilter() {
-		try {
-			filterRegEx = Pattern.compile(filter.getText());
-			filter.setBackground(okColor);
-		} catch (PatternSyntaxException ex) {
-			filterRegEx = null;
-			filter.setBackground(badColor);
+		Pattern filterRegEx = null;
+		if (!StringUtils.isBlank(filter.getText())) {
+			try {
+				filterRegEx = Pattern.compile(filter.getText());
+				filter.setBackground(okColor);
+			} catch (PatternSyntaxException ex) {
+				filterRegEx = null;
+				filter.setBackground(badColor);
+			}
 		}
+		final Pattern filter = filterRegEx;
+		SwingUtils.executNonUi(new Runnable() {
+			@Override
+			public void run() {
+				model.setFilter(filter);
+			}
+		});
 	}
 
 	private void export() {
@@ -313,7 +350,8 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 			File folder = fc.getSelectedFile();
 			String path = folder.getAbsolutePath();
 			for (int i = 0; i < model.getSize(); i++) {
-				LoadedResource obj = (LoadedResource) model.get(i);
+				Resource resource = (Resource) model.get(i);
+				LoadedResource obj = resource.getLoadedResource();
 				String fn = StringUtils.leftPad(String.valueOf(i), 8, "0");
 				JsonObject json = new JsonObject();
 				json.put("url", urlPrefix + obj.getPath());
@@ -400,7 +438,7 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 		} else if (evt.getSource() == replyMenuItem) {
 			int index = list.getSelectedIndex();
 			if (index >= 0) {
-				final LoadedResource resource = model.get(index);
+				final Resource resource = model.get(index);
 				SwingUtils.executNonUi(new Runnable() {
 					@Override
 					public void run() {
@@ -408,14 +446,46 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 						// httpClient.replay("localhost", ajaxProxy.getPort(),
 						// resource, null);
 
-						String baseUrl = "http://localhost:"
-								+ ajaxProxy.getPort();
-						RestClientFrame rest = new RestClientFrame();
-						rest.fromResource(resource);
-						rest.setVisible(true);
+						if (resource.getLoadedResource() != null) {
+							String baseUrl = "http://localhost:"
+									+ ajaxProxy.getPort();
+							RestClientFrame rest = new RestClientFrame();
+							rest.fromResource(resource.getLoadedResource());
+							rest.setVisible(true);
+						}
 					}
 				});
 			}
+		} else if (evt.getSource() == clearMenuItem) {
+			clear();
 		}
+	}
+
+	@Override
+	public void newRequest(UUID id, String url, String method) {
+		model.add(new Resource(id, url, method));
+	}
+
+	@Override
+	public void startRequest(UUID id, URL url, Header[] requestHeaders,
+			byte[] data) {
+		model.startRequest(id, url, requestHeaders, data);
+	}
+
+	@Override
+	public void requestComplete(UUID id, int status, String reason,
+			long duration, Header[] responseHeaders, byte[] data) {
+		model.requestComplete(id, status, reason, duration, responseHeaders,
+				data);
+	}
+
+	@Override
+	public void error(UUID id, String message, Exception e) {
+		model.error(id, message, e);
+	}
+
+	private void clear() {
+		model.clear();
+		showResource(null);
 	}
 }

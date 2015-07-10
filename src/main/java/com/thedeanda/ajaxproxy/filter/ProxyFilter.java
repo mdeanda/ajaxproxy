@@ -1,6 +1,7 @@
 package com.thedeanda.ajaxproxy.filter;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
@@ -52,9 +53,12 @@ public class ProxyFilter implements Filter {
 
 	private Set<ProxyPathMatcher> matchers;
 
+	private RequestListener listener;
+
 	public ProxyFilter(AjaxProxy ajaxProxy) {
 		this.ajaxProxy = ajaxProxy;
 		client = new HttpClient();
+		this.listener = ajaxProxy.getRequestListener();
 	}
 
 	@Override
@@ -67,86 +71,109 @@ public class ProxyFilter implements Filter {
 			FilterChain chain) throws IOException, ServletException {
 
 		if (request instanceof HttpServletRequest) {
-			doFilterInternal((HttpServletRequest) request, response, chain);
+			ProxyPathMatcher proxy = getProxyMatcher((HttpServletRequest) request);
+			if (proxy != null) {
+				doFilterInternal((HttpServletRequest) request, response, chain,
+						proxy);
+			} else {
+				chain.doFilter(request, response);
+			}
 		} else {
 			chain.doFilter(request, response);
 		}
 	}
 
-	private void doFilterInternal(final HttpServletRequest request,
-			final ServletResponse response, final FilterChain chain)
-			throws IOException, ServletException {
-		log.info("proxy filter");
-
+	private ProxyPathMatcher getProxyMatcher(final HttpServletRequest request) {
 		String uri = request.getRequestURI();
 		log.info(uri);
 		ProxyPathMatcher matcher = getMatchingMatcher(uri);
 		if (matcher != null) {
-			ProxyPath proxyPath = matcher.getProxyPath();
-			log.warn("found matcher for new proxy method {}", matcher);
-			StringBuilder sb = new StringBuilder();
-			List<Header> hdrs = new LinkedList<Header>();
-			@SuppressWarnings("unchecked")
-			Enumeration<String> hnames = request.getHeaderNames();
-			while (hnames.hasMoreElements()) {
-				String hn = hnames.nextElement();
-				if (!"Host".equals(hn)) { //TODO: see rest client frame for a whitelist
-					Header h = new BasicHeader(hn, request.getHeader(hn));
-					hdrs.add(h);
-					sb.append(hn + ": " + request.getHeader(hn));
-				}
-			}
-			log.info("headers: {}", sb);
-
-			StringBuilder proxyUrl = new StringBuilder();
-			proxyUrl.append("http://" + proxyPath.getDomain());
-			if (proxyPath.getPort() != 80) {
-				proxyUrl.append(":" + proxyPath.getPort());
-			}
-			proxyUrl.append(uri);
-			log.info("new proxy method to: {}", proxyUrl);
-
-			client.makeRequest(RequestMethod.GET, proxyUrl.toString(),
-					sb.toString(), null, new RequestListener() {
-
-						@Override
-						public void newRequest(UUID id, String url,
-								String method) {
-							// TODO Auto-generated method stub
-
-						}
-
-						@Override
-						public void startRequest(UUID id, URL url,
-								Header[] requestHeaders, byte[] data) {
-							// TODO Auto-generated method stub
-
-						}
-
-						@Override
-						public void requestComplete(UUID id, int status,
-								String reason, long duation,
-								Header[] responseHeaders, byte[] data) {
-
-							try {
-								ServletOutputStream os = response
-										.getOutputStream();
-								IOUtils.copy(new ByteArrayInputStream(data), os);
-							} catch (Exception e) {
-
-							}
-
-						}
-
-						@Override
-						public void error(UUID id, String message, Exception e) {
-							// chain.doFilter(request, response);
-						}
-
-					});
-		} else {
-			chain.doFilter(request, response);
+			return matcher;
 		}
+		return null;
+	}
+
+	private void doFilterInternal(final HttpServletRequest request,
+			final ServletResponse response, final FilterChain chain,
+			ProxyPathMatcher proxy) throws IOException, ServletException {
+		log.info("proxy filter");
+
+		String uri = request.getRequestURI();
+		log.info(uri);
+
+		ProxyPath proxyPath = proxy.getProxyPath();
+
+		StringBuilder inputHeaders = new StringBuilder();
+		List<Header> hdrs = new LinkedList<Header>();
+		@SuppressWarnings("unchecked")
+		Enumeration<String> hnames = request.getHeaderNames();
+		while (hnames.hasMoreElements()) {
+			String hn = hnames.nextElement();
+			if (!"Host".equals(hn)) {
+				// TODO: see rest client frame for a whitelist
+				// TODO: consider allowing header replacement via config
+				Header h = new BasicHeader(hn, request.getHeader(hn));
+				hdrs.add(h);
+				inputHeaders.append(hn + ": " + request.getHeader(hn));
+			}
+		}
+		log.info("headers: {}", inputHeaders);
+
+		StringBuilder proxyUrl = new StringBuilder();
+		proxyUrl.append("http://" + proxyPath.getDomain());
+		if (proxyPath.getPort() != 80) {
+			proxyUrl.append(":" + proxyPath.getPort());
+		}
+		proxyUrl.append(uri);
+		log.info("new proxy method to: {}", proxyUrl);
+
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		IOUtils.copy(request.getInputStream(), baos);
+		byte[] inputData = baos.toByteArray();
+
+		client.makeRequest(RequestMethod.valueOf(request.getMethod()),
+				proxyUrl.toString(), inputHeaders.toString(), inputData,
+				new RequestListener() {
+
+					@Override
+					public void newRequest(UUID id, String url, String method) {
+						listener.newRequest(id, url, method);
+					}
+
+					@Override
+					public void startRequest(UUID id, URL url,
+							Header[] requestHeaders, byte[] data) {
+						listener.startRequest(id, url, requestHeaders, data);
+					}
+
+					@Override
+					public void requestComplete(UUID id, int status,
+							String reason, long duration,
+							Header[] responseHeaders, byte[] data) {
+
+						try {
+							// TODO: add response headers here to pass them
+							// along too!
+
+							ServletOutputStream os = response.getOutputStream();
+							IOUtils.copy(new ByteArrayInputStream(data), os);
+						} catch (Exception e) {
+
+						}
+
+						listener.requestComplete(id, status, reason, duration,
+								responseHeaders, data);
+					}
+
+					@Override
+					public void error(UUID id, String message, Exception e) {
+						// chain.doFilter(request, response);
+						log.debug("error: id/message/ex - {}, {}, {}", id,
+								message, e);
+						listener.error(id, message, e);
+					}
+
+				});
 	}
 
 	@Override

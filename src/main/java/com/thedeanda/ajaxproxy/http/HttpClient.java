@@ -166,7 +166,7 @@ public class HttpClient {
 
 		UUID uuid = UUID.randomUUID();
 		URL urlobj = null;
-		fireNewRequest(uuid, url, method.name(), listener);
+		//fireNewRequest(uuid, url, method.name(), listener);
 		try {
 			urlobj = new URL(url);
 		} catch (MalformedURLException e) {

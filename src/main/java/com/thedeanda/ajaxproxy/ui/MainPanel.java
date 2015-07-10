@@ -174,6 +174,7 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener,
 		json.put("port", generalPanel.getPort());
 		json.put("resourceBase", generalPanel.getResourceBase());
 		json.put(AjaxProxy.SHOW_INDEX, generalPanel.isShowIndex());
+		json.put(AjaxProxy.NEW_PROXY, generalPanel.isNewProxy());
 		json.put("proxy", proxyModel.getConfig());
 		json.put("merge", mergeModel.getConfig());
 		json.put("variables", variableModel.getConfig());
@@ -234,6 +235,7 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener,
 		generalPanel.setPort(0);
 		generalPanel.setResourceBase("");
 		generalPanel.setShowIndex(false);
+		generalPanel.setNewProxy(false);
 		proxyModel.clear();
 		mergeModel.clear();
 		variableModel.clear();
@@ -296,6 +298,7 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener,
 		generalPanel.setPort(config.getInt("port"));
 		generalPanel.setResourceBase(config.getString("resourceBase"));
 		generalPanel.setShowIndex(config.getBoolean(AjaxProxy.SHOW_INDEX));
+		generalPanel.setNewProxy(config.getBoolean(AjaxProxy.NEW_PROXY));
 		trackerPanel.setConfig(json.getJsonObject("tracker"));
 		resourceViewerPanel.setConfig(json.getJsonObject("resource"));
 		optionsPanel.setConfig(json.getJsonObject("options"));
@@ -335,11 +338,11 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener,
 	}
 
 	public void addVariables(Map<String, String> vars) {
-		if (vars!=null) {
+		if (vars != null) {
 			for (String key : vars.keySet()) {
 				String value = vars.get(key);
 				variableModel.set(key, value);
 			}
-		}		
+		}
 	}
 }

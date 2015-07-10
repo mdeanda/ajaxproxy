@@ -359,6 +359,10 @@ public class RestClientPanel extends JPanel implements ActionListener {
 	}
 
 	public void setInput(String input) {
+		if (input == null)
+			input = "";
+		else
+			input = input.trim();
 		this.inputField.setText(input);
 	}
 
