@@ -5,8 +5,9 @@ import java.io.StringWriter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.ListModel;
@@ -19,15 +20,16 @@ public class ResourceListModel implements ListModel<Resource> {
 	private static final long serialVersionUID = -1203515236578998042L;
 
 	private List<ListDataListener> listeners = new ArrayList<>();
-	private List<Resource> unfilteredItems = new ArrayList<>();
+	private Set<Resource> unfilteredItems = new TreeSet<>();
 	private List<Resource> items = new ArrayList<>();
 
 	private Pattern filterRegEx;
 
 	public void add(Resource item) {
 		unfilteredItems.add(item);
-		if (filterRegEx == null || filterRegEx.matcher(item.getPath()).matches()) {
-			items.add(item);
+		if (filterRegEx == null
+				|| filterRegEx.matcher(item.getPath()).matches()) {
+			addSorted(item, items);
 		}
 
 		for (ListDataListener listener : listeners) {
@@ -36,7 +38,24 @@ public class ResourceListModel implements ListModel<Resource> {
 							.size()));
 		}
 	}
-	
+
+	private void addSorted(Resource res, List<Resource> list) {
+		int index = 0;
+		for (Resource item : list) {
+			if (item.getStartTime() < res.getStartTime()) {
+				index++;
+			} else {
+				break;
+			}
+		}
+
+		if (index >= 0) {
+			list.add(index, res);
+		} else {
+			list.add(res);
+		}
+	}
+
 	private void resetFilter() {
 		int size = items.size();
 		items.clear();
@@ -46,9 +65,9 @@ public class ResourceListModel implements ListModel<Resource> {
 						ListDataEvent.INTERVAL_REMOVED, 0, size - 1));
 			}
 		}
-		
-		if (filterRegEx==null) {
-			//just add all
+
+		if (filterRegEx == null) {
+			// just add all
 			items.addAll(unfilteredItems);
 		} else {
 			for (Resource item : unfilteredItems) {
@@ -57,7 +76,7 @@ public class ResourceListModel implements ListModel<Resource> {
 				}
 			}
 		}
-		
+
 		size = items.size();
 		if (size > 0) {
 			for (ListDataListener listener : listeners) {
@@ -65,7 +84,7 @@ public class ResourceListModel implements ListModel<Resource> {
 						ListDataEvent.INTERVAL_ADDED, 0, size - 1));
 			}
 		}
-		
+
 	}
 
 	@Override

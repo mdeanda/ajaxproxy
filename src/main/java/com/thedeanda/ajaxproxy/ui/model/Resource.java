@@ -8,7 +8,7 @@ import org.apache.http.Header;
 
 import com.thedeanda.ajaxproxy.LoadedResource;
 
-public class Resource implements Serializable {
+public class Resource implements Serializable, Comparable<Resource> {
 	private static final long serialVersionUID = -2666007600337135608L;
 
 	/**
@@ -32,15 +32,16 @@ public class Resource implements Serializable {
 
 	private String errorReason;
 	private String exception;
+	private long startTime;
 
 	/**
 	 * calculated fields
 	 */
 	private String path;
-	
+
 	public Resource(LoadedResource lr) {
 		loadedResource = lr;
-		
+
 		setUrl(loadedResource.getUrl());
 		setPath(lr.getPath());
 	}
@@ -49,10 +50,16 @@ public class Resource implements Serializable {
 		this.id = id;
 		this.url = url;
 		this.method = method;
-		
-		//TODO: calculate path from url
+
+		// TODO: calculate path from url
 	}
 
+	@Override
+	public int compareTo(Resource o) {		
+		return (int) (getStartTime() - o.getStartTime());
+	}
+
+	
 	public LoadedResource getLoadedResource() {
 		return loadedResource;
 	}
@@ -171,6 +178,19 @@ public class Resource implements Serializable {
 
 	public void setPath(String path) {
 		this.path = path;
+	}
+
+
+	public long getStartTime() {
+		if (this.loadedResource != null) {
+			return this.loadedResource.getDate().getTime();
+		} else {
+			return startTime;
+		}
+	}
+
+	public void setStartTime(long startTime) {
+		this.startTime = startTime;
 	}
 
 }
