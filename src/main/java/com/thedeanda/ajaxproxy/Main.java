@@ -64,13 +64,11 @@ public class Main {
 				runRest();
 			} else if (config != null && merge != null) {
 				runMerge(config, merge, rm, ignore);
-				return;
 			} else if (config != null && run) {
 				AjaxProxy ap = new AjaxProxy(config);
 				ap.run();
 			} else if (merge != null && config == null) {
 				printHelp(options);
-				return;
 			} else {
 				showUi(config, runui, vars);
 			}
@@ -127,11 +125,11 @@ public class Main {
 					frame.loadFile(file);
 				}
 
+				frame.addVariables(vars);
+
 				if (runui) {
 					frame.startProxy();
 				}
-
-				frame.addVariables(vars);
 			}
 		});
 	}
