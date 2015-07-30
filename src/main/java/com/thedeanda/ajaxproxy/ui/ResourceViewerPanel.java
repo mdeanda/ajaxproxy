@@ -63,8 +63,8 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 	private JList<Resource> list;
 	private ResourcePanel resourcePanel;
 	private JTextField filter;
-	private Color okColor;
-	private Color badColor;
+	private Color filterOkColor;
+	private Color filterBadColor;
 	private JMenuItem removeRequestMenuItem;
 	private JMenuItem replyMenuItem;
 	private JMenuItem clearMenuItem;
@@ -160,8 +160,8 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 		panel.add(filter);
 
 		// Listen for changes in the text
-		okColor = filter.getBackground();
-		badColor = new Color(250, 210, 200);
+		filterOkColor = filter.getBackground();
+		filterBadColor = new Color(250, 210, 200);
 		filter.getDocument().addDocumentListener(new DocumentListener() {
 			public void changedUpdate(DocumentEvent e) {
 				resetFilter();
@@ -320,10 +320,10 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 		if (!StringUtils.isBlank(filter.getText())) {
 			try {
 				filterRegEx = Pattern.compile(filter.getText());
-				filter.setBackground(okColor);
+				filter.setBackground(filterOkColor);
 			} catch (PatternSyntaxException ex) {
 				filterRegEx = null;
-				filter.setBackground(badColor);
+				filter.setBackground(filterBadColor);
 			}
 		}
 		final Pattern filter = filterRegEx;

@@ -23,6 +23,9 @@ public class ResourceCellRenderer extends JPanel implements
 	private JLabel method;
 	private JLabel dur;
 
+	private final Color lightColor = new Color(250, 250, 255);
+	private final Color selectedColor = new Color(220, 235, 255);
+	
 	public ResourceCellRenderer() {
 		SpringLayout layout = new SpringLayout();
 		setLayout(layout);
@@ -69,13 +72,11 @@ public class ResourceCellRenderer extends JPanel implements
 			boolean cellHasFocus) {
 
 		if (isSelected) {
-			setBackground(list.getSelectionBackground());
-			setForeground(list.getSelectionForeground());
+			setBackground(selectedColor);
 		} else {
 			if (index % 2 == 0) {
 				setBackground(list.getBackground());
 			} else {
-				Color lightColor = new Color(250, 250, 255);
 				setBackground(lightColor);
 			}
 			setForeground(list.getForeground());
