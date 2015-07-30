@@ -242,6 +242,7 @@ public class RestClientPanel extends JPanel implements ActionListener {
 		if (is != null) {
 			try {
 				List<String> tmp = IOUtils.readLines(is);
+				tmp.add(0, "");
 				lines = new String[tmp.size()];
 				tmp.toArray(lines);
 			} catch (IOException e) {
