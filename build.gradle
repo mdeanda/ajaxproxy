@@ -18,7 +18,7 @@ apply plugin: "com.github.johnrengelman.shadow"
 apply plugin: 'com.jfrog.artifactory-upload'
 
 group = 'com.thedeanda'
-version = '1.17-SNAPSHOT'
+version = '1.17'
 
 repositories {
 	mavenCentral()
