@@ -46,7 +46,7 @@ public class HttpClient {
 	private final CloseableHttpClient client;
 
 	public enum RequestMethod {
-		GET(false), POST(true), PUT(true), DELETE(false), HEAD(false);
+		GET(false), POST(true), PUT(true), DELETE(false), HEAD(false), PATCH(true), OPTIONS(true), TRACE(true);
 
 		private boolean acceptsPayload;
 
