@@ -24,8 +24,14 @@ public class ResourceCellRenderer extends JPanel implements
 	private JLabel dur;
 
 	private final Color lightColor = new Color(250, 250, 255);
-	private final Color selectedColor = new Color(220, 235, 255);
-	
+	private final Color selectedColor = new Color(162, 202, 255);
+
+	private final Color[] slowColors = new Color[] { Color.decode("#fffdf0"),
+			Color.decode("#ffd187"), Color.decode("#ffa67f"),
+			Color.decode("#ff7b47") };
+
+	private final long[] durForSlow = new long[] { 500, 1000, 2500, 5000 };
+
 	public ResourceCellRenderer() {
 		SpringLayout layout = new SpringLayout();
 		setLayout(layout);
@@ -71,16 +77,12 @@ public class ResourceCellRenderer extends JPanel implements
 			Resource resource, int index, boolean isSelected,
 			boolean cellHasFocus) {
 
-		if (isSelected) {
-			setBackground(selectedColor);
-		} else {
-			if (index % 2 == 0) {
-				setBackground(list.getBackground());
-			} else {
-				setBackground(lightColor);
-			}
-			setForeground(list.getForeground());
+		Color color = list.getBackground();
+		boolean slowColor = false;
+		if (index % 2 == 1) {
+			color = lightColor;
 		}
+		// slowColors
 
 		LoadedResource lr = resource.getLoadedResource();
 		if (lr != null) {
@@ -88,6 +90,15 @@ public class ResourceCellRenderer extends JPanel implements
 			status.setText(String.valueOf(lr.getStatusCode()));
 			method.setText(lr.getMethod());
 			dur.setText(lr.getDuration() + "ms");
+
+			for (int i = 0; i < durForSlow.length; i++) {
+				long dur = durForSlow[i];
+				if (lr.getDuration() > dur) {
+					color = slowColors[i];
+					slowColor = true;
+				}
+			}
+
 		} else {
 			String url = resource.getUrl();
 			if (resource.getUrlObject() != null) {
@@ -110,6 +121,30 @@ public class ResourceCellRenderer extends JPanel implements
 			dur.setText(durText);
 		}
 
+		if (isSelected) {
+			if (slowColor) {
+				color = blend(color, selectedColor);
+			} else {
+				color = selectedColor;
+			}
+		}
+
+		setForeground(list.getForeground());
+		setBackground(color);
+
 		return this;
+	}
+
+	private Color blend(Color c0, Color c1) {
+		double totalAlpha = c0.getAlpha() + c1.getAlpha();
+		double weight0 = c0.getAlpha() / totalAlpha;
+		double weight1 = c1.getAlpha() / totalAlpha;
+
+		double r = weight0 * c0.getRed() + weight1 * c1.getRed();
+		double g = weight0 * c0.getGreen() + weight1 * c1.getGreen();
+		double b = weight0 * c0.getBlue() + weight1 * c1.getBlue();
+		double a = Math.max(c0.getAlpha(), c1.getAlpha());
+
+		return new Color((int) r, (int) g, (int) b, (int) a);
 	}
 }
