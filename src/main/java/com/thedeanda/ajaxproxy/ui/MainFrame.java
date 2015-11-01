@@ -25,6 +25,7 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -44,15 +45,19 @@ import org.slf4j.LoggerFactory;
 import com.thedeanda.ajaxproxy.ProxyListener;
 import com.thedeanda.ajaxproxy.ui.json.JsonViewerFrame;
 import com.thedeanda.ajaxproxy.ui.rest.RestClientFrame;
+import com.thedeanda.ajaxproxy.ui.windows.WindowContainer;
+import com.thedeanda.ajaxproxy.ui.windows.WindowListListener;
+import com.thedeanda.ajaxproxy.ui.windows.WindowListListenerCleanup;
+import com.thedeanda.ajaxproxy.ui.windows.Windows;
 import com.thedeanda.javajson.JsonArray;
 import com.thedeanda.javajson.JsonException;
 import com.thedeanda.javajson.JsonObject;
 import com.thedeanda.javajson.JsonValue;
 
-public class MainFrame extends JFrame implements ProxyListener {
+public class MainFrame extends JFrame implements ProxyListener, WindowListListener {
 	private static final long serialVersionUID = 1L;
 	private static final Logger log = LoggerFactory.getLogger(MainFrame.class);
-	private static final boolean USE_TRAY = true;
+	private boolean USE_TRAY = true;
 	private MainPanel panel;
 	final JFileChooser fc = new JFileChooser();
 	private TrayIcon trayIcon;
@@ -61,15 +66,16 @@ public class MainFrame extends JFrame implements ProxyListener {
 	private Image image;
 	private File file = null;
 	private boolean ignoreSaveSettings = false;
-	private MenuItem stopServerMenuItem;
+	private MenuItem stopServerMenuItem_tray;
 	private JMenuItem stopServerMenuItem2;
-	private MenuItem startServerMenuItem;
+	private MenuItem startServerMenuItem_tray;
 	private JMenuItem startServerMenuItem2;
 	private JMenuItem saveAsMenuItem;
 	private JMenuItem saveMenuItem;
-	private MenuItem showFrameMenuItem;
-	private MenuItem newRestClientMenuItem;
-	private MenuItem newJsonViewerMenuItem;
+	private MenuItem showFrameMenuItem_tray;
+	private MenuItem newRestClientMenuItem_tray;
+	private MenuItem newJsonViewerMenuItem_tray;
+	private String windowId;
 
 	public MainFrame() {
 		this.panel = new MainPanel();
@@ -106,6 +112,9 @@ public class MainFrame extends JFrame implements ProxyListener {
 			}
 		});
 		panel.addProxyListener(this);
+		
+		this.windowId = Windows.get().addListener(this).add(this);
+		this.addWindowListener(new WindowListListenerCleanup(this));		
 	}
 
 	private void updateTitle() {
@@ -132,71 +141,73 @@ public class MainFrame extends JFrame implements ProxyListener {
 	}
 
 	private void initTray() {
-		if (SystemTray.isSupported()) {
+		if (SystemTray.isSupported() || !USE_TRAY)
+			return;
 
-			MouseListener mouseListener = new MouseListener() {
+		MouseListener mouseListener = new MouseListener() {
 
-				public void mouseClicked(MouseEvent e) {
-				}
+			public void mouseClicked(MouseEvent e) {
+			}
 
-				public void mouseEntered(MouseEvent e) {
-				}
+			public void mouseEntered(MouseEvent e) {
+			}
 
-				public void mouseExited(MouseEvent e) {
-				}
+			public void mouseExited(MouseEvent e) {
+			}
 
-				public void mousePressed(MouseEvent e) {
-				}
+			public void mousePressed(MouseEvent e) {
+			}
 
-				public void mouseReleased(MouseEvent e) {
-				}
-			};
+			public void mouseReleased(MouseEvent e) {
+			}
+		};
 
-			ActionListener menuItemListener = new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					if (e.getSource() == startServerMenuItem) {
-						startProxy();
-					} else if (e.getSource() == stopServerMenuItem) {
-						handleStop();
-					} else if (e.getSource() == showFrameMenuItem) {
-						handleShowWindow();
-					} else if (e.getSource() == newRestClientMenuItem) {
-						handleRest();
-					} else if (e.getSource() == newJsonViewerMenuItem) {
-						handleJson();
-					} else
-						handleExit();
-				}
+		ActionListener menuItemListener = new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (e.getSource() == startServerMenuItem_tray) {
+					startProxy();
+				} else if (e.getSource() == stopServerMenuItem_tray) {
+					handleStop();
+				} else if (e.getSource() == showFrameMenuItem_tray) {
+					handleShowWindow();
+				} else if (e.getSource() == newRestClientMenuItem_tray) {
+					handleRest();
+				} else if (e.getSource() == newJsonViewerMenuItem_tray) {
+					handleJson();
+				} else
+					handleExit();
+			}
 
-			};
+		};
 
-			PopupMenu popup = new PopupMenu();
-			this.startServerMenuItem = new MenuItem("Start Server");
-			startServerMenuItem.addActionListener(menuItemListener);
-			popup.add(startServerMenuItem);
+		PopupMenu popup = new PopupMenu();
+		this.startServerMenuItem_tray = new MenuItem("Start Server");
+		startServerMenuItem_tray.addActionListener(menuItemListener);
+		popup.add(startServerMenuItem_tray);
 
-			this.stopServerMenuItem = new MenuItem("Stop Server");
-			stopServerMenuItem.addActionListener(menuItemListener);
-			popup.add(stopServerMenuItem);
+		this.stopServerMenuItem_tray = new MenuItem("Stop Server");
+		stopServerMenuItem_tray.addActionListener(menuItemListener);
+		popup.add(stopServerMenuItem_tray);
 
-			this.showFrameMenuItem = new MenuItem("Show Window");
-			showFrameMenuItem.addActionListener(menuItemListener);
-			popup.add(showFrameMenuItem);
+		this.showFrameMenuItem_tray = new MenuItem("Show Window");
+		showFrameMenuItem_tray.addActionListener(menuItemListener);
+		popup.add(showFrameMenuItem_tray);
 
-			this.newRestClientMenuItem = new MenuItem("New Rest Client");
-			newRestClientMenuItem.addActionListener(menuItemListener);
-			popup.add(newRestClientMenuItem);
+		this.newRestClientMenuItem_tray = new MenuItem("New Rest Client");
+		newRestClientMenuItem_tray.addActionListener(menuItemListener);
+		popup.add(newRestClientMenuItem_tray);
 
-			this.newJsonViewerMenuItem = new MenuItem("New Json Viewer");
-			newJsonViewerMenuItem.addActionListener(menuItemListener);
-			popup.add(newJsonViewerMenuItem);
+		this.newJsonViewerMenuItem_tray = new MenuItem("New Json Viewer");
+		newJsonViewerMenuItem_tray.addActionListener(menuItemListener);
+		popup.add(newJsonViewerMenuItem_tray);
 
-			popup.addSeparator();
+		popup.addSeparator();
 
-			MenuItem defaultItem = new MenuItem("Exit");
-			defaultItem.addActionListener(menuItemListener);
-			popup.add(defaultItem);
+		MenuItem defaultItem = new MenuItem("Exit");
+		defaultItem.addActionListener(menuItemListener);
+		popup.add(defaultItem);
 
+		try {
 			trayIcon = new TrayIcon(image, "AjaxProxy", popup);
 
 			ActionListener actionListener = new ActionListener() {
@@ -213,14 +224,11 @@ public class MainFrame extends JFrame implements ProxyListener {
 			trayIcon.addActionListener(actionListener);
 			trayIcon.addMouseListener(mouseListener);
 
-			if (USE_TRAY) {
-				try {
-					SystemTray tray = SystemTray.getSystemTray();
-					tray.add(trayIcon);
-				} catch (AWTException e) {
-					log.error("TrayIcon could not be added.", e);
-				}
-			}
+			SystemTray tray = SystemTray.getSystemTray();
+			tray.add(trayIcon);
+		} catch (UnsupportedOperationException | AWTException e) {
+			log.error("System tray icon could not be added.", e);
+			USE_TRAY = false;
 		}
 	}
 
@@ -566,8 +574,10 @@ public class MainFrame extends JFrame implements ProxyListener {
 
 	@Override
 	public void started() {
-		startServerMenuItem.setEnabled(false);
-		stopServerMenuItem.setEnabled(true);
+		if (startServerMenuItem_tray != null)
+			startServerMenuItem_tray.setEnabled(false);
+		if (stopServerMenuItem_tray != null)
+			stopServerMenuItem_tray.setEnabled(true);
 
 		startServerMenuItem2.setEnabled(false);
 		stopServerMenuItem2.setEnabled(true);
@@ -575,8 +585,10 @@ public class MainFrame extends JFrame implements ProxyListener {
 
 	@Override
 	public void stopped() {
-		startServerMenuItem.setEnabled(true);
-		stopServerMenuItem.setEnabled(false);
+		if (startServerMenuItem_tray != null)
+			startServerMenuItem_tray.setEnabled(true);
+		if (stopServerMenuItem_tray != null)
+			stopServerMenuItem_tray.setEnabled(false);
 
 		startServerMenuItem2.setEnabled(true);
 		stopServerMenuItem2.setEnabled(false);
@@ -593,6 +605,15 @@ public class MainFrame extends JFrame implements ProxyListener {
 
 	private void handleShowWindow() {
 		this.setVisible(true);
+	}
+
+	@Override
+	public void windowsChanged(Collection<WindowContainer> windows) {
+		log.warn("{}", Thread.currentThread());
+		
+		for (WindowContainer wc : windows) {
+			log.info(wc.getName());
+		}
 	}
 
 }
