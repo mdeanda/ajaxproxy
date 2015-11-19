@@ -36,16 +36,6 @@ public class MergeCode {
 
 	}
 
-	/**
-	 * 
-	 * @param filePath
-	 *            input file with lines that contain filenames to merge
-	 * @param minify
-	 * @param jsMode
-	 *            true when minifying javascript, false for css
-	 * @return
-	 * @throws Exception
-	 */
 	public String mergeContents() throws Exception {
 		StringBuffer sb = new StringBuffer();
 		if (mode == MergeMode.HTML_JSON) {
