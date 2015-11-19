@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.net.URL;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -26,13 +27,19 @@ import com.thedeanda.ajaxproxy.LoadedResource;
 import com.thedeanda.ajaxproxy.http.RequestListener;
 import com.thedeanda.ajaxproxy.ui.busy.BusyNotification;
 import com.thedeanda.ajaxproxy.ui.json.JsonViewerFrame;
+import com.thedeanda.ajaxproxy.ui.windows.WindowContainer;
+import com.thedeanda.ajaxproxy.ui.windows.WindowListListener;
+import com.thedeanda.ajaxproxy.ui.windows.WindowListListenerCleanup;
+import com.thedeanda.ajaxproxy.ui.windows.Windows;
 
-public class RestClientFrame extends JFrame implements RequestListener {
+public class RestClientFrame extends JFrame implements RequestListener,
+		WindowListListener {
 	private static final long serialVersionUID = 1L;
 	private static final Logger log = LoggerFactory
 			.getLogger(RestClientFrame.class);
 	private RestClientPanel panel;
 	private BusyNotification busy;
+	private String windowId;
 
 	private static final Set<String> BLACKLIST_HEADERS = new HashSet<String>();
 	static {
@@ -60,6 +67,8 @@ public class RestClientFrame extends JFrame implements RequestListener {
 		this.setIconImage(image);
 
 		pack();
+		this.windowId = Windows.get().addListener(this).add(this);
+		this.addWindowListener(new WindowListListenerCleanup(this));
 	}
 
 	public void fromResource(LoadedResource resource) {
@@ -178,5 +187,13 @@ public class RestClientFrame extends JFrame implements RequestListener {
 	@Override
 	public void error(UUID id, String message, Exception e) {
 		notBusy();
+	}
+
+	@Override
+	public void windowsChanged(Collection<WindowContainer> windows) {
+		for (WindowContainer wc : windows) {
+			log.info(wc.getName());
+		}
+
 	}
 }

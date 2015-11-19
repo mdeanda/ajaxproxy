@@ -10,6 +10,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collection;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -26,12 +27,19 @@ import com.thedeanda.ajaxproxy.ui.MainFrame;
 import com.thedeanda.ajaxproxy.ui.rest.RestClientFrame;
 
 public class JsonViewerFrame extends JFrame {
+import com.thedeanda.ajaxproxy.ui.windows.WindowContainer;
+import com.thedeanda.ajaxproxy.ui.windows.WindowListListener;
+import com.thedeanda.ajaxproxy.ui.windows.WindowListListenerCleanup;
+import com.thedeanda.ajaxproxy.ui.windows.Windows;
+
+public class JsonViewerFrame extends JFrame implements WindowListListener {
 	private static final long serialVersionUID = 1L;
 	private static final Logger log = LoggerFactory
 			.getLogger(JsonViewerFrame.class);
 	private JsonViewer panel;
 	final JFileChooser fc = new JFileChooser();
 	private File file;
+	private String windowId;
 
 	public JsonViewerFrame() {
 		panel = new JsonViewer();
@@ -49,6 +57,8 @@ public class JsonViewerFrame extends JFrame {
 		this.setIconImage(image);
 
 		pack();
+		this.windowId = Windows.get().addListener(this).add(this);
+		this.addWindowListener(new WindowListListenerCleanup(this));
 	}
 
 	private void initMenuBar() {
@@ -166,6 +176,12 @@ public class JsonViewerFrame extends JFrame {
 		f.pack();
 		f.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		f.setVisible(true);
+	}
+
+	@Override
+	public void windowsChanged(Collection<WindowContainer> windows) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
