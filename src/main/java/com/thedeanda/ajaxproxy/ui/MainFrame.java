@@ -48,13 +48,15 @@ import com.thedeanda.ajaxproxy.ui.rest.RestClientFrame;
 import com.thedeanda.ajaxproxy.ui.windows.WindowContainer;
 import com.thedeanda.ajaxproxy.ui.windows.WindowListListener;
 import com.thedeanda.ajaxproxy.ui.windows.WindowListListenerCleanup;
+import com.thedeanda.ajaxproxy.ui.windows.WindowMenuHelper;
 import com.thedeanda.ajaxproxy.ui.windows.Windows;
 import com.thedeanda.javajson.JsonArray;
 import com.thedeanda.javajson.JsonException;
 import com.thedeanda.javajson.JsonObject;
 import com.thedeanda.javajson.JsonValue;
 
-public class MainFrame extends JFrame implements ProxyListener, WindowListListener {
+public class MainFrame extends JFrame implements ProxyListener,
+		WindowListListener {
 	private static final long serialVersionUID = 1L;
 	private static final Logger log = LoggerFactory.getLogger(MainFrame.class);
 	private boolean USE_TRAY = true;
@@ -85,7 +87,11 @@ public class MainFrame extends JFrame implements ProxyListener, WindowListListen
 		this.initMenuBar();
 		this.initTray();
 		if (!USE_TRAY) {
+			log.info("system tray mode");
 			setDefaultCloseOperation(EXIT_ON_CLOSE);
+		} else {
+			log.info("dispose mode");
+			setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		}
 
 		JsonObject settings = loadSettings();
@@ -112,9 +118,10 @@ public class MainFrame extends JFrame implements ProxyListener, WindowListListen
 			}
 		});
 		panel.addProxyListener(this);
-		
+
 		this.windowId = Windows.get().addListener(this).add(this);
-		this.addWindowListener(new WindowListListenerCleanup(this));		
+		this.addWindowListener(new WindowListListenerCleanup(this));
+		new WindowMenuHelper(windowId, getJMenuBar());
 	}
 
 	private void updateTitle() {
@@ -454,11 +461,8 @@ public class MainFrame extends JFrame implements ProxyListener, WindowListListen
 	}
 
 	private void handleExit() {
-		try {
-			panel.stop();
-		} finally {
-			System.exit(0);
-		}
+		panel.stop();
+		dispose();
 	}
 
 	private File getRecentFile() {
@@ -610,7 +614,7 @@ public class MainFrame extends JFrame implements ProxyListener, WindowListListen
 	@Override
 	public void windowsChanged(Collection<WindowContainer> windows) {
 		log.warn("{}", Thread.currentThread());
-		
+
 		for (WindowContainer wc : windows) {
 			log.info(wc.getName());
 		}

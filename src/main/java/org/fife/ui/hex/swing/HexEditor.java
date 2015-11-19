@@ -485,7 +485,7 @@ public class HexEditor extends JScrollPane {
 
 
 	/**
-	 * Replaces the currently selected bytes (if >=1) with the specified
+	 * Replaces the currently selected bytes (if greater or equal to 1) with the specified
 	 * new bytes.
 	 *
 	 * @param bytes The new bytes.  If this is <code>null</code> or an empty

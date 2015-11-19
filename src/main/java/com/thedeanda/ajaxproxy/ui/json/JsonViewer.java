@@ -52,7 +52,7 @@ public class JsonViewer extends JPanel implements ActionListener {
 		panel.add(inputLabel);
 		panel.add(inputScroll);
 
-		submitButton = new JButton("Submit");
+		submitButton = new JButton("Format");
 		submitButton.addActionListener(this);
 		panel.add(submitButton);
 
@@ -87,7 +87,15 @@ public class JsonViewer extends JPanel implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == submitButton) {
-			documentViewer.interpretStringData(inputField.getText());
+			format();
 		}
+	}
+
+	public void setText(String text) {
+		inputField.setText(text);
+	}
+	
+	public void format() {
+		documentViewer.interpretStringData(inputField.getText());
 	}
 }

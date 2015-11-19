@@ -4,6 +4,9 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.net.URL;
 import java.util.Collection;
 import java.util.HashSet;
@@ -11,6 +14,10 @@ import java.util.Set;
 import java.util.UUID;
 
 import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.KeyStroke;
 
 import org.apache.http.Header;
 import org.slf4j.Logger;
@@ -19,9 +26,11 @@ import org.slf4j.LoggerFactory;
 import com.thedeanda.ajaxproxy.LoadedResource;
 import com.thedeanda.ajaxproxy.http.RequestListener;
 import com.thedeanda.ajaxproxy.ui.busy.BusyNotification;
+import com.thedeanda.ajaxproxy.ui.json.JsonViewerFrame;
 import com.thedeanda.ajaxproxy.ui.windows.WindowContainer;
 import com.thedeanda.ajaxproxy.ui.windows.WindowListListener;
 import com.thedeanda.ajaxproxy.ui.windows.WindowListListenerCleanup;
+import com.thedeanda.ajaxproxy.ui.windows.WindowMenuHelper;
 import com.thedeanda.ajaxproxy.ui.windows.Windows;
 
 public class RestClientFrame extends JFrame implements RequestListener,
@@ -46,9 +55,10 @@ public class RestClientFrame extends JFrame implements RequestListener,
 		panel.setDefaultButton();
 		panel.setListener(this);
 		// panel.setResource(resource);
-		setTitle("Ajax Proxy - Rest Client");
+		setTitle("Rest Client - Ajax Proxy");
 		setPreferredSize(new Dimension(1000, 700));
 		setMinimumSize(new Dimension(600, 380));
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
 		busy = new BusyNotification();
 		setGlassPane(busy);
@@ -57,9 +67,10 @@ public class RestClientFrame extends JFrame implements RequestListener,
 		Image image = Toolkit.getDefaultToolkit().getImage(imgUrl);
 		this.setIconImage(image);
 
-		pack();
 		this.windowId = Windows.get().addListener(this).add(this);
 		this.addWindowListener(new WindowListListenerCleanup(this));
+		initMenuBar();
+		pack();
 	}
 
 	public void fromResource(LoadedResource resource) {
@@ -80,11 +91,69 @@ public class RestClientFrame extends JFrame implements RequestListener,
 		panel.setMethod(resource.getMethod());
 	}
 
-	public static void main(String[] args) {
-		RestClientFrame f = new RestClientFrame();
-		f.pack();
-		f.setDefaultCloseOperation(EXIT_ON_CLOSE);
-		f.setVisible(true);
+	private void initMenuBar() {
+		JMenuBar mb = new JMenuBar();
+		this.setJMenuBar(mb);
+		JMenu menu;
+		JMenuItem mi;
+
+		menu = new JMenu("File");
+		menu.setMnemonic(KeyEvent.VK_F);
+		mb.add(menu);
+
+		// menu.addSeparator();
+
+		mi = new JMenuItem("Rest Client");
+		mi.setMnemonic(KeyEvent.VK_R);
+		mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R,
+				ActionEvent.CTRL_MASK));
+		mi.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent ae) {
+				handleRest();
+			}
+		});
+		menu.add(mi);
+
+		mi = new JMenuItem("Json Viewer");
+		mi.setMnemonic(KeyEvent.VK_J);
+		mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_J,
+				ActionEvent.CTRL_MASK));
+		mi.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent ae) {
+				handleJson();
+			}
+		});
+		menu.add(mi);
+
+		menu.addSeparator();
+
+		mi = new JMenuItem("Exit");
+		mi.setMnemonic(KeyEvent.VK_X);
+		mi.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent ae) {
+				handleExit();
+			}
+		});
+		menu.add(mi);
+
+		new WindowMenuHelper(windowId, mb);
+	}
+
+	private void handleJson() {
+		JsonViewerFrame frame = new JsonViewerFrame();
+		frame.setVisible(true);
+	}
+
+	private void handleExit() {
+		this.dispose();
+	}
+
+	private void handleRest() {
+		RestClientFrame frame = new RestClientFrame();
+		frame.setVisible(true);
 	}
 
 	private void busy() {

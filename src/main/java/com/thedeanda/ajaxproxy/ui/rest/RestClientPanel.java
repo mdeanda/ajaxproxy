@@ -1,6 +1,6 @@
 package com.thedeanda.ajaxproxy.ui.rest;
 
-import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -18,6 +18,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
+import javax.swing.UIDefaults;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -28,6 +29,7 @@ import com.thedeanda.ajaxproxy.http.HttpClient;
 import com.thedeanda.ajaxproxy.http.HttpClient.RequestMethod;
 import com.thedeanda.ajaxproxy.http.RequestListener;
 import com.thedeanda.ajaxproxy.ui.SwingUtils;
+import com.thedeanda.ajaxproxy.ui.border.BottomBorder;
 import com.thedeanda.ajaxproxy.ui.viewer.RequestViewer;
 
 public class RestClientPanel extends JPanel implements ActionListener {
@@ -47,10 +49,15 @@ public class RestClientPanel extends JPanel implements ActionListener {
 
 	public RestClientPanel() {
 		httpClient = new HttpClient();
+		SpringLayout layout = new SpringLayout();
+		setLayout(layout);
+
+		JPanel urlPanel = initUrlPanel();
+		urlPanel.setBorder(new BottomBorder());
+		add(urlPanel);
 
 		JSplitPane mainSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		SwingUtils.flattenSplitPane(mainSplit);
-		setLayout(new BorderLayout());
 		add(mainSplit);
 
 		JPanel leftPanel = initLeftPanel();
@@ -60,6 +67,73 @@ public class RestClientPanel extends JPanel implements ActionListener {
 		mainSplit.setRightComponent(outputPanel);
 		mainSplit.setDividerLocation(400);
 
+		layout.putConstraint(SpringLayout.NORTH, urlPanel, 0,
+				SpringLayout.NORTH, this);
+		layout.putConstraint(SpringLayout.EAST, urlPanel, 0, SpringLayout.EAST,
+				this);
+		layout.putConstraint(SpringLayout.WEST, urlPanel, 0, SpringLayout.WEST,
+				this);
+		layout.putConstraint(SpringLayout.SOUTH, urlPanel, 50,
+				SpringLayout.NORTH, this);
+
+		layout.putConstraint(SpringLayout.EAST, mainSplit, 0,
+				SpringLayout.EAST, this);
+		layout.putConstraint(SpringLayout.WEST, mainSplit, 0,
+				SpringLayout.WEST, this);
+		layout.putConstraint(SpringLayout.SOUTH, mainSplit, 0,
+				SpringLayout.SOUTH, this);
+		layout.putConstraint(SpringLayout.NORTH, mainSplit, 0,
+				SpringLayout.SOUTH, urlPanel);
+	}
+
+	private JPanel initUrlPanel() {
+		JPanel panel = new JPanel();
+		SpringLayout layout = new SpringLayout();
+		panel.setLayout(layout);
+		panel.setMinimumSize(new Dimension(200, 50));
+
+		JLabel urlLabel = SwingUtils.newJLabel("URL");
+		urlField = SwingUtils.newJTextField();
+		panel.add(urlLabel);
+
+		urlField = SwingUtils.newJTextField();
+		panel.add(urlField);
+
+		submitButton = new JButton("Submit");
+		submitButton.addActionListener(this);
+		panel.add(submitButton);
+
+		JComboBox<String> methods = createMethodDropDown();
+		methodCombo = methods;
+		panel.add(methods);
+
+		// url label
+		layout.putConstraint(SpringLayout.WEST, urlLabel, 10,
+				SpringLayout.WEST, panel);
+		layout.putConstraint(SpringLayout.VERTICAL_CENTER, urlLabel, 0,
+				SpringLayout.VERTICAL_CENTER, methods);
+
+		// submit button
+		layout.putConstraint(SpringLayout.EAST, submitButton, -10,
+				SpringLayout.EAST, panel);
+		layout.putConstraint(SpringLayout.VERTICAL_CENTER, submitButton, 0,
+				SpringLayout.VERTICAL_CENTER, panel);
+
+		// method list
+		layout.putConstraint(SpringLayout.EAST, methods, -10,
+				SpringLayout.WEST, submitButton);
+		layout.putConstraint(SpringLayout.VERTICAL_CENTER, methods, 0,
+				SpringLayout.VERTICAL_CENTER, panel);
+
+		// input field
+		layout.putConstraint(SpringLayout.WEST, urlField, 10,
+				SpringLayout.EAST, urlLabel);
+		layout.putConstraint(SpringLayout.VERTICAL_CENTER, urlField, 0,
+				SpringLayout.VERTICAL_CENTER, methods);
+		layout.putConstraint(SpringLayout.EAST, urlField, -10,
+				SpringLayout.WEST, methods);
+
+		return panel;
 	}
 
 	public void setDefaultButton() {
@@ -72,56 +146,17 @@ public class RestClientPanel extends JPanel implements ActionListener {
 		panel.setLayout(layout);
 		panel.setMinimumSize(new Dimension(200, 350));
 
-		JLabel urlLabel = SwingUtils.newJLabel("Request URL");
-		urlField = SwingUtils.newJTextField();
-
-		JComboBox<String> methods = createMethodDropDown();
-		panel.add(methods);
-
-		submitButton = new JButton("Submit");
-		submitButton.addActionListener(this);
-		panel.add(submitButton);
-
-		panel.add(urlLabel);
-		panel.add(urlField);
-
 		JSplitPane split = initLeftSplit();
 		panel.add(split);
 
-		// methods
-		layout.putConstraint(SpringLayout.EAST, methods, -10,
-				SpringLayout.EAST, panel);
-		layout.putConstraint(SpringLayout.NORTH, methods, 20,
-				SpringLayout.NORTH, panel);
-
-		// url label
-		layout.putConstraint(SpringLayout.WEST, urlLabel, 10,
-				SpringLayout.WEST, panel);
-		layout.putConstraint(SpringLayout.VERTICAL_CENTER, urlLabel, 0,
-				SpringLayout.VERTICAL_CENTER, methods);
-
-		// url field
-		layout.putConstraint(SpringLayout.NORTH, urlField, 10,
-				SpringLayout.SOUTH, urlLabel);
-		layout.putConstraint(SpringLayout.EAST, urlField, -10,
-				SpringLayout.EAST, panel);
-		layout.putConstraint(SpringLayout.WEST, urlField, 10,
-				SpringLayout.WEST, panel);
-
 		// split
-		layout.putConstraint(SpringLayout.NORTH, split, 10, SpringLayout.SOUTH,
-				urlField);
+		layout.putConstraint(SpringLayout.NORTH, split, 24, SpringLayout.NORTH,
+				panel);
 		layout.putConstraint(SpringLayout.EAST, split, 0, SpringLayout.EAST,
 				panel);
 		layout.putConstraint(SpringLayout.WEST, split, 0, SpringLayout.WEST,
 				panel);
 		layout.putConstraint(SpringLayout.SOUTH, split, -10,
-				SpringLayout.NORTH, submitButton);
-
-		// submit button
-		layout.putConstraint(SpringLayout.EAST, submitButton, -10,
-				SpringLayout.EAST, panel);
-		layout.putConstraint(SpringLayout.SOUTH, submitButton, -10,
 				SpringLayout.SOUTH, panel);
 
 		return panel;
@@ -176,7 +211,7 @@ public class RestClientPanel extends JPanel implements ActionListener {
 		SpringLayout layout = new SpringLayout();
 		panel.setLayout(layout);
 
-		JLabel headersLabel = SwingUtils.newJLabel("Headers");
+		JLabel headersLabel = SwingUtils.newJLabel("Request Headers");
 		headersField = SwingUtils.newJTextArea();
 
 		JScrollPane headersScroll = new JScrollPane(headersField);
@@ -230,7 +265,7 @@ public class RestClientPanel extends JPanel implements ActionListener {
 		}
 		String[] stmp = new String[tmp.size()];
 		tmp.toArray(stmp);
-		methodCombo = new JComboBox<String>(stmp);
+		JComboBox methodCombo = new JComboBox<String>(stmp);
 		methodCombo.addActionListener(this);
 		return methodCombo;
 	}
@@ -242,6 +277,7 @@ public class RestClientPanel extends JPanel implements ActionListener {
 		if (is != null) {
 			try {
 				List<String> tmp = IOUtils.readLines(is);
+				tmp.add(0, "");
 				lines = new String[tmp.size()];
 				tmp.toArray(lines);
 			} catch (IOException e) {

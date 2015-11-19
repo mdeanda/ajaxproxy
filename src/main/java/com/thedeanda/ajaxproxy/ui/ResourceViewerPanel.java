@@ -63,8 +63,8 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 	private JList<Resource> list;
 	private ResourcePanel resourcePanel;
 	private JTextField filter;
-	private Color okColor;
-	private Color badColor;
+	private Color filterOkColor;
+	private Color filterBadColor;
 	private JMenuItem removeRequestMenuItem;
 	private JMenuItem replyMenuItem;
 	private JMenuItem clearMenuItem;
@@ -160,8 +160,8 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 		panel.add(filter);
 
 		// Listen for changes in the text
-		okColor = filter.getBackground();
-		badColor = new Color(250, 210, 200);
+		filterOkColor = filter.getBackground();
+		filterBadColor = new Color(250, 210, 200);
 		filter.getDocument().addDocumentListener(new DocumentListener() {
 			public void changedUpdate(DocumentEvent e) {
 				resetFilter();
@@ -320,10 +320,10 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 		if (!StringUtils.isBlank(filter.getText())) {
 			try {
 				filterRegEx = Pattern.compile(filter.getText());
-				filter.setBackground(okColor);
+				filter.setBackground(filterOkColor);
 			} catch (PatternSyntaxException ex) {
 				filterRegEx = null;
-				filter.setBackground(badColor);
+				filter.setBackground(filterBadColor);
 			}
 		}
 		final Pattern filter = filterRegEx;
@@ -336,13 +336,6 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 	}
 
 	private void export() {
-		String urlPrefix = JOptionPane.showInputDialog("URL Prefix",
-				"http://localhost");
-
-		if (urlPrefix == null) {
-			return;
-		}
-
 		final JFileChooser fc = new JFileChooser();
 		fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		int returnVal = fc.showSaveDialog(this);
@@ -354,19 +347,9 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 				LoadedResource obj = resource.getLoadedResource();
 				String fn = StringUtils.leftPad(String.valueOf(i), 8, "0");
 				JsonObject json = new JsonObject();
-				json.put("url", urlPrefix + obj.getPath());
-				try {
-					json.put("input", JsonObject.parse(obj.getInputAsText()));
-				} catch (JsonException e1) {
-					json.put("input", obj.getInputAsText());
-					e1.printStackTrace();
-				}
-				try {
-					json.put("output", JsonObject.parse(obj.getOutputAsText()));
-				} catch (JsonException e1) {
-					json.put("output", obj.getOutputAsText());
-					e1.printStackTrace();
-				}
+				json.put("path", obj.getPath());
+				json.put("input", obj.getInputAsText());
+				json.put("output", obj.getOutputAsText());
 				json.put("status", obj.getStatusCode());
 				json.put("duration", obj.getDuration());
 				json.put("method", obj.getMethod());

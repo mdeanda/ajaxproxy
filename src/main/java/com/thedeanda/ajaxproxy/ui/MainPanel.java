@@ -168,7 +168,11 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener,
 		}
 	}
 
-	/** updates the config from the ui data */
+	/**
+	 * updates the config from the ui data
+	 * 
+	 * @return the json object representing the config
+	 */
 	public JsonObject getConfig() {
 		JsonObject json = config;
 		json.put("port", generalPanel.getPort());

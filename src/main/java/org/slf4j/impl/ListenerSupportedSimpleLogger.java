@@ -488,6 +488,7 @@ public class ListenerSupportedSimpleLogger extends MarkerIgnoringBase {
 	 *
 	 * @param logLevel
 	 *            is this level enabled?
+	 * @return true if level is enabled 
 	 */
 	protected boolean isLevelEnabled(int logLevel) {
 		// log level are numerically ordered so can use simple numeric
