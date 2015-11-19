@@ -23,10 +23,7 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.thedeanda.ajaxproxy.ui.MainFrame;
 import com.thedeanda.ajaxproxy.ui.rest.RestClientFrame;
-
-public class JsonViewerFrame extends JFrame {
 import com.thedeanda.ajaxproxy.ui.windows.WindowContainer;
 import com.thedeanda.ajaxproxy.ui.windows.WindowListListener;
 import com.thedeanda.ajaxproxy.ui.windows.WindowListListenerCleanup;
@@ -181,7 +178,7 @@ public class JsonViewerFrame extends JFrame implements WindowListListener {
 	@Override
 	public void windowsChanged(Collection<WindowContainer> windows) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }
