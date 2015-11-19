@@ -30,6 +30,7 @@ import com.thedeanda.ajaxproxy.ui.json.JsonViewerFrame;
 import com.thedeanda.ajaxproxy.ui.windows.WindowContainer;
 import com.thedeanda.ajaxproxy.ui.windows.WindowListListener;
 import com.thedeanda.ajaxproxy.ui.windows.WindowListListenerCleanup;
+import com.thedeanda.ajaxproxy.ui.windows.WindowMenuHelper;
 import com.thedeanda.ajaxproxy.ui.windows.Windows;
 
 public class RestClientFrame extends JFrame implements RequestListener,
@@ -57,7 +58,7 @@ public class RestClientFrame extends JFrame implements RequestListener,
 		setTitle("Rest Client - Ajax Proxy");
 		setPreferredSize(new Dimension(1000, 700));
 		setMinimumSize(new Dimension(600, 380));
-		initMenuBar();
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
 		busy = new BusyNotification();
 		setGlassPane(busy);
@@ -66,9 +67,10 @@ public class RestClientFrame extends JFrame implements RequestListener,
 		Image image = Toolkit.getDefaultToolkit().getImage(imgUrl);
 		this.setIconImage(image);
 
-		pack();
 		this.windowId = Windows.get().addListener(this).add(this);
 		this.addWindowListener(new WindowListListenerCleanup(this));
+		initMenuBar();
+		pack();
 	}
 
 	public void fromResource(LoadedResource resource) {
@@ -99,7 +101,7 @@ public class RestClientFrame extends JFrame implements RequestListener,
 		menu.setMnemonic(KeyEvent.VK_F);
 		mb.add(menu);
 
-		//menu.addSeparator();
+		// menu.addSeparator();
 
 		mi = new JMenuItem("Rest Client");
 		mi.setMnemonic(KeyEvent.VK_R);
@@ -137,6 +139,7 @@ public class RestClientFrame extends JFrame implements RequestListener,
 		});
 		menu.add(mi);
 
+		new WindowMenuHelper(windowId, mb);
 	}
 
 	private void handleJson() {
@@ -151,13 +154,6 @@ public class RestClientFrame extends JFrame implements RequestListener,
 	private void handleRest() {
 		RestClientFrame frame = new RestClientFrame();
 		frame.setVisible(true);
-	}
-
-	public static void main(String[] args) {
-		RestClientFrame f = new RestClientFrame();
-		f.pack();
-		f.setDefaultCloseOperation(EXIT_ON_CLOSE);
-		f.setVisible(true);
 	}
 
 	private void busy() {
