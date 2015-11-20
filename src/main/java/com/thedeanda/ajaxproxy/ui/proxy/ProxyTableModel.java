@@ -2,6 +2,8 @@ package com.thedeanda.ajaxproxy.ui.proxy;
 
 import javax.swing.table.AbstractTableModel;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.thedeanda.javajson.JsonArray;
 import com.thedeanda.javajson.JsonObject;
 import com.thedeanda.javajson.JsonValue;
@@ -12,8 +14,14 @@ public class ProxyTableModel extends AbstractTableModel {
 	private final static String DOMAIN = "domain";
 	private final static String PORT = "port";
 	private final static String PATH = "path";
-	private final static String PREFIX = "prefix";
-	private final static String[] COLS = { DOMAIN, PORT, PATH, PREFIX };
+	private final static String NEW_PROXY = "newProxy";
+	private final static String[] COLS = { DOMAIN, PORT, PATH, NEW_PROXY };
+	private final static FieldType[] TYPES = { FieldType.String,
+			FieldType.Number, FieldType.String, FieldType.Boolean };
+
+	private enum FieldType {
+		String, Boolean, Number
+	};
 
 	public ProxyTableModel(JsonArray data) {
 		this.data = data;
@@ -67,10 +75,18 @@ public class ProxyTableModel extends AbstractTableModel {
 		if (data.size() < row || row < 0)
 			return null;
 		JsonObject json = data.getJsonObject(row);
-		if (json != null)
-			return json.getString(COLS[col]);
-		else
+		if (json == null)
 			return null;
+
+		switch (TYPES[col]) {
+		case Boolean:
+			return json.getBoolean(COLS[col]);
+		case Number:
+			return json.getInt(COLS[col]);
+		case String:
+			return json.getString(COLS[col]);
+		}
+		return null;
 	}
 
 	@Override
@@ -81,14 +97,14 @@ public class ProxyTableModel extends AbstractTableModel {
 		normalizeData();
 	}
 
-	public void setValue(int row, String domain, String port, String path,
-			String prefix) {
+	public void setValue(int row, String domain, int port, String path,
+			Object newProxy) {
 		JsonObject json = data.getJsonObject(row);
 		if (json != null) {
 			json.put(DOMAIN, domain);
 			json.put(PORT, port);
 			json.put(PATH, path);
-			json.put(PREFIX, prefix);
+			json.put(NEW_PROXY, newProxy);
 			fireTableRowsUpdated(row, row);
 			normalizeData();
 		}
@@ -101,7 +117,7 @@ public class ProxyTableModel extends AbstractTableModel {
 			boolean keep = false;
 			for (int i = 0; i < COLS.length; i++) {
 				String v = rowObj.getString(COLS[i]);
-				if (v != null && !v.equals("")) {
+				if (!StringUtils.isBlank(v)) {
 					keep = true;
 					break;
 				}

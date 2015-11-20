@@ -96,10 +96,10 @@ public class ProxyFilter implements Filter {
 	private void doFilterInternal(final HttpServletRequest request,
 			final ServletResponse response, final FilterChain chain,
 			ProxyPathMatcher proxy) throws IOException, ServletException {
-		log.info("proxy filter");
+		log.debug("proxy filter");
 
 		String uri = request.getRequestURI();
-		log.info(uri);
+		log.debug(uri);
 
 		ProxyPath proxyPath = proxy.getProxyPath();
 

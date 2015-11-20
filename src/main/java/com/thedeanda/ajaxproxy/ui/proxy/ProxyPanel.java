@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -31,11 +32,11 @@ public class ProxyPanel extends JPanel {
 	private JTextField domainField;
 	private JTextField portField;
 	private JTextField pathField;
-	private JTextField prefixField;
+	private JComboBox<?> newProxyField;
 	private JLabel domainLabel;
 	private JLabel portLabel;
 	private JLabel pathLabel;
-	private JLabel prefixLabel;
+	private JLabel newProxyLabel;
 	private JScrollPane scroll;
 	private JButton btn;
 	private ProxyTableModel proxyModel;
@@ -86,10 +87,12 @@ public class ProxyPanel extends JPanel {
 		add(pathLabel);
 		add(pathField);
 
-		prefixLabel = new JLabel("Prefix");
-		prefixField = SwingUtils.newJTextField();
-		add(prefixLabel);
-		add(prefixField);
+		newProxyLabel = new JLabel("New Proxy");
+		newProxyField = SwingUtils.newJComboBox(new Boolean[] { Boolean.FALSE,
+				Boolean.TRUE });
+
+		add(newProxyLabel);
+		add(newProxyField);
 
 		btn = new JButton("Ok");
 		btn.setMargin(new Insets(0, 0, 0, 0));
@@ -109,14 +112,15 @@ public class ProxyPanel extends JPanel {
 		String val = (String) proxyModel.getValueAt(row, 0);
 		domainField.setText(val);
 
-		val = (String) proxyModel.getValueAt(row, 1);
-		portField.setText(val);
+		Integer num = (Integer) proxyModel.getValueAt(row, 1);
+		portField.setText(String.valueOf(num));
 
 		val = (String) proxyModel.getValueAt(row, 2);
 		pathField.setText(val);
 
-		val = (String) proxyModel.getValueAt(row, 3);
-		prefixField.setText(val);
+		Boolean bol = (Boolean) proxyModel.getValueAt(row, 3);
+		newProxyField.getSelectedIndex();
+		// newProxyField.setText(val);
 	}
 
 	private void commitEdit() {
@@ -131,8 +135,8 @@ public class ProxyPanel extends JPanel {
 		} catch (NumberFormatException nfe) {
 			return;
 		}
-		proxyModel.setValue(row, domainField.getText(), portField.getText(),
-				pathField.getText(), prefixField.getText());
+		proxyModel.setValue(row, domainField.getText(), port,
+				pathField.getText(), newProxyField.getSelectedItem());
 		proxyTable.changeSelection(row, 0, false, true);
 	}
 
@@ -148,21 +152,30 @@ public class ProxyPanel extends JPanel {
 				SpringLayout.NORTH, domainLabel);
 
 		JLabel[] labels = new JLabel[] { domainLabel, portLabel, pathLabel,
-				prefixLabel, null };
+				newProxyLabel, null };
 		Component[] fields = new Component[] { domainField, portField,
-				pathField, prefixField, btn };
+				pathField, newProxyField, btn };
 		int[] cols = new int[] { 250, 70, 250, 150, 60 };
 
 		for (int i = cols.length - 1; i >= 0; i--) {
 			JLabel lbl = labels[i];
 			Component fld = fields[i];
 			if (i == 0) {
+				layout.putConstraint(SpringLayout.SOUTH, fld, -10,
+						SpringLayout.SOUTH, this);
+
 				layout.putConstraint(SpringLayout.WEST, fld, 10,
 						SpringLayout.WEST, this);
 				if (lbl != null)
 					layout.putConstraint(SpringLayout.WEST, lbl, 10,
 							SpringLayout.WEST, this);
 			} else {
+				layout.putConstraint(SpringLayout.SOUTH, fld, 0,
+						SpringLayout.SOUTH, fields[0]);
+
+				layout.putConstraint(SpringLayout.NORTH, fld, 0,
+						SpringLayout.NORTH, fields[0]);
+
 				layout.putConstraint(SpringLayout.WEST, fld, 10 - cols[i],
 						SpringLayout.EAST, fld);
 				if (lbl != null)
@@ -183,9 +196,6 @@ public class ProxyPanel extends JPanel {
 					layout.putConstraint(SpringLayout.EAST, lbl, -10,
 							SpringLayout.WEST, fields[i + 1]);
 			}
-
-			layout.putConstraint(SpringLayout.SOUTH, fld, -10,
-					SpringLayout.SOUTH, this);
 
 			if (lbl != null)
 				layout.putConstraint(SpringLayout.SOUTH, lbl, -5,

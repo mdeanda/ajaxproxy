@@ -1,16 +1,21 @@
 package com.thedeanda.ajaxproxy.ui;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Insets;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+import javax.swing.BorderFactory;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.ListCellRenderer;
 import javax.swing.SwingConstants;
 import javax.swing.UIDefaults;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
@@ -28,6 +33,14 @@ public class SwingUtils {
 		JLabel ret = new JLabel(label);
 		ret.setHorizontalAlignment(SwingConstants.RIGHT);
 		return ret;
+	}
+
+	public static JComboBox<?> newJComboBox(Object[] items) {
+		JComboBox<Object> combo = new JComboBox<>(items);
+		Insets insets = new Insets(4, 4, 4, 4);
+		combo.setBorder(BorderFactory.createEmptyBorder());
+
+		return combo;
 	}
 
 	public static JTextField newJTextField() {
@@ -112,6 +125,5 @@ public class SwingUtils {
 
 	public static void executNonUi(Runnable runnable) {
 		executor.execute(runnable);
-		;
 	}
 }
