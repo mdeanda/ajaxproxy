@@ -134,7 +134,7 @@ public class ResourceListModel implements ListModel<Resource> {
 	public Resource get(UUID id) {
 		// TODO: use a map
 		for (Resource r : unfilteredItems) {
-			if (r.getId() == id) {
+			if (id.toString().equals(r.getId().toString())) {
 				return r;
 			}
 		}

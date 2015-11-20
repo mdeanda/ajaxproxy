@@ -16,6 +16,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -57,6 +58,10 @@ public class ContentViewer extends JPanel {
 		log.info("setting content");
 		tabs.removeAll();
 
+		if (StringUtils.isBlank(output)) {
+			return;
+		}
+		
 		SwingUtils.executNonUi(new Runnable() {
 			@Override
 			public void run() {

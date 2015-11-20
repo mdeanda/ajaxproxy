@@ -85,7 +85,7 @@ public class ProxyFilter implements Filter {
 
 	private ProxyPathMatcher getProxyMatcher(final HttpServletRequest request) {
 		String uri = request.getRequestURI();
-		log.info(uri);
+		log.debug(uri);
 		ProxyPathMatcher matcher = getMatchingMatcher(uri);
 		if (matcher != null) {
 			return matcher;
@@ -96,7 +96,7 @@ public class ProxyFilter implements Filter {
 	private void doFilterInternal(final HttpServletRequest request,
 			final ServletResponse response, final FilterChain chain,
 			ProxyPathMatcher proxy) throws IOException, ServletException {
-		log.debug("proxy filter");
+		log.debug("using new proxy filter");
 
 		String uri = request.getRequestURI();
 		log.debug(uri);
@@ -114,7 +114,13 @@ public class ProxyFilter implements Filter {
 				// TODO: consider allowing header replacement via config
 				Header h = new BasicHeader(hn, request.getHeader(hn));
 				hdrs.add(h);
-				inputHeaders.append(hn + ": " + request.getHeader(hn));
+				inputHeaders.append(hn + ": " + request.getHeader(hn) + "\n");
+			} else {
+				log.info("remove host name: {}", request.getHeader(hn));
+				ProxyPath path = proxy.getProxyPath();
+				Header h = new BasicHeader(hn, path.getDomain() + ":" + path.getPort());
+				hdrs.add(h);
+				inputHeaders.append(hn + ": " + path.getDomain() + ":" + path.getPort() + "\n");
 			}
 		}
 		log.info("headers: {}", inputHeaders);
@@ -185,6 +191,7 @@ public class ProxyFilter implements Filter {
 		ProxyPathMatcher ret = null;
 		for (ProxyPathMatcher matcher : matchers) {
 			if (matcher.matches(uri)) {
+				log.debug("found a match!");
 				ret = matcher;
 				break;
 			}
@@ -196,14 +203,16 @@ public class ProxyFilter implements Filter {
 		List<ProxyPath> paths = ajaxProxy.getProxyPaths();
 		matchers = new HashSet<ProxyPathMatcher>();
 		for (ProxyPath path : paths) {
-			try {
-				Pattern pattern = Pattern.compile(path.getPath());
-				ProxyPathMatcher matcher = new ProxyPathMatcher();
-				matcher.setPattern(pattern);
-				matcher.setProxyPath(path);
-				matchers.add(matcher);
-			} catch (Exception e) {
-				log.debug("skipping: {}", path, e);
+			if (path.isNewProxy()) {
+				try {
+					Pattern pattern = Pattern.compile(path.getPath());
+					ProxyPathMatcher matcher = new ProxyPathMatcher();
+					matcher.setPattern(pattern);
+					matcher.setProxyPath(path);
+					matchers.add(matcher);
+				} catch (Exception e) {
+					log.debug("skipping: {}", path, e);
+				}
 			}
 		}
 	}

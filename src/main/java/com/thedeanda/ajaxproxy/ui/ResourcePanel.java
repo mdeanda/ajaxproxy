@@ -3,6 +3,9 @@ package com.thedeanda.ajaxproxy.ui;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
@@ -19,10 +22,12 @@ import javax.swing.text.Document;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 
 import com.thedeanda.ajaxproxy.LoadedResource;
+import com.thedeanda.ajaxproxy.ui.model.Resource;
 import com.thedeanda.ajaxproxy.ui.rest.RestClientFrame;
 
 /**
@@ -34,7 +39,7 @@ import com.thedeanda.ajaxproxy.ui.rest.RestClientFrame;
 public class ResourcePanel extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 1L;
 
-	private LoadedResource resource;
+	private LoadedResource oldResource;
 
 	private JTabbedPane tabs;
 
@@ -50,6 +55,8 @@ public class ResourcePanel extends JPanel implements ActionListener {
 	private JButton replayButton;
 
 	private boolean popupMode;
+
+	private Resource newResource;
 
 	public ResourcePanel(boolean popupMode) {
 		setLayout(new BorderLayout());
@@ -111,24 +118,80 @@ public class ResourcePanel extends JPanel implements ActionListener {
 		return button;
 	}
 
-	public void setResource(final LoadedResource resource) {
-		this.resource = resource;
+	private void clear() {
+		inputCv.setContent(null);
+		outputCv.setContent(null);
 		headersContent.setText("");
+	}
 
-		if (resource != null) {
+	private void tryData(final ContentViewer cv, byte[] data) {
+		if (data == null) {
+			tryText(cv, null);
+		} else {
+			StringWriter sw = new StringWriter();
+			try {
+				IOUtils.copy(new InputStreamReader(new ByteArrayInputStream(
+						data)), sw);
+				tryText(cv, sw.toString());
+			} catch (IOException e) {
+				// log.warn(e.getMessage(), e);
+			}
+		}
+	}
+
+	private void tryText(final ContentViewer cv, String text) {
+		cv.setContent(text);
+	}
+
+	private void showHeaders(final String markup) {
+		SwingUtilities.invokeLater(new Runnable() {
+
+			@Override
+			public void run() {
+				headersContent.setText(markup);
+				headersContent.setCaretPosition(0);
+			}
+		});
+	}
+
+	public void setResource(Resource resource) {
+		clear();
+		oldResource = null;
+		this.newResource = resource;
+
+		SwingUtils.executNonUi(new Runnable() {
+			@Override
+			public void run() {
+				if (newResource == null)
+					return;
+
+				Resource resource = newResource;
+
+				tryData(inputCv, resource.getInputData());
+				tryData(outputCv, resource.getOutputData());
+			}
+		});
+	}
+
+	public void setResource(LoadedResource resource) {
+		clear();
+		newResource = null;
+		this.oldResource = resource;
+
+		if (oldResource != null) {
 			final StringBuilder headers = new StringBuilder();
-			final Runnable uiupdate = new Runnable() {
-				@Override
-				public void run() {
-					headersContent.setText(headers.toString());
-					headersContent.setCaretPosition(0);
-				}
-			};
+
 			SwingUtils.executNonUi(new Runnable() {
 				@Override
 				public void run() {
-					inputCv.setContent(resource.getInputAsText());
-					outputCv.setContent(resource.getOutputAsText());
+					if (oldResource == null)
+						return;
+					LoadedResource resource = oldResource;
+
+					tryText(inputCv, resource.getInputAsText());
+					tryText(outputCv, resource.getOutputAsText());
+					// inputCv.setContent(oldResource.getInputAsText());
+					// outputCv.setContent(oldResource.getOutputAsText());
 
 					headers.append("<html><body>");
 					headers.append("<p><b>Request Path:</b> ");
@@ -190,7 +253,7 @@ public class ResourcePanel extends JPanel implements ActionListener {
 
 					headers.append("</body></html>");
 
-					SwingUtilities.invokeLater(uiupdate);
+					showHeaders(headers.toString());
 				}
 			});
 		}
@@ -205,8 +268,8 @@ public class ResourcePanel extends JPanel implements ActionListener {
 	}
 
 	private void loadPopup() {
-		if (resource != null) {
-			ResourceFrame window = new ResourceFrame(resource);
+		if (oldResource != null) {
+			ResourceFrame window = new ResourceFrame(oldResource);
 			window.setVisible(true);
 		}
 	}
@@ -218,7 +281,7 @@ public class ResourcePanel extends JPanel implements ActionListener {
 			loadPopup();
 		} else if (source == this.replayButton) {
 			RestClientFrame rest = new RestClientFrame();
-			rest.fromResource(resource);
+			rest.fromResource(oldResource);
 			rest.setVisible(true);
 		}
 	}

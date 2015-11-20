@@ -196,7 +196,7 @@ public class AjaxProxy implements Runnable {
 				int port = 80;
 				String domain = null;
 				String path = null;
-				String prefix = "";
+				boolean newProxy = false;
 				JsonObject obj = val.getJsonObject();
 				if (obj.isString(DOMAIN))
 					domain = obj.getString(DOMAIN);
@@ -206,11 +206,11 @@ public class AjaxProxy implements Runnable {
 					port = obj.getInt(PORT);
 				else if (obj.isString(PORT))
 					port = Integer.parseInt(obj.getString(PORT));
-				if (obj.isString("prefix"))
-					prefix = obj.getString("prefix");
+				newProxy = obj.getBoolean(NEW_PROXY);
 
 				if (domain != null && path != null && port > 0) {
-					ProxyPath proxyPath = new ProxyPath(domain, port, path);
+					ProxyPath proxyPath = new ProxyPath(domain, port, path,
+							newProxy);
 					ret.add(proxyPath);
 				}
 			}
@@ -231,14 +231,12 @@ public class AjaxProxy implements Runnable {
 
 			Context root = new Context(contexts, "/", Context.SESSIONS);
 
-			if (!newProxy) {
-				FilterHolder filterHolder = new FilterHolder(apfilter);
-				root.addFilter(filterHolder, "/*", 1);
-			} else {
-				FilterHolder proxyFilterHolder = new FilterHolder(proxyFilter);
-				root.addFilter(proxyFilterHolder, "/*", 1);
-				proxyFilter.reset();
-			}
+			FilterHolder proxyFilterHolder = new FilterHolder(proxyFilter);
+			root.addFilter(proxyFilterHolder, "/*", 1);
+			proxyFilter.reset();
+
+			FilterHolder filterHolder = new FilterHolder(apfilter);
+			root.addFilter(filterHolder, "/*", 1);
 
 			ServletHolder servlet;
 			DefaultServlet defaultServlet = new DefaultServlet();
@@ -253,15 +251,18 @@ public class AjaxProxy implements Runnable {
 			if (!mergeMode && config.isJsonArray(PROXY_ARRAY)) {
 				List<ProxyPath> proxyPaths = getProxyPaths();
 				for (ProxyPath proxyPath : proxyPaths) {
-					log.debug("adding proxy servlet: " + proxyPath.getDomain()
-							+ ":" + proxyPath.getPort() + " "
-							+ proxyPath.getPath());
-					root.addServlet(
-							new ServletHolder(
-									new AsyncProxyServlet.Transparent("",
-											proxyPath.getDomain(), proxyPath
-													.getPort())), proxyPath
-									.getPath());
+					if (!proxyPath.isNewProxy()) {
+						log.debug("adding proxy servlet: "
+								+ proxyPath.getDomain() + ":"
+								+ proxyPath.getPort() + " "
+								+ proxyPath.getPath());
+						root.addServlet(
+								new ServletHolder(
+										new AsyncProxyServlet.Transparent("",
+												proxyPath.getDomain(),
+												proxyPath.getPort())),
+								proxyPath.getPath());
+					}
 				}
 			}
 			if (config.isJsonArray(MERGE_ARRAY)) {
