@@ -19,6 +19,8 @@ apply plugin: 'com.jfrog.artifactory-upload'
 
 group = 'com.thedeanda'
 version = '1.20'
+sourceCompatibility = "1.7"
+targetCompatibility = "1.7"
 
 repositories {
 	mavenCentral()
