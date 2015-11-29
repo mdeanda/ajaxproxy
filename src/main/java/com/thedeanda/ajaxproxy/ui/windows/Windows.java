@@ -2,6 +2,7 @@ package com.thedeanda.ajaxproxy.ui.windows;
 
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -9,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.JFrame;
@@ -24,7 +24,7 @@ public class Windows {
 	private static AtomicInteger nextId = new AtomicInteger();
 
 	private Map<String, WindowContainer> frames = new TreeMap<>();
-	private Set<WindowListListener> listeners = new HashSet<>();
+	private Set<WeakReference<WindowListListener>> listeners = new HashSet<>();
 
 	private Windows() {
 
@@ -38,7 +38,7 @@ public class Windows {
 	}
 
 	public Windows addListener(WindowListListener listener) {
-		listeners.add(listener);
+		listeners.add(new WeakReference<>(listener));
 		notifyOfChange(getCurrentWindows(), listener);
 		return this;
 	}
@@ -108,8 +108,11 @@ public class Windows {
 		final Collection<WindowContainer> windows = getCurrentWindows();
 		log.debug("notify of change: {}", windows.size());
 
-		for (final WindowListListener listener : listeners) {
-			notifyOfChange(windows, listener);
+		for (WeakReference<WindowListListener> listenerRef : listeners) {
+			WindowListListener listener = listenerRef.get();
+			if (listener != null) {
+				notifyOfChange(windows, listener);
+			}
 		}
 	}
 

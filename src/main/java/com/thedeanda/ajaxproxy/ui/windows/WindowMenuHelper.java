@@ -51,6 +51,7 @@ public class WindowMenuHelper implements WindowListListener {
 		if (!stillOpen) {
 			// TODO: stop listening
 			log.info("stop listening from: {}", windowId);
+			Windows.get().removeListener(this);
 			return;
 		}
 

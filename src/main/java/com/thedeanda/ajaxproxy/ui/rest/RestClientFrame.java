@@ -67,10 +67,11 @@ public class RestClientFrame extends JFrame implements RequestListener,
 		Image image = Toolkit.getDefaultToolkit().getImage(imgUrl);
 		this.setIconImage(image);
 
-		this.windowId = Windows.get().addListener(this).add(this);
-		this.addWindowListener(new WindowListListenerCleanup(this));
 		initMenuBar();
 		pack();
+		this.windowId = Windows.get().addListener(this).add(this);
+		this.addWindowListener(new WindowListListenerCleanup(this));
+		new WindowMenuHelper(windowId, getJMenuBar());
 	}
 
 	public void fromResource(LoadedResource resource) {
@@ -138,8 +139,6 @@ public class RestClientFrame extends JFrame implements RequestListener,
 			}
 		});
 		menu.add(mi);
-
-		new WindowMenuHelper(windowId, mb);
 	}
 
 	private void handleJson() {

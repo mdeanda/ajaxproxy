@@ -86,7 +86,7 @@ public class MainFrame extends JFrame implements ProxyListener,
 		this.initWindow();
 		this.initMenuBar();
 		this.initTray();
-		if (!USE_TRAY) {
+		if (USE_TRAY) {
 			log.info("system tray mode");
 			setDefaultCloseOperation(EXIT_ON_CLOSE);
 		} else {
