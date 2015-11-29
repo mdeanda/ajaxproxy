@@ -18,6 +18,7 @@ public class ProxyTableModel extends AbstractTableModel {
 	private final static String[] COLS = { DOMAIN, PORT, PATH, NEW_PROXY };
 	private final static FieldType[] TYPES = { FieldType.String,
 			FieldType.Number, FieldType.String, FieldType.Boolean };
+	private final static int[] COLS_TO_CHECK_FOR_NON_EMPTY = new int[]{0, 2};
 
 	private enum FieldType {
 		String, Boolean, Number
@@ -115,8 +116,8 @@ public class ProxyTableModel extends AbstractTableModel {
 		for (int j = 0; j < data.size(); j++) {
 			JsonObject rowObj = data.getJsonObject(j);
 			boolean keep = false;
-			for (int i = 0; i < COLS.length; i++) {
-				String v = rowObj.getString(COLS[i]);
+			for (int i = 0; i < COLS_TO_CHECK_FOR_NON_EMPTY.length; i++) {
+				String v = rowObj.getString(COLS[COLS_TO_CHECK_FOR_NON_EMPTY[i]]);
 				if (!StringUtils.isBlank(v)) {
 					keep = true;
 					break;

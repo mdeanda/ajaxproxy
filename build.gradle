@@ -41,7 +41,6 @@ dependencies {
 	compile 'org.slf4j:slf4j-api:1.7.7'
 	compile 'org.apache.httpcomponents:httpclient:4.+'
 	compile "org.projectlombok:lombok:1.+"
-
 }
 jar {
     manifest {
