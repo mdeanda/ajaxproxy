@@ -25,7 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SwingUtils {
-	private static final Executor executor = Executors.newFixedThreadPool(3);
+	// private static final Executor executor = Executors.newFixedThreadPool(3);
 
 	private static final Logger log = LoggerFactory.getLogger(SwingUtils.class);
 
@@ -124,6 +124,9 @@ public class SwingUtils {
 	}
 
 	public static void executNonUi(Runnable runnable) {
-		executor.execute(runnable);
+		// TODO: need to shutdown threadpool so app can quit
+		// executor.execute(runnable);
+
+		new Thread(runnable).start();
 	}
 }
