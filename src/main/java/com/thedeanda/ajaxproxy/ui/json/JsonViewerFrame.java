@@ -23,7 +23,6 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.thedeanda.ajaxproxy.ui.rest.RestClientFrame;
 import com.thedeanda.ajaxproxy.ui.windows.WindowContainer;
 import com.thedeanda.ajaxproxy.ui.windows.WindowListListener;
 import com.thedeanda.ajaxproxy.ui.windows.WindowListListenerCleanup;
@@ -96,32 +95,6 @@ public class JsonViewerFrame extends JFrame implements WindowListListener {
 
 		menu.addSeparator();
 
-		mi = new JMenuItem("Rest Client");
-		mi.setMnemonic(KeyEvent.VK_R);
-		mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R,
-				ActionEvent.CTRL_MASK));
-		mi.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent ae) {
-				handleRest();
-			}
-		});
-		menu.add(mi);
-
-		mi = new JMenuItem("Json Viewer");
-		mi.setMnemonic(KeyEvent.VK_J);
-		mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_J,
-				ActionEvent.CTRL_MASK));
-		mi.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent ae) {
-				handleJson();
-			}
-		});
-		menu.add(mi);
-
-		menu.addSeparator();
-
 		mi = new JMenuItem("Exit");
 		mi.setMnemonic(KeyEvent.VK_X);
 		mi.addActionListener(new ActionListener() {
@@ -157,18 +130,8 @@ public class JsonViewerFrame extends JFrame implements WindowListListener {
 		}
 	}
 
-	private void handleJson() {
-		JsonViewerFrame frame = new JsonViewerFrame();
-		frame.setVisible(true);
-	}
-
 	private void handleExit() {
 		this.dispose();
-	}
-
-	private void handleRest() {
-		RestClientFrame frame = new RestClientFrame();
-		frame.setVisible(true);
 	}
 
 	@Override

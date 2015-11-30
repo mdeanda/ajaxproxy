@@ -9,9 +9,14 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JSeparator;
+import javax.swing.KeyStroke;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.thedeanda.ajaxproxy.ui.json.JsonViewerFrame;
+import com.thedeanda.ajaxproxy.ui.rest.RestClientFrame;
 
 public class WindowMenuHelper implements WindowListListener {
 	private static final Logger log = LoggerFactory
@@ -28,19 +33,10 @@ public class WindowMenuHelper implements WindowListListener {
 		menu.setMnemonic(KeyEvent.VK_W);
 		menuBar.add(menu);
 
-		reset();
 		Windows.get().addListener(this);
 	}
 
-	private void reset() {
-		JMenuItem mi;
-
-	}
-
-	@Override
-	public void windowsChanged(Collection<WindowContainer> windows) {
-		log.info("windows changed {}", windowId);
-		// first check if our window got closed...
+	private boolean stillOpen(Collection<WindowContainer> windows) {
 		boolean stillOpen = false;
 		for (WindowContainer wc : windows) {
 			if (windowId.equals(wc.getId())) {
@@ -48,7 +44,15 @@ public class WindowMenuHelper implements WindowListListener {
 				break;
 			}
 		}
-		if (!stillOpen) {
+		return stillOpen;
+	}
+
+	@Override
+	public void windowsChanged(Collection<WindowContainer> windows) {
+		log.info("windows changed {}", windowId);
+		// first check if our window got closed...
+
+		if (!stillOpen(windows)) {
 			// TODO: stop listening
 			log.info("stop listening from: {}", windowId);
 			Windows.get().removeListener(this);
@@ -57,6 +61,9 @@ public class WindowMenuHelper implements WindowListListener {
 
 		JMenuItem mi;
 		menu.removeAll();
+
+		addGeneric();
+
 		for (final WindowContainer wc : windows) {
 			mi = new JMenuItem(wc.getName());
 			menu.add(mi);
@@ -71,6 +78,45 @@ public class WindowMenuHelper implements WindowListListener {
 				}
 			});
 		}
+	}
 
+	private void addGeneric() {
+		JMenuItem mi = null;
+
+		mi = new JMenuItem("New Rest Client");
+		mi.setMnemonic(KeyEvent.VK_R);
+		mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R,
+				ActionEvent.CTRL_MASK));
+		mi.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent ae) {
+				handleRest();
+			}
+		});
+		menu.add(mi);
+
+		mi = new JMenuItem("New Json Viewer");
+		mi.setMnemonic(KeyEvent.VK_J);
+		mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_J,
+				ActionEvent.CTRL_MASK));
+		mi.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent ae) {
+				handleJson();
+			}
+		});
+		menu.add(mi);
+
+		menu.add(new JSeparator());
+	}
+
+	private void handleRest() {
+		RestClientFrame frame = new RestClientFrame();
+		frame.setVisible(true);
+	}
+
+	private void handleJson() {
+		JsonViewerFrame frame = new JsonViewerFrame();
+		frame.setVisible(true);
 	}
 }

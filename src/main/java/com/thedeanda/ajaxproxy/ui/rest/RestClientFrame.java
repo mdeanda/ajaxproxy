@@ -17,7 +17,6 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.KeyStroke;
 
 import org.apache.http.Header;
 import org.slf4j.Logger;
@@ -26,7 +25,6 @@ import org.slf4j.LoggerFactory;
 import com.thedeanda.ajaxproxy.LoadedResource;
 import com.thedeanda.ajaxproxy.http.RequestListener;
 import com.thedeanda.ajaxproxy.ui.busy.BusyNotification;
-import com.thedeanda.ajaxproxy.ui.json.JsonViewerFrame;
 import com.thedeanda.ajaxproxy.ui.windows.WindowContainer;
 import com.thedeanda.ajaxproxy.ui.windows.WindowListListener;
 import com.thedeanda.ajaxproxy.ui.windows.WindowListListenerCleanup;
@@ -102,32 +100,6 @@ public class RestClientFrame extends JFrame implements RequestListener,
 		menu.setMnemonic(KeyEvent.VK_F);
 		mb.add(menu);
 
-		// menu.addSeparator();
-
-		mi = new JMenuItem("Rest Client");
-		mi.setMnemonic(KeyEvent.VK_R);
-		mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R,
-				ActionEvent.CTRL_MASK));
-		mi.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent ae) {
-				handleRest();
-			}
-		});
-		menu.add(mi);
-
-		mi = new JMenuItem("Json Viewer");
-		mi.setMnemonic(KeyEvent.VK_J);
-		mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_J,
-				ActionEvent.CTRL_MASK));
-		mi.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent ae) {
-				handleJson();
-			}
-		});
-		menu.add(mi);
-
 		menu.addSeparator();
 
 		mi = new JMenuItem("Exit");
@@ -141,18 +113,8 @@ public class RestClientFrame extends JFrame implements RequestListener,
 		menu.add(mi);
 	}
 
-	private void handleJson() {
-		JsonViewerFrame frame = new JsonViewerFrame();
-		frame.setVisible(true);
-	}
-
 	private void handleExit() {
 		this.dispose();
-	}
-
-	private void handleRest() {
-		RestClientFrame frame = new RestClientFrame();
-		frame.setVisible(true);
 	}
 
 	private void busy() {

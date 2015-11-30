@@ -314,32 +314,6 @@ public class MainFrame extends JFrame implements ProxyListener,
 
 		menu.addSeparator();
 
-		mi = new JMenuItem("Rest Client");
-		mi.setMnemonic(KeyEvent.VK_R);
-		mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R,
-				ActionEvent.CTRL_MASK));
-		mi.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent ae) {
-				handleRest();
-			}
-		});
-		menu.add(mi);
-
-		mi = new JMenuItem("Json Viewer");
-		mi.setMnemonic(KeyEvent.VK_J);
-		mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_J,
-				ActionEvent.CTRL_MASK));
-		mi.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent ae) {
-				handleJson();
-			}
-		});
-		menu.add(mi);
-
-		menu.addSeparator();
-
 		mi = new JMenuItem("Exit");
 		mi.setMnemonic(KeyEvent.VK_X);
 		mi.addActionListener(new ActionListener() {
