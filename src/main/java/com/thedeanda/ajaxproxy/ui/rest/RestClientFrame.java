@@ -138,11 +138,13 @@ public class RestClientFrame extends JFrame implements RequestListener,
 	@Override
 	public void requestComplete(UUID id, int status, String reason,
 			long duation, Header[] responseHeaders, byte[] data) {
+		log.debug("request complete");
 		notBusy();
 	}
 
 	@Override
 	public void error(UUID id, String message, Exception e) {
+		log.debug("request complete (error)", e);
 		notBusy();
 	}
 
