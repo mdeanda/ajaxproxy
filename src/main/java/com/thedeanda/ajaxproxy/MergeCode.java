@@ -26,7 +26,6 @@ public class MergeCode {
 	private boolean minify;
 	private MergeMode mode;
 
-	@SuppressWarnings("unchecked")
 	private List<String> getFileList(File filePath) throws IOException {
 		List<String> lines = FileUtils.readLines(filePath);
 		return lines;

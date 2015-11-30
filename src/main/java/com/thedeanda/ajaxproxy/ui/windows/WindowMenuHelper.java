@@ -11,6 +11,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JSeparator;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +35,7 @@ public class WindowMenuHelper implements WindowListListener {
 		menuBar.add(menu);
 
 		Windows.get().addListener(this);
+		addGeneric();
 	}
 
 	private boolean stillOpen(Collection<WindowContainer> windows) {
@@ -49,14 +51,16 @@ public class WindowMenuHelper implements WindowListListener {
 
 	@Override
 	public void windowsChanged(Collection<WindowContainer> windows) {
-		log.info("windows changed {}", windowId);
+		log.debug("windows changed id is: {}", windowId);
 		// first check if our window got closed...
 
 		if (!stillOpen(windows)) {
 			// TODO: stop listening
-			log.info("stop listening from: {}", windowId);
+			log.debug("stop listening from: {}", windowId);
 			Windows.get().removeListener(this);
 			return;
+		} else {
+			log.debug("window still open: {}", windowId);
 		}
 
 		JMenuItem mi;
@@ -70,11 +74,15 @@ public class WindowMenuHelper implements WindowListListener {
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					JFrame frame = wc.getFrame();
-					if (frame != null) {
-						frame.setVisible(true);
-						frame.requestFocus();
-					}
+					SwingUtilities.invokeLater(new Runnable() {
+						public void run() {
+							JFrame frame = wc.getFrame();
+							if (frame != null) {
+								frame.setVisible(true);
+								frame.requestFocus();
+							}
+						}
+					});
 				}
 			});
 		}
@@ -90,7 +98,11 @@ public class WindowMenuHelper implements WindowListListener {
 		mi.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent ae) {
-				handleRest();
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						handleRest();
+					}
+				});
 			}
 		});
 		menu.add(mi);
@@ -102,7 +114,11 @@ public class WindowMenuHelper implements WindowListListener {
 		mi.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent ae) {
-				handleJson();
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						handleJson();
+					}
+				});
 			}
 		});
 		menu.add(mi);

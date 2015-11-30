@@ -131,7 +131,7 @@ public class ParsedData {
 			try {
 				xml = DocumentHelper.parseText(raw);
 			} catch (DocumentException e) {
-				log.debug(e.getMessage(), e);
+				log.trace(e.getMessage(), e);
 			}
 		}
 	}
@@ -141,7 +141,7 @@ public class ParsedData {
 			ByteArrayInputStream stream = new ByteArrayInputStream(data);
 			bufferedImage = ImageIO.read(stream);
 		} catch (IOException e) {
-			log.debug(e.getMessage(), e);
+			log.trace(e.getMessage(), e);
 		}
 	}
 

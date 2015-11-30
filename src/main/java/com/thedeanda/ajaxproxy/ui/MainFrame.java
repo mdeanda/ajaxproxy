@@ -25,7 +25,6 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -45,9 +44,6 @@ import org.slf4j.LoggerFactory;
 import com.thedeanda.ajaxproxy.ProxyListener;
 import com.thedeanda.ajaxproxy.ui.json.JsonViewerFrame;
 import com.thedeanda.ajaxproxy.ui.rest.RestClientFrame;
-import com.thedeanda.ajaxproxy.ui.windows.WindowContainer;
-import com.thedeanda.ajaxproxy.ui.windows.WindowListListener;
-import com.thedeanda.ajaxproxy.ui.windows.WindowListListenerCleanup;
 import com.thedeanda.ajaxproxy.ui.windows.WindowMenuHelper;
 import com.thedeanda.ajaxproxy.ui.windows.Windows;
 import com.thedeanda.javajson.JsonArray;
@@ -55,8 +51,7 @@ import com.thedeanda.javajson.JsonException;
 import com.thedeanda.javajson.JsonObject;
 import com.thedeanda.javajson.JsonValue;
 
-public class MainFrame extends JFrame implements ProxyListener,
-		WindowListListener {
+public class MainFrame extends JFrame implements ProxyListener {
 	private static final long serialVersionUID = 1L;
 	private static final Logger log = LoggerFactory.getLogger(MainFrame.class);
 	private boolean USE_TRAY = true;
@@ -119,8 +114,7 @@ public class MainFrame extends JFrame implements ProxyListener,
 		});
 		panel.addProxyListener(this);
 
-		this.windowId = Windows.get().addListener(this).add(this);
-		this.addWindowListener(new WindowListListenerCleanup(this));
+		this.windowId = Windows.get().add(this);
 		new WindowMenuHelper(windowId, getJMenuBar());
 	}
 
@@ -148,8 +142,11 @@ public class MainFrame extends JFrame implements ProxyListener,
 	}
 
 	private void initTray() {
-		if (SystemTray.isSupported() || !USE_TRAY)
+		if (SystemTray.isSupported() || !USE_TRAY) {
+			log.error("System tray disabled.");
+			USE_TRAY = false;
 			return;
+		}
 
 		MouseListener mouseListener = new MouseListener() {
 
@@ -583,15 +580,6 @@ public class MainFrame extends JFrame implements ProxyListener,
 
 	private void handleShowWindow() {
 		this.setVisible(true);
-	}
-
-	@Override
-	public void windowsChanged(Collection<WindowContainer> windows) {
-		log.warn("{}", Thread.currentThread());
-
-		for (WindowContainer wc : windows) {
-			log.info(wc.getName());
-		}
 	}
 
 }

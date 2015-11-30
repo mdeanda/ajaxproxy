@@ -106,7 +106,6 @@ public class LoadedResource implements RequestListener {
 		StringBuilder sb = new StringBuilder();
 		if (bytes != null) {
 			try {
-				@SuppressWarnings("unchecked")
 				List<String> lines = IOUtils
 						.readLines(new ByteArrayInputStream(bytes));
 				for (String line : lines) {

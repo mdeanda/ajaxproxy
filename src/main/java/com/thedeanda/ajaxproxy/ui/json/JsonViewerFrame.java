@@ -25,7 +25,6 @@ import org.slf4j.LoggerFactory;
 
 import com.thedeanda.ajaxproxy.ui.windows.WindowContainer;
 import com.thedeanda.ajaxproxy.ui.windows.WindowListListener;
-import com.thedeanda.ajaxproxy.ui.windows.WindowListListenerCleanup;
 import com.thedeanda.ajaxproxy.ui.windows.WindowMenuHelper;
 import com.thedeanda.ajaxproxy.ui.windows.Windows;
 
@@ -53,8 +52,7 @@ public class JsonViewerFrame extends JFrame implements WindowListListener {
 		Image image = Toolkit.getDefaultToolkit().getImage(imgUrl);
 		this.setIconImage(image);
 
-		this.windowId = Windows.get().addListener(this).add(this);
-		this.addWindowListener(new WindowListListenerCleanup(this));
+		this.windowId = Windows.get().add(this);
 		initMenuBar();
 		pack();
 	}
