@@ -96,12 +96,20 @@ public class Windows {
 	}
 
 	protected void remove(String id) {
+		log.debug("removing window: " + id);
 		frames.remove(id);
+		log.debug("frame size: {}", frames.size());
 		notifyOfChange();
 	}
 
 	public void removeListener(WindowListListener listener) {
-		listeners.remove(listener);
+		for (WeakReference<WindowListListener> l : listeners) {
+			if (l.get() == listener) {
+				listeners.remove(l);
+				break;
+			}
+		}
+		log.debug("listeners size: {}", listeners.size());
 	}
 
 	private void notifyOfChange() {
