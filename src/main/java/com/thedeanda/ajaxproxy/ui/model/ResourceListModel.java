@@ -26,7 +26,9 @@ public class ResourceListModel implements ListModel<Resource> {
 	private Pattern filterRegEx;
 
 	public void add(Resource item) {
-		unfilteredItems.add(item);
+		synchronized (unfilteredItems) {
+			unfilteredItems.add(item);
+		}
 		if (filterRegEx == null
 				|| filterRegEx.matcher(item.getPath()).matches()) {
 			addSorted(item, items);
@@ -66,11 +68,16 @@ public class ResourceListModel implements ListModel<Resource> {
 			}
 		}
 
+		Set<Resource> copyOfAllItems = null;
+		synchronized (unfilteredItems) {
+			copyOfAllItems = new TreeSet<>(unfilteredItems);
+		}
+
 		if (filterRegEx == null) {
 			// just add all
-			items.addAll(unfilteredItems);
+			items.addAll(copyOfAllItems);
 		} else {
-			for (Resource item : unfilteredItems) {
+			for (Resource item : copyOfAllItems) {
 				if (filterRegEx.matcher(item.getPath()).matches()) {
 					items.add(item);
 				}
@@ -95,7 +102,9 @@ public class ResourceListModel implements ListModel<Resource> {
 	public void clear() {
 		int size = items.size();
 		items.clear();
-		unfilteredItems.clear();
+		synchronized (unfilteredItems) {
+			unfilteredItems.clear();
+		}
 
 		if (size > 0) {
 			for (ListDataListener listener : listeners) {
@@ -133,9 +142,11 @@ public class ResourceListModel implements ListModel<Resource> {
 
 	public Resource get(UUID id) {
 		// TODO: use a map
-		for (Resource r : unfilteredItems) {
-			if (id.toString().equals(r.getId().toString())) {
-				return r;
+		synchronized (unfilteredItems) {
+			for (Resource r : unfilteredItems) {
+				if (id.toString().equals(r.getId().toString())) {
+					return r;
+				}
 			}
 		}
 		return null;
