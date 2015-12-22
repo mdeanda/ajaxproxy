@@ -32,7 +32,7 @@ public class Resource implements Serializable, Comparable<Resource> {
 
 	private String errorReason;
 	private String exception;
-	private long startTime;
+	private long startTime = System.currentTimeMillis();
 
 	/**
 	 * calculated fields
