@@ -41,7 +41,6 @@ public class AjaxProxy implements Runnable {
 	private ProxyFilter proxyFilter;
 	private boolean mergeMode = false;
 	private List<MergeServlet> mergeServlets = new ArrayList<MergeServlet>();
-	private boolean newProxy = false;
 	private ArrayList<RequestListener> proxyListeners;
 	private RequestListener listener;
 
@@ -183,7 +182,6 @@ public class AjaxProxy implements Runnable {
 			throw new Exception("resourceBase not defined in config file");
 		}
 		showIndex = config.getBoolean(SHOW_INDEX);
-		newProxy = config.getBoolean(NEW_PROXY);
 		log.info("using resource base: " + resourceBase);
 	}
 

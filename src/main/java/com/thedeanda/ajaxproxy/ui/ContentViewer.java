@@ -79,7 +79,7 @@ public class ContentViewer extends JPanel {
 
 							formattedText = json.toString(4);
 						} catch (Exception e) {
-							log.debug(e.getMessage(), e);
+							log.trace(e.getMessage(), e);
 						}
 					}
 					if (formattedText == null && output.trim().startsWith("[")) {
@@ -92,7 +92,7 @@ public class ContentViewer extends JPanel {
 
 							formattedText = json.toString(4);
 						} catch (Exception e) {
-							log.debug(e.getMessage(), e);
+							log.trace(e.getMessage(), e);
 						}
 					}
 
@@ -104,7 +104,7 @@ public class ContentViewer extends JPanel {
 								node = initTree(doc);
 								formattedText = formatXml(doc);
 							} catch (DocumentException e) {
-								log.debug(e.getMessage(), e);
+								log.trace(e.getMessage(), e);
 							}
 						}
 					}
