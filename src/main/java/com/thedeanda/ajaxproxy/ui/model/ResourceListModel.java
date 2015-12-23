@@ -141,9 +141,15 @@ public class ResourceListModel implements ListModel<Resource> {
 	}
 
 	public Resource get(UUID id) {
+		if (id==null) {
+			throw new NullPointerException("uuid is null?");
+		}
 		// TODO: use a map
 		synchronized (unfilteredItems) {
-			for (Resource r : unfilteredItems) {
+			for (Resource r : unfilteredItems) {				
+				if (r.getLoadedResource()!=null) {
+					continue;
+				}
 				if (id.toString().equals(r.getId().toString())) {
 					return r;
 				}

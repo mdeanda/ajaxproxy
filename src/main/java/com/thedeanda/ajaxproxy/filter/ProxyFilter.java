@@ -39,7 +39,7 @@ import com.thedeanda.ajaxproxy.model.ProxyPathMatcher;
  * filter as it has a few issues
  * 
  * @author mdeanda
- *
+ * 
  */
 public class ProxyFilter implements Filter {
 	private static final Logger log = LoggerFactory
@@ -93,6 +93,13 @@ public class ProxyFilter implements Filter {
 		return null;
 	}
 
+	private boolean isHeaderBlacklisted(String headerName) {
+		Set<String> blacklist = new HashSet<>();
+		blacklist.add("host");
+		blacklist.add("content-length");
+		return blacklist.contains(headerName.toLowerCase());
+	}
+
 	private void doFilterInternal(final HttpServletRequest request,
 			final ServletResponse response, final FilterChain chain,
 			ProxyPathMatcher proxy) throws IOException, ServletException {
@@ -100,6 +107,7 @@ public class ProxyFilter implements Filter {
 
 		String uri = request.getRequestURI();
 		log.debug(uri);
+		String queryString = request.getQueryString();
 
 		ProxyPath proxyPath = proxy.getProxyPath();
 
@@ -107,20 +115,22 @@ public class ProxyFilter implements Filter {
 		List<Header> hdrs = new LinkedList<Header>();
 		@SuppressWarnings("unchecked")
 		Enumeration<String> hnames = request.getHeaderNames();
+
+		ProxyPath path = proxy.getProxyPath();
+		Header hostHeader = new BasicHeader("Host", path.getDomain() + ":"
+				+ path.getPort());
+		hdrs.add(hostHeader);
+		inputHeaders.append("Host: " + path.getDomain() + ":" + path.getPort()
+				+ "\n");
+
 		while (hnames.hasMoreElements()) {
 			String hn = hnames.nextElement();
-			if (!"Host".equals(hn)) {
+			if (!isHeaderBlacklisted(hn)) {
 				// TODO: see rest client frame for a whitelist
 				// TODO: consider allowing header replacement via config
 				Header h = new BasicHeader(hn, request.getHeader(hn));
 				hdrs.add(h);
 				inputHeaders.append(hn + ": " + request.getHeader(hn) + "\n");
-			} else {
-				log.info("remove host name: {}", request.getHeader(hn));
-				ProxyPath path = proxy.getProxyPath();
-				Header h = new BasicHeader(hn, path.getDomain() + ":" + path.getPort());
-				hdrs.add(h);
-				inputHeaders.append(hn + ": " + path.getDomain() + ":" + path.getPort() + "\n");
 			}
 		}
 		log.info("headers: {}", inputHeaders);
@@ -131,6 +141,9 @@ public class ProxyFilter implements Filter {
 			proxyUrl.append(":" + proxyPath.getPort());
 		}
 		proxyUrl.append(uri);
+		if (queryString != null) {
+			proxyUrl.append("?" + queryString);
+		}
 		log.info("new proxy method to: {}", proxyUrl);
 
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();

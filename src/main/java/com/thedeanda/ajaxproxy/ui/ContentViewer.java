@@ -55,7 +55,7 @@ public class ContentViewer extends JPanel {
 	}
 
 	public void setContent(final String output) {
-		log.info("setting content");
+		log.trace("setting content");
 		tabs.removeAll();
 
 		if (StringUtils.isBlank(output)) {

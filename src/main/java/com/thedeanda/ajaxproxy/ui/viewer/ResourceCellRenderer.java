@@ -104,6 +104,9 @@ public class ResourceCellRenderer extends JPanel implements
 			if (resource.getUrlObject() != null) {
 				URL uo = resource.getUrlObject();
 				url = uo.getPath();
+				if (uo.getQuery() != null) {
+					url += "?" + uo.getQuery();
+				}
 			}
 			path.setText(url);
 

@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.URL;
+import java.util.Date;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -34,7 +36,7 @@ import com.thedeanda.ajaxproxy.ui.rest.RestClientFrame;
  * panel to view a single resource.
  * 
  * @author mdeanda
- *
+ * 
  */
 public class ResourcePanel extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 1L;
@@ -101,8 +103,8 @@ public class ResourcePanel extends JPanel implements ActionListener {
 		headersContent = new JEditorPane();
 		headersContent.setEditable(false);
 		generalScroll = new JScrollPane(headersContent);
-		generalScroll
-				.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		//generalScroll
+			//	.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		headersContent.setEditorKit(kit);
 		Document doc = kit.createDefaultDocument();
 		headersContent.setDocument(doc);
@@ -169,8 +171,63 @@ public class ResourcePanel extends JPanel implements ActionListener {
 
 				tryData(inputCv, resource.getInputData());
 				tryData(outputCv, resource.getOutputData());
+				showGeneralResourceProperties(resource);
 			}
 		});
+	}
+
+	private void showGeneralResourceProperties(Resource resource) {
+		final StringBuilder output = new StringBuilder();
+
+		output.append("<html><body>");
+
+		writeField(output, "Request URL", resource.getUrl());
+		if (resource.getUrlObject() != null) {
+			URL uo = resource.getUrlObject();
+			writeField(output, "Request Path", uo.getPath());
+			if (uo.getQuery() != null) {
+				writeField(output, "Query String", uo.getQuery());
+			}
+		}
+		// writeField(headers, "", );
+		writeField(output, "Method", resource.getMethod());
+		writeField(output, "Duration", String.valueOf(resource.getDuration()));
+		writeField(output, "Date",
+				new Date(resource.getStartTime()).toString());
+
+		writeField(output, "Status", String.valueOf(resource.getStatus()));
+		output.append("<h1>Request Headers</h1><div class=\"items\">");
+		Header[] reqHeaders = resource.getRequestHeaders();
+		if (reqHeaders != null) {
+			for (Header hdr : reqHeaders) {
+				writeField(output, hdr.getName(), hdr.getValue());
+			}
+		}
+		output.append("</div>");
+
+		output.append("<h1>Response Headers</h1><div class=\"items\">");
+		Header[] respHeaders = resource.getResponseHeaders();
+		if (respHeaders != null) {
+			for (Header hdr : respHeaders) {
+				writeField(output, hdr.getName(), hdr.getValue());
+			}
+		}
+		output.append("</div>");
+
+		/*
+		 * Exception ex = resource.getFilterException(); if (ex != null) {
+		 * StringWriter sw = new StringWriter(); ex.printStackTrace(new
+		 * PrintWriter(sw)); String[] lines = StringUtils.split(sw.toString(),
+		 * "\n");
+		 * 
+		 * headers.append("<h1>Exception</h1><div class=\"items\">"); for
+		 * (String line : lines) { headers.append("<p>"); headers.append(line);
+		 * headers.append("</p>"); } headers.append("</div>"); } //
+		 */
+
+		output.append("</body></html>");
+
+		showHeaders(output.toString());
 	}
 
 	public void setResource(LoadedResource resource) {
@@ -179,7 +236,7 @@ public class ResourcePanel extends JPanel implements ActionListener {
 		this.oldResource = resource;
 
 		if (oldResource != null) {
-			final StringBuilder headers = new StringBuilder();
+			final StringBuilder output = new StringBuilder();
 
 			SwingUtils.executNonUi(new Runnable() {
 				@Override
@@ -193,48 +250,40 @@ public class ResourcePanel extends JPanel implements ActionListener {
 					// inputCv.setContent(oldResource.getInputAsText());
 					// outputCv.setContent(oldResource.getOutputAsText());
 
-					headers.append("<html><body>");
-					headers.append("<p><b>Request Path:</b> ");
-					headers.append(resource.getPath());
-					headers.append("</p>");
-					headers.append("<p><b>Method:</b> ");
-					headers.append(resource.getMethod());
-					headers.append("</p>");
-					headers.append("<p><b>Duration:</b> ");
-					headers.append(resource.getDuration());
-					headers.append("</p>");
-					headers.append("<p><b>Date:</b> ");
-					headers.append(resource.getDate());
-					headers.append("<p><b>Character Encoding:</b> ");
-					headers.append(resource.getCharacterEncoding());
-					headers.append("</p>");
-					writeField(headers, "Status",
+					output.append("<html><body>");
+					output.append("<p><b>Request Path:</b> ");
+					output.append(resource.getPath());
+					output.append("</p>");
+					output.append("<p><b>Method:</b> ");
+					output.append(resource.getMethod());
+					output.append("</p>");
+					output.append("<p><b>Duration:</b> ");
+					output.append(resource.getDuration());
+					output.append("</p>");
+					output.append("<p><b>Date:</b> ");
+					output.append(resource.getDate());
+					output.append("<p><b>Character Encoding:</b> ");
+					output.append(resource.getCharacterEncoding());
+					output.append("</p>");
+					writeField(output, "Status",
 							String.valueOf(resource.getStatusCode()));
-					headers.append("<h1>Request Headers</h1><div class=\"items\">");
+					output.append("<h1>Request Headers</h1><div class=\"items\">");
 					Header[] reqHeaders = resource.getRequestHeaders();
 					if (reqHeaders != null) {
 						for (Header hdr : reqHeaders) {
-							headers.append("<p><b>");
-							headers.append(hdr.getName());
-							headers.append(":</b> ");
-							headers.append(hdr.getValue());
-							headers.append("</p>");
+							writeField(output, hdr.getName(), hdr.getValue());
 						}
 					}
-					headers.append("</div>");
+					output.append("</div>");
 
-					headers.append("<h1>Response Headers</h1><div class=\"items\">");
+					output.append("<h1>Response Headers</h1><div class=\"items\">");
 					Header[] respHeaders = resource.getResponseHeaders();
 					if (respHeaders != null) {
 						for (Header hdr : respHeaders) {
-							headers.append("<p><b>");
-							headers.append(hdr.getName());
-							headers.append(":</b> ");
-							headers.append(hdr.getValue());
-							headers.append("</p>");
+							writeField(output, hdr.getName(), hdr.getValue());
 						}
 					}
-					headers.append("</div>");
+					output.append("</div>");
 
 					Exception ex = resource.getFilterException();
 					if (ex != null) {
@@ -242,29 +291,29 @@ public class ResourcePanel extends JPanel implements ActionListener {
 						ex.printStackTrace(new PrintWriter(sw));
 						String[] lines = StringUtils.split(sw.toString(), "\n");
 
-						headers.append("<h1>Exception</h1><div class=\"items\">");
+						output.append("<h1>Exception</h1><div class=\"items\">");
 						for (String line : lines) {
-							headers.append("<p>");
-							headers.append(line);
-							headers.append("</p>");
+							output.append("<p>");
+							output.append(line);
+							output.append("</p>");
 						}
-						headers.append("</div>");
+						output.append("</div>");
 					}
 
-					headers.append("</body></html>");
+					output.append("</body></html>");
 
-					showHeaders(headers.toString());
+					showHeaders(output.toString());
 				}
 			});
 		}
 	}
 
-	private void writeField(StringBuilder headers, String name, String value) {
-		headers.append("<p><b>");
-		headers.append(name);
-		headers.append(":</b> ");
-		headers.append(value);
-		headers.append("</p>");
+	private void writeField(StringBuilder output, String name, String value) {
+		output.append("<p><b>");
+		output.append(name);
+		output.append(":</b> ");
+		output.append(value);
+		output.append("</p>");
 	}
 
 	private void loadPopup() {
@@ -281,7 +330,11 @@ public class ResourcePanel extends JPanel implements ActionListener {
 			loadPopup();
 		} else if (source == this.replayButton) {
 			RestClientFrame rest = new RestClientFrame();
-			rest.fromResource(oldResource);
+			if (oldResource != null) {
+				rest.fromResource(oldResource);
+			} else {
+				rest.fromResource(newResource);
+			}
 			rest.setVisible(true);
 		}
 	}

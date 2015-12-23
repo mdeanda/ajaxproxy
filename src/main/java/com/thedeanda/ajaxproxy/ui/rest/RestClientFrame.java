@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import com.thedeanda.ajaxproxy.LoadedResource;
 import com.thedeanda.ajaxproxy.http.RequestListener;
 import com.thedeanda.ajaxproxy.ui.busy.BusyNotification;
+import com.thedeanda.ajaxproxy.ui.model.Resource;
 import com.thedeanda.ajaxproxy.ui.windows.WindowContainer;
 import com.thedeanda.ajaxproxy.ui.windows.WindowListListener;
 import com.thedeanda.ajaxproxy.ui.windows.WindowListListenerCleanup;
@@ -76,18 +77,38 @@ public class RestClientFrame extends JFrame implements RequestListener,
 		String url = resource.getUrl();
 		panel.setUrl(url);
 
-		Header[] hdrs = resource.getRequestHeaders();
-		if (hdrs != null) {
+		addHeaders(resource.getRequestHeaders());
+		panel.setInput(resource.getInputAsText());
+		panel.setMethod(resource.getMethod());
+	}
+
+	public void fromResource(Resource resource) {
+		panel.setUrl(resource.getUrl());
+		// TODO: consider keeping byte data as is depending on content type
+		byte[] inputData = resource.getInputData();
+		String input = "";
+		if (inputData != null) {
+			input = new String(inputData);
+		}
+
+		panel.setInput(input);
+		panel.setMethod(resource.getMethod());
+
+		addHeaders(resource.getRequestHeaders());
+
+	}
+	
+	private void addHeaders(Header[] headers) {
+		panel.setHeaders("");
+		if (headers != null) {
 			StringBuilder sb = new StringBuilder();
-			for (Header h : hdrs) {
+			for (Header h : headers) {
 				if (!BLACKLIST_HEADERS.contains(h.getName())) {
 					sb.append(h.getName() + ": " + h.getValue() + "\n");
 				}
 			}
 			panel.setHeaders(sb.toString());
 		}
-		panel.setInput(resource.getInputAsText());
-		panel.setMethod(resource.getMethod());
 	}
 
 	private void initMenuBar() {

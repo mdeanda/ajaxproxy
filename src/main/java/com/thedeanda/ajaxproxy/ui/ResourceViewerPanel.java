@@ -431,13 +431,13 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 						// httpClient.replay("localhost", ajaxProxy.getPort(),
 						// resource, null);
 
+						RestClientFrame rest = new RestClientFrame();
 						if (resource.getLoadedResource() != null) {
-							String baseUrl = "http://localhost:"
-									+ ajaxProxy.getPort();
-							RestClientFrame rest = new RestClientFrame();
 							rest.fromResource(resource.getLoadedResource());
-							rest.setVisible(true);
+						} else {
+							rest.fromResource(resource);
 						}
+						rest.setVisible(true);
 					}
 				});
 			}
