@@ -189,19 +189,27 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener,
 		return json;
 	}
 
-	// TODO: figure out why this returns nothing
+	/**
+	 * ui settings not stored in the current config file
+	 * 
+	 * @return
+	 */
 	public JsonObject getSettings() {
 		JsonObject ret = new JsonObject();
-		// ret.put("port", port.getText());
+		ret.put("currentTab", tabs.getSelectedIndex());
 		return ret;
 	}
 
-	// TODO: figure out why this does nothing
+	/**
+	 * load ui settings
+	 * 
+	 * @param json
+	 */
 	public void setSettings(JsonObject json) {
 		if (json == null)
 			return;
 
-		// port.setText(json.getString("port"));
+		tabs.setSelectedIndex(json.getInt("currentTab"));
 	}
 
 	public void start() {
