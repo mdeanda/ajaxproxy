@@ -3,12 +3,16 @@ package com.thedeanda.ajaxproxy.ui.proxy;
 import javax.swing.table.AbstractTableModel;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.thedeanda.javajson.JsonArray;
 import com.thedeanda.javajson.JsonObject;
 import com.thedeanda.javajson.JsonValue;
 
 public class ProxyTableModel extends AbstractTableModel {
+	private static final Logger log = LoggerFactory
+			.getLogger(ProxyTableModel.class);
 	private static final long serialVersionUID = 1L;
 	private JsonArray data;
 	private final static String DOMAIN = "domain";
@@ -18,7 +22,7 @@ public class ProxyTableModel extends AbstractTableModel {
 	private final static String[] COLS = { DOMAIN, PORT, PATH, NEW_PROXY };
 	private final static FieldType[] TYPES = { FieldType.String,
 			FieldType.Number, FieldType.String, FieldType.Boolean };
-	private final static int[] COLS_TO_CHECK_FOR_NON_EMPTY = new int[]{0, 2};
+	private final static int[] COLS_TO_CHECK_FOR_NON_EMPTY = new int[] { 0, 2 };
 
 	private enum FieldType {
 		String, Boolean, Number
@@ -117,7 +121,8 @@ public class ProxyTableModel extends AbstractTableModel {
 			JsonObject rowObj = data.getJsonObject(j);
 			boolean keep = false;
 			for (int i = 0; i < COLS_TO_CHECK_FOR_NON_EMPTY.length; i++) {
-				String v = rowObj.getString(COLS[COLS_TO_CHECK_FOR_NON_EMPTY[i]]);
+				String v = rowObj
+						.getString(COLS[COLS_TO_CHECK_FOR_NON_EMPTY[i]]);
 				if (!StringUtils.isBlank(v)) {
 					keep = true;
 					break;
