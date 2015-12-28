@@ -28,11 +28,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.thedeanda.ajaxproxy.AjaxProxy;
+import com.thedeanda.ajaxproxy.cache.NoOpCache;
 import com.thedeanda.ajaxproxy.http.HttpClient;
 import com.thedeanda.ajaxproxy.http.HttpClient.RequestMethod;
 import com.thedeanda.ajaxproxy.http.RequestListener;
+import com.thedeanda.ajaxproxy.model.ProxyContainer;
 import com.thedeanda.ajaxproxy.model.ProxyPath;
-import com.thedeanda.ajaxproxy.model.ProxyPathMatcher;
 
 /**
  * new method of proxying requests that does not use jetty's transparent proxy
@@ -51,7 +52,7 @@ public class ProxyFilter implements Filter {
 
 	private HttpClient client;
 
-	private Set<ProxyPathMatcher> matchers;
+	private Set<ProxyContainer> proxyContainers;
 
 	private RequestListener listener;
 
@@ -71,7 +72,7 @@ public class ProxyFilter implements Filter {
 			FilterChain chain) throws IOException, ServletException {
 
 		if (request instanceof HttpServletRequest) {
-			ProxyPathMatcher proxy = getProxyMatcher((HttpServletRequest) request);
+			ProxyContainer proxy = getProxyMatcher((HttpServletRequest) request);
 			if (proxy != null) {
 				doFilterInternal((HttpServletRequest) request, response, chain,
 						proxy);
@@ -83,10 +84,10 @@ public class ProxyFilter implements Filter {
 		}
 	}
 
-	private ProxyPathMatcher getProxyMatcher(final HttpServletRequest request) {
+	private ProxyContainer getProxyMatcher(final HttpServletRequest request) {
 		String uri = request.getRequestURI();
 		log.debug(uri);
-		ProxyPathMatcher matcher = getMatchingMatcher(uri);
+		ProxyContainer matcher = getProxyForPath(uri);
 		if (matcher != null) {
 			return matcher;
 		}
@@ -102,7 +103,7 @@ public class ProxyFilter implements Filter {
 
 	private void doFilterInternal(final HttpServletRequest request,
 			final ServletResponse response, final FilterChain chain,
-			ProxyPathMatcher proxy) throws IOException, ServletException {
+			ProxyContainer proxy) throws IOException, ServletException {
 		log.debug("using new proxy filter");
 
 		String uri = request.getRequestURI();
@@ -150,6 +151,22 @@ public class ProxyFilter implements Filter {
 		IOUtils.copy(request.getInputStream(), baos);
 		byte[] inputData = baos.toByteArray();
 
+		Object cachedResponse = null;
+		if ("GET".equals(request.getMethod())) {
+			// proxy.getCache().get(urlPath);
+		} else {
+			proxy.getCache().clearCache();
+		}
+		if (cachedResponse == null) {
+			makeRequest(request, response, proxyUrl, inputHeaders, inputData);
+		} else {
+			// send cached response
+		}
+	}
+
+	private void makeRequest(HttpServletRequest request,
+			final ServletResponse response, StringBuilder proxyUrl,
+			StringBuilder inputHeaders, byte[] inputData) {
 		client.makeRequest(RequestMethod.valueOf(request.getMethod()),
 				proxyUrl.toString(), inputHeaders.toString(), inputData,
 				new RequestListener() {
@@ -173,6 +190,7 @@ public class ProxyFilter implements Filter {
 						try {
 							// TODO: add response headers here to pass them
 							// along too!
+							log.warn("response headers:\n{}", responseHeaders);
 
 							ServletOutputStream os = response.getOutputStream();
 							IOUtils.copy(new ByteArrayInputStream(data), os);
@@ -200,10 +218,10 @@ public class ProxyFilter implements Filter {
 
 	}
 
-	private ProxyPathMatcher getMatchingMatcher(String uri) {
-		ProxyPathMatcher ret = null;
-		for (ProxyPathMatcher matcher : matchers) {
-			if (matcher.matches(uri)) {
+	private ProxyContainer getProxyForPath(String path) {
+		ProxyContainer ret = null;
+		for (ProxyContainer matcher : proxyContainers) {
+			if (matcher.matches(path)) {
 				log.debug("found a match!");
 				ret = matcher;
 				break;
@@ -214,15 +232,17 @@ public class ProxyFilter implements Filter {
 
 	public void reset() {
 		List<ProxyPath> paths = ajaxProxy.getProxyPaths();
-		matchers = new HashSet<ProxyPathMatcher>();
+		proxyContainers = new HashSet<ProxyContainer>();
 		for (ProxyPath path : paths) {
 			if (path.isNewProxy()) {
 				try {
 					Pattern pattern = Pattern.compile(path.getPath());
-					ProxyPathMatcher matcher = new ProxyPathMatcher();
-					matcher.setPattern(pattern);
-					matcher.setProxyPath(path);
-					matchers.add(matcher);
+					ProxyContainer proxyContainer = new ProxyContainer();
+					proxyContainer.setPattern(pattern);
+					proxyContainer.setProxyPath(path);
+					proxyContainers.add(proxyContainer);
+					// TODO: add option to use a real cache
+					proxyContainer.setCache(new NoOpCache());
 				} catch (Exception e) {
 					log.debug("skipping: {}", path, e);
 				}
