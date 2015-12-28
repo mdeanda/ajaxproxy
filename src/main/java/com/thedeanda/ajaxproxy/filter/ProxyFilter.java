@@ -20,6 +20,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
@@ -118,10 +119,17 @@ public class ProxyFilter implements Filter {
 		Enumeration<String> hnames = request.getHeaderNames();
 
 		ProxyPath path = proxy.getProxyPath();
-		Header hostHeader = new BasicHeader("Host", path.getDomain() + ":"
-				+ path.getPort());
+		Header hostHeader = new BasicHeader("Host", path.getDomain()/*
+																	 * + ":" +
+																	 * path
+																	 * .getPort
+																	 * ()
+																	 */);
 		hdrs.add(hostHeader);
-		inputHeaders.append("Host: " + path.getDomain() + ":" + path.getPort()
+		inputHeaders.append("Host: " + path.getDomain()/*
+														 * + ":" +
+														 * path.getPort()
+														 */
 				+ "\n");
 
 		while (hnames.hasMoreElements()) {
@@ -193,6 +201,12 @@ public class ProxyFilter implements Filter {
 							log.warn("response headers:\n{}", responseHeaders);
 
 							ServletOutputStream os = response.getOutputStream();
+							if (response instanceof HttpServletResponse) {
+								HttpServletResponse httpResponse = (HttpServletResponse) response;
+								for (Header h : responseHeaders) {
+									httpResponse.addHeader(h.getName(), h.getValue());
+								}
+							}
 							IOUtils.copy(new ByteArrayInputStream(data), os);
 						} catch (Exception e) {
 
