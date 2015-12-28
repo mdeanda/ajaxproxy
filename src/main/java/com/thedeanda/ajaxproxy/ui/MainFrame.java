@@ -13,6 +13,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -102,20 +104,51 @@ public class MainFrame extends JFrame implements ProxyListener {
 		getContentPane().add(panel);
 		pack();
 
-		Runtime.getRuntime().addShutdownHook(new Thread() {
-			public void run() {
-				try {
-					panel.stop();
-					saveRecent();
-				} catch (Exception e) {
-					log.error(e.getMessage(), e);
-				}
-			}
-		});
+		addCloseListener();
 		panel.addProxyListener(this);
 
 		this.windowId = Windows.get().add(this);
 		new WindowMenuHelper(windowId, getJMenuBar());
+	}
+
+	private void addCloseListener() {
+		this.addWindowListener(new WindowListener() {
+
+			@Override
+			public void windowOpened(WindowEvent e) {
+			}
+
+			@Override
+			public void windowClosing(WindowEvent e) {
+				try {
+					panel.stop();
+					saveRecent();
+				} catch (Exception ex) {
+					log.error(ex.getMessage(), ex);
+				}
+			}
+
+			@Override
+			public void windowClosed(WindowEvent e) {
+			}
+
+			@Override
+			public void windowIconified(WindowEvent e) {
+			}
+
+			@Override
+			public void windowDeiconified(WindowEvent e) {
+			}
+
+			@Override
+			public void windowActivated(WindowEvent e) {
+			}
+
+			@Override
+			public void windowDeactivated(WindowEvent e) {
+			}
+
+		});
 	}
 
 	private void updateTitle() {
