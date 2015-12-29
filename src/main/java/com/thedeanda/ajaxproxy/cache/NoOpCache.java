@@ -1,14 +1,19 @@
 package com.thedeanda.ajaxproxy.cache;
 
+import com.thedeanda.ajaxproxy.cache.model.CachedResponse;
+
 public class NoOpCache implements ProxyCache {
 
 	@Override
 	public void clearCache() {
-		
 	}
 
 	@Override
-	public Object get(String urlPath) {
+	public void cache(CachedResponse response) {
+	}
+
+	@Override
+	public CachedResponse get(String urlPath) {
 		return null;
 	}
 

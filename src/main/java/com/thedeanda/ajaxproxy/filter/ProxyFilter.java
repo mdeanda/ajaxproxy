@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 
 import com.thedeanda.ajaxproxy.AjaxProxy;
 import com.thedeanda.ajaxproxy.cache.NoOpCache;
+import com.thedeanda.ajaxproxy.cache.model.CachedResponse;
 import com.thedeanda.ajaxproxy.http.HttpClient;
 import com.thedeanda.ajaxproxy.http.HttpClient.RequestMethod;
 import com.thedeanda.ajaxproxy.http.RequestListener;
@@ -72,11 +73,12 @@ public class ProxyFilter implements Filter {
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain chain) throws IOException, ServletException {
 
-		if (request instanceof HttpServletRequest) {
+		if (request instanceof HttpServletRequest
+				&& response instanceof HttpServletResponse) {
 			ProxyContainer proxy = getProxyMatcher((HttpServletRequest) request);
 			if (proxy != null) {
-				doFilterInternal((HttpServletRequest) request, response, chain,
-						proxy);
+				doFilterInternal((HttpServletRequest) request,
+						(HttpServletResponse) response, chain, proxy);
 			} else {
 				chain.doFilter(request, response);
 			}
@@ -103,7 +105,7 @@ public class ProxyFilter implements Filter {
 	}
 
 	private void doFilterInternal(final HttpServletRequest request,
-			final ServletResponse response, final FilterChain chain,
+			final HttpServletResponse response, final FilterChain chain,
 			ProxyContainer proxy) throws IOException, ServletException {
 		log.debug("using new proxy filter");
 
@@ -119,18 +121,9 @@ public class ProxyFilter implements Filter {
 		Enumeration<String> hnames = request.getHeaderNames();
 
 		ProxyPath path = proxy.getProxyPath();
-		Header hostHeader = new BasicHeader("Host", path.getDomain()/*
-																	 * + ":" +
-																	 * path
-																	 * .getPort
-																	 * ()
-																	 */);
+		Header hostHeader = new BasicHeader("Host", path.getDomain());
 		hdrs.add(hostHeader);
-		inputHeaders.append("Host: " + path.getDomain()/*
-														 * + ":" +
-														 * path.getPort()
-														 */
-				+ "\n");
+		inputHeaders.append("Host: " + path.getDomain() + "\n");
 
 		while (hnames.hasMoreElements()) {
 			String hn = hnames.nextElement();
@@ -159,22 +152,39 @@ public class ProxyFilter implements Filter {
 		IOUtils.copy(request.getInputStream(), baos);
 		byte[] inputData = baos.toByteArray();
 
-		Object cachedResponse = null;
+		CachedResponse cachedResponse = null;
 		if ("GET".equals(request.getMethod())) {
-			// proxy.getCache().get(urlPath);
+			String urlPath = null;
+			cachedResponse = proxy.getCache().get(urlPath);
 		} else {
 			proxy.getCache().clearCache();
 		}
 		if (cachedResponse == null) {
-			makeRequest(request, response, proxyUrl, inputHeaders, inputData);
+			cachedResponse = makeRequest(request, response, proxyUrl,
+					inputHeaders, inputData);
+			if (cachedResponse.getStatus() > 0) {
+				proxy.getCache().cache(cachedResponse);
+			}
 		} else {
 			// send cached response
+			sendCachedResponse(cachedResponse, response);
 		}
 	}
 
-	private void makeRequest(HttpServletRequest request,
-			final ServletResponse response, StringBuilder proxyUrl,
+	private void sendCachedResponse(CachedResponse cachedResponse,
+			final HttpServletResponse response) throws IOException {
+		log.info("Using cached response: {}", cachedResponse.getUrl());
+		ServletOutputStream os = response.getOutputStream();
+		for (Header h : cachedResponse.getHeaders()) {
+			response.addHeader(h.getName(), h.getValue());
+		}
+		IOUtils.copy(new ByteArrayInputStream(cachedResponse.getData()), os);
+	}
+
+	private CachedResponse makeRequest(HttpServletRequest request,
+			final HttpServletResponse response, StringBuilder proxyUrl,
 			StringBuilder inputHeaders, byte[] inputData) {
+		final CachedResponse cachedResponse = new CachedResponse();
 		client.makeRequest(RequestMethod.valueOf(request.getMethod()),
 				proxyUrl.toString(), inputHeaders.toString(), inputData,
 				new RequestListener() {
@@ -182,6 +192,7 @@ public class ProxyFilter implements Filter {
 					@Override
 					public void newRequest(UUID id, String url, String method) {
 						listener.newRequest(id, url, method);
+						cachedResponse.setUrl(url);
 					}
 
 					@Override
@@ -194,6 +205,9 @@ public class ProxyFilter implements Filter {
 					public void requestComplete(UUID id, int status,
 							String reason, long duration,
 							Header[] responseHeaders, byte[] data) {
+						cachedResponse.setData(data);
+						cachedResponse.setStatus(status);
+						cachedResponse.setHeaders(responseHeaders);
 
 						try {
 							// TODO: add response headers here to pass them
@@ -201,11 +215,8 @@ public class ProxyFilter implements Filter {
 							log.warn("response headers:\n{}", responseHeaders);
 
 							ServletOutputStream os = response.getOutputStream();
-							if (response instanceof HttpServletResponse) {
-								HttpServletResponse httpResponse = (HttpServletResponse) response;
-								for (Header h : responseHeaders) {
-									httpResponse.addHeader(h.getName(), h.getValue());
-								}
+							for (Header h : responseHeaders) {
+								response.addHeader(h.getName(), h.getValue());
 							}
 							IOUtils.copy(new ByteArrayInputStream(data), os);
 						} catch (Exception e) {
@@ -225,6 +236,8 @@ public class ProxyFilter implements Filter {
 					}
 
 				});
+
+		return cachedResponse;
 	}
 
 	@Override
