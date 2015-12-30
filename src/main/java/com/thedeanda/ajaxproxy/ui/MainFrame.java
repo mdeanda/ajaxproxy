@@ -91,16 +91,7 @@ public class MainFrame extends JFrame implements ProxyListener {
 			setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		}
 
-		JsonObject settings = loadSettings();
-		if (settings != null) {
-			try {
-				panel.setSettings(settings.getJsonObject("settings"));
-				ignoreSaveSettings = true;
-				this.loadRecent(settings);
-			} finally {
-				ignoreSaveSettings = false;
-			}
-		}
+		initSettings();
 		getContentPane().add(panel);
 		pack();
 
@@ -109,6 +100,19 @@ public class MainFrame extends JFrame implements ProxyListener {
 
 		this.windowId = Windows.get().add(this);
 		new WindowMenuHelper(windowId, getJMenuBar());
+	}
+
+	private void initSettings() {
+		ignoreSaveSettings = true;
+		try {
+			JsonObject settings = loadSettings();
+			if (settings != null) {
+				panel.setSettings(settings.getJsonObject("settings"));
+				this.loadRecentFilesMenu(settings);
+			}
+		} finally {
+			ignoreSaveSettings = false;
+		}
 	}
 
 	private void addCloseListener() {
@@ -466,6 +470,7 @@ public class MainFrame extends JFrame implements ProxyListener {
 
 	private void handleExit() {
 		panel.stop();
+		saveRecent();
 		dispose();
 	}
 
@@ -509,7 +514,7 @@ public class MainFrame extends JFrame implements ProxyListener {
 		return ret;
 	}
 
-	private void loadRecent(JsonObject settings) {
+	private void loadRecentFilesMenu(JsonObject settings) {
 		recentMenu.removeAll();
 		recentFiles.clear();
 		if (settings != null) {
@@ -524,24 +529,32 @@ public class MainFrame extends JFrame implements ProxyListener {
 		}
 
 		for (final File rf : recentFiles) {
+			if (!rf.exists())
+				continue;
+			String path = null;
+
 			try {
-				JMenuItem mi = new JMenuItem(rf.getCanonicalPath());
-				recentMenu.add(mi);
-				mi.addActionListener(new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						loadFile(rf);
-					}
-				});
+				path = rf.getCanonicalPath();
 			} catch (IOException e) {
 				log.error(e.getMessage(), e);
+				continue;
 			}
+
+			JMenuItem mi = new JMenuItem(path);
+			recentMenu.add(mi);
+			mi.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					loadFile(rf);
+				}
+			});
 		}
 	}
 
 	private void saveRecent() {
 		if (ignoreSaveSettings)
 			return;
+		log.info("saving recents");
 
 		File f = getRecentFile();
 		JsonObject json = new JsonObject();

@@ -10,6 +10,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
+import com.thedeanda.ajaxproxy.model.config.ProxyConfig;
 import com.thedeanda.ajaxproxy.ui.SettingsChangedListener;
 
 public class ProxyPanel extends JPanel implements EditorListener {
@@ -58,28 +59,17 @@ public class ProxyPanel extends JPanel implements EditorListener {
 
 	private void startEdit() {
 		int row = proxyTable.getSelectedRow();
-		String host = (String) proxyModel.getValueAt(row, 0);
-		Integer tmpPort = (Integer) proxyModel.getValueAt(row, 1);
-		int port = 0;
-		if (tmpPort != null) {
-			port = tmpPort.intValue();
-		}
-		String path = (String) proxyModel.getValueAt(row, 2);
-		Boolean newProxy = (Boolean) proxyModel.getValueAt(row, 3);
-		if (newProxy == null) {
-			newProxy = false;
-		}
-		editor.startEdit(host, port, path, newProxy);
+		ProxyConfig config = proxyModel.getProxyConfig(row);
+		editor.startEdit(config);
 	}
 
 	@Override
-	public void commitChanges(String host, int port, String path,
-			boolean newProxy) {
+	public void commitChanges(ProxyConfig config) {
 		int row = proxyTable.getSelectedRow();
 		if (row < 0) {
 			row = proxyModel.getRowCount() - 1;
 		}
-		proxyModel.setValue(row, host, port, path, newProxy);
+		proxyModel.setValue(row, config);
 		proxyTable.changeSelection(row, 0, false, true);
 
 	}
@@ -95,7 +85,7 @@ public class ProxyPanel extends JPanel implements EditorListener {
 				this);
 		layout.putConstraint(SpringLayout.WEST, scroll, 10, SpringLayout.WEST,
 				this);
-		layout.putConstraint(SpringLayout.SOUTH, scroll, -10,
+		layout.putConstraint(SpringLayout.SOUTH, scroll, -5,
 				SpringLayout.NORTH, editor);
 
 	}

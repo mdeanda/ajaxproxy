@@ -1,6 +1,7 @@
 package com.thedeanda.ajaxproxy.ui.proxy;
 
+import com.thedeanda.ajaxproxy.model.config.ProxyConfig;
+
 public interface EditorListener {
-	public void commitChanges(String host, int port, String path,
-			boolean newProxy);
+	public void commitChanges(ProxyConfig config);
 }

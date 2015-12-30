@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -15,6 +16,7 @@ import javax.swing.SpringLayout;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.thedeanda.ajaxproxy.model.config.ProxyConfig;
 import com.thedeanda.ajaxproxy.ui.SwingUtils;
 
 public class ProxyEditorPanel extends JPanel {
@@ -30,13 +32,14 @@ public class ProxyEditorPanel extends JPanel {
 	private JComboBox<?> newProxyField;
 	private JButton btn;
 	private EditorListener listener;
+	private JCheckBox cacheCheckbox;
 
 	public ProxyEditorPanel(EditorListener listener) {
 		this.listener = listener;
 		layout = new SpringLayout();
 		setLayout(layout);
 
-		domainLabel = new JLabel("Domain");
+		domainLabel = new JLabel("Host");
 		hostField = SwingUtils.newJTextField();
 		add(domainLabel);
 		add(hostField);
@@ -68,8 +71,13 @@ public class ProxyEditorPanel extends JPanel {
 		});
 		add(btn);
 
+		cacheCheckbox = new JCheckBox("Cache Requests");
+		cacheCheckbox
+				.setToolTipText("Any non-GET request clears the cache for this proxy mapping");
+		add(cacheCheckbox);
+
 		initLayout();
-		setPreferredSize(new Dimension(1000, 50));
+		setPreferredSize(new Dimension(1000, 150));
 	}
 
 	private void initLayout() {
@@ -86,7 +94,7 @@ public class ProxyEditorPanel extends JPanel {
 				layout.putConstraint(SpringLayout.NORTH, lbl, 0,
 						SpringLayout.NORTH, this);
 
-				layout.putConstraint(SpringLayout.NORTH, fld, 10,
+				layout.putConstraint(SpringLayout.NORTH, fld, 2,
 						SpringLayout.SOUTH, lbl);
 
 				layout.putConstraint(SpringLayout.WEST, fld, 10,
@@ -95,14 +103,14 @@ public class ProxyEditorPanel extends JPanel {
 				layout.putConstraint(SpringLayout.WEST, lbl, 10,
 						SpringLayout.WEST, this);
 			} else {
-				layout.putConstraint(SpringLayout.NORTH, fld, 0,
-						SpringLayout.NORTH, fields[0]);
+				layout.putConstraint(SpringLayout.BASELINE, fld, 0,
+						SpringLayout.BASELINE, fields[0]);
 
 				layout.putConstraint(SpringLayout.WEST, fld, 10,
 						SpringLayout.EAST, fields[i - 1]);
 				if (lbl != null) {
-					layout.putConstraint(SpringLayout.NORTH, lbl, 0,
-							SpringLayout.NORTH, labels[0]);
+					layout.putConstraint(SpringLayout.VERTICAL_CENTER, lbl, 0,
+							SpringLayout.VERTICAL_CENTER, labels[0]);
 					layout.putConstraint(SpringLayout.WEST, lbl, 0,
 							SpringLayout.WEST, fld);
 				}
@@ -114,22 +122,32 @@ public class ProxyEditorPanel extends JPanel {
 		layout.putConstraint(SpringLayout.NORTH, btn, 0, SpringLayout.NORTH,
 				hostField);
 
+		layout.putConstraint(SpringLayout.NORTH, cacheCheckbox, 5,
+				SpringLayout.SOUTH, fields[0]);
+		layout.putConstraint(SpringLayout.WEST, cacheCheckbox, 0,
+				SpringLayout.WEST, labels[0]);
+
 	}
 
-	public void startEdit(String host, int port, String path, boolean newProxy) {
+	public void startEdit(ProxyConfig config) {
+		if (config == null) {
+			config = new ProxyConfig();
+		}
 		String sport = "";
-		if (port > 0)
-			sport = String.valueOf(port);
+		if (config.getPort() > 0)
+			sport = String.valueOf(config.getPort());
 
-		this.hostField.setText(host);
+		this.hostField.setText(config.getHost());
 		this.portField.setText(sport);
-		this.pathField.setText(path);
+		this.pathField.setText(config.getPath());
 
-		if (newProxy) {
+		if (config.isNewProxy()) {
 			this.newProxyField.setSelectedIndex(1);
 		} else {
 			this.newProxyField.setSelectedIndex(0);
 		}
+
+		this.cacheCheckbox.setSelected(config.isEnableCache());
 	}
 
 	private void commitEdit() {
@@ -145,6 +163,13 @@ public class ProxyEditorPanel extends JPanel {
 		}
 		String path = pathField.getText();
 		boolean newProxy = newProxyField.getSelectedIndex() == 1;
-		listener.commitChanges(host, port, path, newProxy);
+
+		ProxyConfig config = new ProxyConfig();
+		config.setHost(host);
+		config.setPort(port);
+		config.setPath(path);
+		config.setNewProxy(newProxy);
+		config.setEnableCache(cacheCheckbox.isSelected());
+		listener.commitChanges(config);
 	}
 }
