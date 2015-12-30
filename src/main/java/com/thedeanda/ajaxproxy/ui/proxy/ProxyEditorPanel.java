@@ -28,11 +28,10 @@ public class ProxyEditorPanel extends JPanel {
 	private JTextField portField;
 	private JLabel pathLabel;
 	private JTextField pathField;
-	private JLabel newProxyLabel;
-	private JComboBox<?> newProxyField;
 	private JButton btn;
 	private EditorListener listener;
 	private JCheckBox cacheCheckbox;
+	private JCheckBox newProxyCheckbox;
 
 	public ProxyEditorPanel(EditorListener listener) {
 		this.listener = listener;
@@ -54,15 +53,8 @@ public class ProxyEditorPanel extends JPanel {
 		add(pathLabel);
 		add(pathField);
 
-		newProxyLabel = new JLabel("New Proxy");
-		newProxyField = SwingUtils.newJComboBox(new Boolean[] { Boolean.FALSE,
-				Boolean.TRUE });
-
-		add(newProxyLabel);
-		add(newProxyField);
-
 		btn = new JButton("Ok");
-		btn.setMargin(new Insets(0, 0, 0, 0));
+		btn.setMargin(new Insets(2, 14, 2, 14));
 		btn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -71,21 +63,25 @@ public class ProxyEditorPanel extends JPanel {
 		});
 		add(btn);
 
+		newProxyCheckbox = new JCheckBox("Use New Proxy");
+		newProxyCheckbox
+				.setToolTipText("New proxy implementation does not rely on the old Jetty transparent proxy servlet");
+		add(newProxyCheckbox);
+
 		cacheCheckbox = new JCheckBox("Cache Requests");
 		cacheCheckbox
 				.setToolTipText("Any non-GET request clears the cache for this proxy mapping");
 		add(cacheCheckbox);
 
 		initLayout();
-		setPreferredSize(new Dimension(1000, 150));
+		setPreferredSize(new Dimension(700, 80));
+		setMinimumSize(new Dimension(500, 80));
 	}
 
 	private void initLayout() {
-		JLabel[] labels = new JLabel[] { domainLabel, portLabel, pathLabel,
-				newProxyLabel, null };
-		Component[] fields = new Component[] { hostField, portField, pathField,
-				newProxyField, btn };
-		int[] cols = new int[] { 250, 70, 250, 150, 60 };
+		JLabel[] labels = new JLabel[] { domainLabel, portLabel, pathLabel };
+		Component[] fields = new Component[] { hostField, portField, pathField };
+		int[] cols = new int[] { 275, 70, 250 };
 
 		for (int i = cols.length - 1; i >= 0; i--) {
 			JLabel lbl = labels[i];
@@ -97,10 +93,10 @@ public class ProxyEditorPanel extends JPanel {
 				layout.putConstraint(SpringLayout.NORTH, fld, 2,
 						SpringLayout.SOUTH, lbl);
 
-				layout.putConstraint(SpringLayout.WEST, fld, 10,
+				layout.putConstraint(SpringLayout.WEST, fld, 0,
 						SpringLayout.WEST, this);
 
-				layout.putConstraint(SpringLayout.WEST, lbl, 10,
+				layout.putConstraint(SpringLayout.WEST, lbl, 0,
 						SpringLayout.WEST, this);
 			} else {
 				layout.putConstraint(SpringLayout.BASELINE, fld, 0,
@@ -115,17 +111,28 @@ public class ProxyEditorPanel extends JPanel {
 							SpringLayout.WEST, fld);
 				}
 			}
-			layout.putConstraint(SpringLayout.EAST, fld, cols[i],
-					SpringLayout.WEST, fld);
+			if (i == cols.length - 1) {
+				layout.putConstraint(SpringLayout.EAST, fld, -10,
+						SpringLayout.WEST, btn);
+			} else {
+				layout.putConstraint(SpringLayout.EAST, fld, cols[i],
+						SpringLayout.WEST, fld);
+			}
 
 		}
-		layout.putConstraint(SpringLayout.NORTH, btn, 0, SpringLayout.NORTH,
-				hostField);
+		layout.putConstraint(SpringLayout.BASELINE, btn, 0,
+				SpringLayout.BASELINE, hostField);
+		layout.putConstraint(SpringLayout.EAST, btn, 0, SpringLayout.EAST, this);
 
-		layout.putConstraint(SpringLayout.NORTH, cacheCheckbox, 5,
+		layout.putConstraint(SpringLayout.NORTH, newProxyCheckbox, 5,
 				SpringLayout.SOUTH, fields[0]);
-		layout.putConstraint(SpringLayout.WEST, cacheCheckbox, 0,
+		layout.putConstraint(SpringLayout.WEST, newProxyCheckbox, 0,
 				SpringLayout.WEST, labels[0]);
+
+		layout.putConstraint(SpringLayout.NORTH, cacheCheckbox, 0,
+				SpringLayout.NORTH, newProxyCheckbox);
+		layout.putConstraint(SpringLayout.WEST, cacheCheckbox, 15,
+				SpringLayout.EAST, newProxyCheckbox);
 
 	}
 
@@ -141,13 +148,8 @@ public class ProxyEditorPanel extends JPanel {
 		this.portField.setText(sport);
 		this.pathField.setText(config.getPath());
 
-		if (config.isNewProxy()) {
-			this.newProxyField.setSelectedIndex(1);
-		} else {
-			this.newProxyField.setSelectedIndex(0);
-		}
-
 		this.cacheCheckbox.setSelected(config.isEnableCache());
+		newProxyCheckbox.setSelected(config.isNewProxy());
 	}
 
 	private void commitEdit() {
@@ -162,13 +164,12 @@ public class ProxyEditorPanel extends JPanel {
 			port = 0;
 		}
 		String path = pathField.getText();
-		boolean newProxy = newProxyField.getSelectedIndex() == 1;
 
 		ProxyConfig config = new ProxyConfig();
 		config.setHost(host);
 		config.setPort(port);
 		config.setPath(path);
-		config.setNewProxy(newProxy);
+		config.setNewProxy(newProxyCheckbox.isSelected());
 		config.setEnableCache(cacheCheckbox.isSelected());
 		listener.commitChanges(config);
 	}

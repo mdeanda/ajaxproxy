@@ -343,7 +343,7 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener,
 
 	@Override
 	public void settingsChanged() {
-		log.debug("settings changed, possible track to warn of unsaved changes during close");
+		log.debug("settings changed, possibly track to warn of unsaved changes during close");
 	}
 
 	public void addVariables(Map<String, String> vars) {

@@ -24,6 +24,8 @@ import com.thedeanda.ajaxproxy.filter.APFilter;
 import com.thedeanda.ajaxproxy.filter.ProxyFilter;
 import com.thedeanda.ajaxproxy.http.RequestListener;
 import com.thedeanda.ajaxproxy.model.ProxyPath;
+import com.thedeanda.ajaxproxy.model.config.AjaxProxyConfig;
+import com.thedeanda.ajaxproxy.model.config.Convertor;
 import com.thedeanda.javajson.JsonArray;
 import com.thedeanda.javajson.JsonObject;
 import com.thedeanda.javajson.JsonValue;
@@ -44,6 +46,8 @@ public class AjaxProxy implements Runnable {
 	private ArrayList<RequestListener> proxyListeners;
 	private RequestListener listener;
 
+	private AjaxProxyConfig ajaxProxyConfig;
+
 	private enum ProxyEvent {
 		START, STOP, FAIL
 	};
@@ -63,6 +67,7 @@ public class AjaxProxy implements Runnable {
 	public AjaxProxy(JsonObject config, File workingDir) throws Exception {
 		this.config = config;
 		this.workingDir = workingDir;
+		ajaxProxyConfig = Convertor.get().readAjaxProxyConfig(config);
 		init();
 	}
 
@@ -79,6 +84,7 @@ public class AjaxProxy implements Runnable {
 		fis.close();
 		this.config = config;
 		this.workingDir = configDir;
+		ajaxProxyConfig = Convertor.get().readAjaxProxyConfig(config);
 		init();
 	}
 

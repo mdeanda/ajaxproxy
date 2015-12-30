@@ -77,6 +77,10 @@ public class ProxyPanel extends JPanel implements EditorListener {
 	private void initLayout() {
 		layout.putConstraint(SpringLayout.SOUTH, editor, -10,
 				SpringLayout.SOUTH, this);
+		layout.putConstraint(SpringLayout.EAST, editor, -10, SpringLayout.EAST,
+				this);
+		layout.putConstraint(SpringLayout.WEST, editor, 10, SpringLayout.WEST,
+				this);
 
 		// table
 		layout.putConstraint(SpringLayout.NORTH, scroll, 10,
@@ -85,7 +89,7 @@ public class ProxyPanel extends JPanel implements EditorListener {
 				this);
 		layout.putConstraint(SpringLayout.WEST, scroll, 10, SpringLayout.WEST,
 				this);
-		layout.putConstraint(SpringLayout.SOUTH, scroll, -5,
+		layout.putConstraint(SpringLayout.SOUTH, scroll, -10,
 				SpringLayout.NORTH, editor);
 
 	}

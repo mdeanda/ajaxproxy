@@ -1,9 +1,18 @@
 package com.thedeanda.ajaxproxy.model.config;
 
+import java.util.List;
+
 import com.thedeanda.javajson.JsonObject;
+import com.thedeanda.javajson.JsonValue;
 
 public class Convertor {
 	private static Convertor instance;
+
+	public static final String AP_RESOURCE_BASE = "resourceBase";
+	public static final String AP_PORT = "port";
+	public static final String AP_SHOW_INDEX = "showIndex";
+	public static final String AP_PROXY = "proxy";
+
 	@Deprecated
 	public static final String PROXY_HOST_LEGACY = "domain"; // going away soon
 	public static final String PROXY_HOST = "host";
@@ -21,6 +30,22 @@ public class Convertor {
 			instance = new Convertor();
 		}
 		return instance;
+	}
+
+	public AjaxProxyConfig readAjaxProxyConfig(JsonObject json) {
+		AjaxProxyConfig config = new AjaxProxyConfig();
+
+		config.setResourceBase(json.getString(AP_RESOURCE_BASE));
+		config.setPort(json.getInt(AP_PORT));
+		config.setShowIndex(json.getBoolean(AP_SHOW_INDEX));
+
+		List<ProxyConfig> proxies = config.getProxyConfig();
+		for (JsonValue val : json.getJsonArray(AP_PROXY)) {
+			ProxyConfig pc = readProxyConfig(val.getJsonObject());
+			proxies.add(pc);
+		}
+
+		return config;
 	}
 
 	public ProxyConfig readProxyConfig(JsonObject json) {
