@@ -4,9 +4,12 @@ import org.apache.http.Header;
 
 public class CachedResponse {
 	private int id;
+	private String requestPath;
+
 	private String url;
 
 	private int status;
+	private String reason;
 	private byte[] data;
 	private Header[] headers;
 
@@ -50,4 +53,19 @@ public class CachedResponse {
 		this.headers = headers;
 	}
 
+	public String getRequestPath() {
+		return requestPath;
+	}
+
+	public void setRequestPath(String requestPath) {
+		this.requestPath = requestPath;
+	}
+
+	public String getReason() {
+		return reason;
+	}
+
+	public void setReason(String reason) {
+		this.reason = reason;
+	}
 }

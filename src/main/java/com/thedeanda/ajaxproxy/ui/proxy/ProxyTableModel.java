@@ -51,9 +51,9 @@ public class ProxyTableModel extends AbstractTableModel {
 	public JsonArray getConfig() {
 		normalizeData();
 		JsonArray arr = new JsonArray();
-		Convertor convertor = Convertor.get();
+		Convertor converter = Convertor.get();
 		for (ProxyConfig config : data) {
-			arr.add(convertor.toJson(config));
+			arr.add(converter.toJson(config));
 		}
 		return arr;
 	}
@@ -142,9 +142,9 @@ public class ProxyTableModel extends AbstractTableModel {
 			data = new JsonArray();
 
 		this.data.clear();
-		Convertor convertor = Convertor.get();
+		Convertor converter = Convertor.get();
 		for (JsonValue v : data) {
-			ProxyConfig config = convertor.readProxyConfig(v.getJsonObject());
+			ProxyConfig config = converter.readProxyConfig(v.getJsonObject());
 			this.data.add(config);
 		}
 		this.fireTableDataChanged();

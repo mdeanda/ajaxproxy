@@ -1,6 +1,8 @@
 package com.thedeanda.ajaxproxy.model.config;
 
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 import com.thedeanda.javajson.JsonObject;
 import com.thedeanda.javajson.JsonValue;
@@ -12,6 +14,7 @@ public class Convertor {
 	public static final String AP_PORT = "port";
 	public static final String AP_SHOW_INDEX = "showIndex";
 	public static final String AP_PROXY = "proxy";
+	public static final String AP_VARIABLES = "variables";
 
 	@Deprecated
 	public static final String PROXY_HOST_LEGACY = "domain"; // going away soon
@@ -32,6 +35,31 @@ public class Convertor {
 		return instance;
 	}
 
+	public void processVariables(AjaxProxyConfig config) {
+		Map<String, String> vars = config.getVariables();
+		List<ProxyConfig> configs = config.getProxyConfig();
+		for (ProxyConfig proxyConfig : configs) {
+			processVariables(proxyConfig, vars);
+		}
+	}
+
+	public void processVariables(ProxyConfig config, Map<String, String> vars) {
+		for (String key : vars.keySet()) {
+			String var = "${" + key + "}";
+			String val = vars.get(key);
+
+			String configVal;
+			configVal = config.getHost();
+			configVal = configVal.replaceAll(Pattern.quote(var), val);
+			config.setHost(configVal);
+
+			configVal = config.getPath();
+			configVal = configVal.replaceAll(Pattern.quote(var), val);
+			config.setPath(configVal);
+		}
+
+	}
+
 	public AjaxProxyConfig readAjaxProxyConfig(JsonObject json) {
 		AjaxProxyConfig config = new AjaxProxyConfig();
 
@@ -45,6 +73,12 @@ public class Convertor {
 			proxies.add(pc);
 		}
 
+		if (json.isJsonObject(AP_VARIABLES)) {
+			JsonObject vars = json.getJsonObject(AP_VARIABLES);
+			for (String key : vars) {
+				config.getVariables().put(key, vars.getString(key));
+			}
+		}
 		return config;
 	}
 

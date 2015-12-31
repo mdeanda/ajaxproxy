@@ -47,6 +47,7 @@ public class AjaxProxy implements Runnable {
 	private RequestListener listener;
 
 	private AjaxProxyConfig ajaxProxyConfig;
+	private Convertor converter;
 
 	private enum ProxyEvent {
 		START, STOP, FAIL
@@ -65,14 +66,15 @@ public class AjaxProxy implements Runnable {
 	private static final String MINIFY = "minify";
 
 	public AjaxProxy(JsonObject config, File workingDir) throws Exception {
+		converter = Convertor.get();
 		this.config = config;
 		this.workingDir = workingDir;
-		ajaxProxyConfig = Convertor.get().readAjaxProxyConfig(config);
 		init();
 	}
 
 	public AjaxProxy(String configFile) throws Exception {
 		log.info("using config file: " + configFile);
+		converter = Convertor.get();
 		File cf = new File(configFile);
 		if (!cf.exists())
 			throw new FileNotFoundException("config file not found");
@@ -84,11 +86,12 @@ public class AjaxProxy implements Runnable {
 		fis.close();
 		this.config = config;
 		this.workingDir = configDir;
-		ajaxProxyConfig = Convertor.get().readAjaxProxyConfig(config);
 		init();
 	}
 
 	private void init() {
+		ajaxProxyConfig = converter.readAjaxProxyConfig(config);
+
 		this.proxyListeners = new ArrayList<RequestListener>();
 		proxyFilter = new ProxyFilter(this);
 		getRequestListener();
@@ -165,6 +168,7 @@ public class AjaxProxy implements Runnable {
 
 	private void init(JsonObject config, File workingDir) throws Exception {
 		this.config = config;
+		converter.processVariables(ajaxProxyConfig);
 		doVars();
 
 		if (config.isInt(PORT)) {
@@ -220,6 +224,10 @@ public class AjaxProxy implements Runnable {
 			}
 		}
 		return ret;
+	}
+	
+	public AjaxProxyConfig getAjaxProxyConfig() {
+		return ajaxProxyConfig;
 	}
 
 	public void run() {
