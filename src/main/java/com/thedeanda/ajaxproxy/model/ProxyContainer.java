@@ -4,10 +4,19 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.thedeanda.ajaxproxy.cache.ProxyCache;
+import com.thedeanda.ajaxproxy.model.config.ProxyConfig;
 
 public class ProxyContainer {
-	private ProxyPath proxyPath;
 	private ProxyCache cache;
+	private ProxyConfig proxyConfig;
+
+	public ProxyConfig getProxyConfig() {
+		return proxyConfig;
+	}
+
+	public void setProxyConfig(ProxyConfig proxyConfig) {
+		this.proxyConfig = proxyConfig;
+	}
 
 	public ProxyCache getCache() {
 		return cache;
@@ -15,14 +24,6 @@ public class ProxyContainer {
 
 	public void setCache(ProxyCache cache) {
 		this.cache = cache;
-	}
-
-	public ProxyPath getProxyPath() {
-		return proxyPath;
-	}
-
-	public void setProxyPath(ProxyPath proxyPath) {
-		this.proxyPath = proxyPath;
 	}
 
 	public Pattern getPattern() {

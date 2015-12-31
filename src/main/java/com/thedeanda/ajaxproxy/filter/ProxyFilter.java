@@ -5,9 +5,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -23,12 +25,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.thedeanda.ajaxproxy.AjaxProxy;
+import com.thedeanda.ajaxproxy.cache.MemProxyCache;
 import com.thedeanda.ajaxproxy.cache.NoOpCache;
 import com.thedeanda.ajaxproxy.cache.model.CachedResponse;
 import com.thedeanda.ajaxproxy.http.HttpClient;
@@ -36,6 +40,8 @@ import com.thedeanda.ajaxproxy.http.HttpClient.RequestMethod;
 import com.thedeanda.ajaxproxy.http.RequestListener;
 import com.thedeanda.ajaxproxy.model.ProxyContainer;
 import com.thedeanda.ajaxproxy.model.ProxyPath;
+import com.thedeanda.ajaxproxy.model.config.AjaxProxyConfig;
+import com.thedeanda.ajaxproxy.model.config.ProxyConfig;
 
 /**
  * new method of proxying requests that does not use jetty's transparent proxy
@@ -113,17 +119,16 @@ public class ProxyFilter implements Filter {
 		log.debug(uri);
 		String queryString = request.getQueryString();
 
-		ProxyPath proxyPath = proxy.getProxyPath();
+		ProxyConfig proxyConfig = proxy.getProxyConfig();
 
 		StringBuilder inputHeaders = new StringBuilder();
 		List<Header> hdrs = new LinkedList<Header>();
 		@SuppressWarnings("unchecked")
 		Enumeration<String> hnames = request.getHeaderNames();
 
-		ProxyPath path = proxy.getProxyPath();
-		Header hostHeader = new BasicHeader("Host", path.getDomain());
+		Header hostHeader = new BasicHeader("Host", proxyConfig.getHost());
 		hdrs.add(hostHeader);
-		inputHeaders.append("Host: " + path.getDomain() + "\n");
+		inputHeaders.append("Host: " + proxyConfig.getHost() + "\n");
 
 		while (hnames.hasMoreElements()) {
 			String hn = hnames.nextElement();
@@ -138,9 +143,9 @@ public class ProxyFilter implements Filter {
 		log.info("headers: {}", inputHeaders);
 
 		StringBuilder proxyUrl = new StringBuilder();
-		proxyUrl.append("http://" + proxyPath.getDomain());
-		if (proxyPath.getPort() != 80) {
-			proxyUrl.append(":" + proxyPath.getPort());
+		proxyUrl.append("http://" + proxyConfig.getHost());
+		if (proxyConfig.getPort() != 80) {
+			proxyUrl.append(":" + proxyConfig.getPort());
 		}
 		proxyUrl.append(uri);
 		if (queryString != null) {
@@ -153,32 +158,66 @@ public class ProxyFilter implements Filter {
 		byte[] inputData = baos.toByteArray();
 
 		CachedResponse cachedResponse = null;
+		// TODO: remove the host/port portion
+		String requestPath = request.getRequestURL().toString();
 		if ("GET".equals(request.getMethod())) {
-			String urlPath = null;
-			cachedResponse = proxy.getCache().get(urlPath);
+			cachedResponse = proxy.getCache().get(requestPath);
 		} else {
 			proxy.getCache().clearCache();
 		}
 		if (cachedResponse == null) {
 			cachedResponse = makeRequest(request, response, proxyUrl,
 					inputHeaders, inputData);
-			if (cachedResponse.getStatus() > 0) {
+			cachedResponse.setRequestPath(requestPath);
+			if (cachedResponse.getStatus() > 0
+					&& "GET".equals(request.getMethod())) {
 				proxy.getCache().cache(cachedResponse);
 			}
 		} else {
 			// send cached response
-			sendCachedResponse(cachedResponse, response);
+			sendCachedResponse(request, inputHeaders.toString(),
+					cachedResponse, response);
 		}
 	}
 
-	private void sendCachedResponse(CachedResponse cachedResponse,
-			final HttpServletResponse response) throws IOException {
+	private void sendCachedResponse(HttpServletRequest request, String headers,
+			CachedResponse cachedResponse, final HttpServletResponse response)
+			throws IOException {
 		log.info("Using cached response: {}", cachedResponse.getUrl());
 		ServletOutputStream os = response.getOutputStream();
 		for (Header h : cachedResponse.getHeaders()) {
 			response.addHeader(h.getName(), h.getValue());
 		}
 		IOUtils.copy(new ByteArrayInputStream(cachedResponse.getData()), os);
+
+		// now just notify listener so ui can function properly
+
+		Map<String, String> hds = new HashMap<>();
+		if (!StringUtils.isBlank(headers)) {
+			String[] lines = StringUtils.split(headers, "\n");
+			for (String line : lines) {
+				String[] parts = StringUtils.split(line, ":", 2);
+				hds.put(parts[0], parts[1]);
+			}
+		}
+		Header[] requestHeaders = null;
+		if (hds.size() > 0) {
+			requestHeaders = new Header[hds.size()];
+			int i = 0;
+			for (String key : hds.keySet()) {
+				Header h = new BasicHeader(key, hds.get(key));
+				requestHeaders[i++] = h;
+			}
+		}
+
+		UUID id = UUID.randomUUID();
+		String url = cachedResponse.getUrl();
+		Header[] responseHeaders = cachedResponse.getHeaders();
+		listener.newRequest(id, url, "GET");
+		listener.startRequest(id, new URL(url), requestHeaders, new byte[] {});
+		listener.requestComplete(id, cachedResponse.getStatus(),
+				cachedResponse.getReason(), 0, responseHeaders,
+				cachedResponse.getData());
 	}
 
 	private CachedResponse makeRequest(HttpServletRequest request,
@@ -207,6 +246,9 @@ public class ProxyFilter implements Filter {
 							Header[] responseHeaders, byte[] data) {
 						cachedResponse.setData(data);
 						cachedResponse.setStatus(status);
+						cachedResponse.setReason(reason);
+						// TODO: add cached header so its easy to tell it was
+						// cached
 						cachedResponse.setHeaders(responseHeaders);
 
 						try {
@@ -258,20 +300,25 @@ public class ProxyFilter implements Filter {
 	}
 
 	public void reset() {
+		AjaxProxyConfig config = ajaxProxy.getAjaxProxyConfig();
 		List<ProxyPath> paths = ajaxProxy.getProxyPaths();
 		proxyContainers = new HashSet<ProxyContainer>();
-		for (ProxyPath path : paths) {
-			if (path.isNewProxy()) {
+		for (ProxyConfig proxyConfig : config.getProxyConfig()) {
+			if (proxyConfig.isNewProxy()) {
 				try {
-					Pattern pattern = Pattern.compile(path.getPath());
+					Pattern pattern = Pattern.compile(proxyConfig.getPath());
 					ProxyContainer proxyContainer = new ProxyContainer();
 					proxyContainer.setPattern(pattern);
-					proxyContainer.setProxyPath(path);
+					proxyContainer.setProxyConfig(proxyConfig);
 					proxyContainers.add(proxyContainer);
-					// TODO: add option to use a real cache
-					proxyContainer.setCache(new NoOpCache());
+
+					if (proxyConfig.isEnableCache()) {
+						proxyContainer.setCache(new MemProxyCache());
+					} else {
+						proxyContainer.setCache(new NoOpCache());
+					}
 				} catch (Exception e) {
-					log.debug("skipping: {}", path, e);
+					log.debug("skipping: {}", proxyConfig, e);
 				}
 			}
 		}
