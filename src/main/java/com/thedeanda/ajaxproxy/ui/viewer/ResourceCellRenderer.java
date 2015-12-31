@@ -118,7 +118,8 @@ public class ResourceCellRenderer extends JPanel implements
 			method.setText(resource.getMethod());
 
 			String durText = "";
-			if (resource.getDuration() > 0) {
+			if (resource.getDuration() > 0 || resource.getStatus() > 0) {
+				// cached requests have duration of 0
 				durText = String.valueOf(resource.getDuration());
 			}
 			dur.setText(durText);

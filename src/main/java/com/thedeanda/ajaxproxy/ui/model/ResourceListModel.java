@@ -122,7 +122,7 @@ public class ResourceListModel implements ListModel<Resource> {
 			return items.get(index);
 	}
 
-	private void notifyUpdated(UUID id) {
+	private void notifyUpdated(final UUID id) {
 		int index = -1;
 		for (int i = 0; i < items.size(); i++) {
 			Resource r = items.get(i);
@@ -133,21 +133,22 @@ public class ResourceListModel implements ListModel<Resource> {
 		}
 
 		if (index >= 0) {
+			final int theIndex = index;
 			for (ListDataListener listener : listeners) {
 				listener.contentsChanged(new ListDataEvent(this,
-						ListDataEvent.CONTENTS_CHANGED, index, index));
+						ListDataEvent.CONTENTS_CHANGED, theIndex, theIndex));
 			}
 		}
 	}
 
 	public Resource get(UUID id) {
-		if (id==null) {
+		if (id == null) {
 			throw new NullPointerException("uuid is null?");
 		}
 		// TODO: use a map
 		synchronized (unfilteredItems) {
-			for (Resource r : unfilteredItems) {				
-				if (r.getLoadedResource()!=null) {
+			for (Resource r : unfilteredItems) {
+				if (r.getLoadedResource() != null) {
 					continue;
 				}
 				if (id.toString().equals(r.getId().toString())) {
