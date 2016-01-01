@@ -8,11 +8,12 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -73,9 +74,20 @@ public class ProxyEditorPanel extends JPanel {
 				.setToolTipText("Any non-GET request clears the cache for this proxy mapping");
 		add(cacheCheckbox);
 
+		initNewProxyListener();
 		initLayout();
 		setPreferredSize(new Dimension(700, 80));
 		setMinimumSize(new Dimension(500, 80));
+	}
+
+	private void initNewProxyListener() {
+		cacheCheckbox.setEnabled(newProxyCheckbox.isSelected());
+		newProxyCheckbox.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				cacheCheckbox.setEnabled(newProxyCheckbox.isSelected());
+			}
+		});
 	}
 
 	private void initLayout() {
