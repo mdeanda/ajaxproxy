@@ -359,18 +359,18 @@ public class RestClientPanel extends JPanel implements ActionListener {
 			@Override
 			public void run() {
 
-				RequestListener[] items = null;
+				RequestListener[] listeners = null;
 				if (listener != null) {
-					items = new RequestListener[2];
-					items[1] = listener;
+					listeners = new RequestListener[2];
+					listeners[1] = listener;
 				} else {
-					items = new RequestListener[1];
+					listeners = new RequestListener[1];
 				}
-				items[0] = outputPanel;
+				listeners[0] = outputPanel;
 
 				try {
 					log.info("making request");
-					httpClient.makeRequest(method, url, headers, input, items);
+					httpClient.makeRequest(method, url, headers, input, listeners);
 				} catch (Exception e) {
 					log.warn(e.getMessage(), e);
 				}

@@ -1,5 +1,9 @@
 package com.thedeanda.ajaxproxy.http;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.KeyManagementException;
@@ -10,6 +14,7 @@ import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.zip.GZIPInputStream;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.KeyManager;
@@ -18,6 +23,7 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -42,6 +48,8 @@ import org.slf4j.LoggerFactory;
 
 public class HttpClient {
 	private static final Logger log = LoggerFactory.getLogger(HttpClient.class);
+
+	private static final String CONTENT_ENCODING = "Content-Encoding";
 
 	private final CloseableHttpClient client;
 
@@ -265,9 +273,11 @@ public class HttpClient {
 			if (entity != null) {
 				bytes = EntityUtils.toByteArray(response.getEntity());
 			}
+			Header[] headers = response.getAllHeaders();
+			bytes = decompress(bytes, headers);
 			fireRequestComplete(id, status.getStatusCode(),
-					status.getReasonPhrase(), (end - start),
-					response.getAllHeaders(), bytes, listener);
+					status.getReasonPhrase(), (end - start), headers, bytes,
+					listener);
 
 		} catch (Exception e) {
 			log.warn(e.getMessage(), e);
@@ -277,5 +287,30 @@ public class HttpClient {
 				request.releaseConnection();
 			}
 		}
+	}
+
+	private byte[] decompress(byte[] bytes, Header[] headers) {
+		boolean gzip = false;
+		for (Header h : headers) {
+			if (CONTENT_ENCODING.equals(h.getName())) {
+				if ("gzip".equals(h.getValue())) {
+					gzip = true;
+				}
+			}
+		}
+
+		if (gzip) {
+			try {
+				InputStream is = new GZIPInputStream(new ByteArrayInputStream(
+						bytes));
+				ByteArrayOutputStream output = new ByteArrayOutputStream();
+				IOUtils.copy(is, output);
+				bytes = output.toByteArray();
+			} catch (IOException e) {
+				log.warn(e.getMessage(), e);
+			}
+		}
+
+		return bytes;
 	}
 }
