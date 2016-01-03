@@ -35,6 +35,7 @@ import org.fife.ui.hex.swing.HexEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.thedeanda.ajaxproxy.http.NetworkUtil;
 import com.thedeanda.ajaxproxy.http.RequestListener;
 import com.thedeanda.ajaxproxy.ui.SwingUtils;
 import com.thedeanda.javajson.JsonArray;
@@ -201,6 +202,9 @@ public class RequestViewer extends JPanel implements RequestListener {
 			final long duration, Header[] responseHeaders, final byte[] data) {
 		log.info("request complete: {} {} {}", id, status, responseHeaders);
 
+		final byte[] outputData = NetworkUtil.decompressIfNeeded(data,
+				responseHeaders);
+
 		String contentType = null;
 		final StringBuilder headers = new StringBuilder();
 		if (responseHeaders != null) {
@@ -215,7 +219,7 @@ public class RequestViewer extends JPanel implements RequestListener {
 		}
 
 		final ParsedData parsedData = new ParsedData();
-		parsedData.parse(data, contentType);
+		parsedData.parse(outputData, contentType);
 
 		TreeNode node = null;
 		if (parsedData.json != null) {
@@ -294,10 +298,10 @@ public class RequestViewer extends JPanel implements RequestListener {
 					dataTabs.add("Image", scroll);
 				}
 
-				if (data != null) {
+				if (outputData != null) {
 					try {
 						HexEditor hex = new HexEditor();
-						hex.open(new ByteArrayInputStream(data));
+						hex.open(new ByteArrayInputStream(outputData));
 						hex.setCellEditable(false);
 						dataTabs.add("Hex", hex);
 					} catch (IOException e) {
