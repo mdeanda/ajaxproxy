@@ -1,4 +1,4 @@
-package com.thedeanda.ajaxproxy.ui;
+package com.thedeanda.ajaxproxy.ui.resourceviewer;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -29,6 +29,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 
 import com.thedeanda.ajaxproxy.LoadedResource;
+import com.thedeanda.ajaxproxy.ui.ContentViewer;
+import com.thedeanda.ajaxproxy.ui.ResourceFrame;
+import com.thedeanda.ajaxproxy.ui.SwingUtils;
 import com.thedeanda.ajaxproxy.ui.model.Resource;
 import com.thedeanda.ajaxproxy.ui.rest.RestClientFrame;
 
