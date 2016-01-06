@@ -3,7 +3,6 @@ package com.thedeanda.ajaxproxy.ui.busy;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -20,6 +19,7 @@ public class BusyNotification extends JComponent {
 
 	public BusyNotification() {
 		setPreferredSize(new Dimension(100, 100));
+
 		timer = new Timer(50, new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent ae) {
@@ -30,7 +30,16 @@ public class BusyNotification extends JComponent {
 				repaint();
 			}
 		});
-		timer.start();
+	}
+
+	@Override
+	public void setVisible(boolean b) {
+		super.setVisible(b);
+		if (b) {
+			timer.start();
+		} else {
+			timer.stop();
+		}
 	}
 
 	@Override

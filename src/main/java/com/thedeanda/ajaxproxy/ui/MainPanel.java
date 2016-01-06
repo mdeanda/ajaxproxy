@@ -28,6 +28,7 @@ import com.thedeanda.ajaxproxy.AjaxProxy;
 import com.thedeanda.ajaxproxy.ProxyListener;
 import com.thedeanda.ajaxproxy.ui.proxy.ProxyPanel;
 import com.thedeanda.ajaxproxy.ui.proxy.ProxyTableModel;
+import com.thedeanda.ajaxproxy.ui.resourceviewer.ResourceViewerPanel;
 import com.thedeanda.javajson.JsonException;
 import com.thedeanda.javajson.JsonObject;
 
@@ -178,7 +179,6 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener,
 		json.put("port", generalPanel.getPort());
 		json.put("resourceBase", generalPanel.getResourceBase());
 		json.put(AjaxProxy.SHOW_INDEX, generalPanel.isShowIndex());
-		json.put(AjaxProxy.NEW_PROXY, generalPanel.isNewProxy());
 		json.put("proxy", proxyModel.getConfig());
 		json.put("merge", mergeModel.getConfig());
 		json.put("variables", variableModel.getConfig());
@@ -190,19 +190,27 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener,
 		return json;
 	}
 
-	// TODO: figure out why this returns nothing
+	/**
+	 * ui settings not stored in the current config file
+	 * 
+	 * @return
+	 */
 	public JsonObject getSettings() {
 		JsonObject ret = new JsonObject();
-		// ret.put("port", port.getText());
+		ret.put("currentTab", tabs.getSelectedIndex());
 		return ret;
 	}
 
-	// TODO: figure out why this does nothing
+	/**
+	 * load ui settings
+	 * 
+	 * @param json
+	 */
 	public void setSettings(JsonObject json) {
 		if (json == null)
 			return;
 
-		// port.setText(json.getString("port"));
+		tabs.setSelectedIndex(json.getInt("currentTab"));
 	}
 
 	public void start() {
@@ -239,7 +247,6 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener,
 		generalPanel.setPort(0);
 		generalPanel.setResourceBase("");
 		generalPanel.setShowIndex(false);
-		generalPanel.setNewProxy(false);
 		proxyModel.clear();
 		mergeModel.clear();
 		variableModel.clear();
@@ -302,7 +309,6 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener,
 		generalPanel.setPort(config.getInt("port"));
 		generalPanel.setResourceBase(config.getString("resourceBase"));
 		generalPanel.setShowIndex(config.getBoolean(AjaxProxy.SHOW_INDEX));
-		generalPanel.setNewProxy(config.getBoolean(AjaxProxy.NEW_PROXY));
 		trackerPanel.setConfig(json.getJsonObject("tracker"));
 		resourceViewerPanel.setConfig(json.getJsonObject("resource"));
 		optionsPanel.setConfig(json.getJsonObject("options"));
@@ -338,7 +344,7 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener,
 
 	@Override
 	public void settingsChanged() {
-		log.debug("settings changed, possible track to warn of unsaved changes during close");
+		log.debug("settings changed, possibly track to warn of unsaved changes during close");
 	}
 
 	public void addVariables(Map<String, String> vars) {

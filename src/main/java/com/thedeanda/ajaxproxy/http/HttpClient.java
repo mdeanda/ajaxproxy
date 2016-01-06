@@ -46,7 +46,8 @@ public class HttpClient {
 	private final CloseableHttpClient client;
 
 	public enum RequestMethod {
-		GET(false), POST(true), PUT(true), DELETE(false), HEAD(false), PATCH(true), OPTIONS(true), TRACE(true);
+		GET(false), POST(true), PUT(true), DELETE(false), HEAD(false), PATCH(
+				true), OPTIONS(true), TRACE(true);
 
 		private boolean acceptsPayload;
 
@@ -166,7 +167,7 @@ public class HttpClient {
 
 		UUID uuid = UUID.randomUUID();
 		URL urlobj = null;
-		//fireNewRequest(uuid, url, method.name(), listener);
+		// fireNewRequest(uuid, url, method.name(), listener);
 		try {
 			urlobj = new URL(url);
 		} catch (MalformedURLException e) {
@@ -202,7 +203,7 @@ public class HttpClient {
 		makeRequest_internal(uuid, method, url, headers, input, listener);
 	}
 
-	public void makeRequest_internal(UUID uuid, RequestMethod method, URL url,
+	private void makeRequest_internal(UUID uuid, RequestMethod method, URL url,
 			Header[] headers, byte[] input, RequestListener... listener) {
 
 		fireStartRequest(uuid, url, headers, input, listener);
@@ -264,9 +265,10 @@ public class HttpClient {
 			if (entity != null) {
 				bytes = EntityUtils.toByteArray(response.getEntity());
 			}
+			Header[] headers = response.getAllHeaders();
 			fireRequestComplete(id, status.getStatusCode(),
-					status.getReasonPhrase(), (end - start),
-					response.getAllHeaders(), bytes, listener);
+					status.getReasonPhrase(), (end - start), headers, bytes,
+					listener);
 
 		} catch (Exception e) {
 			log.warn(e.getMessage(), e);
@@ -277,4 +279,5 @@ public class HttpClient {
 			}
 		}
 	}
+
 }

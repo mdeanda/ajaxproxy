@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import javax.swing.JFrame;
 
 import com.thedeanda.ajaxproxy.LoadedResource;
+import com.thedeanda.ajaxproxy.ui.resourceviewer.ResourcePanel;
 
 /**
  * simple frame to view resources in a separate window

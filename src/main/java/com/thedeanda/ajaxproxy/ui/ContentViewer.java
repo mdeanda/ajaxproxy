@@ -16,6 +16,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -54,9 +55,13 @@ public class ContentViewer extends JPanel {
 	}
 
 	public void setContent(final String output) {
-		log.info("setting content");
+		log.trace("setting content");
 		tabs.removeAll();
 
+		if (StringUtils.isBlank(output)) {
+			return;
+		}
+		
 		SwingUtils.executNonUi(new Runnable() {
 			@Override
 			public void run() {
@@ -74,7 +79,7 @@ public class ContentViewer extends JPanel {
 
 							formattedText = json.toString(4);
 						} catch (Exception e) {
-							log.debug(e.getMessage(), e);
+							log.trace(e.getMessage(), e);
 						}
 					}
 					if (formattedText == null && output.trim().startsWith("[")) {
@@ -87,7 +92,7 @@ public class ContentViewer extends JPanel {
 
 							formattedText = json.toString(4);
 						} catch (Exception e) {
-							log.debug(e.getMessage(), e);
+							log.trace(e.getMessage(), e);
 						}
 					}
 
@@ -99,7 +104,7 @@ public class ContentViewer extends JPanel {
 								node = initTree(doc);
 								formattedText = formatXml(doc);
 							} catch (DocumentException e) {
-								log.debug(e.getMessage(), e);
+								log.trace(e.getMessage(), e);
 							}
 						}
 					}

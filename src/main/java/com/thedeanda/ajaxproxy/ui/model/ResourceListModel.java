@@ -17,8 +17,6 @@ import javax.swing.event.ListDataListener;
 import org.apache.http.Header;
 
 public class ResourceListModel implements ListModel<Resource> {
-	private static final long serialVersionUID = -1203515236578998042L;
-
 	private List<ListDataListener> listeners = new ArrayList<>();
 	private Set<Resource> unfilteredItems = new TreeSet<>();
 	private List<Resource> items = new ArrayList<>();
@@ -26,7 +24,9 @@ public class ResourceListModel implements ListModel<Resource> {
 	private Pattern filterRegEx;
 
 	public void add(Resource item) {
-		unfilteredItems.add(item);
+		synchronized (unfilteredItems) {
+			unfilteredItems.add(item);
+		}
 		if (filterRegEx == null
 				|| filterRegEx.matcher(item.getPath()).matches()) {
 			addSorted(item, items);
@@ -66,11 +66,16 @@ public class ResourceListModel implements ListModel<Resource> {
 			}
 		}
 
+		Set<Resource> copyOfAllItems = null;
+		synchronized (unfilteredItems) {
+			copyOfAllItems = new TreeSet<>(unfilteredItems);
+		}
+
 		if (filterRegEx == null) {
 			// just add all
-			items.addAll(unfilteredItems);
+			items.addAll(copyOfAllItems);
 		} else {
-			for (Resource item : unfilteredItems) {
+			for (Resource item : copyOfAllItems) {
 				if (filterRegEx.matcher(item.getPath()).matches()) {
 					items.add(item);
 				}
@@ -95,7 +100,9 @@ public class ResourceListModel implements ListModel<Resource> {
 	public void clear() {
 		int size = items.size();
 		items.clear();
-		unfilteredItems.clear();
+		synchronized (unfilteredItems) {
+			unfilteredItems.clear();
+		}
 
 		if (size > 0) {
 			for (ListDataListener listener : listeners) {
@@ -113,7 +120,7 @@ public class ResourceListModel implements ListModel<Resource> {
 			return items.get(index);
 	}
 
-	private void notifyUpdated(UUID id) {
+	private void notifyUpdated(final UUID id) {
 		int index = -1;
 		for (int i = 0; i < items.size(); i++) {
 			Resource r = items.get(i);
@@ -124,18 +131,27 @@ public class ResourceListModel implements ListModel<Resource> {
 		}
 
 		if (index >= 0) {
+			final int theIndex = index;
 			for (ListDataListener listener : listeners) {
 				listener.contentsChanged(new ListDataEvent(this,
-						ListDataEvent.CONTENTS_CHANGED, index, index));
+						ListDataEvent.CONTENTS_CHANGED, theIndex, theIndex));
 			}
 		}
 	}
 
 	public Resource get(UUID id) {
+		if (id == null) {
+			throw new NullPointerException("uuid is null?");
+		}
 		// TODO: use a map
-		for (Resource r : unfilteredItems) {
-			if (r.getId() == id) {
-				return r;
+		synchronized (unfilteredItems) {
+			for (Resource r : unfilteredItems) {
+				if (r.getLoadedResource() != null) {
+					continue;
+				}
+				if (id.toString().equals(r.getId().toString())) {
+					return r;
+				}
 			}
 		}
 		return null;

@@ -17,7 +17,6 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.KeyStroke;
 
 import org.apache.http.Header;
 import org.slf4j.Logger;
@@ -26,7 +25,7 @@ import org.slf4j.LoggerFactory;
 import com.thedeanda.ajaxproxy.LoadedResource;
 import com.thedeanda.ajaxproxy.http.RequestListener;
 import com.thedeanda.ajaxproxy.ui.busy.BusyNotification;
-import com.thedeanda.ajaxproxy.ui.json.JsonViewerFrame;
+import com.thedeanda.ajaxproxy.ui.model.Resource;
 import com.thedeanda.ajaxproxy.ui.windows.WindowContainer;
 import com.thedeanda.ajaxproxy.ui.windows.WindowListListener;
 import com.thedeanda.ajaxproxy.ui.windows.WindowListListenerCleanup;
@@ -67,28 +66,49 @@ public class RestClientFrame extends JFrame implements RequestListener,
 		Image image = Toolkit.getDefaultToolkit().getImage(imgUrl);
 		this.setIconImage(image);
 
-		this.windowId = Windows.get().addListener(this).add(this);
-		this.addWindowListener(new WindowListListenerCleanup(this));
 		initMenuBar();
 		pack();
+		this.windowId = Windows.get().addListener(this).add(this);
+		this.addWindowListener(new WindowListListenerCleanup(this));
+		new WindowMenuHelper(windowId, getJMenuBar());
 	}
 
 	public void fromResource(LoadedResource resource) {
 		String url = resource.getUrl();
 		panel.setUrl(url);
 
-		Header[] hdrs = resource.getRequestHeaders();
-		if (hdrs != null) {
+		addHeaders(resource.getRequestHeaders());
+		panel.setInput(resource.getInputAsText());
+		panel.setMethod(resource.getMethod());
+	}
+
+	public void fromResource(Resource resource) {
+		panel.setUrl(resource.getUrl());
+		// TODO: consider keeping byte data as is depending on content type
+		byte[] inputData = resource.getInputData();
+		String input = "";
+		if (inputData != null) {
+			input = new String(inputData);
+		}
+
+		panel.setInput(input);
+		panel.setMethod(resource.getMethod());
+
+		addHeaders(resource.getRequestHeaders());
+
+	}
+	
+	private void addHeaders(Header[] headers) {
+		panel.setHeaders("");
+		if (headers != null) {
 			StringBuilder sb = new StringBuilder();
-			for (Header h : hdrs) {
+			for (Header h : headers) {
 				if (!BLACKLIST_HEADERS.contains(h.getName())) {
 					sb.append(h.getName() + ": " + h.getValue() + "\n");
 				}
 			}
 			panel.setHeaders(sb.toString());
 		}
-		panel.setInput(resource.getInputAsText());
-		panel.setMethod(resource.getMethod());
 	}
 
 	private void initMenuBar() {
@@ -101,32 +121,6 @@ public class RestClientFrame extends JFrame implements RequestListener,
 		menu.setMnemonic(KeyEvent.VK_F);
 		mb.add(menu);
 
-		// menu.addSeparator();
-
-		mi = new JMenuItem("Rest Client");
-		mi.setMnemonic(KeyEvent.VK_R);
-		mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R,
-				ActionEvent.CTRL_MASK));
-		mi.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent ae) {
-				handleRest();
-			}
-		});
-		menu.add(mi);
-
-		mi = new JMenuItem("Json Viewer");
-		mi.setMnemonic(KeyEvent.VK_J);
-		mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_J,
-				ActionEvent.CTRL_MASK));
-		mi.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent ae) {
-				handleJson();
-			}
-		});
-		menu.add(mi);
-
 		menu.addSeparator();
 
 		mi = new JMenuItem("Exit");
@@ -138,22 +132,10 @@ public class RestClientFrame extends JFrame implements RequestListener,
 			}
 		});
 		menu.add(mi);
-
-		new WindowMenuHelper(windowId, mb);
-	}
-
-	private void handleJson() {
-		JsonViewerFrame frame = new JsonViewerFrame();
-		frame.setVisible(true);
 	}
 
 	private void handleExit() {
 		this.dispose();
-	}
-
-	private void handleRest() {
-		RestClientFrame frame = new RestClientFrame();
-		frame.setVisible(true);
 	}
 
 	private void busy() {
@@ -177,11 +159,13 @@ public class RestClientFrame extends JFrame implements RequestListener,
 	@Override
 	public void requestComplete(UUID id, int status, String reason,
 			long duation, Header[] responseHeaders, byte[] data) {
+		log.debug("request complete");
 		notBusy();
 	}
 
 	@Override
 	public void error(UUID id, String message, Exception e) {
+		log.debug("request complete (error)", e);
 		notBusy();
 	}
 

@@ -46,12 +46,14 @@ public class ParsedData {
 	}
 	
 	public void parseString(String data) {
+		log.debug("in parseString");
 		this.raw = data;
 		loadJson();
 		loadXml();
 	}
 
 	public void parse(byte[] data, String contentType) {
+		log.debug("start parsing data");
 		this.data = data;
 		if (!StringUtils.isBlank(contentType)) {
 			contentType = contentType.toLowerCase().trim();
@@ -60,16 +62,18 @@ public class ParsedData {
 				contentType = contentType.substring(0, semi);
 			}
 		}
-		log.warn("content type: " + contentType);
+		log.debug("content type: " + contentType);
 
 		if (isTextType(contentType)) {
+			log.debug("parsing text data");
 			loadPlain(data);
 			parseString(this.raw);
 		}
 		if (isImageType(contentType)) {
+			log.debug("parsing image data");
 			loadImage(data);
 		}
-
+		log.debug("finished parsing data");
 	}
 
 	private boolean isImageType(String contentType) {
@@ -104,6 +108,7 @@ public class ParsedData {
 		char firstChar = raw.trim().charAt(0);
 
 		if (firstChar == '{') {
+			log.debug("try json object");
 			try {
 				json = JsonObject.parse(raw);
 				formattedText = json.toString(4);
@@ -112,6 +117,7 @@ public class ParsedData {
 			}
 		}
 		if (formattedText == null && firstChar == '[') {
+			log.debug("try json array");
 			try {
 				jsonArray = JsonArray.parse(raw);
 				formattedText = jsonArray.toString(4);
@@ -119,6 +125,7 @@ public class ParsedData {
 				log.debug(e.getMessage(), e);
 			}
 		}
+		log.debug("finished trying to load json");
 	}
 
 	private void loadXml() {
@@ -127,13 +134,15 @@ public class ParsedData {
 		char firstChar = raw.trim().charAt(0);
 
 		if (firstChar == '<') {
+			log.debug("try xml from string");
 			// try xml formatting
 			try {
 				xml = DocumentHelper.parseText(raw);
 			} catch (DocumentException e) {
-				log.debug(e.getMessage(), e);
+				log.trace(e.getMessage(), e);
 			}
 		}
+		log.debug("finished trying to load xml");
 	}
 
 	private void loadImage(byte[] data) {
@@ -141,7 +150,7 @@ public class ParsedData {
 			ByteArrayInputStream stream = new ByteArrayInputStream(data);
 			bufferedImage = ImageIO.read(stream);
 		} catch (IOException e) {
-			log.debug(e.getMessage(), e);
+			log.trace(e.getMessage(), e);
 		}
 	}
 

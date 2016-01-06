@@ -8,7 +8,7 @@ public class ProxyColumnModel extends DefaultTableColumnModel {
 
 	public ProxyColumnModel() {
 		TableColumn col = new TableColumn(0, 300);
-		col.setHeaderValue("Domain");
+		col.setHeaderValue("Host");
 		this.addColumn(col);
 
 		col = new TableColumn(1, 100);
@@ -20,7 +20,7 @@ public class ProxyColumnModel extends DefaultTableColumnModel {
 		this.addColumn(col);
 
 		col = new TableColumn(3, 150);
-		col.setHeaderValue("Prefix");
+		col.setHeaderValue("New Proxy");
 		this.addColumn(col);
 	}
 }

@@ -24,7 +24,7 @@ public class MergeModeCellEditor extends AbstractCellEditor implements
 			model.addElement(mm);
 		}
 
-		comp = new JComboBox(model);
+		comp = new JComboBox<>(model);
 
 	}
 

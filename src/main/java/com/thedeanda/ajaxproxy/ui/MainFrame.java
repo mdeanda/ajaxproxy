@@ -13,6 +13,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -25,7 +27,6 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -45,9 +46,6 @@ import org.slf4j.LoggerFactory;
 import com.thedeanda.ajaxproxy.ProxyListener;
 import com.thedeanda.ajaxproxy.ui.json.JsonViewerFrame;
 import com.thedeanda.ajaxproxy.ui.rest.RestClientFrame;
-import com.thedeanda.ajaxproxy.ui.windows.WindowContainer;
-import com.thedeanda.ajaxproxy.ui.windows.WindowListListener;
-import com.thedeanda.ajaxproxy.ui.windows.WindowListListenerCleanup;
 import com.thedeanda.ajaxproxy.ui.windows.WindowMenuHelper;
 import com.thedeanda.ajaxproxy.ui.windows.Windows;
 import com.thedeanda.javajson.JsonArray;
@@ -55,8 +53,7 @@ import com.thedeanda.javajson.JsonException;
 import com.thedeanda.javajson.JsonObject;
 import com.thedeanda.javajson.JsonValue;
 
-public class MainFrame extends JFrame implements ProxyListener,
-		WindowListListener {
+public class MainFrame extends JFrame implements ProxyListener {
 	private static final long serialVersionUID = 1L;
 	private static final Logger log = LoggerFactory.getLogger(MainFrame.class);
 	private boolean USE_TRAY = true;
@@ -86,7 +83,7 @@ public class MainFrame extends JFrame implements ProxyListener,
 		this.initWindow();
 		this.initMenuBar();
 		this.initTray();
-		if (!USE_TRAY) {
+		if (USE_TRAY) {
 			log.info("system tray mode");
 			setDefaultCloseOperation(EXIT_ON_CLOSE);
 		} else {
@@ -94,34 +91,68 @@ public class MainFrame extends JFrame implements ProxyListener,
 			setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		}
 
-		JsonObject settings = loadSettings();
-		if (settings != null) {
-			try {
-				panel.setSettings(settings.getJsonObject("settings"));
-				ignoreSaveSettings = true;
-				this.loadRecent(settings);
-			} finally {
-				ignoreSaveSettings = false;
-			}
-		}
+		initSettings();
 		getContentPane().add(panel);
 		pack();
 
-		Runtime.getRuntime().addShutdownHook(new Thread() {
-			public void run() {
+		addCloseListener();
+		panel.addProxyListener(this);
+
+		this.windowId = Windows.get().add(this);
+		new WindowMenuHelper(windowId, getJMenuBar());
+	}
+
+	private void initSettings() {
+		ignoreSaveSettings = true;
+		try {
+			JsonObject settings = loadSettings();
+			if (settings != null) {
+				panel.setSettings(settings.getJsonObject("settings"));
+				this.loadRecentFilesMenu(settings);
+			}
+		} finally {
+			ignoreSaveSettings = false;
+		}
+	}
+
+	private void addCloseListener() {
+		this.addWindowListener(new WindowListener() {
+
+			@Override
+			public void windowOpened(WindowEvent e) {
+			}
+
+			@Override
+			public void windowClosing(WindowEvent e) {
 				try {
 					panel.stop();
 					saveRecent();
-				} catch (Exception e) {
-					log.error(e.getMessage(), e);
+				} catch (Exception ex) {
+					log.error(ex.getMessage(), ex);
 				}
 			}
-		});
-		panel.addProxyListener(this);
 
-		this.windowId = Windows.get().addListener(this).add(this);
-		this.addWindowListener(new WindowListListenerCleanup(this));
-		new WindowMenuHelper(windowId, getJMenuBar());
+			@Override
+			public void windowClosed(WindowEvent e) {
+			}
+
+			@Override
+			public void windowIconified(WindowEvent e) {
+			}
+
+			@Override
+			public void windowDeiconified(WindowEvent e) {
+			}
+
+			@Override
+			public void windowActivated(WindowEvent e) {
+			}
+
+			@Override
+			public void windowDeactivated(WindowEvent e) {
+			}
+
+		});
 	}
 
 	private void updateTitle() {
@@ -148,8 +179,11 @@ public class MainFrame extends JFrame implements ProxyListener,
 	}
 
 	private void initTray() {
-		if (SystemTray.isSupported() || !USE_TRAY)
+		if (SystemTray.isSupported() || !USE_TRAY) {
+			log.error("System tray disabled.");
+			USE_TRAY = false;
 			return;
+		}
 
 		MouseListener mouseListener = new MouseListener() {
 
@@ -314,32 +348,6 @@ public class MainFrame extends JFrame implements ProxyListener,
 
 		menu.addSeparator();
 
-		mi = new JMenuItem("Rest Client");
-		mi.setMnemonic(KeyEvent.VK_R);
-		mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R,
-				ActionEvent.CTRL_MASK));
-		mi.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent ae) {
-				handleRest();
-			}
-		});
-		menu.add(mi);
-
-		mi = new JMenuItem("Json Viewer");
-		mi.setMnemonic(KeyEvent.VK_J);
-		mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_J,
-				ActionEvent.CTRL_MASK));
-		mi.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent ae) {
-				handleJson();
-			}
-		});
-		menu.add(mi);
-
-		menu.addSeparator();
-
 		mi = new JMenuItem("Exit");
 		mi.setMnemonic(KeyEvent.VK_X);
 		mi.addActionListener(new ActionListener() {
@@ -462,6 +470,7 @@ public class MainFrame extends JFrame implements ProxyListener,
 
 	private void handleExit() {
 		panel.stop();
+		saveRecent();
 		dispose();
 	}
 
@@ -505,7 +514,7 @@ public class MainFrame extends JFrame implements ProxyListener,
 		return ret;
 	}
 
-	private void loadRecent(JsonObject settings) {
+	private void loadRecentFilesMenu(JsonObject settings) {
 		recentMenu.removeAll();
 		recentFiles.clear();
 		if (settings != null) {
@@ -520,24 +529,32 @@ public class MainFrame extends JFrame implements ProxyListener,
 		}
 
 		for (final File rf : recentFiles) {
+			if (!rf.exists())
+				continue;
+			String path = null;
+
 			try {
-				JMenuItem mi = new JMenuItem(rf.getCanonicalPath());
-				recentMenu.add(mi);
-				mi.addActionListener(new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						loadFile(rf);
-					}
-				});
+				path = rf.getCanonicalPath();
 			} catch (IOException e) {
 				log.error(e.getMessage(), e);
+				continue;
 			}
+
+			JMenuItem mi = new JMenuItem(path);
+			recentMenu.add(mi);
+			mi.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					loadFile(rf);
+				}
+			});
 		}
 	}
 
 	private void saveRecent() {
 		if (ignoreSaveSettings)
 			return;
+		log.info("saving recents");
 
 		File f = getRecentFile();
 		JsonObject json = new JsonObject();
@@ -609,15 +626,6 @@ public class MainFrame extends JFrame implements ProxyListener,
 
 	private void handleShowWindow() {
 		this.setVisible(true);
-	}
-
-	@Override
-	public void windowsChanged(Collection<WindowContainer> windows) {
-		log.warn("{}", Thread.currentThread());
-
-		for (WindowContainer wc : windows) {
-			log.info(wc.getName());
-		}
 	}
 
 }

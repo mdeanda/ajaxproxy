@@ -1,10 +1,12 @@
 package com.thedeanda.ajaxproxy.ui.model;
 
 import java.io.Serializable;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.UUID;
 
 import org.apache.http.Header;
+import org.mortbay.log.Log;
 
 import com.thedeanda.ajaxproxy.LoadedResource;
 
@@ -32,7 +34,7 @@ public class Resource implements Serializable, Comparable<Resource> {
 
 	private String errorReason;
 	private String exception;
-	private long startTime;
+	private long startTime = System.currentTimeMillis();
 
 	/**
 	 * calculated fields
@@ -52,14 +54,21 @@ public class Resource implements Serializable, Comparable<Resource> {
 		this.method = method;
 
 		// TODO: calculate path from url
+		try {
+			URL urlObject = new URL(url);
+			setPath(urlObject.getPath());
+		} catch (MalformedURLException e) {
+			Log.warn(e.getMessage(), e);
+		} finally {
+
+		}
 	}
 
 	@Override
-	public int compareTo(Resource o) {		
+	public int compareTo(Resource o) {
 		return (int) (getStartTime() - o.getStartTime());
 	}
 
-	
 	public LoadedResource getLoadedResource() {
 		return loadedResource;
 	}
@@ -179,7 +188,6 @@ public class Resource implements Serializable, Comparable<Resource> {
 	public void setPath(String path) {
 		this.path = path;
 	}
-
 
 	public long getStartTime() {
 		if (this.loadedResource != null) {

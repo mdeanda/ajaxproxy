@@ -23,10 +23,8 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.thedeanda.ajaxproxy.ui.rest.RestClientFrame;
 import com.thedeanda.ajaxproxy.ui.windows.WindowContainer;
 import com.thedeanda.ajaxproxy.ui.windows.WindowListListener;
-import com.thedeanda.ajaxproxy.ui.windows.WindowListListenerCleanup;
 import com.thedeanda.ajaxproxy.ui.windows.WindowMenuHelper;
 import com.thedeanda.ajaxproxy.ui.windows.Windows;
 
@@ -54,8 +52,7 @@ public class JsonViewerFrame extends JFrame implements WindowListListener {
 		Image image = Toolkit.getDefaultToolkit().getImage(imgUrl);
 		this.setIconImage(image);
 
-		this.windowId = Windows.get().addListener(this).add(this);
-		this.addWindowListener(new WindowListListenerCleanup(this));
+		this.windowId = Windows.get().add(this);
 		initMenuBar();
 		pack();
 	}
@@ -90,32 +87,6 @@ public class JsonViewerFrame extends JFrame implements WindowListListener {
 			@Override
 			public void actionPerformed(ActionEvent ae) {
 				handleOpen();
-			}
-		});
-		menu.add(mi);
-
-		menu.addSeparator();
-
-		mi = new JMenuItem("Rest Client");
-		mi.setMnemonic(KeyEvent.VK_R);
-		mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R,
-				ActionEvent.CTRL_MASK));
-		mi.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent ae) {
-				handleRest();
-			}
-		});
-		menu.add(mi);
-
-		mi = new JMenuItem("Json Viewer");
-		mi.setMnemonic(KeyEvent.VK_J);
-		mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_J,
-				ActionEvent.CTRL_MASK));
-		mi.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent ae) {
-				handleJson();
 			}
 		});
 		menu.add(mi);
@@ -157,18 +128,8 @@ public class JsonViewerFrame extends JFrame implements WindowListListener {
 		}
 	}
 
-	private void handleJson() {
-		JsonViewerFrame frame = new JsonViewerFrame();
-		frame.setVisible(true);
-	}
-
 	private void handleExit() {
 		this.dispose();
-	}
-
-	private void handleRest() {
-		RestClientFrame frame = new RestClientFrame();
-		frame.setVisible(true);
 	}
 
 	@Override

@@ -1,4 +1,4 @@
-package com.thedeanda.ajaxproxy.ui;
+package com.thedeanda.ajaxproxy.ui.resourceviewer;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
@@ -12,7 +12,6 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.URL;
 import java.util.UUID;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -22,7 +21,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JList;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
@@ -38,23 +36,27 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.thedeanda.ajaxproxy.AccessTracker;
 import com.thedeanda.ajaxproxy.AjaxProxy;
 import com.thedeanda.ajaxproxy.LoadedResource;
 import com.thedeanda.ajaxproxy.http.RequestListener;
+import com.thedeanda.ajaxproxy.ui.SwingUtils;
 import com.thedeanda.ajaxproxy.ui.model.Resource;
 import com.thedeanda.ajaxproxy.ui.model.ResourceListModel;
 import com.thedeanda.ajaxproxy.ui.rest.RestClientFrame;
 import com.thedeanda.ajaxproxy.ui.viewer.ResourceCellRenderer;
 import com.thedeanda.javajson.JsonArray;
-import com.thedeanda.javajson.JsonException;
 import com.thedeanda.javajson.JsonObject;
 import com.thedeanda.javajson.JsonValue;
 
 /** tracks files that get loaded */
 public class ResourceViewerPanel extends JPanel implements AccessTracker,
 		ActionListener, RequestListener {
+	private static final Logger log = LoggerFactory
+			.getLogger(ResourceViewerPanel.class);
 	private static final long serialVersionUID = 1L;
 	private JButton clearBtn;
 	private JButton exportBtn;
@@ -68,9 +70,9 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 	private JMenuItem removeRequestMenuItem;
 	private JMenuItem replyMenuItem;
 	private JMenuItem clearMenuItem;
-	private AjaxProxy ajaxProxy;
 
 	public ResourceViewerPanel() {
+		log.debug("new viewer");
 		SpringLayout layout = new SpringLayout();
 		setLayout(layout);
 		model = new ResourceListModel();
@@ -286,20 +288,20 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 		if (!evt.getValueIsAdjusting()) {
 			Resource resource = (Resource) list.getSelectedValue();
 			if (resource != null) {
-				LoadedResource lr = resource.getLoadedResource();
-				if (lr != null) {
-					showResource(lr);
-				}
+				showResource(resource.getLoadedResource(), resource);
 			}
 		}
 	}
 
-	private void showResource(final LoadedResource lr) {
-		resourcePanel.setResource(lr);
+	private void showResource(final LoadedResource lr, final Resource resource) {
+		if (lr != null) {
+			resourcePanel.setResource(lr);
+		} else {
+			resourcePanel.setResource(resource);
+		}
 	}
 
 	public void setProxy(AjaxProxy ajaxProxy) {
-		this.ajaxProxy = ajaxProxy;
 		if (ajaxProxy != null) {
 			ajaxProxy.addTracker(this);
 			ajaxProxy.addRequestListener(this);
@@ -429,13 +431,13 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 						// httpClient.replay("localhost", ajaxProxy.getPort(),
 						// resource, null);
 
+						RestClientFrame rest = new RestClientFrame();
 						if (resource.getLoadedResource() != null) {
-							String baseUrl = "http://localhost:"
-									+ ajaxProxy.getPort();
-							RestClientFrame rest = new RestClientFrame();
 							rest.fromResource(resource.getLoadedResource());
-							rest.setVisible(true);
+						} else {
+							rest.fromResource(resource);
 						}
+						rest.setVisible(true);
 					}
 				});
 			}
@@ -469,6 +471,6 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 
 	private void clear() {
 		model.clear();
-		showResource(null);
+		showResource(null, null);
 	}
 }

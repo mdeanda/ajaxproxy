@@ -24,6 +24,8 @@ import com.thedeanda.ajaxproxy.filter.APFilter;
 import com.thedeanda.ajaxproxy.filter.ProxyFilter;
 import com.thedeanda.ajaxproxy.http.RequestListener;
 import com.thedeanda.ajaxproxy.model.ProxyPath;
+import com.thedeanda.ajaxproxy.model.config.AjaxProxyConfig;
+import com.thedeanda.ajaxproxy.model.config.Convertor;
 import com.thedeanda.javajson.JsonArray;
 import com.thedeanda.javajson.JsonObject;
 import com.thedeanda.javajson.JsonValue;
@@ -41,9 +43,11 @@ public class AjaxProxy implements Runnable {
 	private ProxyFilter proxyFilter;
 	private boolean mergeMode = false;
 	private List<MergeServlet> mergeServlets = new ArrayList<MergeServlet>();
-	private boolean newProxy = false;
 	private ArrayList<RequestListener> proxyListeners;
 	private RequestListener listener;
+
+	private AjaxProxyConfig ajaxProxyConfig;
+	private Convertor converter;
 
 	private enum ProxyEvent {
 		START, STOP, FAIL
@@ -62,6 +66,7 @@ public class AjaxProxy implements Runnable {
 	private static final String MINIFY = "minify";
 
 	public AjaxProxy(JsonObject config, File workingDir) throws Exception {
+		converter = Convertor.get();
 		this.config = config;
 		this.workingDir = workingDir;
 		init();
@@ -69,6 +74,7 @@ public class AjaxProxy implements Runnable {
 
 	public AjaxProxy(String configFile) throws Exception {
 		log.info("using config file: " + configFile);
+		converter = Convertor.get();
 		File cf = new File(configFile);
 		if (!cf.exists())
 			throw new FileNotFoundException("config file not found");
@@ -84,6 +90,8 @@ public class AjaxProxy implements Runnable {
 	}
 
 	private void init() {
+		ajaxProxyConfig = converter.readAjaxProxyConfig(config);
+
 		this.proxyListeners = new ArrayList<RequestListener>();
 		proxyFilter = new ProxyFilter(this);
 		getRequestListener();
@@ -160,6 +168,7 @@ public class AjaxProxy implements Runnable {
 
 	private void init(JsonObject config, File workingDir) throws Exception {
 		this.config = config;
+		converter.processVariables(ajaxProxyConfig);
 		doVars();
 
 		if (config.isInt(PORT)) {
@@ -183,7 +192,6 @@ public class AjaxProxy implements Runnable {
 			throw new Exception("resourceBase not defined in config file");
 		}
 		showIndex = config.getBoolean(SHOW_INDEX);
-		newProxy = config.getBoolean(NEW_PROXY);
 		log.info("using resource base: " + resourceBase);
 	}
 
@@ -196,7 +204,7 @@ public class AjaxProxy implements Runnable {
 				int port = 80;
 				String domain = null;
 				String path = null;
-				String prefix = "";
+				boolean newProxy = false;
 				JsonObject obj = val.getJsonObject();
 				if (obj.isString(DOMAIN))
 					domain = obj.getString(DOMAIN);
@@ -206,16 +214,20 @@ public class AjaxProxy implements Runnable {
 					port = obj.getInt(PORT);
 				else if (obj.isString(PORT))
 					port = Integer.parseInt(obj.getString(PORT));
-				if (obj.isString("prefix"))
-					prefix = obj.getString("prefix");
+				newProxy = obj.getBoolean(NEW_PROXY);
 
 				if (domain != null && path != null && port > 0) {
-					ProxyPath proxyPath = new ProxyPath(domain, port, path);
+					ProxyPath proxyPath = new ProxyPath(domain, port, path,
+							newProxy);
 					ret.add(proxyPath);
 				}
 			}
 		}
 		return ret;
+	}
+	
+	public AjaxProxyConfig getAjaxProxyConfig() {
+		return ajaxProxyConfig;
 	}
 
 	public void run() {
@@ -231,14 +243,12 @@ public class AjaxProxy implements Runnable {
 
 			Context root = new Context(contexts, "/", Context.SESSIONS);
 
-			if (!newProxy) {
-				FilterHolder filterHolder = new FilterHolder(apfilter);
-				root.addFilter(filterHolder, "/*", 1);
-			} else {
-				FilterHolder proxyFilterHolder = new FilterHolder(proxyFilter);
-				root.addFilter(proxyFilterHolder, "/*", 1);
-				proxyFilter.reset();
-			}
+			FilterHolder proxyFilterHolder = new FilterHolder(proxyFilter);
+			root.addFilter(proxyFilterHolder, "/*", 1);
+			proxyFilter.reset();
+
+			FilterHolder filterHolder = new FilterHolder(apfilter);
+			root.addFilter(filterHolder, "/*", 1);
 
 			ServletHolder servlet;
 			DefaultServlet defaultServlet = new DefaultServlet();
@@ -253,15 +263,18 @@ public class AjaxProxy implements Runnable {
 			if (!mergeMode && config.isJsonArray(PROXY_ARRAY)) {
 				List<ProxyPath> proxyPaths = getProxyPaths();
 				for (ProxyPath proxyPath : proxyPaths) {
-					log.debug("adding proxy servlet: " + proxyPath.getDomain()
-							+ ":" + proxyPath.getPort() + " "
-							+ proxyPath.getPath());
-					root.addServlet(
-							new ServletHolder(
-									new AsyncProxyServlet.Transparent("",
-											proxyPath.getDomain(), proxyPath
-													.getPort())), proxyPath
-									.getPath());
+					if (!proxyPath.isNewProxy()) {
+						log.debug("adding proxy servlet: "
+								+ proxyPath.getDomain() + ":"
+								+ proxyPath.getPort() + " "
+								+ proxyPath.getPath());
+						root.addServlet(
+								new ServletHolder(
+										new AsyncProxyServlet.Transparent("",
+												proxyPath.getDomain(),
+												proxyPath.getPort())),
+								proxyPath.getPath());
+					}
 				}
 			}
 			if (config.isJsonArray(MERGE_ARRAY)) {

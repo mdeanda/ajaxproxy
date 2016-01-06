@@ -1,33 +1,38 @@
 package com.thedeanda.ajaxproxy.ui.proxy;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.swing.table.AbstractTableModel;
 
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.thedeanda.ajaxproxy.model.config.Convertor;
+import com.thedeanda.ajaxproxy.model.config.ProxyConfig;
 import com.thedeanda.javajson.JsonArray;
-import com.thedeanda.javajson.JsonObject;
 import com.thedeanda.javajson.JsonValue;
 
 public class ProxyTableModel extends AbstractTableModel {
+	private static final Logger log = LoggerFactory
+			.getLogger(ProxyTableModel.class);
 	private static final long serialVersionUID = 1L;
-	private JsonArray data;
+	private List<ProxyConfig> data;
 	private final static String DOMAIN = "domain";
 	private final static String PORT = "port";
 	private final static String PATH = "path";
-	private final static String PREFIX = "prefix";
-	private final static String[] COLS = { DOMAIN, PORT, PATH, PREFIX };
-
-	public ProxyTableModel(JsonArray data) {
-		this.data = data;
-	}
+	private final static String NEW_PROXY = "newProxy";
+	private final static String[] COLS = { DOMAIN, PORT, PATH, NEW_PROXY };
 
 	public ProxyTableModel() {
-		this.data = new JsonArray();
-		data.add(new JsonObject());
-		data.add(new JsonObject());
+		log.debug("new table model");
+		this.data = new ArrayList<>();
 		fireTableDataChanged();
 	}
 
 	public void clear() {
-		data = new JsonArray();
+		data.clear();
 		fireTableDataChanged();
 		normalizeData();
 	}
@@ -40,10 +45,10 @@ public class ProxyTableModel extends AbstractTableModel {
 	public JsonArray getConfig() {
 		normalizeData();
 		JsonArray arr = new JsonArray();
-		for (JsonValue v : data) {
-			arr.add(v.getJsonObject());
+		Convertor converter = Convertor.get();
+		for (ProxyConfig config : data) {
+			arr.add(converter.toJson(config));
 		}
-		arr.remove(arr.size() - 1);
 		return arr;
 	}
 
@@ -59,67 +64,82 @@ public class ProxyTableModel extends AbstractTableModel {
 
 	@Override
 	public int getRowCount() {
-		return data.size();
+		int count = data.size() + 1;
+		count = Math.max(2, count);
+		return count;
 	}
 
 	@Override
 	public Object getValueAt(int row, int col) {
-		if (data.size() < row || row < 0)
+		if (data.size() <= row || row < 0)
 			return null;
-		JsonObject json = data.getJsonObject(row);
-		if (json != null)
-			return json.getString(COLS[col]);
-		else
-			return null;
+		ProxyConfig config = data.get(row);
+
+		switch (col) {
+		case 0:
+			return config.getHost();
+		case 1:
+			return config.getPort();
+		case 2:
+			return config.getPath();
+		case 3:
+			return config.isNewProxy();
+		}
+		return null;
 	}
 
-	@Override
-	public void setValueAt(Object value, int rowIndex, int columnIndex) {
-		if (value == null)
-			value = "";
-		data.getJsonObject(rowIndex).put(COLS[columnIndex], value.toString());
+	public ProxyConfig getProxyConfig(int row) {
+		ProxyConfig config = null;
+		if (data.size() > row) {
+			config = data.get(row);
+		}
+		return config;
+	}
+
+	public void setValue(int row, ProxyConfig config) {
+		if (data.size() > row) {
+			data.remove(row);
+			data.add(row, config);
+			fireTableRowsUpdated(row, row);
+		} else {
+			data.add(config);
+			fireTableRowsInserted(data.size() - 1, data.size() - 1);
+		}
 		normalizeData();
 	}
 
-	public void setValue(int row, String domain, String port, String path,
-			String prefix) {
-		JsonObject json = data.getJsonObject(row);
-		if (json != null) {
-			json.put(DOMAIN, domain);
-			json.put(PORT, port);
-			json.put(PATH, path);
-			json.put(PREFIX, prefix);
-			fireTableRowsUpdated(row, row);
-			normalizeData();
-		}
-	}
-
 	private void normalizeData() {
-		boolean changed = false;
-		for (int j = 0; j < data.size(); j++) {
-			JsonObject rowObj = data.getJsonObject(j);
-			boolean keep = false;
-			for (int i = 0; i < COLS.length; i++) {
-				String v = rowObj.getString(COLS[i]);
-				if (v != null && !v.equals("")) {
-					keep = true;
-					break;
-				}
-			}
+		List<ProxyConfig> toRemove = new ArrayList<>();
+		for (ProxyConfig config : data) {
+			boolean keep = true;
+			if (config.getPort() <= 0)
+				keep = false;
+			if (StringUtils.isBlank(config.getHost()))
+				keep = false;
+			if (StringUtils.isBlank(config.getPath()))
+				keep = false;
 			if (!keep) {
-				data.remove(j);
-				j--;
-				changed = true;
+				toRemove.add(config);
 			}
 		}
-		data.add(new JsonObject());
-		fireTableDataChanged();
+		if (!toRemove.isEmpty()) {
+			for (ProxyConfig config : toRemove) {
+				data.remove(config);
+			}
+			fireTableDataChanged();
+		}
 	}
 
 	public void setConfig(JsonArray data) {
 		if (data == null)
 			data = new JsonArray();
-		this.data = data;
+
+		this.data.clear();
+		Convertor converter = Convertor.get();
+		for (JsonValue v : data) {
+			ProxyConfig config = converter.readProxyConfig(v.getJsonObject());
+			this.data.add(config);
+		}
 		this.fireTableDataChanged();
 		this.normalizeData();
 	}

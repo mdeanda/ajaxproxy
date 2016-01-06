@@ -17,7 +17,6 @@ public class GeneralPanel extends JPanel {
 	private JTextField port;
 	private JTextField resourceBase;
 	private JCheckBox indexCheck;
-	private JCheckBox newProxyFlag;
 
 	public GeneralPanel(final SettingsChangedListener listener) {
 		SpringLayout layout = new SpringLayout();
@@ -44,18 +43,6 @@ public class GeneralPanel extends JPanel {
 		indexCheck = new JCheckBox("Show Directory Index");
 		add(indexCheck);
 		indexCheck.addChangeListener(new ChangeListener() {
-			@Override
-			public void stateChanged(ChangeEvent e) {
-				ButtonModel model = ((JCheckBox) e.getSource()).getModel();
-				if (model.isPressed()) {
-					listener.restartRequired();
-				}
-			}
-		});
-
-		newProxyFlag = new JCheckBox("Use New Proxy (incomplete)");
-		add(newProxyFlag);
-		newProxyFlag.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
 				ButtonModel model = ((JCheckBox) e.getSource()).getModel();
@@ -92,10 +79,6 @@ public class GeneralPanel extends JPanel {
 		layout.putConstraint(SpringLayout.WEST, indexCheck, 0,
 				SpringLayout.WEST, resourceBase);
 
-		layout.putConstraint(SpringLayout.NORTH, newProxyFlag, 20,
-				SpringLayout.SOUTH, indexCheck);
-		layout.putConstraint(SpringLayout.WEST, newProxyFlag, 0,
-				SpringLayout.WEST, indexCheck);
 
 	}
 
@@ -123,11 +106,4 @@ public class GeneralPanel extends JPanel {
 		return indexCheck.isSelected();
 	}
 
-	public void setNewProxy(boolean bool) {
-		newProxyFlag.setSelected(bool);
-	}
-
-	public boolean isNewProxy() {
-		return newProxyFlag.isSelected();
-	}
 }

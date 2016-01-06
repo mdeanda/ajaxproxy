@@ -4,9 +4,12 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Insets;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
+import javax.swing.BorderFactory;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
@@ -16,18 +19,27 @@ import javax.swing.UIDefaults;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class SwingUtils {
-	private static final Executor executor = Executors.newFixedThreadPool(3);
-
-	private static final Logger log = LoggerFactory.getLogger(SwingUtils.class);
+	// private static final Logger log =
+	// LoggerFactory.getLogger(SwingUtils.class);
+	private static final ThreadPoolExecutor executor = new ThreadPoolExecutor(
+			1, 6, 3, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+	static {
+		executor.allowCoreThreadTimeOut(true);
+	}
 
 	public static JLabel newJLabel(String label) {
 		JLabel ret = new JLabel(label);
 		ret.setHorizontalAlignment(SwingConstants.RIGHT);
 		return ret;
+	}
+
+	public static JComboBox<?> newJComboBox(Object[] items) {
+		JComboBox<Object> combo = new JComboBox<>(items);
+		// Insets insets = new Insets(4, 4, 4, 4);
+		combo.setBorder(BorderFactory.createEmptyBorder());
+
+		return combo;
 	}
 
 	public static JTextField newJTextField() {
@@ -112,6 +124,7 @@ public class SwingUtils {
 
 	public static void executNonUi(Runnable runnable) {
 		executor.execute(runnable);
-		;
+
+		// new Thread(runnable).start();
 	}
 }

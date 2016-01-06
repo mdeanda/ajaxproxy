@@ -1,6 +1,5 @@
 package com.thedeanda.ajaxproxy.ui.rest;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -18,7 +17,6 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
-import javax.swing.UIDefaults;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -265,7 +263,7 @@ public class RestClientPanel extends JPanel implements ActionListener {
 		}
 		String[] stmp = new String[tmp.size()];
 		tmp.toArray(stmp);
-		JComboBox methodCombo = new JComboBox<String>(stmp);
+		JComboBox<String> methodCombo = new JComboBox<>(stmp);
 		methodCombo.addActionListener(this);
 		return methodCombo;
 	}
@@ -359,18 +357,19 @@ public class RestClientPanel extends JPanel implements ActionListener {
 			@Override
 			public void run() {
 
-				RequestListener[] items = null;
+				RequestListener[] listeners = null;
 				if (listener != null) {
-					items = new RequestListener[2];
-					items[1] = listener;
+					listeners = new RequestListener[2];
+					listeners[1] = listener;
 				} else {
-					items = new RequestListener[1];
+					listeners = new RequestListener[1];
 				}
-				items[0] = outputPanel;
+				listeners[0] = outputPanel;
 
 				try {
 					log.info("making request");
-					httpClient.makeRequest(method, url, headers, input, items);
+					httpClient.makeRequest(method, url, headers, input,
+							listeners);
 				} catch (Exception e) {
 					log.warn(e.getMessage(), e);
 				}
