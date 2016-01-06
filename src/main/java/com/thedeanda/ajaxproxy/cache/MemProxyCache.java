@@ -23,6 +23,7 @@ public class MemProxyCache extends LinkedHashMap<String, CachedResponse>
 
 	public MemProxyCache() {
 		super(capacity, 1.1f, true);
+		log.debug("new cache");
 	}
 
 	@Override

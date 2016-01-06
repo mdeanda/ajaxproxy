@@ -23,12 +23,10 @@ public class WindowMenuHelper implements WindowListListener {
 	private static final Logger log = LoggerFactory
 			.getLogger(WindowMenuHelper.class);
 	private String windowId;
-	private JMenuBar menuBar;
 	private JMenu menu;
 
 	public WindowMenuHelper(String windowId, JMenuBar menuBar) {
 		this.windowId = windowId;
-		this.menuBar = menuBar;
 
 		menu = new JMenu("Window");
 		menu.setMnemonic(KeyEvent.VK_W);

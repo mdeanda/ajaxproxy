@@ -17,8 +17,6 @@ import javax.swing.event.ListDataListener;
 import org.apache.http.Header;
 
 public class ResourceListModel implements ListModel<Resource> {
-	private static final long serialVersionUID = -1203515236578998042L;
-
 	private List<ListDataListener> listeners = new ArrayList<>();
 	private Set<Resource> unfilteredItems = new TreeSet<>();
 	private List<Resource> items = new ArrayList<>();

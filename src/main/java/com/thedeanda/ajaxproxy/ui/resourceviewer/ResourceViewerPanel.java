@@ -70,9 +70,9 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 	private JMenuItem removeRequestMenuItem;
 	private JMenuItem replyMenuItem;
 	private JMenuItem clearMenuItem;
-	private AjaxProxy ajaxProxy;
 
 	public ResourceViewerPanel() {
+		log.debug("new viewer");
 		SpringLayout layout = new SpringLayout();
 		setLayout(layout);
 		model = new ResourceListModel();
@@ -302,7 +302,6 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 	}
 
 	public void setProxy(AjaxProxy ajaxProxy) {
-		this.ajaxProxy = ajaxProxy;
 		if (ajaxProxy != null) {
 			ajaxProxy.addTracker(this);
 			ajaxProxy.addRequestListener(this);

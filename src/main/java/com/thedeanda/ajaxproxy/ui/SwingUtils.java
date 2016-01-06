@@ -19,17 +19,14 @@ import javax.swing.UIDefaults;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class SwingUtils {
+	// private static final Logger log =
+	// LoggerFactory.getLogger(SwingUtils.class);
 	private static final ThreadPoolExecutor executor = new ThreadPoolExecutor(
 			1, 6, 3, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
 	static {
 		executor.allowCoreThreadTimeOut(true);
 	}
-
-	private static final Logger log = LoggerFactory.getLogger(SwingUtils.class);
 
 	public static JLabel newJLabel(String label) {
 		JLabel ret = new JLabel(label);
@@ -39,7 +36,7 @@ public class SwingUtils {
 
 	public static JComboBox<?> newJComboBox(Object[] items) {
 		JComboBox<Object> combo = new JComboBox<>(items);
-		Insets insets = new Insets(4, 4, 4, 4);
+		// Insets insets = new Insets(4, 4, 4, 4);
 		combo.setBorder(BorderFactory.createEmptyBorder());
 
 		return combo;
@@ -126,7 +123,6 @@ public class SwingUtils {
 	}
 
 	public static void executNonUi(Runnable runnable) {
-		// TODO: need to shutdown threadpool so app can quit
 		executor.execute(runnable);
 
 		// new Thread(runnable).start();

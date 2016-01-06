@@ -39,7 +39,6 @@ import com.thedeanda.ajaxproxy.http.HttpClient;
 import com.thedeanda.ajaxproxy.http.HttpClient.RequestMethod;
 import com.thedeanda.ajaxproxy.http.RequestListener;
 import com.thedeanda.ajaxproxy.model.ProxyContainer;
-import com.thedeanda.ajaxproxy.model.ProxyPath;
 import com.thedeanda.ajaxproxy.model.config.AjaxProxyConfig;
 import com.thedeanda.ajaxproxy.model.config.ProxyConfig;
 
@@ -53,8 +52,6 @@ import com.thedeanda.ajaxproxy.model.config.ProxyConfig;
 public class ProxyFilter implements Filter {
 	private static final Logger log = LoggerFactory
 			.getLogger(ProxyFilter.class);
-
-	private FilterConfig filterConfig;
 
 	private AjaxProxy ajaxProxy;
 
@@ -72,7 +69,6 @@ public class ProxyFilter implements Filter {
 
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
-		this.filterConfig = filterConfig;
 	}
 
 	@Override
@@ -95,7 +91,7 @@ public class ProxyFilter implements Filter {
 
 	private ProxyContainer getProxyMatcher(final HttpServletRequest request) {
 		String uri = request.getRequestURI();
-		log.debug(uri);
+		log.trace(uri);
 		ProxyContainer matcher = getProxyForPath(uri);
 		if (matcher != null) {
 			return matcher;
@@ -254,7 +250,8 @@ public class ProxyFilter implements Filter {
 						try {
 							// TODO: add response headers here to pass them
 							// along too!
-							log.warn("response headers:\n{}", responseHeaders);
+							log.warn("response headers:\n{}",
+									(Object[]) responseHeaders);
 
 							ServletOutputStream os = response.getOutputStream();
 							for (Header h : responseHeaders) {
@@ -301,7 +298,6 @@ public class ProxyFilter implements Filter {
 
 	public void reset() {
 		AjaxProxyConfig config = ajaxProxy.getAjaxProxyConfig();
-		List<ProxyPath> paths = ajaxProxy.getProxyPaths();
 		proxyContainers = new HashSet<ProxyContainer>();
 		for (ProxyConfig proxyConfig : config.getProxyConfig()) {
 			if (proxyConfig.isNewProxy()) {

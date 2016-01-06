@@ -3,7 +3,6 @@ package com.thedeanda.ajaxproxy.ui.border;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Insets;
 
 import javax.swing.UIDefaults;
@@ -14,7 +13,7 @@ public class BottomBorder implements Border {
 	@Override
 	public void paintBorder(Component c, Graphics g, int x, int y0, int width,
 			int height) {
-		Graphics2D g2 = (Graphics2D) g;
+		// Graphics2D g2 = (Graphics2D) g;
 		UIDefaults defaults = javax.swing.UIManager.getDefaults();
 		final Color light = defaults.getColor("SplitPane.highlight");
 		final Color dark = defaults.getColor("SplitPane.darkShadow");
@@ -26,7 +25,7 @@ public class BottomBorder implements Border {
 			g.setColor(dark);
 			g.fillRect(i, y, 1, 1);
 		}
-		//g.drawLine(0, height - 1, width, height - 1);
+		// g.drawLine(0, height - 1, width, height - 1);
 	}
 
 	@Override
