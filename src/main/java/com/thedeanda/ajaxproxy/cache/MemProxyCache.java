@@ -2,6 +2,7 @@ package com.thedeanda.ajaxproxy.cache;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,12 +19,22 @@ public class MemProxyCache extends LinkedHashMap<String, CachedResponse>
 	private static final Logger log = LoggerFactory
 			.getLogger(MemProxyCache.class);
 	private static final int capacity = 100;
+	private static final long CACHE_TIME = TimeUnit.MINUTES.toMillis(3);
 
 	private Object lock = new Object();
 
 	public MemProxyCache() {
 		super(capacity, 1.1f, true);
 		log.debug("new cache");
+	}
+
+	private void cleanup(CachedResponse response) {
+		if (response != null) {
+			synchronized (lock) {
+				remove(response.getRequestPath());
+			}
+		}
+		// TODO: also look for other expired items
 	}
 
 	@Override
@@ -42,9 +53,16 @@ public class MemProxyCache extends LinkedHashMap<String, CachedResponse>
 
 	@Override
 	public CachedResponse get(String urlPath) {
+		long expiredTs = System.currentTimeMillis() - CACHE_TIME;
+		CachedResponse response = null;
 		synchronized (lock) {
-			return super.get(urlPath);
+			response = super.get(urlPath);
 		}
+		if (response != null && response.getTimestamp() < expiredTs) {
+			cleanup(response);
+			response = null;
+		}
+		return response;
 	}
 
 	@Override

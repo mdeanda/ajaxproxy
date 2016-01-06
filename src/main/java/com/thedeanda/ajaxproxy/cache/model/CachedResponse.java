@@ -5,6 +5,7 @@ import org.apache.http.Header;
 public class CachedResponse {
 	private int id;
 	private String requestPath;
+	private long timestamp = System.currentTimeMillis();
 
 	private String url;
 
@@ -67,5 +68,13 @@ public class CachedResponse {
 
 	public void setReason(String reason) {
 		this.reason = reason;
+	}
+
+	public long getTimestamp() {
+		return timestamp;
+	}
+
+	public void setTimestamp(long timestamp) {
+		this.timestamp = timestamp;
 	}
 }
