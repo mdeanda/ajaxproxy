@@ -66,7 +66,7 @@ public class ProxyEditorPanel extends JPanel {
 
 		newProxyCheckbox = new JCheckBox("Use New Proxy");
 		newProxyCheckbox
-				.setToolTipText("New proxy implementation does not rely on the old Jetty transparent proxy servlet");
+				.setToolTipText("New proxy implementation does not rely on the old Jetty transparent proxy servlet. Paths should be regular expressions instead of web.xml style paths. (Usually it means to change a /* to /.*)");
 		add(newProxyCheckbox);
 
 		cacheCheckbox = new JCheckBox("Cache Requests");
