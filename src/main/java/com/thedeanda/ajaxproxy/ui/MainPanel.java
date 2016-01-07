@@ -26,6 +26,8 @@ import org.slf4j.impl.LogListener;
 
 import com.thedeanda.ajaxproxy.AjaxProxy;
 import com.thedeanda.ajaxproxy.ProxyListener;
+import com.thedeanda.ajaxproxy.ui.merge.MergePanel;
+import com.thedeanda.ajaxproxy.ui.merge.MergeTableModel;
 import com.thedeanda.ajaxproxy.ui.proxy.ProxyPanel;
 import com.thedeanda.ajaxproxy.ui.proxy.ProxyTableModel;
 import com.thedeanda.ajaxproxy.ui.resourceviewer.ResourceViewerPanel;

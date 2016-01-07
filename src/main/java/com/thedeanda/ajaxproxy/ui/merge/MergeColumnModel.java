@@ -1,7 +1,8 @@
-package com.thedeanda.ajaxproxy.ui;
+package com.thedeanda.ajaxproxy.ui.merge;
 
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.TableColumn;
+
 
 public class MergeColumnModel extends DefaultTableColumnModel {
 	private static final long serialVersionUID = 1L;

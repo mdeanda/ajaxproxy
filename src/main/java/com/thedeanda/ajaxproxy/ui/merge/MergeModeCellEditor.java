@@ -1,4 +1,4 @@
-package com.thedeanda.ajaxproxy.ui;
+package com.thedeanda.ajaxproxy.ui.merge;
 
 import java.awt.Component;
 
