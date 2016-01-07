@@ -1,6 +1,5 @@
 package com.thedeanda.ajaxproxy.ui;
 
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -14,15 +13,11 @@ import java.util.Map;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
 import javax.swing.SpringLayout;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.impl.ListenerSupportedSimpleLoggerFactory;
-import org.slf4j.impl.LogListener;
 
 import com.thedeanda.ajaxproxy.AjaxProxy;
 import com.thedeanda.ajaxproxy.ProxyListener;
@@ -36,7 +31,7 @@ import com.thedeanda.ajaxproxy.ui.variable.VariablesPanel;
 import com.thedeanda.javajson.JsonException;
 import com.thedeanda.javajson.JsonObject;
 
-public class MainPanel extends JPanel implements ProxyListener, LogListener,
+public class MainPanel extends JPanel implements ProxyListener,
 		SettingsChangedListener {
 	private static final long serialVersionUID = 1L;
 	private static final Logger log = LoggerFactory.getLogger(MainPanel.class);
@@ -48,11 +43,9 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener,
 	private VariableTableModel variableModel;
 	private File configFile;
 	private JsonObject config;
-	private JTextArea logBox;
 	private OptionsPanel optionsPanel;
 	private FileTrackerPanel trackerPanel;
 	private JTabbedPane tabs;
-	private JScrollPane logBoxScrollPane;
 	private GeneralPanel generalPanel;
 
 	private static final String START = "Start";
@@ -60,14 +53,11 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener,
 
 	private List<ProxyListener> listeners = new ArrayList<ProxyListener>();
 	private ResourceViewerPanel resourceViewerPanel;
-	private JTextArea logTextArea;
 	private JButton restartButton;
 
 	public MainPanel() {
 		SpringLayout layout = new SpringLayout();
 		setLayout(layout);
-
-		ListenerSupportedSimpleLoggerFactory.addListener(this);
 
 		btn = new JButton(START);
 		btn.addActionListener(new ActionListener() {
@@ -104,18 +94,6 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener,
 
 		resourceViewerPanel = new ResourceViewerPanel();
 		tabs.add("Resource Viewer", resourceViewerPanel);
-
-		logTextArea = new JTextArea();
-		logTextArea.setWrapStyleWord(true);
-		logTextArea.setLineWrap(true);
-		this.logBox = logTextArea;
-		Font font = logTextArea.getFont();
-		logTextArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, font
-				.getSize()));
-		// ta.setEditable(false);
-		this.logBoxScrollPane = new JScrollPane(logTextArea);
-		tabs.add("Log", logBoxScrollPane);
-		// LF5SwingUtils.makeVerticalScrollBarTrack(logBoxScrollPane);
 
 		add(btn);
 		restartButton = new JButton("Restart Required");
@@ -221,7 +199,6 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener,
 		if (started)
 			return;
 
-		logBox.setText("");
 		try {
 			btn.setText(STOP);
 			JsonObject json = JsonObject.parse(getConfig().toString());
@@ -239,7 +216,6 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener,
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			failed();
-			this.tabs.setSelectedComponent(logBoxScrollPane);
 		}
 	}
 
@@ -332,11 +308,6 @@ public class MainPanel extends JPanel implements ProxyListener, LogListener,
 	public void failed() {
 		log.error("failed, so calling stop");
 		this.stop();
-	}
-
-	@Override
-	public void write(String msg) {
-		logTextArea.append(msg);
 	}
 
 	@Override

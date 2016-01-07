@@ -8,11 +8,11 @@ public class VariableColumnModel extends DefaultTableColumnModel {
 
 	public VariableColumnModel() {
 		TableColumn col = new TableColumn(0, 100);
-		col.setHeaderValue("key");
+		col.setHeaderValue("Key");
 		this.addColumn(col);
 
 		col = new TableColumn(1, 500);
-		col.setHeaderValue("value");
+		col.setHeaderValue("Value");
 		this.addColumn(col);
 	}
 }
