@@ -5,6 +5,7 @@ import java.awt.BorderLayout;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.SpringLayout;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
@@ -15,11 +16,13 @@ public class MergePanel extends JPanel {
 
 	public MergePanel(final SettingsChangedListener listener,
 			MergeTableModel mergeModel) {
-		setLayout(new BorderLayout());
+		SpringLayout layout = new SpringLayout();
+		setLayout(layout);
+
 		JTable mergeTable = new JTable(mergeModel);
 		mergeTable.setColumnModel(new MergeColumnModel());
 		JScrollPane scroll = new JScrollPane(mergeTable);
-		add(BorderLayout.CENTER, scroll);
+		add(scroll);
 		mergeModel.addTableModelListener(new TableModelListener() {
 			@Override
 			public void tableChanged(TableModelEvent e) {
@@ -27,5 +30,15 @@ public class MergePanel extends JPanel {
 				listener.restartRequired();
 			}
 		});
+
+		layout.putConstraint(SpringLayout.NORTH, scroll, 10,
+				SpringLayout.NORTH, this);
+		layout.putConstraint(SpringLayout.WEST, scroll, 10, SpringLayout.WEST,
+				this);
+		layout.putConstraint(SpringLayout.EAST, scroll, -10, SpringLayout.EAST,
+				this);
+		layout.putConstraint(SpringLayout.SOUTH, scroll, -10,
+				SpringLayout.SOUTH, this);
+
 	}
 }
