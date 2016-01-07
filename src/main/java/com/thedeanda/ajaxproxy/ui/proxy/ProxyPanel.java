@@ -41,7 +41,6 @@ public class ProxyPanel extends JPanel implements EditorListener {
 
 				});
 		scroll = new JScrollPane(proxyTable);
-
 		add(scroll);
 
 		proxyModel.addTableModelListener(new TableModelListener() {
