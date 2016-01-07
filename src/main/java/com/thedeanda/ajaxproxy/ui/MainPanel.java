@@ -26,6 +26,7 @@ import com.thedeanda.ajaxproxy.ui.merge.MergeTableModel;
 import com.thedeanda.ajaxproxy.ui.proxy.ProxyPanel;
 import com.thedeanda.ajaxproxy.ui.proxy.ProxyTableModel;
 import com.thedeanda.ajaxproxy.ui.resourceviewer.ResourceViewerPanel;
+import com.thedeanda.ajaxproxy.ui.tracker.FileTrackerPanel;
 import com.thedeanda.ajaxproxy.ui.variable.VariableTableModel;
 import com.thedeanda.ajaxproxy.ui.variable.VariablesPanel;
 import com.thedeanda.javajson.JsonException;

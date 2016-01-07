@@ -1,4 +1,4 @@
-package com.thedeanda.ajaxproxy.ui;
+package com.thedeanda.ajaxproxy.ui.tracker;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,6 +13,7 @@ import javax.swing.SpringLayout;
 import com.thedeanda.ajaxproxy.AccessTracker;
 import com.thedeanda.ajaxproxy.AjaxProxy;
 import com.thedeanda.ajaxproxy.LoadedResource;
+import com.thedeanda.ajaxproxy.ui.FileTrackerColumnModel;
 import com.thedeanda.javajson.JsonObject;
 
 /** tracks files that get loaded */

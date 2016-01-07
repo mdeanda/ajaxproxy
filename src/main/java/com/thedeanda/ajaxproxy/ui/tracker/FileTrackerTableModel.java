@@ -1,4 +1,4 @@
-package com.thedeanda.ajaxproxy.ui;
+package com.thedeanda.ajaxproxy.ui.tracker;
 
 import java.util.ArrayList;
 import java.util.Collections;
