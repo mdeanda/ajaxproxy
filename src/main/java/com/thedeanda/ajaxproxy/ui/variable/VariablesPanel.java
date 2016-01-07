@@ -1,4 +1,4 @@
-package com.thedeanda.ajaxproxy.ui;
+package com.thedeanda.ajaxproxy.ui.variable;
 
 import java.awt.BorderLayout;
 
@@ -6,6 +6,8 @@ import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
+
+import com.thedeanda.ajaxproxy.ui.SettingsChangedListener;
 
 public class VariablesPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
