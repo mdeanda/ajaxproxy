@@ -246,6 +246,7 @@ public class ProxyFilter implements Filter {
 						// TODO: add cached header so its easy to tell it was
 						// cached
 						cachedResponse.setHeaders(responseHeaders);
+						response.setStatus(status);
 
 						try {
 							// TODO: add response headers here to pass them
