@@ -24,7 +24,6 @@ public class FileTrackerPanel extends JPanel implements AccessTracker {
 	private FileTrackerTableModel model;
 
 	public FileTrackerPanel() {
-		// this.setLayout(new MigLayout("fill", "", "[50][fill]"));
 		SpringLayout layout = new SpringLayout();
 		setLayout(layout);
 		model = new FileTrackerTableModel();
@@ -55,11 +54,11 @@ public class FileTrackerPanel extends JPanel implements AccessTracker {
 
 		layout.putConstraint(SpringLayout.NORTH, scroll, 30,
 				SpringLayout.SOUTH, clearBtn);
-		layout.putConstraint(SpringLayout.SOUTH, scroll, 0, SpringLayout.SOUTH,
+		layout.putConstraint(SpringLayout.SOUTH, scroll, -10, SpringLayout.SOUTH,
 				this);
-		layout.putConstraint(SpringLayout.WEST, scroll, 0, SpringLayout.WEST,
+		layout.putConstraint(SpringLayout.WEST, scroll, 10, SpringLayout.WEST,
 				this);
-		layout.putConstraint(SpringLayout.EAST, scroll, 0, SpringLayout.EAST,
+		layout.putConstraint(SpringLayout.EAST, scroll, -10, SpringLayout.EAST,
 				this);
 	}
 

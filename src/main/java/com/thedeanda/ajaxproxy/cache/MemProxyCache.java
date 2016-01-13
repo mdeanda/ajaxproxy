@@ -28,13 +28,11 @@ public class MemProxyCache extends LinkedHashMap<String, CachedResponse>
 		log.debug("new cache");
 	}
 
-	private void cleanup(CachedResponse response) {
-		if (response != null) {
-			synchronized (lock) {
-				remove(response.getRequestPath());
-			}
+	private void cleanupExpired(CachedResponse response) {
+		synchronized (lock) {
+			remove(response.getRequestPath());
+			// TODO: also look for other expired items
 		}
-		// TODO: also look for other expired items
 	}
 
 	@Override
@@ -59,7 +57,7 @@ public class MemProxyCache extends LinkedHashMap<String, CachedResponse>
 			response = super.get(urlPath);
 		}
 		if (response != null && response.getTimestamp() < expiredTs) {
-			cleanup(response);
+			cleanupExpired(response);
 			response = null;
 		}
 		return response;

@@ -44,6 +44,7 @@ import com.thedeanda.ajaxproxy.AjaxProxy;
 import com.thedeanda.ajaxproxy.LoadedResource;
 import com.thedeanda.ajaxproxy.http.RequestListener;
 import com.thedeanda.ajaxproxy.ui.SwingUtils;
+import com.thedeanda.ajaxproxy.ui.border.BottomBorder;
 import com.thedeanda.ajaxproxy.ui.model.Resource;
 import com.thedeanda.ajaxproxy.ui.model.ResourceListModel;
 import com.thedeanda.ajaxproxy.ui.rest.RestClientFrame;
@@ -94,9 +95,15 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 			}
 		});
 
-		add(clearBtn);
-		add(exportBtn);
-		add(toggleBtn);
+		JPanel topPanel = new JPanel();
+		SpringLayout topPanelLayout = new SpringLayout();
+		topPanel.setLayout(topPanelLayout);
+
+		topPanel.add(clearBtn);
+		topPanel.add(exportBtn);
+		topPanel.add(toggleBtn);
+		add(topPanel);
+		topPanel.setBorder(new BottomBorder());
 
 		JPanel leftPanel = initLeftPanel();
 		JPanel rightPanel = initRightPanel();
@@ -109,26 +116,35 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 		SwingUtils.flattenSplitPane(split);
 		add(split);
 
-		layout.putConstraint(SpringLayout.NORTH, clearBtn, 20,
-				SpringLayout.NORTH, this);
-		layout.putConstraint(SpringLayout.WEST, clearBtn, 10,
-				SpringLayout.WEST, this);
-		layout.putConstraint(SpringLayout.NORTH, exportBtn, 0,
+		topPanelLayout.putConstraint(SpringLayout.NORTH, clearBtn, 20,
+				SpringLayout.NORTH, topPanel);
+		topPanelLayout.putConstraint(SpringLayout.WEST, clearBtn, 10,
+				SpringLayout.WEST, topPanel);
+		topPanelLayout.putConstraint(SpringLayout.NORTH, exportBtn, 0,
 				SpringLayout.NORTH, clearBtn);
-		layout.putConstraint(SpringLayout.WEST, exportBtn, 10,
+		topPanelLayout.putConstraint(SpringLayout.WEST, exportBtn, 10,
 				SpringLayout.EAST, clearBtn);
-		layout.putConstraint(SpringLayout.NORTH, toggleBtn, 20,
-				SpringLayout.NORTH, this);
-		layout.putConstraint(SpringLayout.EAST, toggleBtn, -10,
-				SpringLayout.EAST, this);
+		topPanelLayout.putConstraint(SpringLayout.NORTH, toggleBtn, 20,
+				SpringLayout.NORTH, topPanel);
+		topPanelLayout.putConstraint(SpringLayout.EAST, toggleBtn, -10,
+				SpringLayout.EAST, topPanel);
 
-		layout.putConstraint(SpringLayout.NORTH, split, 30, SpringLayout.SOUTH,
-				clearBtn);
-		layout.putConstraint(SpringLayout.SOUTH, split, -10,
-				SpringLayout.SOUTH, this);
+		layout.putConstraint(SpringLayout.NORTH, topPanel, 0,
+				SpringLayout.NORTH, this);
+		layout.putConstraint(SpringLayout.SOUTH, topPanel, 60,
+				SpringLayout.NORTH, this);
+		layout.putConstraint(SpringLayout.WEST, topPanel, 0, SpringLayout.WEST,
+				this);
+		layout.putConstraint(SpringLayout.EAST, topPanel, 0, SpringLayout.EAST,
+				this);
+
+		layout.putConstraint(SpringLayout.NORTH, split, 0, SpringLayout.SOUTH,
+				topPanel);
+		layout.putConstraint(SpringLayout.SOUTH, split, 0, SpringLayout.SOUTH,
+				this);
 		layout.putConstraint(SpringLayout.WEST, split, 0, SpringLayout.WEST,
 				this);
-		layout.putConstraint(SpringLayout.EAST, split, -10, SpringLayout.EAST,
+		layout.putConstraint(SpringLayout.EAST, split, 0, SpringLayout.EAST,
 				this);
 
 	}
@@ -140,13 +156,13 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 
 		panel.add(resourcePanel);
 
-		layout.putConstraint(SpringLayout.NORTH, resourcePanel, 0,
+		layout.putConstraint(SpringLayout.NORTH, resourcePanel, 10,
 				SpringLayout.NORTH, panel);
 		layout.putConstraint(SpringLayout.WEST, resourcePanel, 10,
 				SpringLayout.WEST, panel);
 		layout.putConstraint(SpringLayout.EAST, resourcePanel, -10,
 				SpringLayout.EAST, panel);
-		layout.putConstraint(SpringLayout.SOUTH, resourcePanel, 0,
+		layout.putConstraint(SpringLayout.SOUTH, resourcePanel, -10,
 				SpringLayout.SOUTH, panel);
 
 		return panel;
@@ -224,7 +240,7 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 		JScrollPane scroll = new JScrollPane(list);
 		panel.add(scroll);
 
-		layout.putConstraint(SpringLayout.NORTH, filter, 0, SpringLayout.NORTH,
+		layout.putConstraint(SpringLayout.NORTH, filter, 10, SpringLayout.NORTH,
 				panel);
 		layout.putConstraint(SpringLayout.WEST, filter, 10, SpringLayout.WEST,
 				panel);
@@ -237,8 +253,8 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 				panel);
 		layout.putConstraint(SpringLayout.EAST, scroll, -10, SpringLayout.EAST,
 				panel);
-		layout.putConstraint(SpringLayout.SOUTH, scroll, 0, SpringLayout.SOUTH,
-				panel);
+		layout.putConstraint(SpringLayout.SOUTH, scroll, -10,
+				SpringLayout.SOUTH, panel);
 
 		return panel;
 	}
