@@ -84,6 +84,8 @@ public class ProxyTableModel extends AbstractTableModel {
 			return config.getPath();
 		case 3:
 			return config.isNewProxy();
+		case 4:
+			return config.isEnableCache();
 		}
 		return null;
 	}
