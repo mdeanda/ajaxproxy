@@ -30,7 +30,6 @@ import org.apache.http.Header;
 
 import com.thedeanda.ajaxproxy.LoadedResource;
 import com.thedeanda.ajaxproxy.ui.ContentViewer;
-import com.thedeanda.ajaxproxy.ui.ResourceFrame;
 import com.thedeanda.ajaxproxy.ui.SwingUtils;
 import com.thedeanda.ajaxproxy.ui.model.Resource;
 import com.thedeanda.ajaxproxy.ui.rest.RestClientFrame;

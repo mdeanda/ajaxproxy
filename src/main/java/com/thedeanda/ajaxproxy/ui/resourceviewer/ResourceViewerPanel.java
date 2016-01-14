@@ -240,8 +240,8 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 		JScrollPane scroll = new JScrollPane(list);
 		panel.add(scroll);
 
-		layout.putConstraint(SpringLayout.NORTH, filter, 10, SpringLayout.NORTH,
-				panel);
+		layout.putConstraint(SpringLayout.NORTH, filter, 10,
+				SpringLayout.NORTH, panel);
 		layout.putConstraint(SpringLayout.WEST, filter, 10, SpringLayout.WEST,
 				panel);
 		layout.putConstraint(SpringLayout.EAST, filter, -10, SpringLayout.EAST,
@@ -464,20 +464,37 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 
 	@Override
 	public void newRequest(UUID id, String url, String method) {
-		model.add(new Resource(id, url, method));
+		final Resource resource = new Resource(id, url, method);
+		SwingUtils.executNonUi(new Runnable() {
+			@Override
+			public void run() {
+				model.add(resource);
+			}
+		});
 	}
 
 	@Override
-	public void startRequest(UUID id, URL url, Header[] requestHeaders,
-			byte[] data) {
-		model.startRequest(id, url, requestHeaders, data);
+	public void startRequest(final UUID id, final URL url,
+			final Header[] requestHeaders, final byte[] data) {
+		SwingUtils.executNonUi(new Runnable() {
+			@Override
+			public void run() {
+				model.startRequest(id, url, requestHeaders, data);
+			}
+		});
 	}
 
 	@Override
-	public void requestComplete(UUID id, int status, String reason,
-			long duration, Header[] responseHeaders, byte[] data) {
-		model.requestComplete(id, status, reason, duration, responseHeaders,
-				data);
+	public void requestComplete(final UUID id, final int status,
+			final String reason, final long duration,
+			final Header[] responseHeaders, final byte[] data) {
+		SwingUtils.executNonUi(new Runnable() {
+			@Override
+			public void run() {
+				model.requestComplete(id, status, reason, duration,
+						responseHeaders, data);
+			}
+		});
 	}
 
 	@Override
