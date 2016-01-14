@@ -1,4 +1,4 @@
-package com.thedeanda.ajaxproxy.ui;
+package com.thedeanda.ajaxproxy.ui.tracker;
 
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.TableColumn;
