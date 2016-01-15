@@ -62,6 +62,7 @@ public class ContentViewer extends JPanel {
 			return;
 		}
 		
+		//TODO: use swingworker here
 		SwingUtils.executNonUi(new Runnable() {
 			@Override
 			public void run() {

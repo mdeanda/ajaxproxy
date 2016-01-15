@@ -83,6 +83,9 @@ public class ResourceCellRenderer extends JPanel implements
 			color = lightColor;
 		}
 		// slowColors
+		if (resource == null) {
+			return this;
+		}
 
 		LoadedResource lr = resource.getLoadedResource();
 		if (lr != null) {

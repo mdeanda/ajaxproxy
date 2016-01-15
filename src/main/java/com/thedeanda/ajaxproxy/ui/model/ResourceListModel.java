@@ -4,47 +4,43 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
-import javax.swing.ListModel;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
+import javax.swing.AbstractListModel;
 
 import org.apache.http.Header;
 
-public class ResourceListModel implements ListModel<Resource> {
-	private List<ListDataListener> listeners = new ArrayList<>();
+public class ResourceListModel extends AbstractListModel<Resource> {
 	private Set<Resource> unfilteredItems = new TreeSet<>();
 	private List<Resource> items = new ArrayList<>();
+	private Map<String, Resource> resourceMap = new HashMap<>();
 
 	private Pattern filterRegEx;
 
 	public void add(Resource item) {
 		synchronized (unfilteredItems) {
+			if (item.getId() != null) {
+				resourceMap.put(item.getId().toString(), item);
+			}
 			unfilteredItems.add(item);
 		}
 		if (filterRegEx == null
 				|| filterRegEx.matcher(item.getPath()).matches()) {
 			addSorted(item, items);
 		}
-
-		for (ListDataListener listener : listeners) {
-			listener.intervalAdded(new ListDataEvent(this,
-					ListDataEvent.INTERVAL_ADDED, items.size() - 1, items
-							.size()));
-		}
 	}
 
 	private void addSorted(Resource res, List<Resource> list) {
 		int index = 0;
-		for (Resource item : list) {
-			if (item.getStartTime() < res.getStartTime()) {
-				index++;
-			} else {
+		for (index = list.size() - 1; index >= 0; index--) {
+			Resource item = list.get(index);
+			if (item != null && item.getStartTime() > res.getStartTime()) {
 				break;
 			}
 		}
@@ -52,18 +48,17 @@ public class ResourceListModel implements ListModel<Resource> {
 		if (index >= 0) {
 			list.add(index, res);
 		} else {
+			index = list.size();
 			list.add(res);
 		}
+		fireIntervalAdded(this, index, index);
 	}
 
 	private void resetFilter() {
 		int size = items.size();
 		items.clear();
 		if (size > 0) {
-			for (ListDataListener listener : listeners) {
-				listener.intervalRemoved(new ListDataEvent(this,
-						ListDataEvent.INTERVAL_REMOVED, 0, size - 1));
-			}
+			fireIntervalRemoved(this, 0, size - 1);
 		}
 
 		Set<Resource> copyOfAllItems = null;
@@ -84,31 +79,21 @@ public class ResourceListModel implements ListModel<Resource> {
 
 		size = items.size();
 		if (size > 0) {
-			for (ListDataListener listener : listeners) {
-				listener.intervalAdded(new ListDataEvent(this,
-						ListDataEvent.INTERVAL_ADDED, 0, size - 1));
-			}
+			fireIntervalAdded(this, 0, size - 1);
 		}
 
-	}
-
-	@Override
-	public void addListDataListener(ListDataListener l) {
-		listeners.add(l);
 	}
 
 	public void clear() {
 		int size = items.size();
 		items.clear();
 		synchronized (unfilteredItems) {
+			resourceMap.clear();
 			unfilteredItems.clear();
 		}
 
 		if (size > 0) {
-			for (ListDataListener listener : listeners) {
-				listener.intervalRemoved(new ListDataEvent(this,
-						ListDataEvent.INTERVAL_REMOVED, 0, size - 1));
-			}
+			fireIntervalRemoved(this, 0, size - 1);
 		}
 
 	}
@@ -124,7 +109,7 @@ public class ResourceListModel implements ListModel<Resource> {
 		int index = -1;
 		for (int i = 0; i < items.size(); i++) {
 			Resource r = items.get(i);
-			if (r.getId() == id) {
+			if (r != null && r.getId() == id) {
 				index = i;
 				break;
 			}
@@ -132,10 +117,7 @@ public class ResourceListModel implements ListModel<Resource> {
 
 		if (index >= 0) {
 			final int theIndex = index;
-			for (ListDataListener listener : listeners) {
-				listener.contentsChanged(new ListDataEvent(this,
-						ListDataEvent.CONTENTS_CHANGED, theIndex, theIndex));
-			}
+			fireContentsChanged(this, theIndex, theIndex);
 		}
 	}
 
@@ -143,18 +125,9 @@ public class ResourceListModel implements ListModel<Resource> {
 		if (id == null) {
 			throw new NullPointerException("uuid is null?");
 		}
-		// TODO: use a map
 		synchronized (unfilteredItems) {
-			for (Resource r : unfilteredItems) {
-				if (r.getLoadedResource() != null) {
-					continue;
-				}
-				if (id.toString().equals(r.getId().toString())) {
-					return r;
-				}
-			}
+			return resourceMap.get(id.toString());
 		}
-		return null;
 	}
 
 	@Override
@@ -183,15 +156,7 @@ public class ResourceListModel implements ListModel<Resource> {
 			unfilteredItems.remove(resource);
 		}
 
-		for (ListDataListener listener : listeners) {
-			listener.intervalRemoved(new ListDataEvent(this,
-					ListDataEvent.INTERVAL_REMOVED, index, index));
-		}
-	}
-
-	@Override
-	public void removeListDataListener(ListDataListener l) {
-		listeners.remove(l);
+		fireIntervalRemoved(this, index, index);
 	}
 
 	public void startRequest(UUID id, URL url, Header[] requestHeaders,

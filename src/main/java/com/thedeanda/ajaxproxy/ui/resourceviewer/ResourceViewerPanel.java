@@ -354,6 +354,8 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 	}
 
 	private void export() {
+		
+		//TODO: move this off swing thread
 		final JFileChooser fc = new JFileChooser();
 		fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		int returnVal = fc.showSaveDialog(this);
@@ -464,37 +466,31 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 
 	@Override
 	public void newRequest(UUID id, String url, String method) {
-		final Resource resource = new Resource(id, url, method);
-		SwingUtils.executNonUi(new Runnable() {
-			@Override
-			public void run() {
-				model.add(resource);
-			}
-		});
+		boolean enableMonitor = toggleBtn.isSelected();
+		if (enableMonitor) {
+			final Resource resource = new Resource(id, url, method);
+			model.add(resource);
+		}
 	}
 
 	@Override
 	public void startRequest(final UUID id, final URL url,
 			final Header[] requestHeaders, final byte[] data) {
-		SwingUtils.executNonUi(new Runnable() {
-			@Override
-			public void run() {
-				model.startRequest(id, url, requestHeaders, data);
-			}
-		});
+		boolean enableMonitor = toggleBtn.isSelected();
+		if (enableMonitor) {
+			model.startRequest(id, url, requestHeaders, data);
+		}
 	}
 
 	@Override
 	public void requestComplete(final UUID id, final int status,
 			final String reason, final long duration,
 			final Header[] responseHeaders, final byte[] data) {
-		SwingUtils.executNonUi(new Runnable() {
-			@Override
-			public void run() {
-				model.requestComplete(id, status, reason, duration,
-						responseHeaders, data);
-			}
-		});
+		boolean enableMonitor = toggleBtn.isSelected();
+		if (enableMonitor) {
+			model.requestComplete(id, status, reason, duration,
+					responseHeaders, data);
+		}
 	}
 
 	@Override
