@@ -136,7 +136,7 @@ public class ProxyFilter implements Filter {
 				inputHeaders.append(hn + ": " + request.getHeader(hn) + "\n");
 			}
 		}
-		log.info("headers: {}", inputHeaders);
+		log.trace("headers: {}", inputHeaders);
 
 		StringBuilder proxyUrl = new StringBuilder();
 		proxyUrl.append("http://" + proxyConfig.getHost());
@@ -147,7 +147,7 @@ public class ProxyFilter implements Filter {
 		if (queryString != null) {
 			proxyUrl.append("?" + queryString);
 		}
-		log.info("new proxy method to: {}", proxyUrl);
+		log.trace("new proxy method to: {}", proxyUrl);
 
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		IOUtils.copy(request.getInputStream(), baos);
@@ -179,7 +179,7 @@ public class ProxyFilter implements Filter {
 	private void sendCachedResponse(HttpServletRequest request, String headers,
 			CachedResponse cachedResponse, final HttpServletResponse response)
 			throws IOException {
-		log.info("Using cached response: {}", cachedResponse.getUrl());
+		log.debug("Using cached response: {}", cachedResponse.getUrl());
 		ServletOutputStream os = response.getOutputStream();
 		for (Header h : cachedResponse.getHeaders()) {
 			response.addHeader(h.getName(), h.getValue());
@@ -251,7 +251,7 @@ public class ProxyFilter implements Filter {
 						try {
 							// TODO: add response headers here to pass them
 							// along too!
-							log.warn("response headers:\n{}",
+							log.debug("response headers:\n{}",
 									(Object[]) responseHeaders);
 
 							ServletOutputStream os = response.getOutputStream();

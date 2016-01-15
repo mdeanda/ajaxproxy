@@ -68,7 +68,7 @@ public class HttpClient {
 		HostnameVerifier verifier = new HostnameVerifier() {
 			@Override
 			public boolean verify(String hostname, SSLSession session) {
-				log.warn("verify {}", hostname);
+				log.debug("verify {}", hostname);
 				return true;
 			}
 		};
@@ -252,13 +252,13 @@ public class HttpClient {
 				break;
 			}
 			request.setHeaders(requestHeaders);
-			log.info(">> Request URI: " + request.getRequestLine().getUri());
+			log.trace(">> Request URI: " + request.getRequestLine().getUri());
 
 			long start = System.currentTimeMillis();
 			HttpResponse response = client.execute(request);
 			long end = System.currentTimeMillis();
 			StatusLine status = response.getStatusLine();
-			log.info("<< Response: " + response.getStatusLine());
+			log.trace("<< Response: " + response.getStatusLine());
 
 			byte[] bytes = null;
 			HttpEntity entity = response.getEntity();
