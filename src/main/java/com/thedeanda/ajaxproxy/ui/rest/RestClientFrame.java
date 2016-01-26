@@ -17,6 +17,7 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.KeyStroke;
 
 import org.apache.http.Header;
 import org.slf4j.Logger;
@@ -97,7 +98,7 @@ public class RestClientFrame extends JFrame implements RequestListener,
 		addHeaders(resource.getRequestHeaders());
 
 	}
-	
+
 	private void addHeaders(Header[] headers) {
 		panel.setHeaders("");
 		if (headers != null) {
@@ -121,6 +122,30 @@ public class RestClientFrame extends JFrame implements RequestListener,
 		menu.setMnemonic(KeyEvent.VK_F);
 		mb.add(menu);
 
+		mi = new JMenuItem("New");
+		mi.setMnemonic(KeyEvent.VK_N);
+		mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N,
+				ActionEvent.CTRL_MASK));
+		mi.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent ae) {
+				handleNew();
+			}
+		});
+		menu.add(mi);
+
+		mi = new JMenuItem("Clone");
+		mi.setMnemonic(KeyEvent.VK_L);
+		mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L,
+				ActionEvent.CTRL_MASK));
+		mi.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent ae) {
+				handleClone();
+			}
+		});
+		menu.add(mi);
+
 		menu.addSeparator();
 
 		mi = new JMenuItem("Exit");
@@ -132,6 +157,20 @@ public class RestClientFrame extends JFrame implements RequestListener,
 			}
 		});
 		menu.add(mi);
+	}
+
+	private void handleNew() {
+		RestClientFrame rest = new RestClientFrame();
+		rest.setVisible(true);
+	}
+
+	private void handleClone() {
+		RestClientFrame rest = new RestClientFrame();
+		rest.panel.setUrl(panel.getUrl());
+		rest.panel.setHeaders(panel.getHeaders());
+		rest.panel.setInput(panel.getInput());
+		rest.panel.setMethod(panel.getMethod());
+		rest.setVisible(true);
 	}
 
 	private void handleExit() {

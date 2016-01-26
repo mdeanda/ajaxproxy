@@ -404,4 +404,20 @@ public class RestClientPanel extends JPanel implements ActionListener {
 	public void setMethod(String method) {
 		methodCombo.setSelectedItem(method);
 	}
+
+	public String getUrl() {
+		return urlField.getText();
+	}
+
+	public String getInput() {
+		return inputField.getText();
+	}
+
+	public String getHeaders() {
+		return headersField.getText();
+	}
+
+	public String getMethod() {
+		return (String) methodCombo.getSelectedItem();
+	}
 }
