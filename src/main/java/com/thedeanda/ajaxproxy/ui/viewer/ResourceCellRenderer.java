@@ -73,9 +73,9 @@ public class ResourceCellRenderer extends JPanel implements
 	}
 
 	@Override
-	public Component getListCellRendererComponent(JList list,
-			Resource resource, int index, boolean isSelected,
-			boolean cellHasFocus) {
+	public Component getListCellRendererComponent(
+			JList<? extends Resource> list, Resource resource, int index,
+			boolean isSelected, boolean cellHasFocus) {
 
 		Color color = list.getBackground();
 		boolean slowColor = false;
@@ -87,23 +87,17 @@ public class ResourceCellRenderer extends JPanel implements
 			return this;
 		}
 
+		long requestDuration = 0;
 		LoadedResource lr = resource.getLoadedResource();
 		if (lr != null) {
+			requestDuration = lr.getDuration();
 			path.setText(lr.getPath());
 			status.setText(String.valueOf(lr.getStatusCode()));
 			method.setText(lr.getMethod());
 			dur.setText(lr.getDuration() + "ms");
-
-			for (int i = 0; i < durForSlow.length; i++) {
-				long dur = durForSlow[i];
-				if (lr.getDuration() > dur) {
-					color = slowColors[i];
-					slowColor = true;
-				}
-			}
-
 		} else {
 			String url = resource.getUrl();
+			requestDuration = resource.getDuration();
 			if (resource.getUrlObject() != null) {
 				URL uo = resource.getUrlObject();
 				url = uo.getPath();
@@ -126,6 +120,13 @@ public class ResourceCellRenderer extends JPanel implements
 				durText = String.valueOf(resource.getDuration());
 			}
 			dur.setText(durText);
+		}
+
+		for (int i = 0; i < durForSlow.length; i++) {
+			if (requestDuration > durForSlow[i]) {
+				color = slowColors[i];
+				slowColor = true;
+			}
 		}
 
 		if (isSelected) {
