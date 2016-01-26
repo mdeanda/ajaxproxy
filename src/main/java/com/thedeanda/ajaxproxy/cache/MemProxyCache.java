@@ -1,9 +1,12 @@
 package com.thedeanda.ajaxproxy.cache;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
+import org.apache.http.Header;
+import org.apache.http.message.BasicHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,12 +22,13 @@ public class MemProxyCache extends LinkedHashMap<String, CachedResponse>
 	private static final Logger log = LoggerFactory
 			.getLogger(MemProxyCache.class);
 	private static final int capacity = 100;
-	private static final long CACHE_TIME = TimeUnit.MINUTES.toMillis(3);
 
 	private Object lock = new Object();
+	private long cacheTimeInMillis;
 
-	public MemProxyCache() {
+	public MemProxyCache(long cacheTimeInMillis) {
 		super(capacity, 1.1f, true);
+		this.cacheTimeInMillis = cacheTimeInMillis;
 		log.debug("new cache");
 	}
 
@@ -44,6 +48,13 @@ public class MemProxyCache extends LinkedHashMap<String, CachedResponse>
 
 	@Override
 	public void cache(CachedResponse response) {
+		Header[] origHeaders = response.getHeaders();
+		Header[] headers = new Header[origHeaders.length + 1];
+		headers[0] = new BasicHeader("X-AjaxProxy", "cached");
+		for (int i = 0; i < origHeaders.length; i++) {
+			headers[i + 1] = origHeaders[i];
+		}
+		response.setHeaders(headers);
 		synchronized (lock) {
 			put(response.getRequestPath(), response);
 		}
@@ -51,7 +62,7 @@ public class MemProxyCache extends LinkedHashMap<String, CachedResponse>
 
 	@Override
 	public CachedResponse get(String urlPath) {
-		long expiredTs = System.currentTimeMillis() - CACHE_TIME;
+		long expiredTs = System.currentTimeMillis() - cacheTimeInMillis;
 		CachedResponse response = null;
 		synchronized (lock) {
 			response = super.get(urlPath);

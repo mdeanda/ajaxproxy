@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import javax.servlet.Filter;
@@ -310,7 +311,8 @@ public class ProxyFilter implements Filter {
 					proxyContainers.add(proxyContainer);
 
 					if (proxyConfig.isEnableCache()) {
-						proxyContainer.setCache(new MemProxyCache());
+						long cacheTime = TimeUnit.SECONDS.toMillis(proxyConfig.getCacheDuration());
+						proxyContainer.setCache(new MemProxyCache(cacheTime));
 					} else {
 						proxyContainer.setCache(new NoOpCache());
 					}
