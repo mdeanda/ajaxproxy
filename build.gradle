@@ -62,6 +62,14 @@ buildscript {
   }
 }
 
+compileJava.doFirst {
+	def prop = new Properties()
+	def propFile = new File("${project.rootDir}/src/main/resources/version.properties");
+	prop.setProperty("version", "$project.version")
+	propFile.createNewFile();
+	prop.store(propFile.newWriter(), null);
+
+}
 
 
 configurations {
