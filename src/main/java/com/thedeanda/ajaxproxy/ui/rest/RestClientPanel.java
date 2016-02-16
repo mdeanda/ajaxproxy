@@ -5,18 +5,22 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -44,6 +48,7 @@ public class RestClientPanel extends JPanel implements ActionListener {
 	private HttpClient httpClient;
 	private RequestViewer outputPanel;
 	private RequestListener listener;
+	private HistoryListModel historyModel;
 
 	public RestClientPanel() {
 		httpClient = new HttpClient();
@@ -54,9 +59,17 @@ public class RestClientPanel extends JPanel implements ActionListener {
 		urlPanel.setBorder(new BottomBorder());
 		add(urlPanel);
 
+		JSplitPane historySplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+		historySplit.setDividerLocation(0);
+		SwingUtils.flattenSplitPane(historySplit);
+		add(historySplit);
+
+		initHistoryPanel(historySplit);
+
 		JSplitPane mainSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		SwingUtils.flattenSplitPane(mainSplit);
-		add(mainSplit);
+		// add(mainSplit);
+		historySplit.setRightComponent(mainSplit);
 
 		JPanel leftPanel = initLeftPanel();
 		mainSplit.setLeftComponent(leftPanel);
@@ -74,14 +87,67 @@ public class RestClientPanel extends JPanel implements ActionListener {
 		layout.putConstraint(SpringLayout.SOUTH, urlPanel, 50,
 				SpringLayout.NORTH, this);
 
-		layout.putConstraint(SpringLayout.EAST, mainSplit, 0,
+		layout.putConstraint(SpringLayout.EAST, historySplit, 0,
 				SpringLayout.EAST, this);
-		layout.putConstraint(SpringLayout.WEST, mainSplit, 0,
+		layout.putConstraint(SpringLayout.WEST, historySplit, 0,
 				SpringLayout.WEST, this);
-		layout.putConstraint(SpringLayout.SOUTH, mainSplit, 0,
+		layout.putConstraint(SpringLayout.SOUTH, historySplit, 0,
 				SpringLayout.SOUTH, this);
-		layout.putConstraint(SpringLayout.NORTH, mainSplit, 0,
+		layout.putConstraint(SpringLayout.NORTH, historySplit, 0,
 				SpringLayout.SOUTH, urlPanel);
+	}
+
+	private void initHistoryPanel(JSplitPane historySplit) {
+		JPanel panel = new JPanel();
+		SpringLayout layout = new SpringLayout();
+		panel.setLayout(layout);
+
+		historyModel = new HistoryListModel();
+
+		JList<HistoryItem> list = new JList<>(historyModel);
+		JScrollPane historyScroll = new JScrollPane(list);
+		panel.add(historyScroll);
+
+		list.addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				if (e.getValueIsAdjusting())
+					return;
+
+				JList<?> list = (JList<?>) e.getSource();
+
+				int index = list.getSelectedIndex();
+				if (index < 0)
+					return;
+
+				HistoryItem item = historyModel.getElementAt(index);
+				historyItemSelected(item);
+			}
+		});
+
+		layout.putConstraint(SpringLayout.NORTH, historyScroll, 10,
+				SpringLayout.NORTH, panel);
+		layout.putConstraint(SpringLayout.WEST, historyScroll, 10,
+				SpringLayout.WEST, panel);
+		layout.putConstraint(SpringLayout.EAST, historyScroll, -10,
+				SpringLayout.EAST, panel);
+		layout.putConstraint(SpringLayout.SOUTH, historyScroll, -10,
+				SpringLayout.SOUTH, panel);
+
+		historySplit.setLeftComponent(panel);
+	}
+
+	private void historyItemSelected(HistoryItem item) {
+		setUrl(item.getUrl());
+		setHeaders(item.getHeaders());
+		setMethod(item.getMethod());
+
+		// possibly support byte input later
+		if (item.getInput() != null) {
+			setInput(new String(item.getInput(), Charset.forName("UTF-8")));
+		} else {
+			setInput("");
+		}
 	}
 
 	private JPanel initUrlPanel() {
@@ -419,5 +485,20 @@ public class RestClientPanel extends JPanel implements ActionListener {
 
 	public String getMethod() {
 		return (String) methodCombo.getSelectedItem();
+	}
+
+	public void saveCurrent() {
+		String name = getUrl();
+		// TODO: prmopt for name
+
+		HistoryItem item = new HistoryItem();
+		item.setHeaders(getHeaders());
+		item.setUrl(getUrl());
+		item.setInput(getInput().getBytes());
+		item.setMethod(getMethod());
+		item.setName(name);
+		HistoryItemService.get().save(item);
+
+		this.historyModel.reload();
 	}
 }

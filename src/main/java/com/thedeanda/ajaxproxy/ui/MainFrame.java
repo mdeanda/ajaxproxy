@@ -474,16 +474,9 @@ public class MainFrame extends JFrame implements ProxyListener {
 		dispose();
 	}
 
-	private File getRecentFile() {
-		String recentFilePath = System.getProperty("user.home")
-				+ File.separator + ".ajaxproxy";
-		File f = new File(recentFilePath);
-		return f;
-	}
-
 	private JsonObject loadSettings() {
 		JsonObject ret = null;
-		File f = getRecentFile();
+		File f = ConfigService.get().getConfigFile();
 		if (f.exists()) {
 			InputStream is = null;
 			try {
@@ -556,7 +549,7 @@ public class MainFrame extends JFrame implements ProxyListener {
 			return;
 		log.info("saving recents");
 
-		File f = getRecentFile();
+		File f = ConfigService.get().getConfigFile();
 		JsonObject json = new JsonObject();
 		Set<String> repeats = new HashSet<String>();
 		for (File recent : recentFiles) {

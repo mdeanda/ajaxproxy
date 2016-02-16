@@ -96,7 +96,6 @@ public class RestClientFrame extends JFrame implements RequestListener,
 		panel.setMethod(resource.getMethod());
 
 		addHeaders(resource.getRequestHeaders());
-
 	}
 
 	private void addHeaders(Header[] headers) {
@@ -134,6 +133,18 @@ public class RestClientFrame extends JFrame implements RequestListener,
 		});
 		menu.add(mi);
 
+		mi = new JMenuItem("Save");
+		mi.setMnemonic(KeyEvent.VK_S);
+		mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,
+				ActionEvent.CTRL_MASK));
+		mi.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent ae) {
+				handleSave();
+			}
+		});
+		menu.add(mi);
+
 		mi = new JMenuItem("Clone");
 		mi.setMnemonic(KeyEvent.VK_L);
 		mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L,
@@ -162,6 +173,10 @@ public class RestClientFrame extends JFrame implements RequestListener,
 	private void handleNew() {
 		RestClientFrame rest = new RestClientFrame();
 		rest.setVisible(true);
+	}
+
+	private void handleSave() {
+		panel.saveCurrent();
 	}
 
 	private void handleClone() {
