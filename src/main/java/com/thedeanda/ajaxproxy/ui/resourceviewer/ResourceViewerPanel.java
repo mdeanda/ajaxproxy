@@ -43,6 +43,7 @@ import com.thedeanda.ajaxproxy.AccessTracker;
 import com.thedeanda.ajaxproxy.AjaxProxy;
 import com.thedeanda.ajaxproxy.LoadedResource;
 import com.thedeanda.ajaxproxy.http.RequestListener;
+import com.thedeanda.ajaxproxy.service.ResourceService;
 import com.thedeanda.ajaxproxy.ui.SwingUtils;
 import com.thedeanda.ajaxproxy.ui.border.BottomBorder;
 import com.thedeanda.ajaxproxy.ui.model.Resource;
@@ -72,11 +73,11 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 	private JMenuItem replyMenuItem;
 	private JMenuItem clearMenuItem;
 
-	public ResourceViewerPanel() {
+	public ResourceViewerPanel(ResourceService resourceService) {
 		log.debug("new viewer");
 		SpringLayout layout = new SpringLayout();
 		setLayout(layout);
-		model = new ResourceListModel();
+		model = new ResourceListModel(resourceService);
 
 		resourcePanel = new ResourcePanel(false);
 		clearBtn = new JButton("Clear");

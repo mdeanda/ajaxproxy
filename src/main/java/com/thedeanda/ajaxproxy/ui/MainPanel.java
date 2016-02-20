@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import com.thedeanda.ajaxproxy.AjaxProxy;
 import com.thedeanda.ajaxproxy.ProxyListener;
+import com.thedeanda.ajaxproxy.service.ResourceService;
 import com.thedeanda.ajaxproxy.ui.merge.MergePanel;
 import com.thedeanda.ajaxproxy.ui.merge.MergeTableModel;
 import com.thedeanda.ajaxproxy.ui.proxy.ProxyPanel;
@@ -36,6 +37,8 @@ public class MainPanel extends JPanel implements ProxyListener,
 		SettingsChangedListener {
 	private static final long serialVersionUID = 1L;
 	private static final Logger log = LoggerFactory.getLogger(MainPanel.class);
+	private static final int CACHE_SIZE = 50;
+
 	private JButton btn;
 	private boolean started = false;
 	private AjaxProxy proxy = null;
@@ -55,10 +58,14 @@ public class MainPanel extends JPanel implements ProxyListener,
 	private List<ProxyListener> listeners = new ArrayList<ProxyListener>();
 	private ResourceViewerPanel resourceViewerPanel;
 	private JButton restartButton;
+	private ResourceService resourceService;
 
 	public MainPanel() {
 		SpringLayout layout = new SpringLayout();
 		setLayout(layout);
+
+		File dbFile = ConfigService.get().getRestHistoryDb();
+		resourceService = new ResourceService(CACHE_SIZE, dbFile);
 
 		btn = new JButton(START);
 		btn.addActionListener(new ActionListener() {
@@ -93,7 +100,7 @@ public class MainPanel extends JPanel implements ProxyListener,
 		trackerPanel = new FileTrackerPanel();
 		tabs.add("Tracker", trackerPanel);
 
-		resourceViewerPanel = new ResourceViewerPanel();
+		resourceViewerPanel = new ResourceViewerPanel(resourceService);
 		tabs.add("Resource Viewer", resourceViewerPanel);
 
 		add(btn);
@@ -209,6 +216,7 @@ public class MainPanel extends JPanel implements ProxyListener,
 			proxy = new AjaxProxy(json, workingDir);
 			proxy.addProxyListener(this);
 			new Thread(proxy).start();
+			proxy.addRequestListener(resourceService);
 			optionsPanel.setProxy(proxy);
 			trackerPanel.setProxy(proxy);
 			resourceViewerPanel.setProxy(proxy);

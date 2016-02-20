@@ -379,6 +379,7 @@ public class AjaxProxy implements Runnable {
 
 	public RequestListener getRequestListener() {
 		if (listener == null) {
+			//TODO: move this to its own class so its easier to read/maintain
 			listener = new RequestListener() {
 
 				@Override

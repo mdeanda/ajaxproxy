@@ -54,4 +54,10 @@ public class ConfigService {
 		File f = new File(configDir, recentFilePath);
 		return f;
 	}
+	
+	public File getResourceHistoryDb() {
+		String recentFilePath = "resource.db";
+		File f = new File(configDir, recentFilePath);
+		return f;
+	}
 }

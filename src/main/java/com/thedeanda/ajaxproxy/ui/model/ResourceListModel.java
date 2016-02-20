@@ -16,12 +16,19 @@ import javax.swing.AbstractListModel;
 
 import org.apache.http.Header;
 
+import com.thedeanda.ajaxproxy.service.ResourceService;
+
 public class ResourceListModel extends AbstractListModel<Resource> {
 	private Set<Resource> unfilteredItems = new TreeSet<>();
 	private List<Resource> items = new ArrayList<>();
 	private Map<String, Resource> resourceMap = new HashMap<>();
 
 	private Pattern filterRegEx;
+	private ResourceService resourceService;
+	
+	public ResourceListModel(ResourceService resourceService) {
+		this.resourceService = resourceService;
+	}
 
 	public void add(Resource item) {
 		synchronized (unfilteredItems) {
