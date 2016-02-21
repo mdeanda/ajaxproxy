@@ -23,7 +23,6 @@ import org.apache.http.Header;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.thedeanda.ajaxproxy.LoadedResource;
 import com.thedeanda.ajaxproxy.http.RequestListener;
 import com.thedeanda.ajaxproxy.ui.busy.BusyNotification;
 import com.thedeanda.ajaxproxy.ui.model.Resource;
@@ -72,15 +71,6 @@ public class RestClientFrame extends JFrame implements RequestListener,
 		this.windowId = Windows.get().addListener(this).add(this);
 		this.addWindowListener(new WindowListListenerCleanup(this));
 		new WindowMenuHelper(windowId, getJMenuBar());
-	}
-
-	public void fromResource(LoadedResource resource) {
-		String url = resource.getUrl();
-		panel.setUrl(url);
-
-		addHeaders(resource.getRequestHeaders());
-		panel.setInput(resource.getInputAsText());
-		panel.setMethod(resource.getMethod());
 	}
 
 	public void fromResource(Resource resource) {

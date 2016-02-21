@@ -6,7 +6,6 @@ import java.awt.event.ActionListener;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URL;
 import java.util.Date;
@@ -18,17 +17,14 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
-import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.text.Document;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 
-import com.thedeanda.ajaxproxy.LoadedResource;
 import com.thedeanda.ajaxproxy.ui.ContentViewer;
 import com.thedeanda.ajaxproxy.ui.SwingUtils;
 import com.thedeanda.ajaxproxy.ui.model.Resource;
@@ -42,8 +38,6 @@ import com.thedeanda.ajaxproxy.ui.rest.RestClientFrame;
  */
 public class ResourcePanel extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 1L;
-
-	private LoadedResource oldResource;
 
 	private JTabbedPane tabs;
 
@@ -105,8 +99,8 @@ public class ResourcePanel extends JPanel implements ActionListener {
 		headersContent = new JEditorPane();
 		headersContent.setEditable(false);
 		generalScroll = new JScrollPane(headersContent);
-		//generalScroll
-			//	.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		// generalScroll
+		// .setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		headersContent.setEditorKit(kit);
 		Document doc = kit.createDefaultDocument();
 		headersContent.setDocument(doc);
@@ -160,7 +154,6 @@ public class ResourcePanel extends JPanel implements ActionListener {
 
 	public void setResource(Resource resource) {
 		clear();
-		oldResource = null;
 		this.newResource = resource;
 
 		SwingUtils.executNonUi(new Runnable() {
@@ -194,8 +187,7 @@ public class ResourcePanel extends JPanel implements ActionListener {
 		// writeField(headers, "", );
 		writeField(output, "Method", resource.getMethod());
 		writeField(output, "Duration", String.valueOf(resource.getDuration()));
-		writeField(output, "Date",
-				new Date(resource.getStartTime()).toString());
+		writeField(output, "Date", new Date(resource.getStartTime()).toString());
 
 		writeField(output, "Status", String.valueOf(resource.getStatus()));
 		output.append("<h1>Request Headers</h1><div class=\"items\">");
@@ -232,84 +224,6 @@ public class ResourcePanel extends JPanel implements ActionListener {
 		showHeaders(output.toString());
 	}
 
-	public void setResource(LoadedResource resource) {
-		clear();
-		newResource = null;
-		this.oldResource = resource;
-
-		if (oldResource != null) {
-			final StringBuilder output = new StringBuilder();
-
-			SwingUtils.executNonUi(new Runnable() {
-				@Override
-				public void run() {
-					if (oldResource == null)
-						return;
-					LoadedResource resource = oldResource;
-
-					tryText(inputCv, resource.getInputAsText());
-					tryText(outputCv, resource.getOutputAsText());
-					// inputCv.setContent(oldResource.getInputAsText());
-					// outputCv.setContent(oldResource.getOutputAsText());
-
-					output.append("<html><body>");
-					output.append("<p><b>Request Path:</b> ");
-					output.append(resource.getPath());
-					output.append("</p>");
-					output.append("<p><b>Method:</b> ");
-					output.append(resource.getMethod());
-					output.append("</p>");
-					output.append("<p><b>Duration:</b> ");
-					output.append(resource.getDuration());
-					output.append("</p>");
-					output.append("<p><b>Date:</b> ");
-					output.append(resource.getDate());
-					output.append("<p><b>Character Encoding:</b> ");
-					output.append(resource.getCharacterEncoding());
-					output.append("</p>");
-					writeField(output, "Status",
-							String.valueOf(resource.getStatusCode()));
-					output.append("<h1>Request Headers</h1><div class=\"items\">");
-					Header[] reqHeaders = resource.getRequestHeaders();
-					if (reqHeaders != null) {
-						for (Header hdr : reqHeaders) {
-							writeField(output, hdr.getName(), hdr.getValue());
-						}
-					}
-					output.append("</div>");
-
-					output.append("<h1>Response Headers</h1><div class=\"items\">");
-					Header[] respHeaders = resource.getResponseHeaders();
-					if (respHeaders != null) {
-						for (Header hdr : respHeaders) {
-							writeField(output, hdr.getName(), hdr.getValue());
-						}
-					}
-					output.append("</div>");
-
-					Exception ex = resource.getFilterException();
-					if (ex != null) {
-						StringWriter sw = new StringWriter();
-						ex.printStackTrace(new PrintWriter(sw));
-						String[] lines = StringUtils.split(sw.toString(), "\n");
-
-						output.append("<h1>Exception</h1><div class=\"items\">");
-						for (String line : lines) {
-							output.append("<p>");
-							output.append(line);
-							output.append("</p>");
-						}
-						output.append("</div>");
-					}
-
-					output.append("</body></html>");
-
-					showHeaders(output.toString());
-				}
-			});
-		}
-	}
-
 	private void writeField(StringBuilder output, String name, String value) {
 		output.append("<p><b>");
 		output.append(name);
@@ -319,10 +233,8 @@ public class ResourcePanel extends JPanel implements ActionListener {
 	}
 
 	private void loadPopup() {
-		if (oldResource != null) {
-			ResourceFrame window = new ResourceFrame(oldResource);
-			window.setVisible(true);
-		}
+		ResourceFrame window = new ResourceFrame(newResource);
+		window.setVisible(true);
 	}
 
 	@Override
@@ -332,11 +244,7 @@ public class ResourcePanel extends JPanel implements ActionListener {
 			loadPopup();
 		} else if (source == this.replayButton) {
 			RestClientFrame rest = new RestClientFrame();
-			if (oldResource != null) {
-				rest.fromResource(oldResource);
-			} else {
-				rest.fromResource(newResource);
-			}
+			rest.fromResource(newResource);
 			rest.setVisible(true);
 		}
 	}

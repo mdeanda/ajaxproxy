@@ -12,7 +12,6 @@ import javax.swing.SpringLayout;
 
 import com.thedeanda.ajaxproxy.AccessTracker;
 import com.thedeanda.ajaxproxy.AjaxProxy;
-import com.thedeanda.ajaxproxy.LoadedResource;
 import com.thedeanda.javajson.JsonObject;
 
 /** tracks files that get loaded */
@@ -66,12 +65,14 @@ public class FileTrackerPanel extends JPanel implements AccessTracker {
 		//	proxy.addTracker(this);
 	}
 
+	/*
 	@Override
 	public void trackFile(LoadedResource res) {
 		if (toggleBtn.isSelected()) {
 			model.trackFile(res.getPath(), res.getDuration());
 		}
 	}
+	//*/
 
 	public JsonObject getConfig() {
 		JsonObject data = new JsonObject();

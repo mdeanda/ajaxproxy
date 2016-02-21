@@ -5,11 +5,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.net.URL;
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -18,7 +13,6 @@ import java.util.regex.PatternSyntaxException;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JFileChooser;
 import javax.swing.JList;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -41,7 +35,6 @@ import org.slf4j.LoggerFactory;
 
 import com.thedeanda.ajaxproxy.AccessTracker;
 import com.thedeanda.ajaxproxy.AjaxProxy;
-import com.thedeanda.ajaxproxy.LoadedResource;
 import com.thedeanda.ajaxproxy.http.RequestListener;
 import com.thedeanda.ajaxproxy.service.ResourceService;
 import com.thedeanda.ajaxproxy.ui.SwingUtils;
@@ -305,34 +298,28 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 		if (!evt.getValueIsAdjusting()) {
 			Resource resource = (Resource) list.getSelectedValue();
 			if (resource != null) {
-				showResource(resource.getLoadedResource(), resource);
+				showResource(resource);
 			}
 		}
 	}
 
-	private void showResource(final LoadedResource lr, final Resource resource) {
-		if (lr != null) {
-			resourcePanel.setResource(lr);
-		} else {
-			resourcePanel.setResource(resource);
-		}
+	private void showResource(Resource resource) {
+		resourcePanel.setResource(resource);
 	}
 
 	public void setProxy(AjaxProxy ajaxProxy) {
 		if (ajaxProxy != null) {
-			//ajaxProxy.addTracker(this);
+			// ajaxProxy.addTracker(this);
 			ajaxProxy.addRequestListener(this);
 		}
 	}
 
-	@Override
-	public void trackFile(LoadedResource res) {
-		boolean show = toggleBtn.isSelected();
-
-		if (show) {
-			model.add(new Resource(res));
-		}
-	}
+	/*
+	 * @Override public void trackFile(LoadedResource res) { boolean show =
+	 * toggleBtn.isSelected();
+	 * 
+	 * if (show) { model.add(new Resource(res)); } }
+	 */
 
 	private void resetFilter() {
 		Pattern filterRegEx = null;
@@ -355,60 +342,36 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 	}
 
 	private void export() {
-		
-		//TODO: move this off swing thread
-		final JFileChooser fc = new JFileChooser();
-		fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		int returnVal = fc.showSaveDialog(this);
-		if (returnVal == JFileChooser.APPROVE_OPTION) {
-			File folder = fc.getSelectedFile();
-			String path = folder.getAbsolutePath();
-			for (int i = 0; i < model.getSize(); i++) {
-				Resource resource = (Resource) model.get(i);
-				LoadedResource obj = resource.getLoadedResource();
-				String fn = StringUtils.leftPad(String.valueOf(i), 8, "0");
-				JsonObject json = new JsonObject();
-				json.put("path", obj.getPath());
-				json.put("input", obj.getInputAsText());
-				json.put("output", obj.getOutputAsText());
-				json.put("status", obj.getStatusCode());
-				json.put("duration", obj.getDuration());
-				json.put("method", obj.getMethod());
-				JsonObject headers = new JsonObject();
-				json.put("request headers", headers);
-				if (obj.getRequestHeaders() != null) {
-					for (Header hdr : obj.getRequestHeaders()) {
-						headers.put(hdr.getName(), hdr.getValue());
-					}
-				}
-				headers = new JsonObject();
-				json.put("response headers", headers);
-				if (obj.getResponseHeaders() != null) {
-					for (Header hdr : obj.getResponseHeaders()) {
-						headers.put(hdr.getName(), hdr.getValue());
-					}
-				}
-
-				Writer writer = null;
-				try {
-					writer = new OutputStreamWriter(new FileOutputStream(
-							new File(path + File.separator + fn + ".txt")),
-							"UTF-8");
-					writer.write(json.toString(4));
-				} catch (Exception e) {
-					e.printStackTrace();
-				} finally {
-					if (writer != null) {
-						try {
-							writer.close();
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-					}
-				}
-
-			}
-		}
+		/*
+		 * //TODO: move this off swing thread final JFileChooser fc = new
+		 * JFileChooser();
+		 * fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY); int returnVal
+		 * = fc.showSaveDialog(this); if (returnVal ==
+		 * JFileChooser.APPROVE_OPTION) { File folder = fc.getSelectedFile();
+		 * String path = folder.getAbsolutePath(); for (int i = 0; i <
+		 * model.getSize(); i++) { Resource resource = (Resource) model.get(i);
+		 * LoadedResource obj = resource.getLoadedResource(); String fn =
+		 * StringUtils.leftPad(String.valueOf(i), 8, "0"); JsonObject json = new
+		 * JsonObject(); json.put("path", obj.getPath()); json.put("input",
+		 * obj.getInputAsText()); json.put("output", obj.getOutputAsText());
+		 * json.put("status", obj.getStatusCode()); json.put("duration",
+		 * obj.getDuration()); json.put("method", obj.getMethod()); JsonObject
+		 * headers = new JsonObject(); json.put("request headers", headers); if
+		 * (obj.getRequestHeaders() != null) { for (Header hdr :
+		 * obj.getRequestHeaders()) { headers.put(hdr.getName(),
+		 * hdr.getValue()); } } headers = new JsonObject();
+		 * json.put("response headers", headers); if (obj.getResponseHeaders()
+		 * != null) { for (Header hdr : obj.getResponseHeaders()) {
+		 * headers.put(hdr.getName(), hdr.getValue()); } }
+		 * 
+		 * Writer writer = null; try { writer = new OutputStreamWriter(new
+		 * FileOutputStream( new File(path + File.separator + fn + ".txt")),
+		 * "UTF-8"); writer.write(json.toString(4)); } catch (Exception e) {
+		 * e.printStackTrace(); } finally { if (writer != null) { try {
+		 * writer.close(); } catch (IOException e) { e.printStackTrace(); } } }
+		 * 
+		 * } } //
+		 */
 	}
 
 	public JsonObject getConfig() {
@@ -451,11 +414,7 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 						// resource, null);
 
 						RestClientFrame rest = new RestClientFrame();
-						if (resource.getLoadedResource() != null) {
-							rest.fromResource(resource.getLoadedResource());
-						} else {
-							rest.fromResource(resource);
-						}
+						rest.fromResource(resource);
 						rest.setVisible(true);
 					}
 				});
@@ -501,6 +460,6 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 
 	private void clear() {
 		model.clear();
-		showResource(null, null);
+		showResource(null);
 	}
 }

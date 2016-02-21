@@ -5,7 +5,7 @@ import java.awt.Dimension;
 
 import javax.swing.JFrame;
 
-import com.thedeanda.ajaxproxy.LoadedResource;
+import com.thedeanda.ajaxproxy.ui.model.Resource;
 
 /**
  * simple frame to view resources in a separate window
@@ -17,7 +17,7 @@ public class ResourceFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private ResourcePanel panel;
 
-	public ResourceFrame(LoadedResource resource) {
+	public ResourceFrame(Resource resource) {
 		panel = new ResourcePanel(true);
 		setLayout(new BorderLayout());
 		add(BorderLayout.CENTER, panel);

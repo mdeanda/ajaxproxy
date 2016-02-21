@@ -12,7 +12,6 @@ import javax.swing.JPanel;
 import javax.swing.ListCellRenderer;
 import javax.swing.SpringLayout;
 
-import com.thedeanda.ajaxproxy.LoadedResource;
 import com.thedeanda.ajaxproxy.ui.model.Resource;
 
 public class ResourceCellRenderer extends JPanel implements
@@ -88,39 +87,30 @@ public class ResourceCellRenderer extends JPanel implements
 		}
 
 		long requestDuration = 0;
-		LoadedResource lr = resource.getLoadedResource();
-		if (lr != null) {
-			requestDuration = lr.getDuration();
-			path.setText(lr.getPath());
-			status.setText(String.valueOf(lr.getStatusCode()));
-			method.setText(lr.getMethod());
-			dur.setText(lr.getDuration() + "ms");
-		} else {
-			String url = resource.getUrl();
-			requestDuration = resource.getDuration();
-			if (resource.getUrlObject() != null) {
-				URL uo = resource.getUrlObject();
-				url = uo.getPath();
-				if (uo.getQuery() != null) {
-					url += "?" + uo.getQuery();
-				}
+		String url = resource.getUrl();
+		requestDuration = resource.getDuration();
+		if (resource.getUrlObject() != null) {
+			URL uo = resource.getUrlObject();
+			url = uo.getPath();
+			if (uo.getQuery() != null) {
+				url += "?" + uo.getQuery();
 			}
-			path.setText(url);
-
-			String statusText = "";
-			if (resource.getStatus() > 0) {
-				statusText = String.valueOf(resource.getStatus());
-			}
-			status.setText(statusText);
-			method.setText(resource.getMethod());
-
-			String durText = "";
-			if (resource.getDuration() > 0 || resource.getStatus() > 0) {
-				// cached requests have duration of 0
-				durText = String.valueOf(resource.getDuration());
-			}
-			dur.setText(durText);
 		}
+		path.setText(url);
+
+		String statusText = "";
+		if (resource.getStatus() > 0) {
+			statusText = String.valueOf(resource.getStatus());
+		}
+		status.setText(statusText);
+		method.setText(resource.getMethod());
+
+		String durText = "";
+		if (resource.getDuration() > 0 || resource.getStatus() > 0) {
+			// cached requests have duration of 0
+			durText = String.valueOf(resource.getDuration());
+		}
+		dur.setText(durText);
 
 		for (int i = 0; i < durForSlow.length; i++) {
 			if (requestDuration > durForSlow[i]) {

@@ -8,15 +8,8 @@ import java.util.UUID;
 import org.apache.http.Header;
 import org.mortbay.log.Log;
 
-import com.thedeanda.ajaxproxy.LoadedResource;
-
 public class Resource implements Serializable, Comparable<Resource> {
 	private static final long serialVersionUID = -2666007600337135608L;
-
-	/**
-	 * old stuff, should go away if new proxy works
-	 */
-	private LoadedResource loadedResource;
 
 	private UUID id;
 	private String url;
@@ -41,13 +34,6 @@ public class Resource implements Serializable, Comparable<Resource> {
 	 */
 	private String path;
 
-	public Resource(LoadedResource lr) {
-		loadedResource = lr;
-
-		setUrl(loadedResource.getUrl());
-		setPath(lr.getPath());
-	}
-
 	public Resource(UUID id, String url, String method) {
 		this.id = id;
 		this.url = url;
@@ -67,14 +53,6 @@ public class Resource implements Serializable, Comparable<Resource> {
 	@Override
 	public int compareTo(Resource o) {
 		return (int) (getStartTime() - o.getStartTime());
-	}
-
-	public LoadedResource getLoadedResource() {
-		return loadedResource;
-	}
-
-	public void setLoadedResource(LoadedResource loadedResource) {
-		this.loadedResource = loadedResource;
 	}
 
 	public UUID getId() {
@@ -190,11 +168,7 @@ public class Resource implements Serializable, Comparable<Resource> {
 	}
 
 	public long getStartTime() {
-		if (this.loadedResource != null) {
-			return this.loadedResource.getDate().getTime();
-		} else {
-			return startTime;
-		}
+		return startTime;
 	}
 
 	public void setStartTime(long startTime) {
