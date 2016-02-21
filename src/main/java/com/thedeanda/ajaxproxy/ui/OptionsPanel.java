@@ -14,7 +14,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import com.thedeanda.ajaxproxy.AjaxProxy;
-import com.thedeanda.ajaxproxy.filter.APFilter;
 import com.thedeanda.javajson.JsonObject;
 
 public class OptionsPanel extends JPanel implements ActionListener,
@@ -95,12 +94,14 @@ public class OptionsPanel extends JPanel implements ActionListener,
 		if (proxy == null)
 			return;
 
+		/*
 		APFilter filter = proxy.getApfilter();
 		if (filter == null)
 			return;
 
 		filter.setForcedLatency(forcedLatency.getValue());
 		filter.setMaxBitrate(maxBitrate.getValue());
+		*/
 	}
 
 	public void setProxy(AjaxProxy proxy) {

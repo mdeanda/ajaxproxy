@@ -62,8 +62,8 @@ public class FileTrackerPanel extends JPanel implements AccessTracker {
 	}
 
 	public void setProxy(AjaxProxy proxy) {
-		if (proxy != null)
-			proxy.addTracker(this);
+		//if (proxy != null)
+		//	proxy.addTracker(this);
 	}
 
 	@Override

@@ -20,7 +20,6 @@ import org.mortbay.proxy.AsyncProxyServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.thedeanda.ajaxproxy.filter.APFilter;
 import com.thedeanda.ajaxproxy.filter.ProxyFilter;
 import com.thedeanda.ajaxproxy.http.RequestListener;
 import com.thedeanda.ajaxproxy.model.ProxyPath;
@@ -39,7 +38,6 @@ public class AjaxProxy implements Runnable {
 	private Server jettyServer;
 	private File workingDir;
 	private List<ProxyListener> listeners = new ArrayList<ProxyListener>();
-	private APFilter apfilter = new APFilter();
 	private ProxyFilter proxyFilter;
 	private boolean mergeMode = false;
 	private List<MergeServlet> mergeServlets = new ArrayList<MergeServlet>();
@@ -225,7 +223,7 @@ public class AjaxProxy implements Runnable {
 		}
 		return ret;
 	}
-	
+
 	public AjaxProxyConfig getAjaxProxyConfig() {
 		return ajaxProxyConfig;
 	}
@@ -246,9 +244,6 @@ public class AjaxProxy implements Runnable {
 			FilterHolder proxyFilterHolder = new FilterHolder(proxyFilter);
 			root.addFilter(proxyFilterHolder, "/*", 1);
 			proxyFilter.reset();
-
-			FilterHolder filterHolder = new FilterHolder(apfilter);
-			root.addFilter(filterHolder, "/*", 1);
 
 			ServletHolder servlet;
 			DefaultServlet defaultServlet = new DefaultServlet();
@@ -349,10 +344,6 @@ public class AjaxProxy implements Runnable {
 		}
 	}
 
-	public APFilter getApfilter() {
-		return apfilter;
-	}
-
 	public JsonObject getConfig() {
 		return config;
 	}
@@ -365,10 +356,6 @@ public class AjaxProxy implements Runnable {
 		this.mergeMode = mergeMode;
 	}
 
-	public void addTracker(AccessTracker tracker) {
-		apfilter.add(tracker);
-	}
-
 	public void addRequestListener(RequestListener listener) {
 		this.proxyListeners.add(listener);
 	}
@@ -379,7 +366,7 @@ public class AjaxProxy implements Runnable {
 
 	public RequestListener getRequestListener() {
 		if (listener == null) {
-			//TODO: move this to its own class so its easier to read/maintain
+			// TODO: move this to its own class so its easier to read/maintain
 			listener = new RequestListener() {
 
 				@Override

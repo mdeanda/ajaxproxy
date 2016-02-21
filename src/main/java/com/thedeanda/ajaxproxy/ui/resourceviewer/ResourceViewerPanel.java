@@ -320,7 +320,7 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 
 	public void setProxy(AjaxProxy ajaxProxy) {
 		if (ajaxProxy != null) {
-			ajaxProxy.addTracker(this);
+			//ajaxProxy.addTracker(this);
 			ajaxProxy.addRequestListener(this);
 		}
 	}
