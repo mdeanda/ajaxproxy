@@ -19,6 +19,7 @@ import org.apache.http.Header;
 import com.thedeanda.ajaxproxy.service.ResourceService;
 
 public class ResourceListModel extends AbstractListModel<Resource> {
+	private static final long serialVersionUID = -8347782415802894185L;
 	private Set<Resource> unfilteredItems = new TreeSet<>();
 	private List<Resource> items = new ArrayList<>();
 	private Map<String, Resource> resourceMap = new HashMap<>();
