@@ -16,8 +16,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -36,7 +34,6 @@ public class ProxyEditorPanel extends JPanel {
 	private JButton btn;
 	private EditorListener listener;
 	private JCheckBox cacheCheckbox;
-	private JCheckBox newProxyCheckbox;
 
 	public ProxyEditorPanel(EditorListener listener) {
 		this.listener = listener;
@@ -71,17 +68,11 @@ public class ProxyEditorPanel extends JPanel {
 		});
 		add(btn);
 
-		newProxyCheckbox = new JCheckBox("Use New Proxy");
-		newProxyCheckbox
-				.setToolTipText("New proxy implementation does not rely on the old Jetty transparent proxy servlet. Paths should be regular expressions instead of web.xml style paths. (Usually it means to change a /* to /.*)");
-		add(newProxyCheckbox);
-
 		cacheCheckbox = new JCheckBox("Cache Requests");
 		cacheCheckbox
 				.setToolTipText("Any non-GET request clears the cache for this proxy mapping");
 		add(cacheCheckbox);
 
-		initNewProxyListener();
 		initLayout();
 		setPreferredSize(new Dimension(700, 80));
 		setMinimumSize(new Dimension(500, 80));
@@ -118,16 +109,6 @@ public class ProxyEditorPanel extends JPanel {
 			@Override
 			public void focusLost(FocusEvent e) {
 				txtField.select(0, 0);
-			}
-		});
-	}
-
-	private void initNewProxyListener() {
-		cacheCheckbox.setEnabled(newProxyCheckbox.isSelected());
-		newProxyCheckbox.addChangeListener(new ChangeListener() {
-			@Override
-			public void stateChanged(ChangeEvent e) {
-				cacheCheckbox.setEnabled(newProxyCheckbox.isSelected());
 			}
 		});
 	}
@@ -178,15 +159,10 @@ public class ProxyEditorPanel extends JPanel {
 				SpringLayout.BASELINE, hostField);
 		layout.putConstraint(SpringLayout.EAST, btn, 0, SpringLayout.EAST, this);
 
-		layout.putConstraint(SpringLayout.NORTH, newProxyCheckbox, 5,
+		layout.putConstraint(SpringLayout.NORTH, cacheCheckbox, 5,
 				SpringLayout.SOUTH, fields[0]);
-		layout.putConstraint(SpringLayout.WEST, newProxyCheckbox, 0,
+		layout.putConstraint(SpringLayout.WEST, cacheCheckbox, 0,
 				SpringLayout.WEST, labels[0]);
-
-		layout.putConstraint(SpringLayout.NORTH, cacheCheckbox, 0,
-				SpringLayout.NORTH, newProxyCheckbox);
-		layout.putConstraint(SpringLayout.WEST, cacheCheckbox, 15,
-				SpringLayout.EAST, newProxyCheckbox);
 
 	}
 
@@ -203,7 +179,6 @@ public class ProxyEditorPanel extends JPanel {
 		this.pathField.setText(config.getPath());
 
 		this.cacheCheckbox.setSelected(config.isEnableCache());
-		newProxyCheckbox.setSelected(config.isNewProxy());
 	}
 
 	private void commitEdit() {
@@ -223,7 +198,6 @@ public class ProxyEditorPanel extends JPanel {
 		config.setHost(host);
 		config.setPort(port);
 		config.setPath(path);
-		config.setNewProxy(newProxyCheckbox.isSelected());
 		config.setEnableCache(cacheCheckbox.isSelected());
 		listener.commitChanges(config);
 	}

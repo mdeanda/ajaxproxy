@@ -16,12 +16,9 @@ public class Convertor {
 	public static final String AP_PROXY = "proxy";
 	public static final String AP_VARIABLES = "variables";
 
-	@Deprecated
-	public static final String PROXY_HOST_LEGACY = "domain"; // going away soon
 	public static final String PROXY_HOST = "host";
 	public static final String PROXY_PORT = "port";
 	public static final String PROXY_PATH = "path";
-	public static final String PROXY_NEWPROXY = "newProxy";
 	public static final String PROXY_CACHE = "cache";
 
 	private Convertor() {
@@ -85,7 +82,6 @@ public class Convertor {
 	public ProxyConfig readProxyConfig(JsonObject json) {
 		ProxyConfig config = new ProxyConfig();
 
-		config.setHost(json.getString(PROXY_HOST_LEGACY));
 		if (json.hasKey(PROXY_HOST))
 			config.setHost(json.getString(PROXY_HOST));
 
@@ -100,7 +96,6 @@ public class Convertor {
 			}
 		}
 		config.setPath(json.getString(PROXY_PATH));
-		config.setNewProxy(json.getBoolean(PROXY_NEWPROXY));
 		config.setEnableCache(json.getBoolean(PROXY_CACHE));
 
 		return config;
@@ -109,11 +104,9 @@ public class Convertor {
 	public JsonObject toJson(ProxyConfig config) {
 		JsonObject json = new JsonObject();
 
-		json.put(PROXY_HOST_LEGACY, config.getHost());
 		json.put(PROXY_HOST, config.getHost());
 		json.put(PROXY_PORT, config.getPort());
 		json.put(PROXY_PATH, config.getPath());
-		json.put(PROXY_NEWPROXY, config.isNewProxy());
 		json.put(PROXY_CACHE, config.isEnableCache());
 
 		return json;

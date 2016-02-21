@@ -22,8 +22,8 @@ public class ProxyTableModel extends AbstractTableModel {
 	private final static String DOMAIN = "domain";
 	private final static String PORT = "port";
 	private final static String PATH = "path";
-	private final static String NEW_PROXY = "newProxy";
-	private final static String[] COLS = { DOMAIN, PORT, PATH, NEW_PROXY };
+	//private final static String NEW_PROXY = "newProxy";
+	private final static String[] COLS = { DOMAIN, PORT, PATH };
 
 	public ProxyTableModel() {
 		log.debug("new table model");
@@ -82,9 +82,9 @@ public class ProxyTableModel extends AbstractTableModel {
 			return config.getPort();
 		case 2:
 			return config.getPath();
+		//case 3:
+		//	return config.isNewProxy();
 		case 3:
-			return config.isNewProxy();
-		case 4:
 			return config.isEnableCache();
 		}
 		return null;

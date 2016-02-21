@@ -4,7 +4,6 @@ public class ProxyConfig {
 	private String host;
 	private int port;
 	private String path;
-	private boolean newProxy;
 	private boolean enableCache;
 	/** cache duration in seconds */
 	private int cacheDuration = 500;
@@ -31,14 +30,6 @@ public class ProxyConfig {
 
 	public void setPath(String path) {
 		this.path = path;
-	}
-
-	public boolean isNewProxy() {
-		return newProxy;
-	}
-
-	public void setNewProxy(boolean newProxy) {
-		this.newProxy = newProxy;
 	}
 
 	public boolean isEnableCache() {

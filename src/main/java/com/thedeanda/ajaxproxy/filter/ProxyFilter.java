@@ -302,23 +302,22 @@ public class ProxyFilter implements Filter {
 		AjaxProxyConfig config = ajaxProxy.getAjaxProxyConfig();
 		proxyContainers = new HashSet<ProxyContainer>();
 		for (ProxyConfig proxyConfig : config.getProxyConfig()) {
-			if (proxyConfig.isNewProxy()) {
-				try {
-					Pattern pattern = Pattern.compile(proxyConfig.getPath());
-					ProxyContainer proxyContainer = new ProxyContainer();
-					proxyContainer.setPattern(pattern);
-					proxyContainer.setProxyConfig(proxyConfig);
-					proxyContainers.add(proxyContainer);
+			try {
+				Pattern pattern = Pattern.compile(proxyConfig.getPath());
+				ProxyContainer proxyContainer = new ProxyContainer();
+				proxyContainer.setPattern(pattern);
+				proxyContainer.setProxyConfig(proxyConfig);
+				proxyContainers.add(proxyContainer);
 
-					if (proxyConfig.isEnableCache()) {
-						long cacheTime = TimeUnit.SECONDS.toMillis(proxyConfig.getCacheDuration());
-						proxyContainer.setCache(new MemProxyCache(cacheTime));
-					} else {
-						proxyContainer.setCache(new NoOpCache());
-					}
-				} catch (Exception e) {
-					log.debug("skipping: {}", proxyConfig, e);
+				if (proxyConfig.isEnableCache()) {
+					long cacheTime = TimeUnit.SECONDS.toMillis(proxyConfig
+							.getCacheDuration());
+					proxyContainer.setCache(new MemProxyCache(cacheTime));
+				} else {
+					proxyContainer.setCache(new NoOpCache());
 				}
+			} catch (Exception e) {
+				log.debug("skipping: {}", proxyConfig, e);
 			}
 		}
 	}

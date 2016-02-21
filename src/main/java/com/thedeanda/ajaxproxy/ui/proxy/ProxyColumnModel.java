@@ -20,10 +20,6 @@ public class ProxyColumnModel extends DefaultTableColumnModel {
 		this.addColumn(col);
 
 		col = new TableColumn(3, 80);
-		col.setHeaderValue("New Proxy");
-		this.addColumn(col);
-
-		col = new TableColumn(4, 80);
 		col.setHeaderValue("Cached");
 		this.addColumn(col);
 	}
