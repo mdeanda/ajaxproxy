@@ -95,7 +95,7 @@ public class MainPanel extends JPanel implements ProxyListener,
 		tabs.add("Variables", new VariablesPanel(this, variableModel));
 
 		optionsPanel = new OptionsPanel();
-		//tabs.add("Options", optionsPanel);
+		tabs.add("Options", optionsPanel);
 
 		trackerPanel = new FileTrackerPanel();
 		//tabs.add("Tracker", trackerPanel);

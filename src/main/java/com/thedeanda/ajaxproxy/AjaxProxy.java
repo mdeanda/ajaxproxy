@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.thedeanda.ajaxproxy.filter.ProxyFilter;
+import com.thedeanda.ajaxproxy.filter.ThrottleFilter;
 import com.thedeanda.ajaxproxy.http.RequestListener;
 import com.thedeanda.ajaxproxy.model.ProxyPath;
 import com.thedeanda.ajaxproxy.model.config.AjaxProxyConfig;
@@ -39,6 +40,7 @@ public class AjaxProxy implements Runnable {
 	private File workingDir;
 	private List<ProxyListener> listeners = new ArrayList<ProxyListener>();
 	private ProxyFilter proxyFilter;
+	private ThrottleFilter throttleFilter;
 	private boolean mergeMode = false;
 	private List<MergeServlet> mergeServlets = new ArrayList<MergeServlet>();
 	private ArrayList<RequestListener> proxyListeners;
@@ -91,6 +93,7 @@ public class AjaxProxy implements Runnable {
 		ajaxProxyConfig = converter.readAjaxProxyConfig(config);
 
 		this.proxyListeners = new ArrayList<RequestListener>();
+		throttleFilter = new ThrottleFilter();
 		proxyFilter = new ProxyFilter(this);
 		getRequestListener();
 	}
@@ -240,6 +243,9 @@ public class AjaxProxy implements Runnable {
 			jettyServer.setHandler(contexts);
 
 			Context root = new Context(contexts, "/", Context.SESSIONS);
+
+			FilterHolder throttleFilterHolder = new FilterHolder(throttleFilter);
+			root.addFilter(throttleFilterHolder, "/*", 1);
 
 			FilterHolder proxyFilterHolder = new FilterHolder(proxyFilter);
 			root.addFilter(proxyFilterHolder, "/*", 1);
@@ -419,6 +425,10 @@ public class AjaxProxy implements Runnable {
 			};
 		}
 		return listener;
+	}
+
+	public ThrottleFilter getThrottleFilter() {
+		return throttleFilter;
 	}
 
 }
