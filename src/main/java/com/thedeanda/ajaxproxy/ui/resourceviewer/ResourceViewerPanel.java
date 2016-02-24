@@ -63,7 +63,8 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 	private Color filterOkColor;
 	private Color filterBadColor;
 	private JMenuItem removeRequestMenuItem;
-	private JMenuItem replyMenuItem;
+	private JMenuItem replayMenuItem;
+	private JMenuItem newWindowMenuItem;
 	private JMenuItem clearMenuItem;
 
 	public ResourceViewerPanel(ResourceService resourceService) {
@@ -188,19 +189,7 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 			}
 		});
 
-		final JPopupMenu popup = new JPopupMenu();
-
-		clearMenuItem = new JMenuItem("Clear");
-		clearMenuItem.addActionListener(this);
-		popup.add(clearMenuItem);
-
-		removeRequestMenuItem = new JMenuItem("Remove Request");
-		removeRequestMenuItem.addActionListener(this);
-		popup.add(removeRequestMenuItem);
-
-		replyMenuItem = new JMenuItem("Replay Request");
-		replyMenuItem.addActionListener(this);
-		popup.add(replyMenuItem);
+		final JPopupMenu popup = this.createListPopup();
 
 		list = new JList<Resource>(model);
 		list.setCellRenderer(new ResourceCellRenderer());
@@ -251,6 +240,28 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 				SpringLayout.SOUTH, panel);
 
 		return panel;
+	}
+
+	private JPopupMenu createListPopup() {
+		final JPopupMenu popup = new JPopupMenu();
+
+		clearMenuItem = new JMenuItem("Clear All");
+		clearMenuItem.addActionListener(this);
+		popup.add(clearMenuItem);
+
+		removeRequestMenuItem = new JMenuItem("Remove Request");
+		removeRequestMenuItem.addActionListener(this);
+		popup.add(removeRequestMenuItem);
+
+		replayMenuItem = new JMenuItem("Open in Rest Client");
+		replayMenuItem.addActionListener(this);
+		popup.add(replayMenuItem);
+
+		newWindowMenuItem = new JMenuItem("Open in New Window");
+		newWindowMenuItem.addActionListener(this);
+		popup.add(newWindowMenuItem);
+
+		return popup;
 	}
 
 	private void initTree(DefaultMutableTreeNode top, JsonObject obj) {
@@ -402,17 +413,13 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 					list.setSelectedIndex(index - 1);
 				}
 			}
-		} else if (evt.getSource() == replyMenuItem) {
+		} else if (evt.getSource() == replayMenuItem) {
 			int index = list.getSelectedIndex();
 			if (index >= 0) {
 				final Resource resource = model.get(index);
 				SwingUtils.executNonUi(new Runnable() {
 					@Override
 					public void run() {
-						// TODO: maybe 127.0.0.1?
-						// httpClient.replay("localhost", ajaxProxy.getPort(),
-						// resource, null);
-
 						RestClientFrame rest = new RestClientFrame();
 						rest.fromResource(resource);
 						rest.setVisible(true);
@@ -421,6 +428,13 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 			}
 		} else if (evt.getSource() == clearMenuItem) {
 			clear();
+		} else if (evt.getSource() == newWindowMenuItem) {
+			int index = list.getSelectedIndex();
+			if (index >= 0) {
+				final Resource resource = model.get(index);
+				ResourceFrame window = new ResourceFrame(resource);
+				window.setVisible(true);
+			}
 		}
 	}
 

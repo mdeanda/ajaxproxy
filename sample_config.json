@@ -1,0 +1,25 @@
+{
+  "merge":[],
+  "options":{
+    "forcedLatency":0,
+    "maxBitrate":0
+  },
+  "port":9247,
+  "proxy":[
+    {
+      "cache":true,
+      "host":"jsonplaceholder.typicode.com",
+      "path":"/.*",
+      "port":80
+    }
+  ],
+  "resource":{
+    "track":true
+  },
+  "resourceBase":"",
+  "showIndex":false,
+  "tracker":{
+    "track":false
+  },
+  "variables":{}
+}
