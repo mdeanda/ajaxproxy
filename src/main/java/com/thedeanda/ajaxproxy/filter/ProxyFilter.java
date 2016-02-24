@@ -162,7 +162,7 @@ public class ProxyFilter implements Filter {
 		} else {
 			proxy.getCache().clearCache();
 		}
-		if (cachedResponse == null) {
+		if (cachedResponse == null || cachedResponse.getData() == null) {
 			cachedResponse = makeRequest(request, response, proxyUrl,
 					inputHeaders, inputData);
 			cachedResponse.setRequestPath(requestPath);
