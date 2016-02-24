@@ -156,10 +156,16 @@ public class MainFrame extends JFrame implements ProxyListener {
 	}
 
 	private void updateTitle() {
-		if (file == null)
-			setTitle("Ajax Proxy");
-		else
-			setTitle("Ajax Proxy - " + file.getAbsolutePath());
+		String title = "Ajax Proxy";
+		String version = ConfigService.get().getVersionString();
+		if (file != null) {
+			title += " - " + file.getAbsolutePath();
+		}
+		if (version!=null) {
+			title += " - " + version;
+		}
+		
+		setTitle(title);
 	}
 
 	public void loadFile(final File file) {
