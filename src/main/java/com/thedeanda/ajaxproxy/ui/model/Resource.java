@@ -8,6 +8,8 @@ import java.util.UUID;
 import org.apache.http.Header;
 import org.mortbay.log.Log;
 
+import com.j256.ormlite.table.DatabaseTable;
+
 public class Resource implements Serializable, Comparable<Resource> {
 	private static final long serialVersionUID = -2666007600337135608L;
 

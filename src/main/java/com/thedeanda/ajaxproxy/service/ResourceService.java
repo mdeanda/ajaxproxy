@@ -22,7 +22,7 @@ public class ResourceService implements RequestListener {
 	private static Logger log = LoggerFactory.getLogger(ResourceService.class);
 	private final LruCache<String, StoredResource> cache;
 	private JdbcConnectionSource connectionSource;
-	private Dao<HistoryItem, Resource> dao;
+	private Dao<StoredResource, String> dao;
 	private File dbFile;
 
 	public ResourceService(int cacheSize, File dbFile) {
@@ -35,11 +35,11 @@ public class ResourceService implements RequestListener {
 			String databaseUrl = "jdbc:h2:file:" + dbFile.getAbsolutePath();
 			connectionSource = new JdbcConnectionSource(databaseUrl);
 
-			dao = DaoManager.createDao(connectionSource, Resource.class);
+			dao = DaoManager.createDao(connectionSource, StoredResource.class);
 
 			if (!dao.isTableExists()) {
 				TableUtils.createTableIfNotExists(connectionSource,
-						Resource.class);
+						StoredResource.class);
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
