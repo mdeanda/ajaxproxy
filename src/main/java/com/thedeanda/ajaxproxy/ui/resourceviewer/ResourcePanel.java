@@ -17,6 +17,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
+import javax.swing.SpringLayout;
 import javax.swing.SwingUtilities;
 import javax.swing.text.Document;
 import javax.swing.text.html.HTMLEditorKit;
@@ -49,16 +50,10 @@ public class ResourcePanel extends JPanel implements ActionListener {
 
 	private JPanel generalPanel;
 
-	private JButton popupButton;
-	private JButton replayButton;
-
-	private boolean popupMode;
-
 	private Resource newResource;
 
 	public ResourcePanel(boolean popupMode) {
 		setLayout(new BorderLayout());
-		this.popupMode = popupMode;
 		inputCv = new ContentViewer();
 		outputCv = new ContentViewer();
 
@@ -66,26 +61,33 @@ public class ResourcePanel extends JPanel implements ActionListener {
 
 		tabs = new JTabbedPane();
 		tabs.add("General", generalPanel);
-		tabs.add("Input", inputCv);
-		tabs.add("Output", outputCv);
+		tabs.add("Input", wrap(inputCv));
+		tabs.add("Output", wrap(outputCv));
 		tabs.setBorder(BorderFactory.createEmptyBorder());
 		add(BorderLayout.CENTER, tabs);
+	}
+
+	private JPanel wrap(JPanel comp) {
+		SpringLayout layout = new SpringLayout();
+		JPanel panel = new JPanel(layout);
+		
+		panel.add(comp);
+
+		layout.putConstraint(SpringLayout.NORTH, comp, 10, SpringLayout.NORTH,
+				panel);
+		layout.putConstraint(SpringLayout.SOUTH, comp, -10, SpringLayout.SOUTH,
+				panel);
+		layout.putConstraint(SpringLayout.WEST, comp, 10, SpringLayout.WEST,
+				panel);
+		layout.putConstraint(SpringLayout.EAST, comp, -10, SpringLayout.EAST,
+				panel);
+
+		return panel;
 	}
 
 	private void initGeneralPanel() {
 		generalPanel = new JPanel();
 		generalPanel.setLayout(new BorderLayout());
-
-		if (!popupMode) {
-			JToolBar toolBar = new JToolBar("Still draggable");
-			toolBar.setFloatable(false);
-			generalPanel.add(BorderLayout.NORTH, toolBar);
-			popupButton = makeNavigationButton("New Window");
-			toolBar.add(popupButton);
-
-			replayButton = makeNavigationButton("Rest Client");
-			toolBar.add(replayButton);
-		}
 
 		HTMLEditorKit kit = new HTMLEditorKit();
 		StyleSheet styleSheet = kit.getStyleSheet();
@@ -239,14 +241,6 @@ public class ResourcePanel extends JPanel implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		Object source = e.getSource();
-		if (source == this.popupButton) {
-			loadPopup();
-		} else if (source == this.replayButton) {
-			RestClientFrame rest = new RestClientFrame();
-			rest.fromResource(newResource);
-			rest.setVisible(true);
-		}
 	}
 
 }
