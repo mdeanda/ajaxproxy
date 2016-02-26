@@ -37,6 +37,7 @@ import com.thedeanda.ajaxproxy.AccessTracker;
 import com.thedeanda.ajaxproxy.AjaxProxy;
 import com.thedeanda.ajaxproxy.http.RequestListener;
 import com.thedeanda.ajaxproxy.service.ResourceService;
+import com.thedeanda.ajaxproxy.service.StoredResource;
 import com.thedeanda.ajaxproxy.ui.SwingUtils;
 import com.thedeanda.ajaxproxy.ui.border.BottomBorder;
 import com.thedeanda.ajaxproxy.ui.model.Resource;
@@ -66,14 +67,17 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 	private JMenuItem replayMenuItem;
 	private JMenuItem newWindowMenuItem;
 	private JMenuItem clearMenuItem;
+	private ResourceService resourceService;
 
 	public ResourceViewerPanel(ResourceService resourceService) {
 		log.debug("new viewer");
 		SpringLayout layout = new SpringLayout();
 		setLayout(layout);
+		
+		this.resourceService = resourceService;
 		model = new ResourceListModel(resourceService);
 
-		resourcePanel = new ResourcePanel(false);
+		resourcePanel = new ResourcePanel(resourceService, false);
 		clearBtn = new JButton("Clear");
 		exportBtn = new JButton("Export");
 		toggleBtn = new JCheckBox("Monitor Resources");
@@ -416,10 +420,11 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 		} else if (evt.getSource() == replayMenuItem) {
 			int index = list.getSelectedIndex();
 			if (index >= 0) {
-				final Resource resource = model.get(index);
+				final UUID resourceId = model.get(index).getId();
 				SwingUtils.executNonUi(new Runnable() {
 					@Override
 					public void run() {
+						StoredResource resource = resourceService.get(resourceId);
 						RestClientFrame rest = new RestClientFrame();
 						rest.fromResource(resource);
 						rest.setVisible(true);
@@ -432,7 +437,7 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 			int index = list.getSelectedIndex();
 			if (index >= 0) {
 				final Resource resource = model.get(index);
-				ResourceFrame window = new ResourceFrame(resource);
+				ResourceFrame window = new ResourceFrame(resourceService, resource);
 				window.setVisible(true);
 			}
 		}

@@ -173,7 +173,6 @@ public class ResourceListModel extends AbstractListModel<Resource> {
 		Resource resource = get(id);
 		if (resource != null) {
 			resource.setUrlObject(url);
-			resource.setInputData(data);
 			resource.setRequestHeaders(requestHeaders);
 
 			notifyUpdated(id);
@@ -188,7 +187,6 @@ public class ResourceListModel extends AbstractListModel<Resource> {
 			resource.setReason(reason);
 			resource.setDuration(duration);
 			resource.setResponseHeaders(responseHeaders);
-			resource.setOutputData(data);
 			notifyUpdated(id);
 		}
 	}

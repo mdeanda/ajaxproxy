@@ -72,6 +72,7 @@ public class ResourceService implements RequestListener {
 		sr.setId(id.toString());
 		sr.setUrl(url);
 		sr.setMethod(method);
+		sr.setStartTime(System.currentTimeMillis());
 		save(sr);
 	}
 

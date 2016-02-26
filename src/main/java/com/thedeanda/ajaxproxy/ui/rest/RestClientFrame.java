@@ -19,11 +19,13 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.thedeanda.ajaxproxy.http.RequestListener;
+import com.thedeanda.ajaxproxy.service.StoredResource;
 import com.thedeanda.ajaxproxy.ui.busy.BusyNotification;
 import com.thedeanda.ajaxproxy.ui.model.Resource;
 import com.thedeanda.ajaxproxy.ui.windows.WindowContainer;
@@ -73,10 +75,10 @@ public class RestClientFrame extends JFrame implements RequestListener,
 		new WindowMenuHelper(windowId, getJMenuBar());
 	}
 
-	public void fromResource(Resource resource) {
+	public void fromResource(StoredResource resource) {
 		panel.setUrl(resource.getUrl());
 		// TODO: consider keeping byte data as is depending on content type
-		byte[] inputData = resource.getInputData();
+		byte[] inputData = resource.getInput();
 		String input = "";
 		if (inputData != null) {
 			input = new String(inputData);
@@ -85,20 +87,22 @@ public class RestClientFrame extends JFrame implements RequestListener,
 		panel.setInput(input);
 		panel.setMethod(resource.getMethod());
 
-		addHeaders(resource.getRequestHeaders());
+		setHeaders(resource.getHeaders());
 	}
 
-	private void addHeaders(Header[] headers) {
-		panel.setHeaders("");
-		if (headers != null) {
-			StringBuilder sb = new StringBuilder();
-			for (Header h : headers) {
-				if (!BLACKLIST_HEADERS.contains(h.getName())) {
-					sb.append(h.getName() + ": " + h.getValue() + "\n");
+	private void setHeaders(String headerString) {
+		StringBuilder sb = new StringBuilder();
+		if (!StringUtils.isBlank(headerString)) {
+			String[] headers = StringUtils.split(headerString, "\n");
+			for (String header : headers) {
+				String[] hparts = StringUtils.split(header, ":");
+				String name = hparts[0];
+				if (!BLACKLIST_HEADERS.contains(name)) {
+					sb.append(header + "\n");
 				}
 			}
-			panel.setHeaders(sb.toString());
 		}
+		panel.setHeaders(sb.toString());
 	}
 
 	private void initMenuBar() {

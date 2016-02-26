@@ -8,8 +8,6 @@ import java.util.UUID;
 import org.apache.http.Header;
 import org.mortbay.log.Log;
 
-import com.j256.ormlite.table.DatabaseTable;
-
 public class Resource implements Serializable, Comparable<Resource> {
 	private static final long serialVersionUID = -2666007600337135608L;
 
@@ -19,13 +17,11 @@ public class Resource implements Serializable, Comparable<Resource> {
 
 	private URL urlObject;
 	private Header[] requestHeaders;
-	private byte[] inputData;
 
 	private int status;
 	private String reason;
 	private long duration;
 	private Header[] responseHeaders;
-	private byte[] outputData;
 
 	private String errorReason;
 	private String exception;
@@ -85,14 +81,6 @@ public class Resource implements Serializable, Comparable<Resource> {
 		this.requestHeaders = requestHeaders;
 	}
 
-	public byte[] getInputData() {
-		return inputData;
-	}
-
-	public void setInputData(byte[] inputData) {
-		this.inputData = inputData;
-	}
-
 	public int getStatus() {
 		return status;
 	}
@@ -123,14 +111,6 @@ public class Resource implements Serializable, Comparable<Resource> {
 
 	public void setResponseHeaders(Header[] responseHeaders) {
 		this.responseHeaders = responseHeaders;
-	}
-
-	public byte[] getOutputData() {
-		return outputData;
-	}
-
-	public void setOutputData(byte[] outputData) {
-		this.outputData = outputData;
 	}
 
 	public void setId(UUID id) {

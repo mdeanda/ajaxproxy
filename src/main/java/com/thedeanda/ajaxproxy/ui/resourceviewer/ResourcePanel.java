@@ -16,7 +16,6 @@ import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JToolBar;
 import javax.swing.SpringLayout;
 import javax.swing.SwingUtilities;
 import javax.swing.text.Document;
@@ -25,11 +24,14 @@ import javax.swing.text.html.StyleSheet;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import com.thedeanda.ajaxproxy.service.ResourceService;
+import com.thedeanda.ajaxproxy.service.StoredResource;
 import com.thedeanda.ajaxproxy.ui.ContentViewer;
 import com.thedeanda.ajaxproxy.ui.SwingUtils;
 import com.thedeanda.ajaxproxy.ui.model.Resource;
-import com.thedeanda.ajaxproxy.ui.rest.RestClientFrame;
 
 /**
  * panel to view a single resource.
@@ -39,6 +41,8 @@ import com.thedeanda.ajaxproxy.ui.rest.RestClientFrame;
  */
 public class ResourcePanel extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 1L;
+	private static final Logger log = LoggerFactory
+			.getLogger(ResourcePanel.class);
 
 	private JTabbedPane tabs;
 
@@ -51,8 +55,11 @@ public class ResourcePanel extends JPanel implements ActionListener {
 	private JPanel generalPanel;
 
 	private Resource newResource;
+	private ResourceService resourceService;
 
-	public ResourcePanel(boolean popupMode) {
+	public ResourcePanel(ResourceService resourceService, boolean popupMode) {
+		this.resourceService = resourceService;
+
 		setLayout(new BorderLayout());
 		inputCv = new ContentViewer();
 		outputCv = new ContentViewer();
@@ -70,7 +77,7 @@ public class ResourcePanel extends JPanel implements ActionListener {
 	private JPanel wrap(JPanel comp) {
 		SpringLayout layout = new SpringLayout();
 		JPanel panel = new JPanel(layout);
-		
+
 		panel.add(comp);
 
 		layout.putConstraint(SpringLayout.NORTH, comp, 10, SpringLayout.NORTH,
@@ -158,22 +165,31 @@ public class ResourcePanel extends JPanel implements ActionListener {
 		clear();
 		this.newResource = resource;
 
+		//use swing worker
 		SwingUtils.executNonUi(new Runnable() {
 			@Override
 			public void run() {
 				if (newResource == null)
 					return;
 
+				StoredResource storedResource = resourceService.get(newResource
+						.getId());
+				if (storedResource == null) {
+					log.warn("couldn't load resource: {}", newResource.getId());
+					return;
+				}
+
 				Resource resource = newResource;
 
-				tryData(inputCv, resource.getInputData());
-				tryData(outputCv, resource.getOutputData());
-				showGeneralResourceProperties(resource);
+				tryData(inputCv, storedResource.getInput());
+				tryData(outputCv, storedResource.getOutput());
+				showGeneralResourceProperties(storedResource, resource);
 			}
 		});
 	}
 
-	private void showGeneralResourceProperties(Resource resource) {
+	private void showGeneralResourceProperties(StoredResource storedResource,
+			Resource resource) {
 		final StringBuilder output = new StringBuilder();
 
 		output.append("<html><body>");
@@ -187,11 +203,13 @@ public class ResourcePanel extends JPanel implements ActionListener {
 			}
 		}
 		// writeField(headers, "", );
-		writeField(output, "Method", resource.getMethod());
-		writeField(output, "Duration", String.valueOf(resource.getDuration()));
-		writeField(output, "Date", new Date(resource.getStartTime()).toString());
+		writeField(output, "Method", storedResource.getMethod());
+		writeField(output, "Duration",
+				String.valueOf(storedResource.getDuration()));
+		writeField(output, "Date",
+				new Date(storedResource.getStartTime()).toString());
 
-		writeField(output, "Status", String.valueOf(resource.getStatus()));
+		writeField(output, "Status", String.valueOf(storedResource.getStatus()));
 		output.append("<h1>Request Headers</h1><div class=\"items\">");
 		Header[] reqHeaders = resource.getRequestHeaders();
 		if (reqHeaders != null) {
@@ -235,7 +253,7 @@ public class ResourcePanel extends JPanel implements ActionListener {
 	}
 
 	private void loadPopup() {
-		ResourceFrame window = new ResourceFrame(newResource);
+		ResourceFrame window = new ResourceFrame(resourceService, newResource);
 		window.setVisible(true);
 	}
 

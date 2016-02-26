@@ -25,6 +25,8 @@ public class StoredResource {
 	private String reason;
 
 	@DatabaseField()
+	private long startTime;
+	@DatabaseField()
 	private long duration;
 
 	@DatabaseField(width = 1024 * 4)
@@ -122,6 +124,14 @@ public class StoredResource {
 
 	public void setErrorMessage(String errorMessage) {
 		this.errorMessage = errorMessage;
+	}
+
+	public long getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(long startTime) {
+		this.startTime = startTime;
 	}
 
 }
