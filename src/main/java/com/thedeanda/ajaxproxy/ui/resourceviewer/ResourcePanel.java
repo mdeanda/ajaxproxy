@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.net.URL;
 import java.util.Date;
+import java.util.concurrent.ExecutionException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -18,6 +19,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.SpringLayout;
 import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 import javax.swing.text.Document;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
@@ -30,7 +32,6 @@ import org.slf4j.LoggerFactory;
 import com.thedeanda.ajaxproxy.service.ResourceService;
 import com.thedeanda.ajaxproxy.service.StoredResource;
 import com.thedeanda.ajaxproxy.ui.ContentViewer;
-import com.thedeanda.ajaxproxy.ui.SwingUtils;
 import com.thedeanda.ajaxproxy.ui.model.Resource;
 
 /**
@@ -161,31 +162,35 @@ public class ResourcePanel extends JPanel implements ActionListener {
 		});
 	}
 
-	public void setResource(Resource resource) {
+	public void setResource(final Resource resource) {
 		clear();
 		this.newResource = resource;
 
-		//use swing worker
-		SwingUtils.executNonUi(new Runnable() {
-			@Override
-			public void run() {
-				if (newResource == null)
-					return;
+		if (newResource == null)
+			return;
 
-				StoredResource storedResource = resourceService.get(newResource
+		new SwingWorker<StoredResource, StoredResource>() {
+			StoredResource storedResource;
+			
+			@Override
+			protected StoredResource doInBackground() throws Exception {
+				storedResource = resourceService.get(newResource
 						.getId());
+				return storedResource;
+			}
+
+			@Override
+			protected void done() {
 				if (storedResource == null) {
 					log.warn("couldn't load resource: {}", newResource.getId());
 					return;
 				}
 
-				Resource resource = newResource;
-
 				tryData(inputCv, storedResource.getInput());
 				tryData(outputCv, storedResource.getOutput());
 				showGeneralResourceProperties(storedResource, resource);
 			}
-		});
+		}.execute();
 	}
 
 	private void showGeneralResourceProperties(StoredResource storedResource,
