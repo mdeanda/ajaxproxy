@@ -5,6 +5,7 @@ import java.net.URL;
 import java.sql.SQLException;
 import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,11 +29,17 @@ public class ResourceService implements RequestListener {
 	public ResourceService(int cacheSize, File dbFile) {
 		cache = new LruCache<String, StoredResource>(cacheSize);
 		this.dbFile = dbFile;
+		try {
+			initConnection();
+		} catch (SQLException e) {
+			log.error(e.getMessage(), e);
+			dao = null;
+		}
 	}
 
 	private void initConnection() throws SQLException {
 		try {
-			String databaseUrl = "jdbc:h2:file:" + dbFile.getAbsolutePath();
+			String databaseUrl = "jdbc:h2:file:" + dbFile.getAbsolutePath() + ";AUTO_SERVER=TRUE";
 			connectionSource = new JdbcConnectionSource(databaseUrl);
 
 			dao = DaoManager.createDao(connectionSource, StoredResource.class);
@@ -50,7 +57,24 @@ public class ResourceService implements RequestListener {
 	public void save(StoredResource resource) {
 		log.debug("saving resource: {}", resource);
 		// TODO: save to db in the background
+		saveImmediately(resource);
 		cache.put(resource.getId(), resource);
+	}
+
+	private void saveImmediately(StoredResource resource) {
+		if (dao == null)
+			return;
+
+		try {
+			if (StringUtils.isBlank(resource.getId())) {
+				dao.create(resource);
+			} else {
+				dao.update(resource);
+			}
+		} catch (SQLException e) {
+			log.warn(e.getMessage(), e);
+		}
+
 	}
 
 	public StoredResource get(UUID id) {
@@ -59,8 +83,12 @@ public class ResourceService implements RequestListener {
 
 	public StoredResource get(String id) {
 		StoredResource ret = cache.get(id);
-		if (ret == null) {
-			// TODO: get from db
+		if (ret == null && dao != null) {
+			try {
+				ret = dao.queryForId(id);
+			} catch (SQLException e) {
+				log.error(e.getMessage(), e);
+			}
 		}
 		return ret;
 	}
@@ -115,7 +143,7 @@ public class ResourceService implements RequestListener {
 			save(sr);
 		}
 	}
-	
+
 	private String headersToString(Header[] headers) {
 		StringBuilder ret = new StringBuilder();
 		for (Header h : headers) {

@@ -64,7 +64,7 @@ public class MainPanel extends JPanel implements ProxyListener,
 		SpringLayout layout = new SpringLayout();
 		setLayout(layout);
 
-		File dbFile = ConfigService.get().getRestHistoryDb();
+		File dbFile = ConfigService.get().getResourceHistoryDb();
 		resourceService = new ResourceService(CACHE_SIZE, dbFile);
 
 		btn = new JButton(START);

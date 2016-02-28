@@ -73,7 +73,7 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 		log.debug("new viewer");
 		SpringLayout layout = new SpringLayout();
 		setLayout(layout);
-		
+
 		this.resourceService = resourceService;
 		model = new ResourceListModel(resourceService);
 
@@ -249,21 +249,23 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 	private JPopupMenu createListPopup() {
 		final JPopupMenu popup = new JPopupMenu();
 
-		clearMenuItem = new JMenuItem("Clear All");
-		clearMenuItem.addActionListener(this);
-		popup.add(clearMenuItem);
+		replayMenuItem = new JMenuItem("Replay in Rest Client");
+		replayMenuItem.addActionListener(this);
+		popup.add(replayMenuItem);
+
+		newWindowMenuItem = new JMenuItem("View in New Window");
+		newWindowMenuItem.addActionListener(this);
+		popup.add(newWindowMenuItem);
+
+		popup.addSeparator();
 
 		removeRequestMenuItem = new JMenuItem("Remove Request");
 		removeRequestMenuItem.addActionListener(this);
 		popup.add(removeRequestMenuItem);
 
-		replayMenuItem = new JMenuItem("Open in Rest Client");
-		replayMenuItem.addActionListener(this);
-		popup.add(replayMenuItem);
-
-		newWindowMenuItem = new JMenuItem("Open in New Window");
-		newWindowMenuItem.addActionListener(this);
-		popup.add(newWindowMenuItem);
+		clearMenuItem = new JMenuItem("Clear All");
+		clearMenuItem.addActionListener(this);
+		popup.add(clearMenuItem);
 
 		return popup;
 	}
@@ -424,7 +426,8 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 				SwingUtils.executNonUi(new Runnable() {
 					@Override
 					public void run() {
-						StoredResource resource = resourceService.get(resourceId);
+						StoredResource resource = resourceService
+								.get(resourceId);
 						RestClientFrame rest = new RestClientFrame();
 						rest.fromResource(resource);
 						rest.setVisible(true);
@@ -437,7 +440,8 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 			int index = list.getSelectedIndex();
 			if (index >= 0) {
 				final Resource resource = model.get(index);
-				ResourceFrame window = new ResourceFrame(resourceService, resource);
+				ResourceFrame window = new ResourceFrame(resourceService,
+						resource);
 				window.setVisible(true);
 			}
 		}
