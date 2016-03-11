@@ -488,12 +488,18 @@ public class RestClientPanel extends JPanel implements ActionListener {
 	}
 
 	public void saveCurrent() {
-		String name = getUrl();
+		String url = getUrl();
+
+		if (StringUtils.isBlank(url)) {
+			return;
+		}
+
+		String name = url;
 		// TODO: prmopt for name
 
 		HistoryItem item = new HistoryItem();
 		item.setHeaders(getHeaders());
-		item.setUrl(getUrl());
+		item.setUrl(url);
 		item.setInput(getInput().getBytes());
 		item.setMethod(getMethod());
 		item.setName(name);

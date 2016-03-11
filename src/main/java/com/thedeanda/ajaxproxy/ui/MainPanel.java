@@ -47,7 +47,6 @@ public class MainPanel extends JPanel implements ProxyListener,
 	private VariableTableModel variableModel;
 	private File configFile;
 	private JsonObject config;
-	private OptionsPanel optionsPanel;
 	private FileTrackerPanel trackerPanel;
 	private JTabbedPane tabs;
 	private GeneralPanel generalPanel;
@@ -94,11 +93,8 @@ public class MainPanel extends JPanel implements ProxyListener,
 		variableModel = new VariableTableModel();
 		tabs.add("Variables", new VariablesPanel(this, variableModel));
 
-		optionsPanel = new OptionsPanel();
-		tabs.add("Options", optionsPanel);
-
 		trackerPanel = new FileTrackerPanel();
-		//tabs.add("Tracker", trackerPanel);
+		// tabs.add("Tracker", trackerPanel);
 
 		resourceViewerPanel = new ResourceViewerPanel(resourceService);
 		tabs.add("Resource Viewer", resourceViewerPanel);
@@ -166,15 +162,13 @@ public class MainPanel extends JPanel implements ProxyListener,
 	 */
 	public JsonObject getConfig() {
 		JsonObject json = config;
-		json.put("port", generalPanel.getPort());
-		json.put("resourceBase", generalPanel.getResourceBase());
-		json.put(AjaxProxy.SHOW_INDEX, generalPanel.isShowIndex());
 		json.put("proxy", proxyModel.getConfig());
 		json.put("merge", mergeModel.getConfig());
 		json.put("variables", variableModel.getConfig());
 		json.put("tracker", trackerPanel.getConfig());
 		json.put("resource", resourceViewerPanel.getConfig());
-		json.put("options", optionsPanel.getConfig());
+
+		generalPanel.updateConfig(json);
 
 		log.info(json.toString(2));
 		return json;
@@ -217,7 +211,7 @@ public class MainPanel extends JPanel implements ProxyListener,
 			proxy.addProxyListener(this);
 			new Thread(proxy).start();
 			proxy.addRequestListener(resourceService);
-			optionsPanel.setProxy(proxy);
+			generalPanel.setProxy(proxy);
 			trackerPanel.setProxy(proxy);
 			resourceViewerPanel.setProxy(proxy);
 			started = true;
@@ -249,7 +243,7 @@ public class MainPanel extends JPanel implements ProxyListener,
 				AjaxProxy p = proxy;
 				proxy = null;
 				p.stop();
-				optionsPanel.setProxy(null);
+				generalPanel.setProxy(null);
 				trackerPanel.setProxy(null);
 				resourceViewerPanel.setProxy(null);
 			}
@@ -295,12 +289,9 @@ public class MainPanel extends JPanel implements ProxyListener,
 		proxyModel.setConfig(config.getJsonArray("proxy"));
 		mergeModel.setConfig(config.getJsonArray("merge"));
 		variableModel.setConfig(config.getJsonObject("variables"));
-		generalPanel.setPort(config.getInt("port"));
-		generalPanel.setResourceBase(config.getString("resourceBase"));
-		generalPanel.setShowIndex(config.getBoolean(AjaxProxy.SHOW_INDEX));
+		generalPanel.setConfig(config);
 		trackerPanel.setConfig(json.getJsonObject("tracker"));
 		resourceViewerPanel.setConfig(json.getJsonObject("resource"));
-		optionsPanel.setConfig(json.getJsonObject("options"));
 	}
 
 	@Override
