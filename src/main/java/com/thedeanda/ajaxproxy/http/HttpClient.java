@@ -2,8 +2,6 @@ package com.thedeanda.ajaxproxy.http;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -208,17 +206,11 @@ public class HttpClient {
 
 		fireStartRequest(uuid, url, headers, input, listener);
 
-		try {
-			makeRequestInternal(method, uuid, url, headers, input, listener);
-		} catch (KeyManagementException | NoSuchAlgorithmException e) {
-			log.warn(e.getMessage(), e);
-		}
-
+		makeRequestInternal(method, uuid, url, headers, input, listener);
 	}
 
 	private void makeRequestInternal(RequestMethod method, UUID id, URL url,
-			Header[] requestHeaders, byte[] data, RequestListener... listener)
-			throws NoSuchAlgorithmException, KeyManagementException {
+			Header[] requestHeaders, byte[] data, RequestListener... listener) {
 
 		HttpRequestBase request = null;
 		try {
