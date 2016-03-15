@@ -20,6 +20,7 @@ public class Convertor {
 	public static final String PROXY_PORT = "port";
 	public static final String PROXY_PATH = "path";
 	public static final String PROXY_CACHE = "cache";
+	public static final String PROXY_CACHE_DUR = "cacheDuration";
 
 	private Convertor() {
 
@@ -97,6 +98,7 @@ public class Convertor {
 		}
 		config.setPath(json.getString(PROXY_PATH));
 		config.setEnableCache(json.getBoolean(PROXY_CACHE));
+		config.setCacheDuration(json.getInt(PROXY_CACHE_DUR));
 
 		return config;
 	}
@@ -108,6 +110,7 @@ public class Convertor {
 		json.put(PROXY_PORT, config.getPort());
 		json.put(PROXY_PATH, config.getPath());
 		json.put(PROXY_CACHE, config.isEnableCache());
+		json.put(PROXY_CACHE_DUR, config.getCacheDuration());
 
 		return json;
 	}

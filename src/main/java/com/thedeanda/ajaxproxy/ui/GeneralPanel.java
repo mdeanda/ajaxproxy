@@ -297,6 +297,10 @@ public class GeneralPanel extends JPanel implements ChangeListener,
 		options.put("forcedLatency", forcedLatency.getValue());
 		options.put("cacheTime", cacheSlider.getValue());
 	}
+	
+	public int getCacheTime() {
+		return cacheOptionsValues.get(cacheSlider.getValue()).getRealValue();
+	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {

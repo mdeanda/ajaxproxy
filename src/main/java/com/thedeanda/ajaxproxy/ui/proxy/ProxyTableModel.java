@@ -42,11 +42,12 @@ public class ProxyTableModel extends AbstractTableModel {
 		return String.class;
 	}
 
-	public JsonArray getConfig() {
+	public JsonArray getConfig(final int cacheTime) {
 		normalizeData();
 		JsonArray arr = new JsonArray();
 		Convertor converter = Convertor.get();
 		for (ProxyConfig config : data) {
+			config.setCacheDuration(cacheTime);
 			arr.add(converter.toJson(config));
 		}
 		return arr;
