@@ -1,6 +1,7 @@
 package com.thedeanda.ajaxproxy;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
 import java.net.URL;
@@ -9,6 +10,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.http.Header;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.thedeanda.ajaxproxy.http.HttpClient;
@@ -36,6 +38,7 @@ public class TestHeaders {
 		client = new HttpClient();
 	}
 
+	@Ignore
 	@Test
 	public void testHeadersNewProxy() throws Exception {
 		JsonObject config = new JsonObject();

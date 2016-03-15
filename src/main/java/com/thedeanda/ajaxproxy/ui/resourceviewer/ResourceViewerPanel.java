@@ -26,7 +26,6 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
@@ -44,9 +43,7 @@ import com.thedeanda.ajaxproxy.ui.model.Resource;
 import com.thedeanda.ajaxproxy.ui.model.ResourceListModel;
 import com.thedeanda.ajaxproxy.ui.rest.RestClientFrame;
 import com.thedeanda.ajaxproxy.ui.viewer.ResourceCellRenderer;
-import com.thedeanda.javajson.JsonArray;
 import com.thedeanda.javajson.JsonObject;
-import com.thedeanda.javajson.JsonValue;
 
 /** tracks files that get loaded */
 public class ResourceViewerPanel extends JPanel implements AccessTracker,
@@ -268,47 +265,6 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 		popup.add(clearMenuItem);
 
 		return popup;
-	}
-
-	private void initTree(DefaultMutableTreeNode top, JsonObject obj) {
-		for (String key : obj) {
-			JsonValue val = obj.get(key);
-			if (val.isJsonObject()) {
-				DefaultMutableTreeNode node = new DefaultMutableTreeNode(key);
-				top.add(node);
-				initTree(node, val.getJsonObject());
-			} else if (val.isJsonArray()) {
-				DefaultMutableTreeNode node = new DefaultMutableTreeNode(key);
-				top.add(node);
-				initTree(node, val.getJsonArray());
-			} else {
-				DefaultMutableTreeNode node = new DefaultMutableTreeNode(key
-						+ "=" + val.toString());
-				top.add(node);
-			}
-		}
-	}
-
-	private void initTree(DefaultMutableTreeNode top, JsonArray arr) {
-		int i = 0;
-		for (JsonValue val : arr) {
-			if (val.isJsonObject()) {
-				DefaultMutableTreeNode node = new DefaultMutableTreeNode("["
-						+ i + "]");
-				top.add(node);
-				initTree(node, val.getJsonObject());
-			} else if (val.isJsonArray()) {
-				DefaultMutableTreeNode node = new DefaultMutableTreeNode("["
-						+ i + "]");
-				top.add(node);
-				initTree(node, val.getJsonArray());
-			} else {
-				DefaultMutableTreeNode node = new DefaultMutableTreeNode(
-						val.toString());
-				top.add(node);
-			}
-			i++;
-		}
 	}
 
 	private void listItemSelected(ListSelectionEvent evt) {

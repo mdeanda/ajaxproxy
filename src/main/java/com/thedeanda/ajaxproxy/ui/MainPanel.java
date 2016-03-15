@@ -1,14 +1,17 @@
 package com.thedeanda.ajaxproxy.ui;
 
+import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
@@ -16,6 +19,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SpringLayout;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,13 +32,14 @@ import com.thedeanda.ajaxproxy.ui.proxy.ProxyPanel;
 import com.thedeanda.ajaxproxy.ui.proxy.ProxyTableModel;
 import com.thedeanda.ajaxproxy.ui.resourceviewer.ResourceViewerPanel;
 import com.thedeanda.ajaxproxy.ui.tracker.FileTrackerPanel;
+import com.thedeanda.ajaxproxy.ui.update.UpdateCheckWorker;
 import com.thedeanda.ajaxproxy.ui.variable.VariableTableModel;
 import com.thedeanda.ajaxproxy.ui.variable.VariablesPanel;
 import com.thedeanda.javajson.JsonException;
 import com.thedeanda.javajson.JsonObject;
 
 public class MainPanel extends JPanel implements ProxyListener,
-		SettingsChangedListener {
+		SettingsChangedListener, ActionListener {
 	private static final long serialVersionUID = 1L;
 	private static final Logger log = LoggerFactory.getLogger(MainPanel.class);
 	private static final int CACHE_SIZE = 50;
@@ -58,6 +63,7 @@ public class MainPanel extends JPanel implements ProxyListener,
 	private ResourceViewerPanel resourceViewerPanel;
 	private JButton restartButton;
 	private ResourceService resourceService;
+	private JButton releasesButton;
 
 	public MainPanel() {
 		SpringLayout layout = new SpringLayout();
@@ -111,6 +117,8 @@ public class MainPanel extends JPanel implements ProxyListener,
 				}
 			}
 		});
+		prepareReleasesButton();
+		add(releasesButton);
 
 		layout.putConstraint(SpringLayout.SOUTH, btn, -10, SpringLayout.SOUTH,
 				this);
@@ -130,8 +138,37 @@ public class MainPanel extends JPanel implements ProxyListener,
 		layout.putConstraint(SpringLayout.EAST, restartButton, -10,
 				SpringLayout.WEST, btn);
 
+		layout.putConstraint(SpringLayout.SOUTH, releasesButton, 0,
+				SpringLayout.SOUTH, btn);
+		layout.putConstraint(SpringLayout.WEST, releasesButton, 10,
+				SpringLayout.WEST, this);
+
 		clearAll();
 
+	}
+
+	private void prepareReleasesButton() {
+		releasesButton = new JButton("Update Available");
+		releasesButton.addActionListener(this);
+		releasesButton.setVisible(false);
+
+		new UpdateCheckWorker() {
+			@Override
+			protected void done() {
+				Boolean updateAvailable = null;
+				try {
+					updateAvailable = get();
+				} catch (InterruptedException | ExecutionException e) {
+				}
+				if (updateAvailable == Boolean.TRUE) {
+					releasesButton.setVisible(true);
+					String message = getMessage();
+					if (!StringUtils.isBlank(message)) {
+						releasesButton.setToolTipText(message);
+					}
+				}
+			}
+		}.execute();
 	}
 
 	public void addProxyListener(ProxyListener listener) {
@@ -162,7 +199,7 @@ public class MainPanel extends JPanel implements ProxyListener,
 	 */
 	public JsonObject getConfig() {
 		JsonObject json = config;
-		json.put("proxy", proxyModel.getConfig());
+		json.put("proxy", proxyModel.getConfig(generalPanel.getCacheTime()));
 		json.put("merge", mergeModel.getConfig());
 		json.put("variables", variableModel.getConfig());
 		json.put("tracker", trackerPanel.getConfig());
@@ -328,6 +365,31 @@ public class MainPanel extends JPanel implements ProxyListener,
 				String value = vars.get(key);
 				variableModel.set(key, value);
 			}
+		}
+	}
+
+	private void openReleasesPage() {
+		try {
+			URI url = new URI(UpdateCheckWorker.RELEASE_URL);
+			Desktop desktop = Desktop.isDesktopSupported() ? Desktop
+					.getDesktop() : null;
+			if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
+				try {
+					desktop.browse(url);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		} catch (Exception e) {
+
+		}
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		Object source = e.getSource();
+		if (source == releasesButton) {
+			openReleasesPage();
 		}
 	}
 }
