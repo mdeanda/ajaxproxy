@@ -38,17 +38,8 @@ public class UpdateCheckWorker extends SwingWorker<Boolean, Void> {
 					+ MIN_DELAY;
 			Thread.sleep(delay);
 			loadAtomFeed();
-			ReleaseEntry entry = entries.iterator().next();
-
-			String version = ConfigService.get().getVersionString();
-			ReleaseVersion currentVersion = new ReleaseVersion(version);
-
-			if (currentVersion.compareTo(entry.version) < 0) {
-				message = String.format(
-						"Version %s is available for download.", entry.version);
-				retVal = true;
-			}
-
+			ReleaseEntry entry = getEntry();
+			retVal = verifyUpdateAvailable(entry);
 			log.warn("latest: {}", entry);
 		} catch (Throwable e) {
 			log.warn(e.getMessage(), e);
@@ -57,9 +48,35 @@ public class UpdateCheckWorker extends SwingWorker<Boolean, Void> {
 		return retVal;
 	}
 
+	private boolean verifyUpdateAvailable(ReleaseEntry entry) {
+		boolean retVal = false;
+		if (entry != null) {
+			String version = ConfigService.get().getVersionString();
+			ReleaseVersion currentVersion = new ReleaseVersion(version);
+
+			if (currentVersion.compareTo(entry.version) < 0) {
+				message = String.format(
+						"Version %s is available for download.", entry.version);
+				retVal = true;
+			}
+		}
+		return retVal;
+	}
+
+	private ReleaseEntry getEntry() {
+		ReleaseEntry entry = null;
+		if (entries != null && !entries.isEmpty())
+			entry = entries.iterator().next();
+
+		return entry;
+	}
+
 	private void loadAtomFeed() throws DocumentException {
 		SimpleHttpClient client = new SimpleHttpClient();
 		String data = client.getString(RELEASE_CHECK_URL);
+
+		if (data == null)
+			return;
 
 		Document doc = DocumentHelper.parseText(data);
 		@SuppressWarnings("unchecked")

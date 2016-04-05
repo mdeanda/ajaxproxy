@@ -1,15 +1,11 @@
 package com.thedeanda.ajaxproxy.ui.resourceviewer;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.StringWriter;
 import java.net.URL;
 import java.util.Date;
-import java.util.concurrent.ExecutionException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -24,14 +20,13 @@ import javax.swing.text.Document;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.http.Header;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.thedeanda.ajaxproxy.service.ResourceService;
 import com.thedeanda.ajaxproxy.service.StoredResource;
-import com.thedeanda.ajaxproxy.ui.ContentViewer;
 import com.thedeanda.ajaxproxy.ui.model.Resource;
 
 /**
@@ -127,28 +122,14 @@ public class ResourcePanel extends JPanel implements ActionListener {
 	}
 
 	private void clear() {
+		log.debug("clear content viewer");
 		inputCv.setContent(null);
 		outputCv.setContent(null);
 		headersContent.setText("");
 	}
 
 	private void tryData(final ContentViewer cv, byte[] data) {
-		if (data == null) {
-			tryText(cv, null);
-		} else {
-			StringWriter sw = new StringWriter();
-			try {
-				IOUtils.copy(new InputStreamReader(new ByteArrayInputStream(
-						data)), sw);
-				tryText(cv, sw.toString());
-			} catch (IOException e) {
-				// log.warn(e.getMessage(), e);
-			}
-		}
-	}
-
-	private void tryText(final ContentViewer cv, String text) {
-		cv.setContent(text);
+		cv.setContent(data);
 	}
 
 	private void showHeaders(final String markup) {
@@ -171,11 +152,10 @@ public class ResourcePanel extends JPanel implements ActionListener {
 
 		new SwingWorker<StoredResource, StoredResource>() {
 			StoredResource storedResource;
-			
+
 			@Override
 			protected StoredResource doInBackground() throws Exception {
-				storedResource = resourceService.get(newResource
-						.getId());
+				storedResource = resourceService.get(newResource.getId());
 				return storedResource;
 			}
 
@@ -186,8 +166,21 @@ public class ResourcePanel extends JPanel implements ActionListener {
 					return;
 				}
 
-				tryData(inputCv, storedResource.getInput());
-				tryData(outputCv, storedResource.getOutput());
+				byte[] data = storedResource.getInput();
+				if (ArrayUtils.isEmpty(data)) {
+					// tabs.setEnabledAt(1, false);
+				} else {
+					// tabs.setEnabledAt(1, true);
+					tryData(inputCv, data);
+				}
+
+				data = storedResource.getOutput();
+				if (ArrayUtils.isEmpty(data)) {
+					// tabs.setEnabledAt(2, false);
+				} else {
+					// tabs.setEnabledAt(2, true);
+					tryData(outputCv, data);
+				}
 				showGeneralResourceProperties(storedResource, resource);
 			}
 		}.execute();

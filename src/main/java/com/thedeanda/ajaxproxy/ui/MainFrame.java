@@ -181,7 +181,7 @@ public class MainFrame extends JFrame implements ProxyListener {
 		URL imgUrl = ClassLoader.getSystemClassLoader().getResource("icon.png");
 		this.image = Toolkit.getDefaultToolkit().getImage(imgUrl);
 		this.setIconImage(image);
-		setPreferredSize(new Dimension(980, 700));
+		setPreferredSize(new Dimension(1150, 700));
 	}
 
 	private void initTray() {

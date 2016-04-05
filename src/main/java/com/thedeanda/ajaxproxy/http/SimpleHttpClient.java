@@ -21,12 +21,14 @@ public class SimpleHttpClient {
 
 	public String getString(String url) {
 		byte[] bytes = getBytes(url);
+		if (bytes == null)
+			return null;
 		try {
 			return new String(bytes, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
 			log.warn(e.getMessage(), e);
-			return null;
 		}
+		return null;
 	}
 
 	public byte[] getBytes(String url) {
