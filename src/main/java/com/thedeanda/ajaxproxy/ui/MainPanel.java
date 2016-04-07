@@ -31,6 +31,7 @@ import com.thedeanda.ajaxproxy.ui.merge.MergeTableModel;
 import com.thedeanda.ajaxproxy.ui.proxy.ProxyPanel;
 import com.thedeanda.ajaxproxy.ui.proxy.ProxyTableModel;
 import com.thedeanda.ajaxproxy.ui.resourceviewer.ResourceViewerPanel;
+import com.thedeanda.ajaxproxy.ui.tamper.TamperPanel;
 import com.thedeanda.ajaxproxy.ui.tracker.FileTrackerPanel;
 import com.thedeanda.ajaxproxy.ui.update.UpdateCheckWorker;
 import com.thedeanda.ajaxproxy.ui.variable.VariableTableModel;
@@ -55,6 +56,7 @@ public class MainPanel extends JPanel implements ProxyListener,
 	private FileTrackerPanel trackerPanel;
 	private JTabbedPane tabs;
 	private GeneralPanel generalPanel;
+	private TamperPanel tamperPanel;
 
 	private static final String START = "Start";
 	private static final String STOP = "Stop";
@@ -98,6 +100,9 @@ public class MainPanel extends JPanel implements ProxyListener,
 		// TODO: move proxy to its own panel so code is easier to maintain
 		variableModel = new VariableTableModel();
 		tabs.add("Variables", new VariablesPanel(this, variableModel));
+		
+		tamperPanel = new TamperPanel();
+		tabs.add("Tamper", tamperPanel);
 
 		trackerPanel = new FileTrackerPanel();
 		// tabs.add("Tracker", trackerPanel);
