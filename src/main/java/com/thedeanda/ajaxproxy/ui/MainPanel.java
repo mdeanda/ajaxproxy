@@ -209,6 +209,7 @@ public class MainPanel extends JPanel implements ProxyListener,
 		json.put("variables", variableModel.getConfig());
 		json.put("tracker", trackerPanel.getConfig());
 		json.put("resource", resourceViewerPanel.getConfig());
+		json.put("tamper", tamperPanel.getConfig());
 
 		generalPanel.updateConfig(json);
 
@@ -334,6 +335,7 @@ public class MainPanel extends JPanel implements ProxyListener,
 		generalPanel.setConfig(config);
 		trackerPanel.setConfig(json.getJsonObject("tracker"));
 		resourceViewerPanel.setConfig(json.getJsonObject("resource"));
+		tamperPanel.setConfig(json.getJsonObject("tamper"));
 	}
 
 	@Override

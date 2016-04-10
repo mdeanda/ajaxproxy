@@ -37,15 +37,14 @@ public class TamperSelectorDialog extends JDialog implements ActionListener {
 	private JPanel formPanel;
 	private JTextField txtPath;
 
-	public static TamperSelector showDialog(Component frameComp,
-			Component locationComp) {
+	public static TamperSelector showDialog(Component frameComp) {
 
 		String title = "Add Tamper";
 		TamperSelector initialValue = new TamperSelector();
 
 		Frame frame = JOptionPane.getFrameForComponent(frameComp);
 		TamperSelectorDialog dialog = new TamperSelectorDialog(frame,
-				locationComp, title, initialValue);
+				frameComp, title, initialValue);
 		dialog.setVisible(true);
 		return dialog.getValue();
 	}
@@ -60,14 +59,12 @@ public class TamperSelectorDialog extends JDialog implements ActionListener {
 		initComponenets();
 		initLayout(panel);
 		getRootPane().setDefaultButton(saveButton);
-		// contentPane.add(listPane, BorderLayout.CENTER);
-		// contentPane.add(buttonPane, BorderLayout.PAGE_END);
 
 		// Initialize values.
 		// setValue(initialValue);
 
-		setMinimumSize(new Dimension(250, 200));
-		setPreferredSize(new Dimension(400, 250));
+		setMinimumSize(new Dimension(250, 180));
+		setPreferredSize(new Dimension(400, 180));
 		pack();
 		setLocationRelativeTo(locationComp);
 	}
@@ -77,8 +74,9 @@ public class TamperSelectorDialog extends JDialog implements ActionListener {
 		// TODO Auto-generated method stub
 		Object source = e.getSource();
 		if (source == cancelButton) {
-			value = null;
-			setVisible(false);
+			doCancel();
+		} else if (source == saveButton) {
+			doSave();
 		}
 	}
 
@@ -174,6 +172,20 @@ public class TamperSelectorDialog extends JDialog implements ActionListener {
 		buttonPane.add(cancelButton);
 		buttonPane.add(Box.createRigidArea(new Dimension(10, 0)));
 		buttonPane.add(saveButton);
+	}
+	
+	public void doCancel() {
+		value = null;
+		setVisible(false);		
+	}
+	
+	public void doSave() {
+		//TODO: validation and block
+		
+		value = new TamperSelector();
+		value.setName(txtName.getText());
+		value.setPathRegEx(txtPath.getText());
+		setVisible(false);
 	}
 
 	public TamperSelector getValue() {
