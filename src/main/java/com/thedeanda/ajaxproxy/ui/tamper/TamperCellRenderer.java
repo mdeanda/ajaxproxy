@@ -3,6 +3,7 @@ package com.thedeanda.ajaxproxy.ui.tamper;
 import java.awt.Color;
 import java.awt.Component;
 
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -31,6 +32,8 @@ public class TamperCellRenderer extends JPanel implements
 	private void initLayout() {
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
+		setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+		
 		add(name);
 		add(path);
 	}

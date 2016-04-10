@@ -75,6 +75,7 @@ public class TamperPanel extends JPanel implements ActionListener {
 		importBtn.setEnabled(false);
 
 		addBtn.addActionListener(this);
+		clearBtn.addActionListener(this);
 	}
 
 	private void initComponentsListPanel() {
@@ -185,6 +186,8 @@ public class TamperPanel extends JPanel implements ActionListener {
 					showAddDialog();
 				}
 			});
+		} else if (source == clearBtn) {
+			clearItems();
 		}
 	}
 
@@ -230,6 +233,10 @@ public class TamperPanel extends JPanel implements ActionListener {
 			element.setSelector(selector);
 			model.add(element);
 		}
+	}
+
+	private void clearItems() {
+		model.clear();
 	}
 
 	private void listItemSelected(ListSelectionEvent evt) {
