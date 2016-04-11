@@ -42,6 +42,7 @@ public class TamperPanel extends JPanel implements ActionListener {
 	private TamperListModel model;
 	private JList<TamperItem> list;
 	private TamperConvertor convertor = new TamperConvertor();
+	private TamperViewPanel viewPanel;
 
 	public TamperPanel() {
 		log.debug("new tamper panel");
@@ -55,9 +56,11 @@ public class TamperPanel extends JPanel implements ActionListener {
 
 		initComponentsListPanel();
 
+		viewPanel = new TamperViewPanel();
+
 		split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		split.setLeftComponent(listPanel);
-		split.setRightComponent(new JButton("right"));
+		split.setRightComponent(viewPanel);
 		split.setDividerLocation(300);
 		split.setBorder(BorderFactory.createEmptyBorder());
 		SwingUtils.flattenSplitPane(split);
@@ -240,7 +243,11 @@ public class TamperPanel extends JPanel implements ActionListener {
 	}
 
 	private void listItemSelected(ListSelectionEvent evt) {
-		// TODO Auto-generated method stub
+		if (evt.getValueIsAdjusting())
+			return;
 
+		TamperItem value = list.getSelectedValue();
+		// if null, switch cards to empty view
+		viewPanel.showTamper(value);
 	}
 }
