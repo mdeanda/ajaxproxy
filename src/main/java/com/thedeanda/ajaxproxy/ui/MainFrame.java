@@ -85,10 +85,10 @@ public class MainFrame extends JFrame implements ProxyListener {
 		this.initTray();
 		if (USE_TRAY) {
 			log.info("system tray mode");
-			setDefaultCloseOperation(EXIT_ON_CLOSE);
+			setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		} else {
 			log.info("dispose mode");
-			setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+			setDefaultCloseOperation(EXIT_ON_CLOSE);
 		}
 
 		initSettings();
@@ -185,7 +185,7 @@ public class MainFrame extends JFrame implements ProxyListener {
 	}
 
 	private void initTray() {
-		if (SystemTray.isSupported() || !USE_TRAY) {
+		if (!SystemTray.isSupported() || !USE_TRAY) {
 			log.error("System tray disabled.");
 			USE_TRAY = false;
 			return;
