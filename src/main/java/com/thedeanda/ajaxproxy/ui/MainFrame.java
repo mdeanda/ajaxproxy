@@ -125,6 +125,7 @@ public class MainFrame extends JFrame implements ProxyListener {
 			@Override
 			public void windowClosing(WindowEvent e) {
 				try {
+					log.info("window closing");
 					panel.stop();
 					saveRecent();
 				} catch (Exception ex) {
@@ -161,10 +162,10 @@ public class MainFrame extends JFrame implements ProxyListener {
 		if (file != null) {
 			title += " - " + file.getAbsolutePath();
 		}
-		if (version!=null) {
+		if (version != null) {
 			title += " - " + version;
 		}
-		
+
 		setTitle(title);
 	}
 
@@ -291,8 +292,7 @@ public class MainFrame extends JFrame implements ProxyListener {
 
 		mi = new JMenuItem("New");
 		mi.setMnemonic(KeyEvent.VK_N);
-		mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N,
-				ActionEvent.CTRL_MASK));
+		mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
 		mi.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent ae) {
@@ -303,8 +303,7 @@ public class MainFrame extends JFrame implements ProxyListener {
 
 		mi = new JMenuItem("Open");
 		mi.setMnemonic(KeyEvent.VK_O);
-		mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O,
-				ActionEvent.CTRL_MASK));
+		mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
 		mi.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent ae) {
@@ -331,8 +330,7 @@ public class MainFrame extends JFrame implements ProxyListener {
 
 		mi = new JMenuItem("Save");
 		mi.setMnemonic(KeyEvent.VK_S);
-		mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,
-				ActionEvent.CTRL_MASK));
+		mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
 		saveMenuItem = mi;
 		mi.addActionListener(new ActionListener() {
 			@Override
@@ -378,15 +376,13 @@ public class MainFrame extends JFrame implements ProxyListener {
 		mb.add(menu);
 		this.startServerMenuItem2 = mi = new JMenuItem("Start Server");
 		mi.setMnemonic(KeyEvent.VK_A);
-		mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1,
-				ActionEvent.CTRL_MASK));
+		mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, ActionEvent.CTRL_MASK));
 		mi.addActionListener(menuItemListener);
 		menu.add(mi);
 
 		this.stopServerMenuItem2 = mi = new JMenuItem("Stop Server");
 		mi.setMnemonic(KeyEvent.VK_O);
-		mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_2,
-				ActionEvent.CTRL_MASK));
+		mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_2, ActionEvent.CTRL_MASK));
 		mi.addActionListener(menuItemListener);
 		menu.add(mi);
 
@@ -460,8 +456,7 @@ public class MainFrame extends JFrame implements ProxyListener {
 		}
 
 		if (ex != null) {
-			JOptionPane.showMessageDialog(this.getComponent(0),
-					ex.getMessage(), "Failed to save",
+			JOptionPane.showMessageDialog(this.getComponent(0), ex.getMessage(), "Failed to save",
 					JOptionPane.ERROR_MESSAGE);
 		}
 	}

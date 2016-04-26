@@ -305,7 +305,7 @@ public class RequestViewer extends JPanel implements RequestListener {
 
 	private void clear() {
 		headersField.setText("");
-		contentViewer.setContent(null);
+		contentViewer.setContent((byte[]) null);
 		statusCode.setText("");
 		statusPhrase.setText("");
 		durationField.setText("");
