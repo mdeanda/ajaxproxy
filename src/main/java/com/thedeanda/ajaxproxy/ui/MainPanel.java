@@ -39,8 +39,7 @@ import com.thedeanda.ajaxproxy.ui.variable.VariablesPanel;
 import com.thedeanda.javajson.JsonException;
 import com.thedeanda.javajson.JsonObject;
 
-public class MainPanel extends JPanel implements ProxyListener,
-		SettingsChangedListener, ActionListener {
+public class MainPanel extends JPanel implements ProxyListener, SettingsChangedListener, ActionListener {
 	private static final long serialVersionUID = 1L;
 	private static final Logger log = LoggerFactory.getLogger(MainPanel.class);
 	private static final int CACHE_SIZE = 50;
@@ -100,7 +99,7 @@ public class MainPanel extends JPanel implements ProxyListener,
 		// TODO: move proxy to its own panel so code is easier to maintain
 		variableModel = new VariableTableModel();
 		tabs.add("Variables", new VariablesPanel(this, variableModel));
-		
+
 		tamperPanel = new TamperPanel();
 		tabs.add("Tamper", tamperPanel);
 
@@ -125,28 +124,18 @@ public class MainPanel extends JPanel implements ProxyListener,
 		prepareReleasesButton();
 		add(releasesButton);
 
-		layout.putConstraint(SpringLayout.SOUTH, btn, -10, SpringLayout.SOUTH,
-				this);
-		layout.putConstraint(SpringLayout.EAST, btn, -10, SpringLayout.EAST,
-				this);
-		layout.putConstraint(SpringLayout.NORTH, tabs, 15, SpringLayout.NORTH,
-				this);
-		layout.putConstraint(SpringLayout.WEST, tabs, 10, SpringLayout.WEST,
-				this);
-		layout.putConstraint(SpringLayout.EAST, tabs, -10, SpringLayout.EAST,
-				this);
-		layout.putConstraint(SpringLayout.SOUTH, tabs, -10, SpringLayout.NORTH,
-				btn);
+		layout.putConstraint(SpringLayout.SOUTH, btn, -10, SpringLayout.SOUTH, this);
+		layout.putConstraint(SpringLayout.EAST, btn, -10, SpringLayout.EAST, this);
+		layout.putConstraint(SpringLayout.NORTH, tabs, 15, SpringLayout.NORTH, this);
+		layout.putConstraint(SpringLayout.WEST, tabs, 10, SpringLayout.WEST, this);
+		layout.putConstraint(SpringLayout.EAST, tabs, -10, SpringLayout.EAST, this);
+		layout.putConstraint(SpringLayout.SOUTH, tabs, -10, SpringLayout.NORTH, btn);
 
-		layout.putConstraint(SpringLayout.SOUTH, restartButton, 0,
-				SpringLayout.SOUTH, btn);
-		layout.putConstraint(SpringLayout.EAST, restartButton, -10,
-				SpringLayout.WEST, btn);
+		layout.putConstraint(SpringLayout.SOUTH, restartButton, 0, SpringLayout.SOUTH, btn);
+		layout.putConstraint(SpringLayout.EAST, restartButton, -10, SpringLayout.WEST, btn);
 
-		layout.putConstraint(SpringLayout.SOUTH, releasesButton, 0,
-				SpringLayout.SOUTH, btn);
-		layout.putConstraint(SpringLayout.WEST, releasesButton, 10,
-				SpringLayout.WEST, this);
+		layout.putConstraint(SpringLayout.SOUTH, releasesButton, 0, SpringLayout.SOUTH, btn);
+		layout.putConstraint(SpringLayout.WEST, releasesButton, 10, SpringLayout.WEST, this);
 
 		clearAll();
 
@@ -237,7 +226,10 @@ public class MainPanel extends JPanel implements ProxyListener,
 		if (json == null)
 			return;
 
-		tabs.setSelectedIndex(json.getInt("currentTab"));
+		int tab = json.getInt("currentTab");
+		if (tabs.getTabCount() > tab) {
+			tabs.setSelectedIndex(tab);
+		}
 	}
 
 	public void start() {
@@ -378,8 +370,7 @@ public class MainPanel extends JPanel implements ProxyListener,
 	private void openReleasesPage() {
 		try {
 			URI url = new URI(UpdateCheckWorker.RELEASE_URL);
-			Desktop desktop = Desktop.isDesktopSupported() ? Desktop
-					.getDesktop() : null;
+			Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
 			if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
 				try {
 					desktop.browse(url);
