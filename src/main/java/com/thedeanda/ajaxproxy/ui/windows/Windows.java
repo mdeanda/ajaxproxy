@@ -162,4 +162,15 @@ public class Windows {
 
 		return ret;
 	}
+
+	public boolean contains(final JFrame theFrame) {
+		for (WindowContainer wc : frames.values()) {
+			JFrame frame = wc.getFrame();
+			if (frame == theFrame) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
 }

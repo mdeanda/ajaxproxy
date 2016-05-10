@@ -13,8 +13,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -27,6 +25,7 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +45,9 @@ import org.slf4j.LoggerFactory;
 import com.thedeanda.ajaxproxy.ProxyListener;
 import com.thedeanda.ajaxproxy.ui.json.JsonViewerFrame;
 import com.thedeanda.ajaxproxy.ui.rest.RestClientFrame;
+import com.thedeanda.ajaxproxy.ui.windows.WindowContainer;
+import com.thedeanda.ajaxproxy.ui.windows.WindowListListener;
+import com.thedeanda.ajaxproxy.ui.windows.WindowListListenerCleanup;
 import com.thedeanda.ajaxproxy.ui.windows.WindowMenuHelper;
 import com.thedeanda.ajaxproxy.ui.windows.Windows;
 import com.thedeanda.javajson.JsonArray;
@@ -53,10 +55,10 @@ import com.thedeanda.javajson.JsonException;
 import com.thedeanda.javajson.JsonObject;
 import com.thedeanda.javajson.JsonValue;
 
-public class MainFrame extends JFrame implements ProxyListener {
+public class MainFrame extends JFrame implements ProxyListener, WindowListListener {
 	private static final long serialVersionUID = 1L;
 	private static final Logger log = LoggerFactory.getLogger(MainFrame.class);
-	private boolean USE_TRAY = false; //got slightly buggy, disable for now
+	private boolean USE_TRAY = false; // got slightly buggy, disable for now
 	private MainPanel panel;
 	final JFileChooser fc = new JFileChooser();
 	private TrayIcon trayIcon;
@@ -89,11 +91,12 @@ public class MainFrame extends JFrame implements ProxyListener {
 		getContentPane().add(panel);
 		pack();
 
-		addCloseListener();
 		panel.addProxyListener(this);
 
-		this.windowId = Windows.get().add(this);
+		this.windowId = Windows.get().addListener(this).add(this);
+		this.addWindowListener(new WindowListListenerCleanup(this));
 		new WindowMenuHelper(windowId, getJMenuBar());
+
 	}
 
 	private void initSettings() {
@@ -107,47 +110,6 @@ public class MainFrame extends JFrame implements ProxyListener {
 		} finally {
 			ignoreSaveSettings = false;
 		}
-	}
-
-	private void addCloseListener() {
-		this.addWindowListener(new WindowListener() {
-
-			@Override
-			public void windowOpened(WindowEvent e) {
-			}
-
-			@Override
-			public void windowClosing(WindowEvent e) {
-				try {
-					log.info("window closing");
-					panel.stop();
-					saveSettings();
-				} catch (Exception ex) {
-					log.error(ex.getMessage(), ex);
-				}
-			}
-
-			@Override
-			public void windowClosed(WindowEvent e) {
-			}
-
-			@Override
-			public void windowIconified(WindowEvent e) {
-			}
-
-			@Override
-			public void windowDeiconified(WindowEvent e) {
-			}
-
-			@Override
-			public void windowActivated(WindowEvent e) {
-			}
-
-			@Override
-			public void windowDeactivated(WindowEvent e) {
-			}
-
-		});
 	}
 
 	private void updateTitle() {
@@ -614,6 +576,19 @@ public class MainFrame extends JFrame implements ProxyListener {
 
 	private void handleShowWindow() {
 		this.setVisible(true);
+	}
+
+	@Override
+	public void windowsChanged(Collection<WindowContainer> windows) {
+		if (!Windows.get().contains(this)) {
+			try {
+				log.info("window closing");
+				panel.stop();
+				saveSettings();
+			} catch (Exception ex) {
+				log.error(ex.getMessage(), ex);
+			}
+		}
 	}
 
 }
