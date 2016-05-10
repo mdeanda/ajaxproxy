@@ -171,6 +171,7 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 
 		filter = new JTextField(".*");
 		SwingUtils.prepJTextField(filter);
+		filter.setToolTipText("Filter path by java regex");
 		panel.add(filter);
 
 		// Listen for changes in the text
