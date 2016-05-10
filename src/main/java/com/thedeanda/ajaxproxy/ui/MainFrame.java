@@ -56,7 +56,7 @@ import com.thedeanda.javajson.JsonValue;
 public class MainFrame extends JFrame implements ProxyListener {
 	private static final long serialVersionUID = 1L;
 	private static final Logger log = LoggerFactory.getLogger(MainFrame.class);
-	private boolean USE_TRAY = true;
+	private boolean USE_TRAY = false; //got slightly buggy, disable for now
 	private MainPanel panel;
 	final JFileChooser fc = new JFileChooser();
 	private TrayIcon trayIcon;
@@ -83,13 +83,7 @@ public class MainFrame extends JFrame implements ProxyListener {
 		this.initWindow();
 		this.initMenuBar();
 		this.initTray();
-		if (USE_TRAY) {
-			log.info("system tray mode");
-			setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		} else {
-			log.info("dispose mode");
-			setDefaultCloseOperation(EXIT_ON_CLOSE);
-		}
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
 		initSettings();
 		getContentPane().add(panel);
@@ -127,7 +121,7 @@ public class MainFrame extends JFrame implements ProxyListener {
 				try {
 					log.info("window closing");
 					panel.stop();
-					saveRecent();
+					saveSettings();
 				} catch (Exception ex) {
 					log.error(ex.getMessage(), ex);
 				}
@@ -175,7 +169,7 @@ public class MainFrame extends JFrame implements ProxyListener {
 		recentFiles.add(file);
 		updateTitle();
 		panel.setConfigFile(file);
-		saveRecent();
+		saveSettings();
 	}
 
 	private void initWindow() {
@@ -471,7 +465,7 @@ public class MainFrame extends JFrame implements ProxyListener {
 
 	private void handleExit() {
 		panel.stop();
-		saveRecent();
+		saveSettings();
 		dispose();
 	}
 
@@ -545,7 +539,7 @@ public class MainFrame extends JFrame implements ProxyListener {
 		}
 	}
 
-	private void saveRecent() {
+	private void saveSettings() {
 		if (ignoreSaveSettings)
 			return;
 		log.info("saving recents");
