@@ -101,7 +101,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		tabs.add("Variables", new VariablesPanel(this, variableModel));
 
 		tamperPanel = new TamperPanel();
-		tabs.add("Tamper", tamperPanel);
+		// tabs.add("Tamper", tamperPanel);
 
 		trackerPanel = new FileTrackerPanel();
 		// tabs.add("Tracker", trackerPanel);
