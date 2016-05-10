@@ -1,9 +1,6 @@
 package com.thedeanda.ajaxproxy.ui.viewer;
 
 import java.awt.BorderLayout;
-import java.awt.Font;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URL;
@@ -16,28 +13,23 @@ import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.JTree;
 import javax.swing.SpringLayout;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeNode;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.Element;
-import org.fife.ui.hex.swing.HexEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.thedeanda.ajaxproxy.http.NetworkUtil;
 import com.thedeanda.ajaxproxy.http.RequestListener;
 import com.thedeanda.ajaxproxy.ui.SwingUtils;
+import com.thedeanda.ajaxproxy.ui.resourceviewer.ContentViewer;
 import com.thedeanda.javajson.JsonArray;
 import com.thedeanda.javajson.JsonObject;
 import com.thedeanda.javajson.JsonValue;
@@ -53,15 +45,14 @@ import com.thedeanda.javajson.JsonValue;
  */
 public class RequestViewer extends JPanel implements RequestListener {
 	private static final long serialVersionUID = 1L;
-	private static final Logger log = LoggerFactory
-			.getLogger(RequestViewer.class);
+	private static final Logger log = LoggerFactory.getLogger(RequestViewer.class);
 	private JTextArea headersField;
 	private JLabel dataLabel;
-	private JTabbedPane dataTabs;
 	private JScrollPane headerScroll;
 	private JTextField statusCode;
 	private JTextField statusPhrase;
 	private JTextField durationField;
+	private ContentViewer contentViewer;
 
 	public RequestViewer() {
 		super();
@@ -103,54 +94,35 @@ public class RequestViewer extends JPanel implements RequestListener {
 		panel.add(headerScroll);
 
 		// status label
-		layout.putConstraint(SpringLayout.WEST, statusLabel, 10,
-				SpringLayout.WEST, panel);
-		layout.putConstraint(SpringLayout.NORTH, statusLabel, 24,
-				SpringLayout.NORTH, panel);
+		layout.putConstraint(SpringLayout.WEST, statusLabel, 10, SpringLayout.WEST, panel);
+		layout.putConstraint(SpringLayout.NORTH, statusLabel, 24, SpringLayout.NORTH, panel);
 
 		// status label code
-		layout.putConstraint(SpringLayout.WEST, statusCode, 20,
-				SpringLayout.EAST, statusLabel);
-		layout.putConstraint(SpringLayout.VERTICAL_CENTER, statusCode, 0,
-				SpringLayout.VERTICAL_CENTER, statusLabel);
-		layout.putConstraint(SpringLayout.EAST, statusCode, 90,
-				SpringLayout.EAST, statusLabel);
+		layout.putConstraint(SpringLayout.WEST, statusCode, 20, SpringLayout.EAST, statusLabel);
+		layout.putConstraint(SpringLayout.VERTICAL_CENTER, statusCode, 0, SpringLayout.VERTICAL_CENTER, statusLabel);
+		layout.putConstraint(SpringLayout.EAST, statusCode, 90, SpringLayout.EAST, statusLabel);
 
 		// duration
-		layout.putConstraint(SpringLayout.WEST, durationField, -95,
-				SpringLayout.EAST, panel);
-		layout.putConstraint(SpringLayout.NORTH, durationField, 0,
-				SpringLayout.NORTH, statusCode);
-		layout.putConstraint(SpringLayout.SOUTH, durationField, 0,
-				SpringLayout.SOUTH, statusCode);
-		layout.putConstraint(SpringLayout.EAST, durationField, -10,
-				SpringLayout.EAST, panel);
+		layout.putConstraint(SpringLayout.WEST, durationField, -95, SpringLayout.EAST, panel);
+		layout.putConstraint(SpringLayout.NORTH, durationField, 0, SpringLayout.NORTH, statusCode);
+		layout.putConstraint(SpringLayout.SOUTH, durationField, 0, SpringLayout.SOUTH, statusCode);
+		layout.putConstraint(SpringLayout.EAST, durationField, -10, SpringLayout.EAST, panel);
 
 		// headers label
-		layout.putConstraint(SpringLayout.WEST, headersLabel, 10,
-				SpringLayout.WEST, panel);
-		layout.putConstraint(SpringLayout.NORTH, headersLabel, 15,
-				SpringLayout.SOUTH, statusLabel);
+		layout.putConstraint(SpringLayout.WEST, headersLabel, 10, SpringLayout.WEST, panel);
+		layout.putConstraint(SpringLayout.NORTH, headersLabel, 15, SpringLayout.SOUTH, statusLabel);
 
 		// status label phrase
-		layout.putConstraint(SpringLayout.WEST, statusPhrase, 20,
-				SpringLayout.EAST, statusCode);
-		layout.putConstraint(SpringLayout.NORTH, statusPhrase, 0,
-				SpringLayout.NORTH, statusCode);
-		layout.putConstraint(SpringLayout.SOUTH, statusPhrase, 0,
-				SpringLayout.SOUTH, statusCode);
-		layout.putConstraint(SpringLayout.EAST, statusPhrase, -10,
-				SpringLayout.WEST, durationField);
+		layout.putConstraint(SpringLayout.WEST, statusPhrase, 20, SpringLayout.EAST, statusCode);
+		layout.putConstraint(SpringLayout.NORTH, statusPhrase, 0, SpringLayout.NORTH, statusCode);
+		layout.putConstraint(SpringLayout.SOUTH, statusPhrase, 0, SpringLayout.SOUTH, statusCode);
+		layout.putConstraint(SpringLayout.EAST, statusPhrase, -10, SpringLayout.WEST, durationField);
 
 		// headers field
-		layout.putConstraint(SpringLayout.WEST, headerScroll, 10,
-				SpringLayout.WEST, panel);
-		layout.putConstraint(SpringLayout.EAST, headerScroll, -10,
-				SpringLayout.EAST, panel);
-		layout.putConstraint(SpringLayout.NORTH, headerScroll, 10,
-				SpringLayout.SOUTH, headersLabel);
-		layout.putConstraint(SpringLayout.SOUTH, headerScroll, -5,
-				SpringLayout.SOUTH, panel);
+		layout.putConstraint(SpringLayout.WEST, headerScroll, 10, SpringLayout.WEST, panel);
+		layout.putConstraint(SpringLayout.EAST, headerScroll, -10, SpringLayout.EAST, panel);
+		layout.putConstraint(SpringLayout.NORTH, headerScroll, 10, SpringLayout.SOUTH, headersLabel);
+		layout.putConstraint(SpringLayout.SOUTH, headerScroll, -5, SpringLayout.SOUTH, panel);
 
 		return panel;
 	}
@@ -162,32 +134,25 @@ public class RequestViewer extends JPanel implements RequestListener {
 
 		dataLabel = SwingUtils.newJLabel("Data");
 		panel.add(dataLabel);
-		dataTabs = new JTabbedPane();
-		panel.add(dataTabs);
-		dataTabs.setBorder(BorderFactory.createEmptyBorder());
+		contentViewer = new ContentViewer();
+		panel.add(contentViewer);
+		contentViewer.setBorder(BorderFactory.createEmptyBorder());
 
 		// data label
-		layout.putConstraint(SpringLayout.WEST, dataLabel, 10,
-				SpringLayout.WEST, this);
-		layout.putConstraint(SpringLayout.NORTH, dataLabel, 5,
-				SpringLayout.NORTH, panel);
+		layout.putConstraint(SpringLayout.WEST, dataLabel, 10, SpringLayout.WEST, this);
+		layout.putConstraint(SpringLayout.NORTH, dataLabel, 5, SpringLayout.NORTH, panel);
 
 		// data tabs
-		layout.putConstraint(SpringLayout.WEST, dataTabs, 10,
-				SpringLayout.WEST, panel);
-		layout.putConstraint(SpringLayout.EAST, dataTabs, -10,
-				SpringLayout.EAST, panel);
-		layout.putConstraint(SpringLayout.NORTH, dataTabs, 10,
-				SpringLayout.SOUTH, dataLabel);
-		layout.putConstraint(SpringLayout.SOUTH, dataTabs, -10,
-				SpringLayout.SOUTH, panel);
+		layout.putConstraint(SpringLayout.WEST, contentViewer, 10, SpringLayout.WEST, panel);
+		layout.putConstraint(SpringLayout.EAST, contentViewer, -10, SpringLayout.EAST, panel);
+		layout.putConstraint(SpringLayout.NORTH, contentViewer, 10, SpringLayout.SOUTH, dataLabel);
+		layout.putConstraint(SpringLayout.SOUTH, contentViewer, -10, SpringLayout.SOUTH, panel);
 
 		return panel;
 	}
 
 	@Override
-	public void startRequest(UUID id, URL url, Header[] requestHeaders,
-			byte[] data) {
+	public void startRequest(UUID id, URL url, Header[] requestHeaders, byte[] data) {
 		log.info("new request: {} {} {}", id, url, requestHeaders);
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
@@ -198,119 +163,38 @@ public class RequestViewer extends JPanel implements RequestListener {
 	}
 
 	@Override
-	public void requestComplete(UUID id, final int status, final String reason,
-			final long duration, Header[] responseHeaders, final byte[] data) {
+	public void requestComplete(UUID id, final int status, final String reason, final long duration,
+			Header[] responseHeaders, final byte[] data) {
 		log.info("request complete: {} {} {}", id, status, responseHeaders);
 
-		final byte[] outputData = NetworkUtil.decompressIfNeeded(data,
-				responseHeaders);
+		final byte[] outputData = NetworkUtil.decompressIfNeeded(data, responseHeaders);
 
-		String contentType = null;
+		// String contentType = null;
 		final StringBuilder headers = new StringBuilder();
 		if (responseHeaders != null) {
 			for (Header h : responseHeaders) {
-				headers.append(String.format("%s: %s\n", h.getName(),
-						h.getValue()));
+				headers.append(String.format("%s: %s\n", h.getName(), h.getValue()));
 
-				if ("content-type".equalsIgnoreCase(h.getName())) {
-					contentType = h.getValue();
-				}
+				/*
+				 * if ("content-type".equalsIgnoreCase(h.getName())) {
+				 * contentType = h.getValue(); }
+				 */
 			}
 		}
 
-		final ParsedData parsedData = new ParsedData();
-		parsedData.parse(outputData, contentType);
-
-		TreeNode node = null;
-		if (parsedData.json != null) {
-			try {
-				DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(
-						"{}");
-				initTree(rootNode, parsedData.json);
-				node = rootNode;
-			} catch (Exception e) {
-				log.debug(e.getMessage(), e);
-			}
-		} else if (parsedData.jsonArray != null) {
-			try {
-				DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(
-						"[]");
-				initTree(rootNode, parsedData.jsonArray);
-				node = rootNode;
-			} catch (Exception e) {
-				log.debug(e.getMessage(), e);
-			}
-		} else if (parsedData.xml != null) {
-			try {
-				node = initTree(parsedData.xml);
-			} catch (Exception e) {
-				log.debug(e.getMessage(), e);
-			}
-		}
-
-		final TreeNode rootNode = node;
+		// final ParsedData parsedData = new ParsedData();
+		// parsedData.parse(outputData, contentType);
 
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				int selectedTab = 0;
 				headersField.setText(headers.toString().trim());
 				scrollUp(headerScroll);
 				statusCode.setText(String.valueOf(status));
 				statusPhrase.setText(reason);
 				durationField.setText(String.format("%d ms", duration));
 
-				if (!StringUtils.isBlank(parsedData.raw)) {
-					JTextArea txtField = SwingUtils.newJTextArea();
-					JScrollPane scroll = new JScrollPane(txtField);
-					txtField.setText(parsedData.raw);
-					txtField.setEditable(false);
-					txtField.setWrapStyleWord(true);
-					txtField.setLineWrap(true);
-					dataTabs.add("Text", scroll);
-					scrollUp(scroll);
-				}
-				if (!StringUtils.isBlank(parsedData.formattedText)) {
-					selectedTab = 1;
-					JTextArea txtField = SwingUtils.newJTextArea();
-					JScrollPane scroll = new JScrollPane(txtField);
-					txtField.setText(parsedData.formattedText);
-					txtField.setEditable(false);
-					txtField.setWrapStyleWord(true);
-					txtField.setLineWrap(true);
-					txtField.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
-					dataTabs.add("Formatted Text", scroll);
-					scrollUp(scroll);
-				}
-				if (rootNode != null) {
-					JTree tree = new JTree(new DefaultTreeModel(rootNode));
-					tree.setBorder(BorderFactory.createEmptyBorder());
-					tree.setShowsRootHandles(true);
-					JScrollPane scroll = new JScrollPane(tree);
-					scroll.setBorder(BorderFactory.createEmptyBorder());
-					dataTabs.add("Tree View", scroll);
-				}
-				if (parsedData.bufferedImage != null) {
-					ImageViewer panel = new ImageViewer(
-							parsedData.bufferedImage);
-					JScrollPane scroll = new JScrollPane(panel);
-					scroll.setBorder(BorderFactory.createEmptyBorder());
-					dataTabs.add("Image", scroll);
-				}
-
-				if (outputData != null) {
-					try {
-						HexEditor hex = new HexEditor();
-						hex.open(new ByteArrayInputStream(outputData));
-						hex.setCellEditable(false);
-						dataTabs.add("Hex", hex);
-					} catch (IOException e) {
-						log.warn(e.getMessage(), e);
-					}
-				}
-				if (selectedTab > 0) {
-					dataTabs.setSelectedIndex(selectedTab);
-				}
+				contentViewer.setContent(data);
 			}
 		});
 	}
@@ -329,20 +213,17 @@ public class RequestViewer extends JPanel implements RequestListener {
 		for (String key : obj) {
 			JsonValue val = obj.get(key);
 			if (val.isJsonObject()) {
-				String name = String.format("%s: {%d}", key, val
-						.getJsonObject().size());
+				String name = String.format("%s: {%d}", key, val.getJsonObject().size());
 				DefaultMutableTreeNode node = new DefaultMutableTreeNode(name);
 				top.add(node);
 				initTree(node, val.getJsonObject());
 			} else if (val.isJsonArray()) {
-				String name = String.format("%s: [%d]", key, val.getJsonArray()
-						.size());
+				String name = String.format("%s: [%d]", key, val.getJsonArray().size());
 				DefaultMutableTreeNode node = new DefaultMutableTreeNode(name);
 				top.add(node);
 				initTree(node, val.getJsonArray());
 			} else {
-				DefaultMutableTreeNode node = new DefaultMutableTreeNode(key
-						+ "=" + val.toString());
+				DefaultMutableTreeNode node = new DefaultMutableTreeNode(key + "=" + val.toString());
 				top.add(node);
 			}
 		}
@@ -352,20 +233,17 @@ public class RequestViewer extends JPanel implements RequestListener {
 		int i = 0;
 		for (JsonValue val : arr) {
 			if (val.isJsonObject()) {
-				String name = String.format("%s: {%d}", String.valueOf(i), val
-						.getJsonObject().size());
+				String name = String.format("%s: {%d}", String.valueOf(i), val.getJsonObject().size());
 				DefaultMutableTreeNode node = new DefaultMutableTreeNode(name);
 				top.add(node);
 				initTree(node, val.getJsonObject());
 			} else if (val.isJsonArray()) {
-				String name = String.format("%s: [%d]", i, val.getJsonArray()
-						.size());
+				String name = String.format("%s: [%d]", i, val.getJsonArray().size());
 				DefaultMutableTreeNode node = new DefaultMutableTreeNode(name);
 				top.add(node);
 				initTree(node, val.getJsonArray());
 			} else {
-				DefaultMutableTreeNode node = new DefaultMutableTreeNode(
-						val.toString());
+				DefaultMutableTreeNode node = new DefaultMutableTreeNode(val.toString());
 				top.add(node);
 			}
 			i++;
@@ -407,8 +285,7 @@ public class RequestViewer extends JPanel implements RequestListener {
 		for (Iterator i = element.attributeIterator(); i.hasNext();) {
 			Attribute attr = (Attribute) i.next();
 
-			DefaultMutableTreeNode tmp = new DefaultMutableTreeNode(
-					attr.getName() + " = " + attr.getText());
+			DefaultMutableTreeNode tmp = new DefaultMutableTreeNode(attr.getName() + " = " + attr.getText());
 			ret.add(tmp);
 		}
 		return ret;
@@ -422,16 +299,13 @@ public class RequestViewer extends JPanel implements RequestListener {
 			StringWriter sw = new StringWriter();
 			PrintWriter writer = new PrintWriter(sw);
 			e.printStackTrace(writer);
-			JTextArea txt = SwingUtils.newJTextArea();
-			txt.setEditable(false);
-			txt.setText(sw.toString());
-			dataTabs.add("Exception", txt);
+			contentViewer.setContent(sw.toString().getBytes());
 		}
 	}
 
 	private void clear() {
 		headersField.setText("");
-		dataTabs.removeAll();
+		contentViewer.setContent((byte[]) null);
 		statusCode.setText("");
 		statusPhrase.setText("");
 		durationField.setText("");

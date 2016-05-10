@@ -186,6 +186,7 @@ public class GeneralPanel extends JPanel implements ChangeListener,
 		values.add(new OptionValue("1m", 3, 60));
 		values.add(new OptionValue("5m", 4, 300));
 		values.add(new OptionValue("10m", 5, 600));
+		values.add(new OptionValue("60m", 6, 3600));
 
 		return values;
 	}

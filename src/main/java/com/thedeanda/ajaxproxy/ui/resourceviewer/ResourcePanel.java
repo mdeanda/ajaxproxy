@@ -37,8 +37,7 @@ import com.thedeanda.ajaxproxy.ui.model.Resource;
  */
 public class ResourcePanel extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 1L;
-	private static final Logger log = LoggerFactory
-			.getLogger(ResourcePanel.class);
+	private static final Logger log = LoggerFactory.getLogger(ResourcePanel.class);
 
 	private JTabbedPane tabs;
 
@@ -76,14 +75,10 @@ public class ResourcePanel extends JPanel implements ActionListener {
 
 		panel.add(comp);
 
-		layout.putConstraint(SpringLayout.NORTH, comp, 10, SpringLayout.NORTH,
-				panel);
-		layout.putConstraint(SpringLayout.SOUTH, comp, -10, SpringLayout.SOUTH,
-				panel);
-		layout.putConstraint(SpringLayout.WEST, comp, 10, SpringLayout.WEST,
-				panel);
-		layout.putConstraint(SpringLayout.EAST, comp, -10, SpringLayout.EAST,
-				panel);
+		layout.putConstraint(SpringLayout.NORTH, comp, 10, SpringLayout.NORTH, panel);
+		layout.putConstraint(SpringLayout.SOUTH, comp, -10, SpringLayout.SOUTH, panel);
+		layout.putConstraint(SpringLayout.WEST, comp, 10, SpringLayout.WEST, panel);
+		layout.putConstraint(SpringLayout.EAST, comp, -10, SpringLayout.EAST, panel);
 
 		return panel;
 	}
@@ -94,8 +89,7 @@ public class ResourcePanel extends JPanel implements ActionListener {
 
 		HTMLEditorKit kit = new HTMLEditorKit();
 		StyleSheet styleSheet = kit.getStyleSheet();
-		styleSheet
-				.addRule("body {color:#000000; margin: 4px; font-size: 10px; font-family: sans-serif; }");
+		styleSheet.addRule("body {color:#000000; margin: 4px; font-size: 10px; font-family: sans-serif; }");
 		styleSheet.addRule("h1 { margin: 4px 0; font-size: 12px; }");
 		styleSheet.addRule("div.items { margin-left: 10px;}");
 		styleSheet.addRule("p { margin: 0; font-family: monospace;}");
@@ -123,8 +117,8 @@ public class ResourcePanel extends JPanel implements ActionListener {
 
 	private void clear() {
 		log.debug("clear content viewer");
-		inputCv.setContent(null);
-		outputCv.setContent(null);
+		inputCv.setContent((byte[]) null);
+		outputCv.setContent((byte[]) null);
 		headersContent.setText("");
 	}
 
@@ -186,8 +180,7 @@ public class ResourcePanel extends JPanel implements ActionListener {
 		}.execute();
 	}
 
-	private void showGeneralResourceProperties(StoredResource storedResource,
-			Resource resource) {
+	private void showGeneralResourceProperties(StoredResource storedResource, Resource resource) {
 		final StringBuilder output = new StringBuilder();
 
 		output.append("<html><body>");
@@ -202,10 +195,8 @@ public class ResourcePanel extends JPanel implements ActionListener {
 		}
 		// writeField(headers, "", );
 		writeField(output, "Method", storedResource.getMethod());
-		writeField(output, "Duration",
-				String.valueOf(storedResource.getDuration()));
-		writeField(output, "Date",
-				new Date(storedResource.getStartTime()).toString());
+		writeField(output, "Duration", String.valueOf(storedResource.getDuration()));
+		writeField(output, "Date", new Date(storedResource.getStartTime()).toString());
 
 		writeField(output, "Status", String.valueOf(storedResource.getStatus()));
 		output.append("<h1>Request Headers</h1><div class=\"items\">");

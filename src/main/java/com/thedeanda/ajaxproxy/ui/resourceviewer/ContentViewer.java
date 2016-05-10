@@ -1,6 +1,6 @@
 package com.thedeanda.ajaxproxy.ui.resourceviewer;
 
-import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.BorderFactory;
@@ -8,14 +8,11 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JTextPane;
 import javax.swing.JTree;
 import javax.swing.SwingWorker;
-import javax.swing.text.WrappedPlainView;
 import javax.swing.tree.DefaultTreeModel;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,21 +29,36 @@ import com.thedeanda.ajaxproxy.ui.resourceviewer.util.DocumentParser;
 public class ContentViewer extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private static final int MAX_TEXT_SIZE = 300000;
-	private static final Logger log = LoggerFactory
-			.getLogger(ContentViewer.class);
+	private static final Logger log = LoggerFactory.getLogger(ContentViewer.class);
 	private JTabbedPane tabs;
+	private CardLayout cardLayout;
+
+	private static final String EMPTY_CARD = "empty";
+	private static final String NORMAL_CARD = "normal";
 
 	public ContentViewer() {
-		setLayout(new BorderLayout());
+		cardLayout = new CardLayout();
+		setLayout(cardLayout);
+		add(new JPanel(), EMPTY_CARD);
+
 		tabs = new JTabbedPane();
-		add(BorderLayout.CENTER, tabs);
+		add(tabs, NORMAL_CARD);
 		tabs.add("", new JButton(""));
 
 		setBorder(BorderFactory.createEmptyBorder());
 		tabs.setBorder(BorderFactory.createEmptyBorder());
 	}
 
+	public void setContent(String input) {
+		if (input == null) {
+			setContent((byte[]) null);
+		} else {
+			setContent(input.getBytes());
+		}
+	}
+
 	public void setContent(final byte[] input) {
+		cardLayout.show(this, EMPTY_CARD);
 		tabs.removeAll();
 
 		if (ArrayUtils.isEmpty(input)) {
@@ -58,8 +70,7 @@ public class ContentViewer extends JPanel {
 		new TreeLoader(input).execute();
 	}
 
-	private class TreeLoader extends
-			SwingWorker<DocumentContainer, DocumentContainer> {
+	private class TreeLoader extends SwingWorker<DocumentContainer, DocumentContainer> {
 
 		private String input;
 		private byte[] bytes;
@@ -123,6 +134,7 @@ public class ContentViewer extends JPanel {
 			}
 
 			log.info("end of done");
+			cardLayout.show(ContentViewer.this, NORMAL_CARD);
 		}
 
 	}

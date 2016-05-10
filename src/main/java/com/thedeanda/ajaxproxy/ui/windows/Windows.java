@@ -112,9 +112,9 @@ public class Windows {
 		log.debug("listeners size: {}", listeners.size());
 	}
 
-	private void notifyOfChange() {
+	public void notifyOfChange() {
 		final Collection<WindowContainer> windows = getCurrentWindows();
-		log.debug("notify of change: {}", windows.size());
+		log.debug("notify window listeners of change: {} windows remaining", windows.size());
 
 		for (WeakReference<WindowListListener> listenerRef : listeners) {
 			WindowListListener listener = listenerRef.get();
@@ -122,11 +122,14 @@ public class Windows {
 				notifyOfChange(windows, listener);
 			}
 		}
+
+		if (windows.size() == 0) {
+			log.debug("application exiting");
+		}
 	}
 
-	private void notifyOfChange(final Collection<WindowContainer> windows,
-			final WindowListListener listener) {
-		log.debug("notify of change: {}", windows.size());
+	private void notifyOfChange(final Collection<WindowContainer> windows, final WindowListListener listener) {
+		log.debug("notify window listener of change: {} windows left", windows.size());
 
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
@@ -158,5 +161,16 @@ public class Windows {
 		}
 
 		return ret;
+	}
+
+	public boolean contains(final JFrame theFrame) {
+		for (WindowContainer wc : frames.values()) {
+			JFrame frame = wc.getFrame();
+			if (frame == theFrame) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }

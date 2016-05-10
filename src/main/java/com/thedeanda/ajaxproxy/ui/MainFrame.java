@@ -13,8 +13,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -27,6 +25,7 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +45,9 @@ import org.slf4j.LoggerFactory;
 import com.thedeanda.ajaxproxy.ProxyListener;
 import com.thedeanda.ajaxproxy.ui.json.JsonViewerFrame;
 import com.thedeanda.ajaxproxy.ui.rest.RestClientFrame;
+import com.thedeanda.ajaxproxy.ui.windows.WindowContainer;
+import com.thedeanda.ajaxproxy.ui.windows.WindowListListener;
+import com.thedeanda.ajaxproxy.ui.windows.WindowListListenerCleanup;
 import com.thedeanda.ajaxproxy.ui.windows.WindowMenuHelper;
 import com.thedeanda.ajaxproxy.ui.windows.Windows;
 import com.thedeanda.javajson.JsonArray;
@@ -53,10 +55,10 @@ import com.thedeanda.javajson.JsonException;
 import com.thedeanda.javajson.JsonObject;
 import com.thedeanda.javajson.JsonValue;
 
-public class MainFrame extends JFrame implements ProxyListener {
+public class MainFrame extends JFrame implements ProxyListener, WindowListListener {
 	private static final long serialVersionUID = 1L;
 	private static final Logger log = LoggerFactory.getLogger(MainFrame.class);
-	private boolean USE_TRAY = true;
+	private boolean USE_TRAY = false; // got slightly buggy, disable for now
 	private MainPanel panel;
 	final JFileChooser fc = new JFileChooser();
 	private TrayIcon trayIcon;
@@ -83,23 +85,18 @@ public class MainFrame extends JFrame implements ProxyListener {
 		this.initWindow();
 		this.initMenuBar();
 		this.initTray();
-		if (USE_TRAY) {
-			log.info("system tray mode");
-			setDefaultCloseOperation(EXIT_ON_CLOSE);
-		} else {
-			log.info("dispose mode");
-			setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		}
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
 		initSettings();
 		getContentPane().add(panel);
 		pack();
 
-		addCloseListener();
 		panel.addProxyListener(this);
 
-		this.windowId = Windows.get().add(this);
+		this.windowId = Windows.get().addListener(this).add(this);
+		this.addWindowListener(new WindowListListenerCleanup(this));
 		new WindowMenuHelper(windowId, getJMenuBar());
+
 	}
 
 	private void initSettings() {
@@ -115,57 +112,18 @@ public class MainFrame extends JFrame implements ProxyListener {
 		}
 	}
 
-	private void addCloseListener() {
-		this.addWindowListener(new WindowListener() {
-
-			@Override
-			public void windowOpened(WindowEvent e) {
-			}
-
-			@Override
-			public void windowClosing(WindowEvent e) {
-				try {
-					panel.stop();
-					saveRecent();
-				} catch (Exception ex) {
-					log.error(ex.getMessage(), ex);
-				}
-			}
-
-			@Override
-			public void windowClosed(WindowEvent e) {
-			}
-
-			@Override
-			public void windowIconified(WindowEvent e) {
-			}
-
-			@Override
-			public void windowDeiconified(WindowEvent e) {
-			}
-
-			@Override
-			public void windowActivated(WindowEvent e) {
-			}
-
-			@Override
-			public void windowDeactivated(WindowEvent e) {
-			}
-
-		});
-	}
-
 	private void updateTitle() {
 		String title = "Ajax Proxy";
 		String version = ConfigService.get().getVersionString();
 		if (file != null) {
 			title += " - " + file.getAbsolutePath();
 		}
-		if (version!=null) {
+		if (version != null) {
 			title += " - " + version;
 		}
-		
+
 		setTitle(title);
+		Windows.get().notifyOfChange();
 	}
 
 	public void loadFile(final File file) {
@@ -174,7 +132,7 @@ public class MainFrame extends JFrame implements ProxyListener {
 		recentFiles.add(file);
 		updateTitle();
 		panel.setConfigFile(file);
-		saveRecent();
+		saveSettings();
 	}
 
 	private void initWindow() {
@@ -185,7 +143,7 @@ public class MainFrame extends JFrame implements ProxyListener {
 	}
 
 	private void initTray() {
-		if (SystemTray.isSupported() || !USE_TRAY) {
+		if (!SystemTray.isSupported() || !USE_TRAY) {
 			log.error("System tray disabled.");
 			USE_TRAY = false;
 			return;
@@ -291,8 +249,7 @@ public class MainFrame extends JFrame implements ProxyListener {
 
 		mi = new JMenuItem("New");
 		mi.setMnemonic(KeyEvent.VK_N);
-		mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N,
-				ActionEvent.CTRL_MASK));
+		mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
 		mi.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent ae) {
@@ -303,8 +260,7 @@ public class MainFrame extends JFrame implements ProxyListener {
 
 		mi = new JMenuItem("Open");
 		mi.setMnemonic(KeyEvent.VK_O);
-		mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O,
-				ActionEvent.CTRL_MASK));
+		mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
 		mi.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent ae) {
@@ -331,8 +287,7 @@ public class MainFrame extends JFrame implements ProxyListener {
 
 		mi = new JMenuItem("Save");
 		mi.setMnemonic(KeyEvent.VK_S);
-		mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,
-				ActionEvent.CTRL_MASK));
+		mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
 		saveMenuItem = mi;
 		mi.addActionListener(new ActionListener() {
 			@Override
@@ -378,15 +333,13 @@ public class MainFrame extends JFrame implements ProxyListener {
 		mb.add(menu);
 		this.startServerMenuItem2 = mi = new JMenuItem("Start Server");
 		mi.setMnemonic(KeyEvent.VK_A);
-		mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1,
-				ActionEvent.CTRL_MASK));
+		mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, ActionEvent.CTRL_MASK));
 		mi.addActionListener(menuItemListener);
 		menu.add(mi);
 
 		this.stopServerMenuItem2 = mi = new JMenuItem("Stop Server");
 		mi.setMnemonic(KeyEvent.VK_O);
-		mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_2,
-				ActionEvent.CTRL_MASK));
+		mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_2, ActionEvent.CTRL_MASK));
 		mi.addActionListener(menuItemListener);
 		menu.add(mi);
 
@@ -460,8 +413,7 @@ public class MainFrame extends JFrame implements ProxyListener {
 		}
 
 		if (ex != null) {
-			JOptionPane.showMessageDialog(this.getComponent(0),
-					ex.getMessage(), "Failed to save",
+			JOptionPane.showMessageDialog(this.getComponent(0), ex.getMessage(), "Failed to save",
 					JOptionPane.ERROR_MESSAGE);
 		}
 	}
@@ -476,7 +428,7 @@ public class MainFrame extends JFrame implements ProxyListener {
 
 	private void handleExit() {
 		panel.stop();
-		saveRecent();
+		saveSettings();
 		dispose();
 	}
 
@@ -550,7 +502,7 @@ public class MainFrame extends JFrame implements ProxyListener {
 		}
 	}
 
-	private void saveRecent() {
+	private void saveSettings() {
 		if (ignoreSaveSettings)
 			return;
 		log.info("saving recents");
@@ -625,6 +577,19 @@ public class MainFrame extends JFrame implements ProxyListener {
 
 	private void handleShowWindow() {
 		this.setVisible(true);
+	}
+
+	@Override
+	public void windowsChanged(Collection<WindowContainer> windows) {
+		if (!Windows.get().contains(this)) {
+			try {
+				log.info("window closing");
+				panel.stop();
+				saveSettings();
+			} catch (Exception ex) {
+				log.error(ex.getMessage(), ex);
+			}
+		}
 	}
 
 }

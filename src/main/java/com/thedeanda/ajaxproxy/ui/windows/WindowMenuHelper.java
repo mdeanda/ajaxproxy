@@ -16,14 +16,15 @@ import javax.swing.SwingUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.thedeanda.ajaxproxy.ui.MainFrame;
 import com.thedeanda.ajaxproxy.ui.json.JsonViewerFrame;
 import com.thedeanda.ajaxproxy.ui.rest.RestClientFrame;
 
 public class WindowMenuHelper implements WindowListListener {
-	private static final Logger log = LoggerFactory
-			.getLogger(WindowMenuHelper.class);
+	private static final Logger log = LoggerFactory.getLogger(WindowMenuHelper.class);
 	private String windowId;
 	private JMenu menu;
+	private JMenuItem ajaxProxyMenuItem;
 
 	public WindowMenuHelper(String windowId, JMenuBar menuBar) {
 		this.windowId = windowId;
@@ -89,10 +90,26 @@ public class WindowMenuHelper implements WindowListListener {
 	private void addGeneric() {
 		JMenuItem mi = null;
 
+		mi = new JMenuItem("New Ajax Proxy");
+		mi.setMnemonic(KeyEvent.VK_P);
+		mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, ActionEvent.CTRL_MASK));
+		mi.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent ae) {
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						handleAjaxProxy();
+					}
+				});
+			}
+		});
+		menu.add(mi);
+		this.ajaxProxyMenuItem = mi;
+		// ajaxProxyMenuItem.setVisible(false);
+
 		mi = new JMenuItem("New Rest Client");
 		mi.setMnemonic(KeyEvent.VK_R);
-		mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R,
-				ActionEvent.CTRL_MASK));
+		mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, ActionEvent.CTRL_MASK));
 		mi.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent ae) {
@@ -107,8 +124,7 @@ public class WindowMenuHelper implements WindowListListener {
 
 		mi = new JMenuItem("New Json Viewer");
 		mi.setMnemonic(KeyEvent.VK_J);
-		mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_J,
-				ActionEvent.CTRL_MASK));
+		mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_J, ActionEvent.CTRL_MASK));
 		mi.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent ae) {
@@ -122,6 +138,11 @@ public class WindowMenuHelper implements WindowListListener {
 		menu.add(mi);
 
 		menu.add(new JSeparator());
+	}
+
+	private void handleAjaxProxy() {
+		MainFrame frame = new MainFrame();
+		frame.setVisible(true);
 	}
 
 	private void handleRest() {
