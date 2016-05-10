@@ -123,6 +123,7 @@ public class MainFrame extends JFrame implements ProxyListener, WindowListListen
 		}
 
 		setTitle(title);
+		Windows.get().notifyOfChange();
 	}
 
 	public void loadFile(final File file) {

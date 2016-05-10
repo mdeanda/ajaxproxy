@@ -112,7 +112,7 @@ public class Windows {
 		log.debug("listeners size: {}", listeners.size());
 	}
 
-	private void notifyOfChange() {
+	public void notifyOfChange() {
 		final Collection<WindowContainer> windows = getCurrentWindows();
 		log.debug("notify window listeners of change: {} windows remaining", windows.size());
 
@@ -170,7 +170,7 @@ public class Windows {
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
 }
