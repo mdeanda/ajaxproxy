@@ -144,7 +144,7 @@ public class MainFrame extends JFrame implements ProxyListener, WindowListListen
 
 	private void initTray() {
 		if (!SystemTray.isSupported() || !USE_TRAY) {
-			log.error("System tray disabled.");
+			log.info("System tray disabled.");
 			USE_TRAY = false;
 			return;
 		}
