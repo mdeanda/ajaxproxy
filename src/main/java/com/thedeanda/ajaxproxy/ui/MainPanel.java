@@ -49,7 +49,6 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 	private AjaxProxy proxy = null;
 	private ProxyTableModel proxyModel;
 	private MergeTableModel mergeModel;
-	private VariableTableModel variableModel;
 	private File configFile;
 	private JsonObject config;
 	private FileTrackerPanel trackerPanel;
@@ -65,6 +64,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 	private JButton restartButton;
 	private ResourceService resourceService;
 	private JButton releasesButton;
+	private VariablesPanel variablePanel;
 
 	public MainPanel() {
 		SpringLayout layout = new SpringLayout();
@@ -97,8 +97,8 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		tabs.add("Merge", new MergePanel(this, mergeModel));
 
 		// TODO: move proxy to its own panel so code is easier to maintain
-		variableModel = new VariableTableModel();
-		tabs.add("Variables", new VariablesPanel(this, variableModel));
+		variablePanel = new VariablesPanel(this);
+		tabs.add("Variables", variablePanel);
 
 		tamperPanel = new TamperPanel();
 		// tabs.add("Tamper", tamperPanel);
@@ -195,7 +195,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		JsonObject json = config;
 		json.put("proxy", proxyModel.getConfig(generalPanel.getCacheTime()));
 		json.put("merge", mergeModel.getConfig());
-		json.put("variables", variableModel.getConfig());
+		json.put("variables", variablePanel.getConfig());
 		json.put("tracker", trackerPanel.getConfig());
 		json.put("resource", resourceViewerPanel.getConfig());
 		json.put("tamper", tamperPanel.getConfig());
@@ -267,7 +267,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		generalPanel.setShowIndex(false);
 		proxyModel.clear();
 		mergeModel.clear();
-		variableModel.clear();
+		variablePanel.clear();
 	}
 
 	public void stop() {
@@ -323,7 +323,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		this.config = json;
 		proxyModel.setConfig(config.getJsonArray("proxy"));
 		mergeModel.setConfig(config.getJsonArray("merge"));
-		variableModel.setConfig(config.getJsonObject("variables"));
+		variablePanel.setConfig(config.getJsonObject("variables"));
 		generalPanel.setConfig(config);
 		trackerPanel.setConfig(json.getJsonObject("tracker"));
 		resourceViewerPanel.setConfig(json.getJsonObject("resource"));
@@ -359,12 +359,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 	}
 
 	public void addVariables(Map<String, String> vars) {
-		if (vars != null) {
-			for (String key : vars.keySet()) {
-				String value = vars.get(key);
-				variableModel.set(key, value);
-			}
-		}
+		variablePanel.setVariables(vars);
 	}
 
 	private void openReleasesPage() {

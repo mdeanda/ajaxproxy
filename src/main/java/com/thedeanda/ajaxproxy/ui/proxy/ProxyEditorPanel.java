@@ -69,8 +69,7 @@ public class ProxyEditorPanel extends JPanel {
 		add(btn);
 
 		cacheCheckbox = new JCheckBox("Cache Requests");
-		cacheCheckbox
-				.setToolTipText("Any non-GET request clears the cache for this proxy mapping");
+		cacheCheckbox.setToolTipText("Any non-GET request clears the cache for this proxy mapping");
 		add(cacheCheckbox);
 
 		initLayout();
@@ -99,18 +98,6 @@ public class ProxyEditorPanel extends JPanel {
 
 			}
 		});
-		txtField.addFocusListener(new FocusListener() {
-
-			@Override
-			public void focusGained(FocusEvent e) {
-				txtField.select(0, txtField.getText().length());
-			}
-
-			@Override
-			public void focusLost(FocusEvent e) {
-				txtField.select(0, 0);
-			}
-		});
 	}
 
 	private void initLayout() {
@@ -122,47 +109,34 @@ public class ProxyEditorPanel extends JPanel {
 			JLabel lbl = labels[i];
 			Component fld = fields[i];
 			if (i == 0) {
-				layout.putConstraint(SpringLayout.NORTH, lbl, 0,
-						SpringLayout.NORTH, this);
+				layout.putConstraint(SpringLayout.NORTH, lbl, 0, SpringLayout.NORTH, this);
 
-				layout.putConstraint(SpringLayout.NORTH, fld, 2,
-						SpringLayout.SOUTH, lbl);
+				layout.putConstraint(SpringLayout.NORTH, fld, 2, SpringLayout.SOUTH, lbl);
 
-				layout.putConstraint(SpringLayout.WEST, fld, 0,
-						SpringLayout.WEST, this);
+				layout.putConstraint(SpringLayout.WEST, fld, 0, SpringLayout.WEST, this);
 
-				layout.putConstraint(SpringLayout.WEST, lbl, 0,
-						SpringLayout.WEST, this);
+				layout.putConstraint(SpringLayout.WEST, lbl, 0, SpringLayout.WEST, this);
 			} else {
-				layout.putConstraint(SpringLayout.BASELINE, fld, 0,
-						SpringLayout.BASELINE, fields[0]);
+				layout.putConstraint(SpringLayout.BASELINE, fld, 0, SpringLayout.BASELINE, fields[0]);
 
-				layout.putConstraint(SpringLayout.WEST, fld, 10,
-						SpringLayout.EAST, fields[i - 1]);
+				layout.putConstraint(SpringLayout.WEST, fld, 10, SpringLayout.EAST, fields[i - 1]);
 				if (lbl != null) {
-					layout.putConstraint(SpringLayout.VERTICAL_CENTER, lbl, 0,
-							SpringLayout.VERTICAL_CENTER, labels[0]);
-					layout.putConstraint(SpringLayout.WEST, lbl, 0,
-							SpringLayout.WEST, fld);
+					layout.putConstraint(SpringLayout.VERTICAL_CENTER, lbl, 0, SpringLayout.VERTICAL_CENTER, labels[0]);
+					layout.putConstraint(SpringLayout.WEST, lbl, 0, SpringLayout.WEST, fld);
 				}
 			}
 			if (i == cols.length - 1) {
-				layout.putConstraint(SpringLayout.EAST, fld, -10,
-						SpringLayout.WEST, btn);
+				layout.putConstraint(SpringLayout.EAST, fld, -10, SpringLayout.WEST, btn);
 			} else {
-				layout.putConstraint(SpringLayout.EAST, fld, cols[i],
-						SpringLayout.WEST, fld);
+				layout.putConstraint(SpringLayout.EAST, fld, cols[i], SpringLayout.WEST, fld);
 			}
 
 		}
-		layout.putConstraint(SpringLayout.BASELINE, btn, 0,
-				SpringLayout.BASELINE, hostField);
+		layout.putConstraint(SpringLayout.BASELINE, btn, 0, SpringLayout.BASELINE, hostField);
 		layout.putConstraint(SpringLayout.EAST, btn, 0, SpringLayout.EAST, this);
 
-		layout.putConstraint(SpringLayout.NORTH, cacheCheckbox, 5,
-				SpringLayout.SOUTH, fields[0]);
-		layout.putConstraint(SpringLayout.WEST, cacheCheckbox, 0,
-				SpringLayout.WEST, labels[0]);
+		layout.putConstraint(SpringLayout.NORTH, cacheCheckbox, 5, SpringLayout.SOUTH, fields[0]);
+		layout.putConstraint(SpringLayout.WEST, cacheCheckbox, 0, SpringLayout.WEST, labels[0]);
 
 	}
 

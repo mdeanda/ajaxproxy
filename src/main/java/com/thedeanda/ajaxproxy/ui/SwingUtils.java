@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Insets;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -22,8 +24,8 @@ import javax.swing.plaf.basic.BasicSplitPaneUI;
 public class SwingUtils {
 	// private static final Logger log =
 	// LoggerFactory.getLogger(SwingUtils.class);
-	private static final ThreadPoolExecutor executor = new ThreadPoolExecutor(
-			1, 6, 3, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+	private static final ThreadPoolExecutor executor = new ThreadPoolExecutor(1, 6, 3, TimeUnit.SECONDS,
+			new LinkedBlockingQueue<Runnable>());
 	static {
 		executor.allowCoreThreadTimeOut(true);
 	}
@@ -46,9 +48,23 @@ public class SwingUtils {
 		return prepJTextField(new JTextField());
 	}
 
-	public static JTextField prepJTextField(JTextField field) {
+	public static JTextField prepJTextField(final JTextField field) {
 		Insets insets = new Insets(4, 4, 4, 4);
 		field.setMargin(insets);
+
+		field.addFocusListener(new FocusListener() {
+
+			@Override
+			public void focusGained(FocusEvent e) {
+				field.select(0, field.getText().length());
+			}
+
+			@Override
+			public void focusLost(FocusEvent e) {
+				field.select(0, 0);
+			}
+		});
+
 		return field;
 	}
 
@@ -79,8 +95,7 @@ public class SwingUtils {
 					@Override
 					public void paint(Graphics g) {
 						// super.paint(g);
-						int orientation = this.getBasicSplitPaneUI()
-								.getOrientation();
+						int orientation = this.getBasicSplitPaneUI().getOrientation();
 
 						Dimension size = this.getSize();
 
