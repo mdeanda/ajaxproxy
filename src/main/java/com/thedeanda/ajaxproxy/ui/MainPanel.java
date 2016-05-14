@@ -374,7 +374,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 				}
 			}
 		} catch (Exception e) {
-
+			log.warn(e.getMessage(), e);
 		}
 	}
 
