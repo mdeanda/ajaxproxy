@@ -8,6 +8,7 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
 import javax.swing.JTree;
 import javax.swing.SwingWorker;
 import javax.swing.tree.DefaultTreeModel;
@@ -39,7 +40,9 @@ public class ContentViewer extends JPanel {
 	public ContentViewer() {
 		cardLayout = new CardLayout();
 		setLayout(cardLayout);
-		add(new JPanel(), EMPTY_CARD);
+		JTextArea empty = new JTextArea();
+		empty.setEditable(false);
+		add(new JScrollPane(empty), EMPTY_CARD);
 
 		tabs = new JTabbedPane();
 		add(tabs, NORMAL_CARD);

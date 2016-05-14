@@ -1,7 +1,6 @@
 package com.thedeanda.ajaxproxy.ui.resourceviewer;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.URL;
@@ -9,6 +8,7 @@ import java.util.Date;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -69,7 +69,7 @@ public class ResourcePanel extends JPanel implements ActionListener {
 		add(BorderLayout.CENTER, tabs);
 	}
 
-	private JPanel wrap(JPanel comp) {
+	private JPanel wrap(JComponent comp) {
 		SpringLayout layout = new SpringLayout();
 		JPanel panel = new JPanel(layout);
 
@@ -84,9 +84,6 @@ public class ResourcePanel extends JPanel implements ActionListener {
 	}
 
 	private void initGeneralPanel() {
-		generalPanel = new JPanel();
-		generalPanel.setLayout(new BorderLayout());
-
 		HTMLEditorKit kit = new HTMLEditorKit();
 		StyleSheet styleSheet = kit.getStyleSheet();
 		styleSheet.addRule("body {color:#000000; margin: 4px; font-size: 10px; font-family: sans-serif; }");
@@ -103,7 +100,8 @@ public class ResourcePanel extends JPanel implements ActionListener {
 		headersContent.setEditorKit(kit);
 		Document doc = kit.createDefaultDocument();
 		headersContent.setDocument(doc);
-		generalPanel.add(BorderLayout.CENTER, generalScroll);
+		
+		generalPanel = wrap(generalScroll);
 	}
 
 	protected JButton makeNavigationButton(String altText) {
