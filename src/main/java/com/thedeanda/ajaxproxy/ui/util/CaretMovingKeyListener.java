@@ -66,7 +66,7 @@ public class CaretMovingKeyListener implements KeyListener {
 	private void moveCursor(KeyEvent e, int direction) {
 		String origText = field.getText();
 		int position = field.getCaretPosition();
-		char[] delimeter = " .\t".toCharArray();
+		char[] delimeter = " /.\t".toCharArray();
 		int next = getNextCursorPosition(origText.toCharArray(), position, delimeter, direction);
 		if (next != position) {
 			if ((e.getModifiers() & KeyEvent.SHIFT_MASK) == KeyEvent.SHIFT_MASK) {
