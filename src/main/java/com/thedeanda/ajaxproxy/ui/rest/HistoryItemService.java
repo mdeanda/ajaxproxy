@@ -29,7 +29,6 @@ public class HistoryItemService {
 		File dbFile = ConfigService.get().getRestHistoryDb();
 
 		try {
-			// this uses h2 but you can change it to match your database
 			String databaseUrl = "jdbc:h2:file:" + dbFile.getAbsolutePath();
 			connectionSource = new JdbcConnectionSource(databaseUrl);
 
