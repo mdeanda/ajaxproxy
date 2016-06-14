@@ -38,6 +38,8 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.thedeanda.ajaxproxy.ui.ConfigService;
+
 public class HttpClient {
 	private static final Logger log = LoggerFactory.getLogger(HttpClient.class);
 
@@ -71,6 +73,7 @@ public class HttpClient {
 			}
 		};
 		SSLContext ctx = getSslContext();
+		String version = ConfigService.get().getVersionString();
 		client = HttpClientBuilder
 				.create()
 				.disableAuthCaching()
@@ -84,7 +87,7 @@ public class HttpClient {
 				.setConnectionReuseStrategy(
 						DefaultConnectionReuseStrategy.INSTANCE)
 				.setDefaultRequestConfig(requestConfig)
-				.setUserAgent("AjaxProxy/1.2").build();
+				.setUserAgent("AjaxProxy/" + version).build();
 
 	}
 
