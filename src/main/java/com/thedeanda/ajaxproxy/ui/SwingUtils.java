@@ -21,6 +21,8 @@ import javax.swing.UIDefaults;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 
+import com.thedeanda.ajaxproxy.ui.util.CaretMovingKeyListener;
+
 public class SwingUtils {
 	// private static final Logger log =
 	// LoggerFactory.getLogger(SwingUtils.class);
@@ -64,6 +66,8 @@ public class SwingUtils {
 				field.select(0, 0);
 			}
 		});
+
+		field.addKeyListener(new CaretMovingKeyListener(field));
 
 		return field;
 	}
