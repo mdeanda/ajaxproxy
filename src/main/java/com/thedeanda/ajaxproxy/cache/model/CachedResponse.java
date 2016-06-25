@@ -2,16 +2,34 @@ package com.thedeanda.ajaxproxy.cache.model;
 
 import org.apache.http.Header;
 
+import com.j256.ormlite.field.DataType;
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
+
+@DatabaseTable(tableName = "cache")
 public class CachedResponse {
+
+	@DatabaseField(id = true, generatedId = true)
 	private int id;
+
+	@DatabaseField(width = 2048)
 	private String requestPath;
+
+	@DatabaseField(dataType = DataType.LONG)
 	private long timestamp = System.currentTimeMillis();
 
+	@DatabaseField(width = 2048)
 	private String url;
 
+	@DatabaseField
 	private int status;
+
+	@DatabaseField
 	private String reason;
+
+	@DatabaseField(dataType = DataType.SERIALIZABLE, width = 1024 * 1024)
 	private byte[] data;
+
 	private Header[] headers;
 
 	public int getId() {
