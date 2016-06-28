@@ -14,11 +14,9 @@ import com.thedeanda.ajaxproxy.cache.model.CachedResponse;
  * in memory implementation of cache, this should be replaced by a file/db based
  * implementation to save memory
  */
-public class MemProxyCache extends LinkedHashMap<String, CachedResponse>
-		implements ProxyCache {
+public class MemProxyCache extends LinkedHashMap<String, CachedResponse> implements ProxyCache {
 	private static final long serialVersionUID = -5854542957026651145L;
-	private static final Logger log = LoggerFactory
-			.getLogger(MemProxyCache.class);
+	private static final Logger log = LoggerFactory.getLogger(MemProxyCache.class);
 	private static final int capacity = 100;
 
 	private Object lock = new Object();
@@ -43,6 +41,10 @@ public class MemProxyCache extends LinkedHashMap<String, CachedResponse>
 			clear();
 		}
 	}
+	
+	private String getCacheKey(CachedResponse response) {
+		return response.getRequestPath() + "?" + response.getQueryString();
+	}
 
 	@Override
 	public void cache(CachedResponse response) {
@@ -54,7 +56,7 @@ public class MemProxyCache extends LinkedHashMap<String, CachedResponse>
 		}
 		response.setHeaders(headers);
 		synchronized (lock) {
-			put(response.getRequestPath(), response);
+			put(getCacheKey(response), response);
 		}
 	}
 

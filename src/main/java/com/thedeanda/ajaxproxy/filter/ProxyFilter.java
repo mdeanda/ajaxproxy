@@ -115,7 +115,6 @@ public class ProxyFilter implements Filter {
 		String uri = request.getRequestURI();
 		log.debug(uri);
 		String queryString = request.getQueryString();
-
 		ProxyConfig proxyConfig = proxy.getProxyConfig();
 
 		StringBuilder inputHeaders = new StringBuilder();
@@ -157,8 +156,9 @@ public class ProxyFilter implements Filter {
 		CachedResponse cachedResponse = null;
 		// TODO: remove the host/port portion
 		String requestPath = request.getRequestURL().toString();
+		String pathAndQuery = requestPath + "?" + queryString;
 		if ("GET".equals(request.getMethod())) {
-			cachedResponse = proxy.getCache().get(requestPath);
+			cachedResponse = proxy.getCache().get(pathAndQuery);
 		} else {
 			proxy.getCache().clearCache();
 		}
@@ -166,6 +166,7 @@ public class ProxyFilter implements Filter {
 			cachedResponse = makeRequest(request, response, proxyUrl,
 					inputHeaders, inputData);
 			cachedResponse.setRequestPath(requestPath);
+			cachedResponse.setQueryString(queryString);
 			if (cachedResponse.getStatus() > 0
 					&& "GET".equals(request.getMethod())) {
 				proxy.getCache().cache(cachedResponse);

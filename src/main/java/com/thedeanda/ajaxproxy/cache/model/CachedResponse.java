@@ -20,6 +20,9 @@ public class CachedResponse {
 
 	@DatabaseField(width = 2048)
 	private String url;
+	
+	@DatabaseField(width = 2048)
+	private String queryString;
 
 	@DatabaseField
 	private int status;
@@ -94,5 +97,13 @@ public class CachedResponse {
 
 	public void setTimestamp(long timestamp) {
 		this.timestamp = timestamp;
+	}
+
+	public String getQueryString() {
+		return queryString;
+	}
+
+	public void setQueryString(String queryString) {
+		this.queryString = queryString;
 	}
 }

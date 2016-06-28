@@ -20,6 +20,7 @@ public class DbCache extends Repo<CachedResponse> implements ProxyCache {
 
 	@Override
 	public void cache(CachedResponse response) {
+		// TODO: find existing response by path+?+querystring
 		int id = save(response);
 		response.setId(id);
 	}
