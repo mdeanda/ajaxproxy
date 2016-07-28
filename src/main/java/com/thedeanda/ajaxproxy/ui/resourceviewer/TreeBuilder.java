@@ -4,6 +4,7 @@ import java.util.Iterator;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -13,14 +14,16 @@ import com.thedeanda.javajson.JsonObject;
 import com.thedeanda.javajson.JsonValue;
 
 public class TreeBuilder {
+	private static final int MAX_WIDTH = 80;
+
 	public DefaultMutableTreeNode buildTree(JsonObject object) {
-		DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode("{}");
+		DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(getNodeValue(null, object));
 		initTree(rootNode, object);
 		return rootNode;
 	}
 
 	public DefaultMutableTreeNode buildTree(JsonArray array) {
-		DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode("[]");
+		DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(getNodeValue(null, array));
 		initTree(rootNode, array);
 		return rootNode;
 	}
@@ -30,50 +33,63 @@ public class TreeBuilder {
 		return rootNode;
 	}
 
+	private String getNodeValue(String fieldName, JsonObject json) {
+		StringBuilder output = new StringBuilder();
+		if (StringUtils.isNotBlank(fieldName)) {
+			output.append(fieldName);
+			output.append(": ");
+		}
+		output.append("{");
+		output.append(json.size());
+		output.append("} ");
+		output.append(StringUtils.abbreviate(json.toString(), MAX_WIDTH));
+
+		return output.toString().trim();
+	}
+
+	private String getNodeValue(String fieldName, JsonArray json) {
+		StringBuilder output = new StringBuilder();
+		if (StringUtils.isNotBlank(fieldName)) {
+			output.append(fieldName);
+			output.append(": ");
+		}
+		output.append("[");
+		output.append(json.size());
+		output.append("] ");
+		output.append(StringUtils.abbreviate(json.toString(), MAX_WIDTH));
+
+		return output.toString().trim();
+	}
+
 	private void initTree(DefaultMutableTreeNode top, JsonObject obj) {
 		for (String key : obj) {
 			JsonValue val = obj.get(key);
-			if (val.isJsonObject()) {
-				String name = String.format("%s: {%d}", key, val
-						.getJsonObject().size());
-				DefaultMutableTreeNode node = new DefaultMutableTreeNode(name);
-				top.add(node);
-				initTree(node, val.getJsonObject());
-			} else if (val.isJsonArray()) {
-				String name = String.format("%s: [%d]", key, val.getJsonArray()
-						.size());
-				DefaultMutableTreeNode node = new DefaultMutableTreeNode(name);
-				top.add(node);
-				initTree(node, val.getJsonArray());
-			} else {
-				DefaultMutableTreeNode node = new DefaultMutableTreeNode(key
-						+ "=" + val.toString());
-				top.add(node);
-			}
+			initTree(top, val, key);
 		}
 	}
 
 	private void initTree(DefaultMutableTreeNode top, JsonArray arr) {
 		int i = 0;
 		for (JsonValue val : arr) {
-			if (val.isJsonObject()) {
-				String name = String.format("%s: {%d}", String.valueOf(i), val
-						.getJsonObject().size());
-				DefaultMutableTreeNode node = new DefaultMutableTreeNode(name);
-				top.add(node);
-				initTree(node, val.getJsonObject());
-			} else if (val.isJsonArray()) {
-				String name = String.format("%s: [%d]", i, val.getJsonArray()
-						.size());
-				DefaultMutableTreeNode node = new DefaultMutableTreeNode(name);
-				top.add(node);
-				initTree(node, val.getJsonArray());
-			} else {
-				DefaultMutableTreeNode node = new DefaultMutableTreeNode(
-						val.toString());
-				top.add(node);
-			}
+			initTree(top, val, String.valueOf(i));
 			i++;
+		}
+	}
+
+	private void initTree(DefaultMutableTreeNode top, JsonValue val, String key) {
+		if (val.isJsonObject()) {
+			String name = getNodeValue(key, val.getJsonObject());
+			DefaultMutableTreeNode node = new DefaultMutableTreeNode(name);
+			top.add(node);
+			initTree(node, val.getJsonObject());
+		} else if (val.isJsonArray()) {
+			String name = getNodeValue(key, val.getJsonArray());
+			DefaultMutableTreeNode node = new DefaultMutableTreeNode(name);
+			top.add(node);
+			initTree(node, val.getJsonArray());
+		} else {
+			DefaultMutableTreeNode node = new DefaultMutableTreeNode(key + "=" + val.toString());
+			top.add(node);
 		}
 	}
 
@@ -112,8 +128,7 @@ public class TreeBuilder {
 		for (Iterator i = element.attributeIterator(); i.hasNext();) {
 			Attribute attr = (Attribute) i.next();
 
-			DefaultMutableTreeNode tmp = new DefaultMutableTreeNode(
-					attr.getName() + " = " + attr.getText());
+			DefaultMutableTreeNode tmp = new DefaultMutableTreeNode(attr.getName() + " = " + attr.getText());
 			ret.add(tmp);
 		}
 		return ret;
