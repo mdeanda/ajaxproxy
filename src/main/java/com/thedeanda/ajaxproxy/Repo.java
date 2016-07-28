@@ -3,6 +3,7 @@ package com.thedeanda.ajaxproxy;
 import java.io.File;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,12 +21,18 @@ public class Repo<T> {
 	protected File dbFile;
 	protected JdbcConnectionSource connectionSource;
 	protected Dao<T, Integer> dao;
+	protected Class<T> typeParameterClass;
 
-	private Class<T> typeParameterClass;
+	private boolean server;
 
 	public Repo(File dbFile, Class<T> typeParameterClass) {
+		this(dbFile, typeParameterClass, true);
+	}
+
+	public Repo(File dbFile, Class<T> typeParameterClass, boolean server) {
 		this.dbFile = dbFile;
 		this.typeParameterClass = typeParameterClass;
+		this.server = server;
 		try {
 			initConnection();
 		} catch (SQLException e) {
@@ -35,8 +42,16 @@ public class Repo<T> {
 	}
 
 	protected void initConnection() throws SQLException {
+		// TODO: thread safety
+		if (connectionSource != null) {
+			return;
+		}
+
 		try {
-			String databaseUrl = "jdbc:h2:file:" + dbFile.getAbsolutePath() + ";AUTO_SERVER=TRUE";
+			String databaseUrl = "jdbc:h2:file:" + dbFile.getAbsolutePath();
+			if (server) {
+				databaseUrl += ";AUTO_SERVER=TRUE";
+			}
 			connectionSource = new JdbcConnectionSource(databaseUrl);
 
 			dao = DaoManager.createDao(connectionSource, typeParameterClass);
@@ -58,6 +73,11 @@ public class Repo<T> {
 		}
 	}
 
+	public void deleteAll() throws SQLException {
+		initConnection();
+		TableUtils.clearTable(connectionSource, typeParameterClass);
+	}
+
 	public int save(T item) {
 		int id = 0;
 		try {
@@ -65,7 +85,7 @@ public class Repo<T> {
 			id = dao.create(item);
 			log.warn("saved with id: {}", id);
 		} catch (SQLException e) {
-			//TODO: throw exception to caller...
+			// TODO: throw exception to caller...
 			e.printStackTrace();
 		} finally {
 			closeConnection();
@@ -87,11 +107,11 @@ public class Repo<T> {
 		return t;
 	}
 
-	public List<T> getMatching(T matchObj) {
+	public List<T> getMatching(Map<String, Object> fieldValues) {
 		List<T> response = null;
 		try {
 			initConnection();
-			response = dao.queryForMatchingArgs(matchObj);
+			response = dao.queryForFieldValuesArgs(fieldValues);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

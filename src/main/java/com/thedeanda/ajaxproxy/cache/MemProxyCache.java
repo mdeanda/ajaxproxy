@@ -43,7 +43,7 @@ public class MemProxyCache extends LinkedHashMap<String, CachedResponse> impleme
 	}
 	
 	private String getCacheKey(CachedResponse response) {
-		return response.getRequestPath() + "?" + response.getQueryString();
+		return response.getUrl();
 	}
 
 	@Override

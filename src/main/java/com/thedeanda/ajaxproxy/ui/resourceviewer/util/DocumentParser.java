@@ -27,20 +27,12 @@ import com.thedeanda.javajson.JsonArray;
 import com.thedeanda.javajson.JsonObject;
 
 public class DocumentParser {
-	private static final Logger log = LoggerFactory
-			.getLogger(DocumentParser.class);
+	private static final Logger log = LoggerFactory.getLogger(DocumentParser.class);
 
 	public DocumentContainer parse(byte[] data) {
 		log.debug("start parsing byte input");
 
 		DocumentContainer container = parseInternal(data);
-		return container;
-	}
-
-	public DocumentContainer parse(String input) {
-		log.debug("start parsing string input");
-
-		DocumentContainer container = parseInternal(input.getBytes());
 		return container;
 	}
 

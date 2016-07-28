@@ -18,7 +18,6 @@ public class DbCacheTest {
 	private static final String CACHE_PATH = "./src/test/resources/DB_CACHE";
 	private static final String PATH = "/foo/bar";
 	private static final String URL = "http://example.com/foo/bar";
-	private static final String reason = "reason";
 	private static final String REASON = "reason";
 	private static final int STATUS = 200;
 	private static final long TIMESTAMP = 3209l;
@@ -29,13 +28,15 @@ public class DbCacheTest {
 	@Before
 	public void init() throws IOException {
 		done();
-
-		cache = new DbCache(new File(cacheDir, "test"));
+		cache = new DbCache(new File(cacheDir, "test"), false);
 	}
 
 	@After
 	public void done() throws IOException {
-		//FileUtils.deleteDirectory(cacheDir);
+		if (cache != null) {
+			cache.clearCache();
+		}
+		FileUtils.deleteDirectory(cacheDir);
 	}
 
 	@Test
@@ -50,10 +51,33 @@ public class DbCacheTest {
 		sample.setStatus(STATUS);
 		sample.setTimestamp(TIMESTAMP);
 		cache.cache(sample);
-		
+
 		assertEquals(1, sample.getId());
 
 		CachedResponse response = cache.get(1);
+		assertNotNull(response);
+		assertEquals(PATH, response.getRequestPath());
+		assertEquals(URL, response.getUrl());
+		assertEquals(STATUS, response.getStatus());
+		assertEquals(REASON, response.getReason());
+		assertEquals(TIMESTAMP, response.getTimestamp());
+	}
+
+	@Test
+	public void testGetByUrl() {
+		CachedResponse r = cache.get(PATH);
+		assertNull(r);
+
+		CachedResponse sample = new CachedResponse();
+		sample.setRequestPath(PATH);
+		sample.setUrl(URL);
+		sample.setReason(REASON);
+		sample.setStatus(STATUS);
+		sample.setTimestamp(TIMESTAMP);
+		cache.cache(sample);
+
+		CachedResponse response = cache.get(URL);
+
 		assertNotNull(response);
 		assertEquals(PATH, response.getRequestPath());
 		assertEquals(URL, response.getUrl());

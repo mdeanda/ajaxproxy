@@ -1,5 +1,6 @@
 package com.thedeanda.ajaxproxy.cache.model;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 
 import com.j256.ormlite.field.DataType;
@@ -9,7 +10,7 @@ import com.j256.ormlite.table.DatabaseTable;
 @DatabaseTable(tableName = "cache")
 public class CachedResponse {
 
-	@DatabaseField(id = true, generatedId = true)
+	@DatabaseField(generatedId = true)
 	private int id;
 
 	@DatabaseField(width = 2048)
@@ -20,7 +21,7 @@ public class CachedResponse {
 
 	@DatabaseField(width = 2048)
 	private String url;
-	
+
 	@DatabaseField(width = 2048)
 	private String queryString;
 
@@ -35,12 +36,36 @@ public class CachedResponse {
 
 	private Header[] headers;
 
+	public static String getFullUrl(String requstUrl, String queryString) {
+		if (StringUtils.isBlank(queryString)) {
+			return requstUrl;
+		} else {
+			return requstUrl + "?" + queryString;
+		}
+	}
+
 	public int getId() {
 		return id;
 	}
 
 	public void setId(int id) {
 		this.id = id;
+	}
+
+	public String getRequestPath() {
+		return requestPath;
+	}
+
+	public void setRequestPath(String requestPath) {
+		this.requestPath = requestPath;
+	}
+
+	public long getTimestamp() {
+		return timestamp;
+	}
+
+	public void setTimestamp(long timestamp) {
+		this.timestamp = timestamp;
 	}
 
 	public String getUrl() {
@@ -51,12 +76,28 @@ public class CachedResponse {
 		this.url = url;
 	}
 
+	public String getQueryString() {
+		return queryString;
+	}
+
+	public void setQueryString(String queryString) {
+		this.queryString = queryString;
+	}
+
 	public int getStatus() {
 		return status;
 	}
 
 	public void setStatus(int status) {
 		this.status = status;
+	}
+
+	public String getReason() {
+		return reason;
+	}
+
+	public void setReason(String reason) {
+		this.reason = reason;
 	}
 
 	public byte[] getData() {
@@ -75,35 +116,4 @@ public class CachedResponse {
 		this.headers = headers;
 	}
 
-	public String getRequestPath() {
-		return requestPath;
-	}
-
-	public void setRequestPath(String requestPath) {
-		this.requestPath = requestPath;
-	}
-
-	public String getReason() {
-		return reason;
-	}
-
-	public void setReason(String reason) {
-		this.reason = reason;
-	}
-
-	public long getTimestamp() {
-		return timestamp;
-	}
-
-	public void setTimestamp(long timestamp) {
-		this.timestamp = timestamp;
-	}
-
-	public String getQueryString() {
-		return queryString;
-	}
-
-	public void setQueryString(String queryString) {
-		this.queryString = queryString;
-	}
 }

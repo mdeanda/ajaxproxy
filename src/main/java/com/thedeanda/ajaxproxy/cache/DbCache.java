@@ -2,20 +2,34 @@ package com.thedeanda.ajaxproxy.cache;
 
 import java.io.File;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.thedeanda.ajaxproxy.Repo;
 import com.thedeanda.ajaxproxy.cache.model.CachedResponse;
 
 public class DbCache extends Repo<CachedResponse> implements ProxyCache {
+	private static final Logger log = LoggerFactory.getLogger(DbCache.class);
 
 	public DbCache(File file) {
 		super(file, CachedResponse.class);
 	}
 
+	public DbCache(File file, boolean serverMode) {
+		super(file, CachedResponse.class, serverMode);
+	}
+
 	@Override
 	public void clearCache() {
-		// TODO Auto-generated method stub
+		try {
+			deleteAll();
+		} catch (SQLException e) {
+			log.warn(e.getMessage(), e);
+		}
 	}
 
 	@Override
@@ -27,8 +41,8 @@ public class DbCache extends Repo<CachedResponse> implements ProxyCache {
 
 	@Override
 	public CachedResponse get(String urlPath) {
-		CachedResponse matchObj = new CachedResponse();
-		matchObj.setRequestPath(urlPath);
+		Map<String, Object> matchObj = new HashMap<>();
+		matchObj.put("url", urlPath);
 
 		List<CachedResponse> items = getMatching(matchObj);
 		CachedResponse response = null;

@@ -75,15 +75,10 @@ public class ContentViewer extends JPanel {
 
 	private class TreeLoader extends SwingWorker<DocumentContainer, DocumentContainer> {
 
-		private String input;
 		private byte[] bytes;
 
 		public TreeLoader(byte[] input) {
 			this.bytes = input;
-		}
-
-		public TreeLoader(String input) {
-			this.input = input;
 		}
 
 		@Override
@@ -92,11 +87,7 @@ public class ContentViewer extends JPanel {
 
 			DocumentParser parser = new DocumentParser();
 			DocumentContainer document;
-			if (bytes != null) {
-				document = parser.parse(bytes);
-			} else {
-				document = parser.parse(input);
-			}
+			document = parser.parse(bytes);
 
 			log.info("done parsing");
 
