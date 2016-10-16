@@ -46,25 +46,16 @@ import com.thedeanda.ajaxproxy.ui.viewer.ResourceCellRenderer;
 import com.thedeanda.javajson.JsonObject;
 
 /** tracks files that get loaded */
-public class ResourceViewerPanel extends JPanel implements AccessTracker,
-		ActionListener, RequestListener {
-	private static final Logger log = LoggerFactory
-			.getLogger(ResourceViewerPanel.class);
+public class ResourceViewerPanel extends JPanel implements AccessTracker, RequestListener {
+	private static final Logger log = LoggerFactory.getLogger(ResourceViewerPanel.class);
 	private static final long serialVersionUID = 1L;
 	private JButton clearBtn;
 	private JButton exportBtn;
 	private JCheckBox toggleBtn;
-	private ResourceListModel model;
-	private JList<Resource> list;
 	private ResourcePanel resourcePanel;
-	private JTextField filter;
-	private Color filterOkColor;
-	private Color filterBadColor;
-	private JMenuItem removeRequestMenuItem;
-	private JMenuItem replayMenuItem;
-	private JMenuItem newWindowMenuItem;
-	private JMenuItem clearMenuItem;
 	private ResourceService resourceService;
+	private ResourceListModel model;
+	private ResourceListPanel resourceListPanel;
 
 	public ResourceViewerPanel(ResourceService resourceService) {
 		log.debug("new viewer");
@@ -72,7 +63,7 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 		setLayout(layout);
 
 		this.resourceService = resourceService;
-		model = new ResourceListModel(resourceService);
+		this.model = new ResourceListModel(resourceService);
 
 		resourcePanel = new ResourcePanel(resourceService, false);
 		clearBtn = new JButton("Clear");
@@ -81,7 +72,7 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 		clearBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				clear();
+				resourceListPanel.clear();
 			}
 		});
 		exportBtn.addActionListener(new ActionListener() {
@@ -112,36 +103,22 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 		SwingUtils.flattenSplitPane(split);
 		add(split);
 
-		topPanelLayout.putConstraint(SpringLayout.NORTH, clearBtn, 20,
-				SpringLayout.NORTH, topPanel);
-		topPanelLayout.putConstraint(SpringLayout.WEST, clearBtn, 10,
-				SpringLayout.WEST, topPanel);
-		topPanelLayout.putConstraint(SpringLayout.NORTH, exportBtn, 0,
-				SpringLayout.NORTH, clearBtn);
-		topPanelLayout.putConstraint(SpringLayout.WEST, exportBtn, 10,
-				SpringLayout.EAST, clearBtn);
-		topPanelLayout.putConstraint(SpringLayout.NORTH, toggleBtn, 20,
-				SpringLayout.NORTH, topPanel);
-		topPanelLayout.putConstraint(SpringLayout.EAST, toggleBtn, -10,
-				SpringLayout.EAST, topPanel);
+		topPanelLayout.putConstraint(SpringLayout.NORTH, clearBtn, 20, SpringLayout.NORTH, topPanel);
+		topPanelLayout.putConstraint(SpringLayout.WEST, clearBtn, 10, SpringLayout.WEST, topPanel);
+		topPanelLayout.putConstraint(SpringLayout.NORTH, exportBtn, 0, SpringLayout.NORTH, clearBtn);
+		topPanelLayout.putConstraint(SpringLayout.WEST, exportBtn, 10, SpringLayout.EAST, clearBtn);
+		topPanelLayout.putConstraint(SpringLayout.NORTH, toggleBtn, 20, SpringLayout.NORTH, topPanel);
+		topPanelLayout.putConstraint(SpringLayout.EAST, toggleBtn, -10, SpringLayout.EAST, topPanel);
 
-		layout.putConstraint(SpringLayout.NORTH, topPanel, 0,
-				SpringLayout.NORTH, this);
-		layout.putConstraint(SpringLayout.SOUTH, topPanel, 60,
-				SpringLayout.NORTH, this);
-		layout.putConstraint(SpringLayout.WEST, topPanel, 0, SpringLayout.WEST,
-				this);
-		layout.putConstraint(SpringLayout.EAST, topPanel, 0, SpringLayout.EAST,
-				this);
+		layout.putConstraint(SpringLayout.NORTH, topPanel, 0, SpringLayout.NORTH, this);
+		layout.putConstraint(SpringLayout.SOUTH, topPanel, 60, SpringLayout.NORTH, this);
+		layout.putConstraint(SpringLayout.WEST, topPanel, 0, SpringLayout.WEST, this);
+		layout.putConstraint(SpringLayout.EAST, topPanel, 0, SpringLayout.EAST, this);
 
-		layout.putConstraint(SpringLayout.NORTH, split, 0, SpringLayout.SOUTH,
-				topPanel);
-		layout.putConstraint(SpringLayout.SOUTH, split, 0, SpringLayout.SOUTH,
-				this);
-		layout.putConstraint(SpringLayout.WEST, split, 0, SpringLayout.WEST,
-				this);
-		layout.putConstraint(SpringLayout.EAST, split, 0, SpringLayout.EAST,
-				this);
+		layout.putConstraint(SpringLayout.NORTH, split, 0, SpringLayout.SOUTH, topPanel);
+		layout.putConstraint(SpringLayout.SOUTH, split, 0, SpringLayout.SOUTH, this);
+		layout.putConstraint(SpringLayout.WEST, split, 0, SpringLayout.WEST, this);
+		layout.putConstraint(SpringLayout.EAST, split, 0, SpringLayout.EAST, this);
 
 	}
 
@@ -152,132 +129,20 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 
 		panel.add(resourcePanel);
 
-		layout.putConstraint(SpringLayout.NORTH, resourcePanel, 10,
-				SpringLayout.NORTH, panel);
-		layout.putConstraint(SpringLayout.WEST, resourcePanel, 10,
-				SpringLayout.WEST, panel);
-		layout.putConstraint(SpringLayout.EAST, resourcePanel, -10,
-				SpringLayout.EAST, panel);
-		layout.putConstraint(SpringLayout.SOUTH, resourcePanel, -10,
-				SpringLayout.SOUTH, panel);
+		layout.putConstraint(SpringLayout.NORTH, resourcePanel, 10, SpringLayout.NORTH, panel);
+		layout.putConstraint(SpringLayout.WEST, resourcePanel, 10, SpringLayout.WEST, panel);
+		layout.putConstraint(SpringLayout.EAST, resourcePanel, -10, SpringLayout.EAST, panel);
+		layout.putConstraint(SpringLayout.SOUTH, resourcePanel, -10, SpringLayout.SOUTH, panel);
 
 		return panel;
 	}
 
 	private JPanel initLeftPanel() {
-		SpringLayout layout = new SpringLayout();
-		JPanel panel = new JPanel(layout);
-		panel.setBorder(BorderFactory.createEmptyBorder());
-
-		filter = new JTextField(".*");
-		SwingUtils.prepJTextField(filter);
-		filter.setToolTipText("Filter path by java regex");
-		panel.add(filter);
-
-		// Listen for changes in the text
-		filterOkColor = filter.getBackground();
-		filterBadColor = new Color(250, 210, 200);
-		filter.getDocument().addDocumentListener(new DocumentListener() {
-			public void changedUpdate(DocumentEvent e) {
-				resetFilter();
-			}
-
-			public void removeUpdate(DocumentEvent e) {
-				resetFilter();
-			}
-
-			public void insertUpdate(DocumentEvent e) {
-				resetFilter();
-			}
-		});
-
-		final JPopupMenu popup = this.createListPopup();
-
-		list = new JList<Resource>(model);
-		list.setCellRenderer(new ResourceCellRenderer());
-		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		list.addListSelectionListener(new ListSelectionListener() {
-			@Override
-			public void valueChanged(ListSelectionEvent evt) {
-				listItemSelected(evt);
-			}
-		});
-		list.addMouseListener(new MouseAdapter() {
-
-			@Override
-			public void mousePressed(MouseEvent e) {
-				maybeShowPopup(e);
-			}
-
-			@Override
-			public void mouseReleased(MouseEvent e) {
-				maybeShowPopup(e);
-			}
-
-			private void maybeShowPopup(MouseEvent e) {
-				list.setSelectedIndex(list.locationToIndex(e.getPoint()));
-				if (e.isPopupTrigger() && list.getSelectedIndex() >= 0) {
-					popup.show(e.getComponent(), e.getX(), e.getY());
-				}
-			}
-		});
-		list.setBorder(BorderFactory.createEmptyBorder());
-		JScrollPane scroll = new JScrollPane(list);
-		panel.add(scroll);
-
-		layout.putConstraint(SpringLayout.NORTH, filter, 10,
-				SpringLayout.NORTH, panel);
-		layout.putConstraint(SpringLayout.WEST, filter, 10, SpringLayout.WEST,
-				panel);
-		layout.putConstraint(SpringLayout.EAST, filter, -10, SpringLayout.EAST,
-				panel);
-
-		layout.putConstraint(SpringLayout.NORTH, scroll, 10,
-				SpringLayout.SOUTH, filter);
-		layout.putConstraint(SpringLayout.WEST, scroll, 10, SpringLayout.WEST,
-				panel);
-		layout.putConstraint(SpringLayout.EAST, scroll, -10, SpringLayout.EAST,
-				panel);
-		layout.putConstraint(SpringLayout.SOUTH, scroll, -10,
-				SpringLayout.SOUTH, panel);
-
-		return panel;
+		resourceListPanel = new ResourceListPanel(this, resourceService, model);
+		return resourceListPanel;
 	}
 
-	private JPopupMenu createListPopup() {
-		final JPopupMenu popup = new JPopupMenu();
-
-		replayMenuItem = new JMenuItem("Replay in Rest Client");
-		replayMenuItem.addActionListener(this);
-		popup.add(replayMenuItem);
-
-		newWindowMenuItem = new JMenuItem("View in New Window");
-		newWindowMenuItem.addActionListener(this);
-		popup.add(newWindowMenuItem);
-
-		popup.addSeparator();
-
-		removeRequestMenuItem = new JMenuItem("Remove Request");
-		removeRequestMenuItem.addActionListener(this);
-		popup.add(removeRequestMenuItem);
-
-		clearMenuItem = new JMenuItem("Clear All");
-		clearMenuItem.addActionListener(this);
-		popup.add(clearMenuItem);
-
-		return popup;
-	}
-
-	private void listItemSelected(ListSelectionEvent evt) {
-		if (!evt.getValueIsAdjusting()) {
-			Resource resource = (Resource) list.getSelectedValue();
-			if (resource != null) {
-				showResource(resource);
-			}
-		}
-	}
-
-	private void showResource(Resource resource) {
+	protected void showResource(Resource resource) {
 		resourcePanel.setResource(resource);
 	}
 
@@ -294,26 +159,6 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 	 * 
 	 * if (show) { model.add(new Resource(res)); } }
 	 */
-
-	private void resetFilter() {
-		Pattern filterRegEx = null;
-		if (!StringUtils.isBlank(filter.getText())) {
-			try {
-				filterRegEx = Pattern.compile(filter.getText());
-				filter.setBackground(filterOkColor);
-			} catch (PatternSyntaxException ex) {
-				filterRegEx = null;
-				filter.setBackground(filterBadColor);
-			}
-		}
-		final Pattern filter = filterRegEx;
-		SwingUtils.executNonUi(new Runnable() {
-			@Override
-			public void run() {
-				model.setFilter(filter);
-			}
-		});
-	}
 
 	private void export() {
 		/*
@@ -333,9 +178,9 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 		 * headers = new JsonObject(); json.put("request headers", headers); if
 		 * (obj.getRequestHeaders() != null) { for (Header hdr :
 		 * obj.getRequestHeaders()) { headers.put(hdr.getName(),
-		 * hdr.getValue()); } } headers = new JsonObject();
-		 * json.put("response headers", headers); if (obj.getResponseHeaders()
-		 * != null) { for (Header hdr : obj.getResponseHeaders()) {
+		 * hdr.getValue()); } } headers = new JsonObject(); json.put(
+		 * "response headers", headers); if (obj.getResponseHeaders() != null) {
+		 * for (Header hdr : obj.getResponseHeaders()) {
 		 * headers.put(hdr.getName(), hdr.getValue()); } }
 		 * 
 		 * Writer writer = null; try { writer = new OutputStreamWriter(new
@@ -365,46 +210,6 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent evt) {
-		if (evt.getSource() == removeRequestMenuItem) {
-			int index = list.getSelectedIndex();
-			if (index >= 0) {
-				model.remove(index);
-				if (model.getSize() > index)
-					list.setSelectedIndex(index);
-				else if (!model.isEmpty()) {
-					list.setSelectedIndex(index - 1);
-				}
-			}
-		} else if (evt.getSource() == replayMenuItem) {
-			int index = list.getSelectedIndex();
-			if (index >= 0) {
-				final UUID resourceId = model.get(index).getId();
-				SwingUtils.executNonUi(new Runnable() {
-					@Override
-					public void run() {
-						StoredResource resource = resourceService
-								.get(resourceId);
-						RestClientFrame rest = new RestClientFrame();
-						rest.fromResource(resource);
-						rest.setVisible(true);
-					}
-				});
-			}
-		} else if (evt.getSource() == clearMenuItem) {
-			clear();
-		} else if (evt.getSource() == newWindowMenuItem) {
-			int index = list.getSelectedIndex();
-			if (index >= 0) {
-				final Resource resource = model.get(index);
-				ResourceFrame window = new ResourceFrame(resourceService,
-						resource);
-				window.setVisible(true);
-			}
-		}
-	}
-
-	@Override
 	public void newRequest(UUID id, String url, String method) {
 		boolean enableMonitor = toggleBtn.isSelected();
 		if (enableMonitor) {
@@ -414,8 +219,7 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 	}
 
 	@Override
-	public void startRequest(final UUID id, final URL url,
-			final Header[] requestHeaders, final byte[] data) {
+	public void startRequest(final UUID id, final URL url, final Header[] requestHeaders, final byte[] data) {
 		boolean enableMonitor = toggleBtn.isSelected();
 		if (enableMonitor) {
 			model.startRequest(id, url, requestHeaders, data);
@@ -423,23 +227,16 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker,
 	}
 
 	@Override
-	public void requestComplete(final UUID id, final int status,
-			final String reason, final long duration,
+	public void requestComplete(final UUID id, final int status, final String reason, final long duration,
 			final Header[] responseHeaders, final byte[] data) {
 		boolean enableMonitor = toggleBtn.isSelected();
 		if (enableMonitor) {
-			model.requestComplete(id, status, reason, duration,
-					responseHeaders, data);
+			model.requestComplete(id, status, reason, duration, responseHeaders, data);
 		}
 	}
 
 	@Override
 	public void error(UUID id, String message, Exception e) {
 		model.error(id, message, e);
-	}
-
-	private void clear() {
-		model.clear();
-		showResource(null);
 	}
 }
