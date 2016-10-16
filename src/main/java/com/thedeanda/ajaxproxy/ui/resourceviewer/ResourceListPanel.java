@@ -40,6 +40,7 @@ import com.thedeanda.ajaxproxy.ui.viewer.ResourceCellRenderer;
  *
  */
 public class ResourceListPanel extends JPanel implements ActionListener {
+	private static final long serialVersionUID = -4795136826991822425L;
 	private JTextField filter;
 	private Color filterOkColor;
 	private Color filterBadColor;
@@ -52,7 +53,8 @@ public class ResourceListPanel extends JPanel implements ActionListener {
 	private ResourceService resourceService;
 	private ResourceViewerPanel resourceViewerPanel;
 
-	public ResourceListPanel(ResourceViewerPanel resourceViewerPanel, ResourceService resourceService, ResourceListModel model) {
+	public ResourceListPanel(ResourceViewerPanel resourceViewerPanel, ResourceService resourceService,
+			ResourceListModel model) {
 		SpringLayout layout = new SpringLayout();
 		JPanel panel = this;
 		panel.setLayout(layout);
@@ -186,6 +188,7 @@ public class ResourceListPanel extends JPanel implements ActionListener {
 		model.clear();
 		showResource(null);
 	}
+
 	private void showResource(Resource resource) {
 		resourceViewerPanel.showResource(resource);
 	}
