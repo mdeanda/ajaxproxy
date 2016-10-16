@@ -24,6 +24,7 @@ import com.thedeanda.ajaxproxy.ui.SwingUtils;
 import com.thedeanda.ajaxproxy.ui.border.BottomBorder;
 import com.thedeanda.ajaxproxy.ui.model.Resource;
 import com.thedeanda.ajaxproxy.ui.model.ResourceListModel;
+import com.thedeanda.ajaxproxy.ui.resourceviewer.list.ResourceListPanel;
 import com.thedeanda.javajson.JsonObject;
 
 /** tracks files that get loaded */
