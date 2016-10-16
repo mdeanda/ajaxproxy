@@ -124,7 +124,7 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker, Reques
 		return resourceListPanel;
 	}
 
-	protected void showResource(Resource resource) {
+	public void showResource(Resource resource) {
 		resourcePanel.setResource(resource);
 	}
 

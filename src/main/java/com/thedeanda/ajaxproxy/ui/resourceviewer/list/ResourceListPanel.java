@@ -30,6 +30,8 @@ import com.thedeanda.ajaxproxy.service.StoredResource;
 import com.thedeanda.ajaxproxy.ui.SwingUtils;
 import com.thedeanda.ajaxproxy.ui.model.Resource;
 import com.thedeanda.ajaxproxy.ui.model.ResourceListModel;
+import com.thedeanda.ajaxproxy.ui.resourceviewer.ResourceFrame;
+import com.thedeanda.ajaxproxy.ui.resourceviewer.ResourceViewerPanel;
 import com.thedeanda.ajaxproxy.ui.rest.RestClientFrame;
 import com.thedeanda.ajaxproxy.ui.viewer.ResourceCellRenderer;
 
