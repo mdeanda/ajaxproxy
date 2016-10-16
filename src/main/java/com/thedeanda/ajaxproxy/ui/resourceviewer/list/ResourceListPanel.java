@@ -1,4 +1,4 @@
-package com.thedeanda.ajaxproxy.ui.resourceviewer;
+package com.thedeanda.ajaxproxy.ui.resourceviewer.list;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
