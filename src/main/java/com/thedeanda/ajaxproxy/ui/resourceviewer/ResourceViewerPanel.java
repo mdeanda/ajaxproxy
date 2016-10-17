@@ -2,8 +2,6 @@ package com.thedeanda.ajaxproxy.ui.resourceviewer;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.net.URL;
-import java.util.UUID;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -12,23 +10,21 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.SpringLayout;
 
-import org.apache.http.Header;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.thedeanda.ajaxproxy.AccessTracker;
 import com.thedeanda.ajaxproxy.AjaxProxy;
-import com.thedeanda.ajaxproxy.http.RequestListener;
 import com.thedeanda.ajaxproxy.service.ResourceService;
 import com.thedeanda.ajaxproxy.ui.SwingUtils;
 import com.thedeanda.ajaxproxy.ui.border.BottomBorder;
 import com.thedeanda.ajaxproxy.ui.model.Resource;
-import com.thedeanda.ajaxproxy.ui.model.ResourceListModel;
 import com.thedeanda.ajaxproxy.ui.resourceviewer.list.ResourceListPanel;
+import com.thedeanda.ajaxproxy.ui.resourceviewer.list.ResourceListPanelListener;
 import com.thedeanda.javajson.JsonObject;
 
 /** tracks files that get loaded */
-public class ResourceViewerPanel extends JPanel implements AccessTracker, RequestListener {
+public class ResourceViewerPanel extends JPanel implements AccessTracker, ResourceListPanelListener {
 	private static final Logger log = LoggerFactory.getLogger(ResourceViewerPanel.class);
 	private static final long serialVersionUID = 1L;
 	private JButton clearBtn;
@@ -36,7 +32,6 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker, Reques
 	private JCheckBox toggleBtn;
 	private ResourcePanel resourcePanel;
 	private ResourceService resourceService;
-	private ResourceListModel model;
 	private ResourceListPanel resourceListPanel;
 
 	public ResourceViewerPanel(ResourceService resourceService) {
@@ -45,7 +40,6 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker, Reques
 		setLayout(layout);
 
 		this.resourceService = resourceService;
-		this.model = new ResourceListModel(resourceService);
 
 		resourcePanel = new ResourcePanel(resourceService, false);
 		clearBtn = new JButton("Clear");
@@ -61,6 +55,12 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker, Reques
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				export();
+			}
+		});
+		toggleBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				handleMonitorCheckboxChanged();
 			}
 		});
 
@@ -104,6 +104,11 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker, Reques
 
 	}
 
+	protected void handleMonitorCheckboxChanged() {
+		boolean enableMonitor = toggleBtn.isSelected();
+		resourceListPanel.setEnableMonitor(enableMonitor);
+	}
+
 	private JPanel initRightPanel() {
 		SpringLayout layout = new SpringLayout();
 		JPanel panel = new JPanel(layout);
@@ -120,10 +125,12 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker, Reques
 	}
 
 	private JPanel initLeftPanel() {
-		resourceListPanel = new ResourceListPanel(this, resourceService, model);
+		resourceListPanel = new ResourceListPanel(resourceService);
+		resourceListPanel.setListener(this);
 		return resourceListPanel;
 	}
 
+	@Override
 	public void showResource(Resource resource) {
 		resourcePanel.setResource(resource);
 	}
@@ -131,7 +138,7 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker, Reques
 	public void setProxy(AjaxProxy ajaxProxy) {
 		if (ajaxProxy != null) {
 			// ajaxProxy.addTracker(this);
-			ajaxProxy.addRequestListener(this);
+			ajaxProxy.addRequestListener(resourceListPanel);
 		}
 	}
 
@@ -185,40 +192,12 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker, Reques
 		if (config == null)
 			return;
 		toggleBtn.setSelected(config.getBoolean("track"));
+		
+		handleMonitorCheckboxChanged();
 	}
 
 	class DataHolder {
 		public String headers;
 	}
 
-	@Override
-	public void newRequest(UUID id, String url, String method) {
-		boolean enableMonitor = toggleBtn.isSelected();
-		if (enableMonitor) {
-			final Resource resource = new Resource(id, url, method);
-			model.add(resource);
-		}
-	}
-
-	@Override
-	public void startRequest(final UUID id, final URL url, final Header[] requestHeaders, final byte[] data) {
-		boolean enableMonitor = toggleBtn.isSelected();
-		if (enableMonitor) {
-			model.startRequest(id, url, requestHeaders, data);
-		}
-	}
-
-	@Override
-	public void requestComplete(final UUID id, final int status, final String reason, final long duration,
-			final Header[] responseHeaders, final byte[] data) {
-		boolean enableMonitor = toggleBtn.isSelected();
-		if (enableMonitor) {
-			model.requestComplete(id, status, reason, duration, responseHeaders, data);
-		}
-	}
-
-	@Override
-	public void error(UUID id, String message, Exception e) {
-		model.error(id, message, e);
-	}
 }

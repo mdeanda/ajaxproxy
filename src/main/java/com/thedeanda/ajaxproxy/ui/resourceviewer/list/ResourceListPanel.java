@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.net.URL;
 import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -24,7 +25,9 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.Header;
 
+import com.thedeanda.ajaxproxy.http.RequestListener;
 import com.thedeanda.ajaxproxy.service.ResourceService;
 import com.thedeanda.ajaxproxy.service.StoredResource;
 import com.thedeanda.ajaxproxy.ui.SwingUtils;
@@ -41,7 +44,7 @@ import com.thedeanda.ajaxproxy.ui.viewer.ResourceCellRenderer;
  * @author mdeanda
  *
  */
-public class ResourceListPanel extends JPanel implements ActionListener {
+public class ResourceListPanel extends JPanel implements ActionListener , RequestListener{
 	private static final long serialVersionUID = -4795136826991822425L;
 	private JTextField filter;
 	private Color filterOkColor;
@@ -53,18 +56,18 @@ public class ResourceListPanel extends JPanel implements ActionListener {
 	private JMenuItem clearMenuItem;
 	private ResourceListModel model;
 	private ResourceService resourceService;
-	private ResourceViewerPanel resourceViewerPanel;
+	private boolean enableMonitor;
 
-	public ResourceListPanel(ResourceViewerPanel resourceViewerPanel, ResourceService resourceService,
-			ResourceListModel model) {
+	private ResourceListPanelListener listener;
+
+	public ResourceListPanel(ResourceService resourceService) {
 		SpringLayout layout = new SpringLayout();
 		JPanel panel = this;
 		panel.setLayout(layout);
 		panel.setBorder(BorderFactory.createEmptyBorder());
 
-		this.resourceViewerPanel = resourceViewerPanel;
 		this.resourceService = resourceService;
-		this.model = model;
+		this.model = new ResourceListModel(resourceService);
 
 		filter = new JTextField(".*");
 		SwingUtils.prepJTextField(filter);
@@ -192,7 +195,7 @@ public class ResourceListPanel extends JPanel implements ActionListener {
 	}
 
 	private void showResource(Resource resource) {
-		resourceViewerPanel.showResource(resource);
+		listener.showResource(resource);
 	}
 
 	@Override
@@ -233,4 +236,43 @@ public class ResourceListPanel extends JPanel implements ActionListener {
 		}
 	}
 
+	public void setListener(ResourceListPanelListener listener) {
+		this.listener = listener;
+	}
+	
+	@Override
+	public void newRequest(UUID id, String url, String method) {
+		if (enableMonitor) {
+			final Resource resource = new Resource(id, url, method);
+			model.add(resource);
+		}
+	}
+
+	@Override
+	public void startRequest(final UUID id, final URL url, final Header[] requestHeaders, final byte[] data) {
+		if (enableMonitor) {
+			model.startRequest(id, url, requestHeaders, data);
+		}
+	}
+
+	@Override
+	public void requestComplete(final UUID id, final int status, final String reason, final long duration,
+			final Header[] responseHeaders, final byte[] data) {
+		if (enableMonitor) {
+			model.requestComplete(id, status, reason, duration, responseHeaders, data);
+		}
+	}
+
+	@Override
+	public void error(UUID id, String message, Exception e) {
+		model.error(id, message, e);
+	}
+
+	public boolean isEnableMonitor() {
+		return enableMonitor;
+	}
+
+	public void setEnableMonitor(boolean enableMonitor) {
+		this.enableMonitor = enableMonitor;
+	}
 }
