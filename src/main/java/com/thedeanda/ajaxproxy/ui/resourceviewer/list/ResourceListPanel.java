@@ -44,11 +44,8 @@ import com.thedeanda.ajaxproxy.ui.viewer.ResourceCellRenderer;
  * @author mdeanda
  *
  */
-public class ResourceListPanel extends JPanel implements ActionListener , RequestListener{
+public class ResourceListPanel extends JPanel implements ActionListener, RequestListener {
 	private static final long serialVersionUID = -4795136826991822425L;
-	private JTextField filter;
-	private Color filterOkColor;
-	private Color filterBadColor;
 	private JList<Resource> list;
 	private JMenuItem replayMenuItem;
 	private JMenuItem removeRequestMenuItem;
@@ -56,40 +53,17 @@ public class ResourceListPanel extends JPanel implements ActionListener , Reques
 	private JMenuItem clearMenuItem;
 	private ResourceListModel model;
 	private ResourceService resourceService;
-	private boolean enableMonitor;
 
 	private ResourceListPanelListener listener;
 
-	public ResourceListPanel(ResourceService resourceService) {
+	public ResourceListPanel(ResourceListModel model, ResourceService resourceService) {
 		SpringLayout layout = new SpringLayout();
 		JPanel panel = this;
 		panel.setLayout(layout);
 		panel.setBorder(BorderFactory.createEmptyBorder());
 
+		this.model = model;
 		this.resourceService = resourceService;
-		this.model = new ResourceListModel(resourceService);
-
-		filter = new JTextField(".*");
-		SwingUtils.prepJTextField(filter);
-		filter.setToolTipText("Filter path by java regex");
-		panel.add(filter);
-
-		// Listen for changes in the text
-		filterOkColor = filter.getBackground();
-		filterBadColor = new Color(250, 210, 200);
-		filter.getDocument().addDocumentListener(new DocumentListener() {
-			public void changedUpdate(DocumentEvent e) {
-				resetFilter();
-			}
-
-			public void removeUpdate(DocumentEvent e) {
-				resetFilter();
-			}
-
-			public void insertUpdate(DocumentEvent e) {
-				resetFilter();
-			}
-		});
 
 		final JPopupMenu popup = this.createListPopup();
 
@@ -125,11 +99,7 @@ public class ResourceListPanel extends JPanel implements ActionListener , Reques
 		JScrollPane scroll = new JScrollPane(list);
 		panel.add(scroll);
 
-		layout.putConstraint(SpringLayout.NORTH, filter, 10, SpringLayout.NORTH, panel);
-		layout.putConstraint(SpringLayout.WEST, filter, 10, SpringLayout.WEST, panel);
-		layout.putConstraint(SpringLayout.EAST, filter, -10, SpringLayout.EAST, panel);
-
-		layout.putConstraint(SpringLayout.NORTH, scroll, 10, SpringLayout.SOUTH, filter);
+		layout.putConstraint(SpringLayout.NORTH, scroll, 10, SpringLayout.NORTH, panel);
 		layout.putConstraint(SpringLayout.WEST, scroll, 10, SpringLayout.WEST, panel);
 		layout.putConstraint(SpringLayout.EAST, scroll, -10, SpringLayout.EAST, panel);
 		layout.putConstraint(SpringLayout.SOUTH, scroll, -10, SpringLayout.SOUTH, panel);
@@ -167,26 +137,6 @@ public class ResourceListPanel extends JPanel implements ActionListener , Reques
 				showResource(resource);
 			}
 		}
-	}
-
-	private void resetFilter() {
-		Pattern filterRegEx = null;
-		if (!StringUtils.isBlank(filter.getText())) {
-			try {
-				filterRegEx = Pattern.compile(filter.getText());
-				filter.setBackground(filterOkColor);
-			} catch (PatternSyntaxException ex) {
-				filterRegEx = null;
-				filter.setBackground(filterBadColor);
-			}
-		}
-		final Pattern filter = filterRegEx;
-		SwingUtils.executNonUi(new Runnable() {
-			@Override
-			public void run() {
-				model.setFilter(filter);
-			}
-		});
 	}
 
 	public void clear() {
@@ -239,28 +189,22 @@ public class ResourceListPanel extends JPanel implements ActionListener , Reques
 	public void setListener(ResourceListPanelListener listener) {
 		this.listener = listener;
 	}
-	
+
 	@Override
 	public void newRequest(UUID id, String url, String method) {
-		if (enableMonitor) {
-			final Resource resource = new Resource(id, url, method);
-			model.add(resource);
-		}
+		final Resource resource = new Resource(id, url, method);
+		model.add(resource);
 	}
 
 	@Override
 	public void startRequest(final UUID id, final URL url, final Header[] requestHeaders, final byte[] data) {
-		if (enableMonitor) {
-			model.startRequest(id, url, requestHeaders, data);
-		}
+		model.startRequest(id, url, requestHeaders, data);
 	}
 
 	@Override
 	public void requestComplete(final UUID id, final int status, final String reason, final long duration,
 			final Header[] responseHeaders, final byte[] data) {
-		if (enableMonitor) {
-			model.requestComplete(id, status, reason, duration, responseHeaders, data);
-		}
+		model.requestComplete(id, status, reason, duration, responseHeaders, data);
 	}
 
 	@Override
@@ -268,11 +212,4 @@ public class ResourceListPanel extends JPanel implements ActionListener , Reques
 		model.error(id, message, e);
 	}
 
-	public boolean isEnableMonitor() {
-		return enableMonitor;
-	}
-
-	public void setEnableMonitor(boolean enableMonitor) {
-		this.enableMonitor = enableMonitor;
-	}
 }

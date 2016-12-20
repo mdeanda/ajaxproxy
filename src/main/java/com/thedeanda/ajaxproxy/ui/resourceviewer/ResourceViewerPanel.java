@@ -1,11 +1,6 @@
 package com.thedeanda.ajaxproxy.ui.resourceviewer;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
 import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.SpringLayout;
@@ -17,8 +12,8 @@ import com.thedeanda.ajaxproxy.AccessTracker;
 import com.thedeanda.ajaxproxy.AjaxProxy;
 import com.thedeanda.ajaxproxy.service.ResourceService;
 import com.thedeanda.ajaxproxy.ui.SwingUtils;
-import com.thedeanda.ajaxproxy.ui.border.BottomBorder;
 import com.thedeanda.ajaxproxy.ui.model.Resource;
+import com.thedeanda.ajaxproxy.ui.model.ResourceListModel;
 import com.thedeanda.ajaxproxy.ui.resourceviewer.list.ResourceListPanel;
 import com.thedeanda.ajaxproxy.ui.resourceviewer.list.ResourceListPanelListener;
 import com.thedeanda.javajson.JsonObject;
@@ -27,12 +22,10 @@ import com.thedeanda.javajson.JsonObject;
 public class ResourceViewerPanel extends JPanel implements AccessTracker, ResourceListPanelListener {
 	private static final Logger log = LoggerFactory.getLogger(ResourceViewerPanel.class);
 	private static final long serialVersionUID = 1L;
-	private JButton clearBtn;
-	private JButton exportBtn;
-	private JCheckBox toggleBtn;
 	private ResourcePanel resourcePanel;
 	private ResourceService resourceService;
 	private ResourceListPanel resourceListPanel;
+	private ResourceListModel model;
 
 	public ResourceViewerPanel(ResourceService resourceService) {
 		log.debug("new viewer");
@@ -42,37 +35,11 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker, Resour
 		this.resourceService = resourceService;
 
 		resourcePanel = new ResourcePanel(resourceService, false);
-		clearBtn = new JButton("Clear");
-		exportBtn = new JButton("Export");
-		toggleBtn = new JCheckBox("Monitor Resources");
-		clearBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				resourceListPanel.clear();
-			}
-		});
-		exportBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				export();
-			}
-		});
-		toggleBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				handleMonitorCheckboxChanged();
-			}
-		});
+		this.model = new ResourceListModel(resourceService);
 
-		JPanel topPanel = new JPanel();
-		SpringLayout topPanelLayout = new SpringLayout();
-		topPanel.setLayout(topPanelLayout);
-
-		topPanel.add(clearBtn);
-		topPanel.add(exportBtn);
-		topPanel.add(toggleBtn);
+		FilterPanel topPanel = new FilterPanel();
 		add(topPanel);
-		topPanel.setBorder(new BottomBorder());
+		topPanel.setModel(model);
 
 		JPanel leftPanel = initLeftPanel();
 		JPanel rightPanel = initRightPanel();
@@ -84,13 +51,6 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker, Resour
 		split.setBorder(BorderFactory.createEmptyBorder());
 		SwingUtils.flattenSplitPane(split);
 		add(split);
-
-		topPanelLayout.putConstraint(SpringLayout.NORTH, clearBtn, 20, SpringLayout.NORTH, topPanel);
-		topPanelLayout.putConstraint(SpringLayout.WEST, clearBtn, 10, SpringLayout.WEST, topPanel);
-		topPanelLayout.putConstraint(SpringLayout.NORTH, exportBtn, 0, SpringLayout.NORTH, clearBtn);
-		topPanelLayout.putConstraint(SpringLayout.WEST, exportBtn, 10, SpringLayout.EAST, clearBtn);
-		topPanelLayout.putConstraint(SpringLayout.NORTH, toggleBtn, 20, SpringLayout.NORTH, topPanel);
-		topPanelLayout.putConstraint(SpringLayout.EAST, toggleBtn, -10, SpringLayout.EAST, topPanel);
 
 		layout.putConstraint(SpringLayout.NORTH, topPanel, 0, SpringLayout.NORTH, this);
 		layout.putConstraint(SpringLayout.SOUTH, topPanel, 60, SpringLayout.NORTH, this);
@@ -105,8 +65,8 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker, Resour
 	}
 
 	protected void handleMonitorCheckboxChanged() {
-		boolean enableMonitor = toggleBtn.isSelected();
-		resourceListPanel.setEnableMonitor(enableMonitor);
+		// boolean enableMonitor = toggleBtn.isSelected();
+		// resourceListPanel.setEnableMonitor(enableMonitor);
 	}
 
 	private JPanel initRightPanel() {
@@ -125,7 +85,7 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker, Resour
 	}
 
 	private JPanel initLeftPanel() {
-		resourceListPanel = new ResourceListPanel(resourceService);
+		resourceListPanel = new ResourceListPanel(model, resourceService);
 		resourceListPanel.setListener(this);
 		return resourceListPanel;
 	}
@@ -184,15 +144,15 @@ public class ResourceViewerPanel extends JPanel implements AccessTracker, Resour
 
 	public JsonObject getConfig() {
 		JsonObject data = new JsonObject();
-		data.put("track", toggleBtn.isSelected());
+		// data.put("track", toggleBtn.isSelected());
 		return data;
 	}
 
 	public void setConfig(JsonObject config) {
 		if (config == null)
 			return;
-		toggleBtn.setSelected(config.getBoolean("track"));
-		
+		// f toggleBtn.setSelected(config.getBoolean("track"));
+
 		handleMonitorCheckboxChanged();
 	}
 
