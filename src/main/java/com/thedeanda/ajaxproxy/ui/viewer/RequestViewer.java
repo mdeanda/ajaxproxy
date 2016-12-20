@@ -194,7 +194,7 @@ public class RequestViewer extends JPanel implements RequestListener {
 				statusPhrase.setText(reason);
 				durationField.setText(String.format("%d ms", duration));
 
-				contentViewer.setContent(data);
+				contentViewer.setContent(outputData);
 			}
 		});
 	}

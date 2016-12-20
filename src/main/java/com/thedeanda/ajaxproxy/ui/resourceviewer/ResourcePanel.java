@@ -69,6 +69,7 @@ public class ResourcePanel extends JPanel implements ActionListener {
 		add(BorderLayout.CENTER, tabs);
 	}
 
+	/** wraps component to add padding */
 	private JPanel wrap(JComponent comp) {
 		SpringLayout layout = new SpringLayout();
 		JPanel panel = new JPanel(layout);
@@ -100,17 +101,8 @@ public class ResourcePanel extends JPanel implements ActionListener {
 		headersContent.setEditorKit(kit);
 		Document doc = kit.createDefaultDocument();
 		headersContent.setDocument(doc);
-		
+
 		generalPanel = wrap(generalScroll);
-	}
-
-	protected JButton makeNavigationButton(String altText) {
-		// Create and initialize the button.
-		JButton button = new JButton();
-		button.addActionListener(this);
-		button.setText(altText);
-
-		return button;
 	}
 
 	private void clear() {
@@ -118,10 +110,6 @@ public class ResourcePanel extends JPanel implements ActionListener {
 		inputCv.setContent((byte[]) null);
 		outputCv.setContent((byte[]) null);
 		headersContent.setText("");
-	}
-
-	private void tryData(final ContentViewer cv, byte[] data) {
-		cv.setContent(data);
 	}
 
 	private void showHeaders(final String markup) {
@@ -159,19 +147,13 @@ public class ResourcePanel extends JPanel implements ActionListener {
 				}
 
 				byte[] data = storedResource.getInput();
-				if (ArrayUtils.isEmpty(data)) {
-					// tabs.setEnabledAt(1, false);
-				} else {
-					// tabs.setEnabledAt(1, true);
-					tryData(inputCv, data);
+				if (!ArrayUtils.isEmpty(data)) {
+					inputCv.setContent(data);
 				}
 
-				data = storedResource.getOutput();
-				if (ArrayUtils.isEmpty(data)) {
-					// tabs.setEnabledAt(2, false);
-				} else {
-					// tabs.setEnabledAt(2, true);
-					tryData(outputCv, data);
+				data = storedResource.getOutputDecompressed();
+				if (!ArrayUtils.isEmpty(data)) {
+					outputCv.setContent(data);
 				}
 				showGeneralResourceProperties(storedResource, resource);
 			}

@@ -15,6 +15,7 @@ import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 import com.thedeanda.ajaxproxy.cache.LruCache;
+import com.thedeanda.ajaxproxy.http.NetworkUtil;
 import com.thedeanda.ajaxproxy.http.RequestListener;
 import com.thedeanda.ajaxproxy.ui.model.Resource;
 import com.thedeanda.ajaxproxy.ui.rest.HistoryItem;
@@ -31,6 +32,7 @@ public class ResourceService implements RequestListener {
 		this.dbFile = dbFile;
 		try {
 			initConnection();
+			verifyTable();
 		} catch (SQLException e) {
 			log.error(e.getMessage(), e);
 			dao = null;
@@ -45,12 +47,34 @@ public class ResourceService implements RequestListener {
 			dao = DaoManager.createDao(connectionSource, StoredResource.class);
 
 			if (!dao.isTableExists()) {
-				TableUtils.createTableIfNotExists(connectionSource,
-						StoredResource.class);
+				TableUtils.createTableIfNotExists(connectionSource, StoredResource.class);
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+	}
+
+	private void verifyTable() throws SQLException {
+		// check if we can save/load/delete an empty record, if not, recreate
+		// table
+		String id = UUID.randomUUID().toString();
+		try {
+			StoredResource r = new StoredResource();
+			r.setId(id);
+			r.setContentEncoding("test");
+			if (!saveImmediately(r)) {
+				throw new Exception("failed to save");
+			}
+			
+			dao.queryForId(id);
+			dao.deleteById(id);
+		} catch (Exception e) {
+			log.warn(e.getMessage(), e);
+			log.debug("recreating table");
+			
+			TableUtils.dropTable(connectionSource, StoredResource.class, true);
+			TableUtils.createTableIfNotExists(connectionSource, StoredResource.class);
 		}
 	}
 
@@ -61,9 +85,9 @@ public class ResourceService implements RequestListener {
 		cache.put(resource.getId(), resource);
 	}
 
-	private void saveImmediately(StoredResource resource) {
+	private boolean saveImmediately(StoredResource resource) {
 		if (dao == null)
-			return;
+			return false;
 
 		try {
 			if (StringUtils.isBlank(resource.getId())) {
@@ -73,8 +97,10 @@ public class ResourceService implements RequestListener {
 			}
 		} catch (SQLException e) {
 			log.warn(e.getMessage(), e);
+			return false;
 		}
 
+		return true;
 	}
 
 	public StoredResource get(UUID id) {
@@ -86,11 +112,18 @@ public class ResourceService implements RequestListener {
 		if (ret == null && dao != null) {
 			try {
 				ret = dao.queryForId(id);
+				decompressIfNeeded(ret);
+				cache.put(ret.getId(), ret);
 			} catch (SQLException e) {
 				log.error(e.getMessage(), e);
 			}
 		}
 		return ret;
+	}
+
+	private void decompressIfNeeded(StoredResource resource) {
+		byte[] bytes = NetworkUtil.decompress(resource.getContentEncoding(), resource.getOutput());
+		resource.setOutputDecompressed(bytes);
 	}
 
 	@Override
@@ -105,8 +138,7 @@ public class ResourceService implements RequestListener {
 	}
 
 	@Override
-	public void startRequest(UUID id, URL url, Header[] requestHeaders,
-			byte[] data) {
+	public void startRequest(UUID id, URL url, Header[] requestHeaders, byte[] data) {
 		log.debug("start request: {} {}", id, url);
 
 		String headers = headersToString(requestHeaders);
@@ -119,17 +151,20 @@ public class ResourceService implements RequestListener {
 	}
 
 	@Override
-	public void requestComplete(UUID id, int status, String reason,
-			long duration, Header[] responseHeaders, byte[] data) {
+	public void requestComplete(UUID id, int status, String reason, long duration, Header[] responseHeaders,
+			byte[] data) {
 		log.debug("request complete: {} {}", id, status);
 		String headers = headersToString(responseHeaders);
 		StoredResource sr = get(id.toString());
 		if (sr != null) {
+			String encoding = NetworkUtil.getContentEncoding(responseHeaders);
+			sr.setContentEncoding(encoding);
 			sr.setStatus(status);
 			sr.setReason(reason);
 			sr.setDuration(duration);
 			sr.setResponseHeaders(headers);
 			sr.setOutput(data);
+			decompressIfNeeded(sr);
 			save(sr);
 		}
 	}
