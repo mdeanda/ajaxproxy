@@ -5,7 +5,10 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.zip.DataFormatException;
 import java.util.zip.GZIPInputStream;
+import java.util.zip.Inflater;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
@@ -20,6 +23,7 @@ public class NetworkUtil {
 	private static final String CONTENT_ENCODING = "Content-Encoding";
 	private static final String GZIP = "gzip";
 	private static final String LZMA = "lzma";
+	private static final String DEFLATE = "deflate";
 
 	public static byte[] decompressIfNeeded(byte[] bytes, Header[] headers) {
 		String encoding = getContentEncoding(headers);
@@ -59,6 +63,17 @@ public class NetworkUtil {
 				IOUtils.copy(inputStream, output);
 				bytes = output.toByteArray();
 			} catch (IOException e) {
+				log.warn(e.getMessage(), e);
+			}
+		} else if (DEFLATE.equalsIgnoreCase(encoding)) {
+			try {
+				Inflater decompresser = new Inflater();
+				decompresser.setInput(bytes, 0, bytes.length);
+				byte[] result = new byte[decompresser.getRemaining()];
+				int resultLength = decompresser.inflate(result);
+				decompresser.end();
+				bytes = Arrays.copyOf(result, resultLength);
+			} catch (DataFormatException e) {
 				log.warn(e.getMessage(), e);
 			}
 		}

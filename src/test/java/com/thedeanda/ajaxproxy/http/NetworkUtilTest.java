@@ -26,6 +26,20 @@ public class NetworkUtilTest {
 	}
 
 	@Test
+	public void testNoDecompression() throws IOException {
+		byte[] input = readBytes("sample.txt");
+		byte[] expected = readBytes("sample.txt");
+
+		assertNotNull(input);
+
+		byte[] output = NetworkUtil.decompress("", input);
+
+		assertNotNull(output);
+		assertNotNull(expected);
+		verifyBytes(expected, output);
+	}
+
+	@Test
 	public void testDecompressionGzip() throws IOException {
 		byte[] input = readBytes("sample.gz");
 		byte[] expected = readBytes("sample.txt");
@@ -47,6 +61,20 @@ public class NetworkUtilTest {
 		assertNotNull(input);
 
 		byte[] output = NetworkUtil.decompress("lzma", input);
+
+		assertNotNull(output);
+		assertNotNull(expected);
+		verifyBytes(expected, output);
+	}
+
+	@Test
+	public void testDecompressionDeflate() throws IOException {
+		byte[] input = readBytes("sample.zlib");
+		byte[] expected = readBytes("sample.txt");
+
+		assertNotNull(input);
+
+		byte[] output = NetworkUtil.decompress("deflate", input);
 
 		assertNotNull(output);
 		assertNotNull(expected);
