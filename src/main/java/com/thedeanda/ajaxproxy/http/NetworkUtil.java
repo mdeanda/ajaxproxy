@@ -76,7 +76,7 @@ public class NetworkUtil {
 			} catch (DataFormatException e) {
 				log.warn(e.getMessage(), e);
 			}
-		}
+		} //TODO: LZW ("compress") format
 
 		return bytes;
 	}
