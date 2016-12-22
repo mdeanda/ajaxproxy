@@ -1,5 +1,7 @@
 package com.thedeanda.ajaxproxy.ui.resourceviewer.util;
 
+import java.awt.image.BufferedImage;
+
 import javax.swing.JComponent;
 import javax.swing.text.DefaultStyledDocument;
 import javax.swing.tree.TreeNode;
@@ -24,4 +26,6 @@ public class DocumentContainer {
 	public DefaultStyledDocument rawDoc;
 
 	public HexEditor hex;
+	
+	public BufferedImage image;
 }

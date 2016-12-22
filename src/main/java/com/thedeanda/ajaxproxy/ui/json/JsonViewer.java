@@ -105,6 +105,7 @@ public class JsonViewer extends JPanel implements ActionListener {
 	}
 
 	public void format() {
-		contentViewer.setContent(inputField.getText());
+		byte[] bytes = inputField.getText().getBytes();
+		contentViewer.setContent(bytes);
 	}
 }

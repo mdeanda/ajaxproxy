@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import com.thedeanda.ajaxproxy.ui.resourceviewer.util.DocumentContainer;
 import com.thedeanda.ajaxproxy.ui.resourceviewer.util.DocumentParser;
+import com.thedeanda.ajaxproxy.ui.viewer.ImageViewer;
 
 /**
  * this is a content viewer used to show input/ouput content of http requests.
@@ -50,14 +51,6 @@ public class ContentViewer extends JPanel {
 
 		setBorder(BorderFactory.createEmptyBorder());
 		tabs.setBorder(BorderFactory.createEmptyBorder());
-	}
-
-	public void setContent(String input) {
-		if (input == null) {
-			setContent((byte[]) null);
-		} else {
-			setContent(input.getBytes());
-		}
 	}
 
 	public void setContent(final byte[] input) {
@@ -105,22 +98,27 @@ public class ContentViewer extends JPanel {
 				return;
 			}
 
-			if (data.formattedText != null) {
-				log.info("setting formatted");
-				tabs.add("Formatted", data.formattedTextArea);
-			}
-			if (data.treeNode != null) {
-				log.info("setting tree");
-				JTree tree = new JTree(new DefaultTreeModel(data.treeNode));
-				tree.setBorder(BorderFactory.createEmptyBorder());
-				tree.setShowsRootHandles(true);
-				JScrollPane scroll = new JScrollPane(tree);
-				scroll.setBorder(BorderFactory.createEmptyBorder());
-				tabs.add("Tree View", scroll);
-			}
-			if (data.rawText != null && data.rawText.length() < MAX_TEXT_SIZE) {
-				log.info("setting raw: " + data.rawText.length());
-				tabs.add("Raw Text", data.rawTextArea);
+			if (data.image != null) {
+				log.info("setting image");
+				tabs.add("Image", new ImageViewer(data.image));
+			} else {
+				if (data.formattedText != null) {
+					log.info("setting formatted");
+					tabs.add("Formatted", data.formattedTextArea);
+				}
+				if (data.treeNode != null) {
+					log.info("setting tree");
+					JTree tree = new JTree(new DefaultTreeModel(data.treeNode));
+					tree.setBorder(BorderFactory.createEmptyBorder());
+					tree.setShowsRootHandles(true);
+					JScrollPane scroll = new JScrollPane(tree);
+					scroll.setBorder(BorderFactory.createEmptyBorder());
+					tabs.add("Tree View", scroll);
+				}
+				if (data.rawText != null && data.rawText.length() < MAX_TEXT_SIZE) {
+					log.info("setting raw: " + data.rawText.length());
+					tabs.add("Raw Text", data.rawTextArea);
+				}
 			}
 			if (data.hex != null) {
 				log.info("setting hex");

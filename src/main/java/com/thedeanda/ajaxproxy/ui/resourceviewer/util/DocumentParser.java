@@ -1,11 +1,12 @@
 package com.thedeanda.ajaxproxy.ui.resourceviewer.util;
 
-import java.awt.Component;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 
+import javax.imageio.ImageIO;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.text.AttributeSet;
@@ -28,6 +29,7 @@ import com.thedeanda.javajson.JsonObject;
 
 public class DocumentParser {
 	private static final Logger log = LoggerFactory.getLogger(DocumentParser.class);
+	public static final int MAX_TEXT_SIZE = 300000;
 
 	public DocumentContainer parse(byte[] data) {
 		log.debug("start parsing byte input");
@@ -40,6 +42,7 @@ public class DocumentParser {
 		DocumentContainer container = new DocumentContainer();
 
 		try {
+			log.debug("loading hex editor");
 			HexEditor hex = new HexEditor();
 			hex.open(new ByteArrayInputStream(data));
 			hex.setCellEditable(false);
@@ -48,36 +51,57 @@ public class DocumentParser {
 			log.warn(e.getMessage(), e);
 		}
 
-		String input = null;
-		try {
-			input = new String(data, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			log.error(e.getMessage(), e);
-			input = "";
+		log.debug("loading image");
+		tryParsingImage(container, data);
+
+		if (container.image == null) {
+
+			String input = null;
+			try {
+				log.debug("loading string data");
+				input = new String(data, "UTF-8");
+			} catch (UnsupportedEncodingException e) {
+				log.error(e.getMessage(), e);
+				input = "";
+			}
+			container.rawText = input;
+
+			if (MAX_TEXT_SIZE > input.length()) {
+				log.debug("creating jtext area");
+				JTextArea textArea = new JTextArea(container.rawText);
+				textArea.setWrapStyleWord(true);
+				textArea.setLineWrap(true);
+				container.rawTextArea = new JScrollPane(textArea);
+				DefaultStyledDocument doc = new DefaultStyledDocument();
+				AttributeSet a = null;
+				try {
+					doc.insertString(0, container.rawText, a);
+					container.rawDoc = doc;
+				} catch (BadLocationException e) {
+					log.error(e.getMessage(), e);
+				}
+			}
+
+			input = StringUtils.trimToEmpty(input);
+
+			log.debug("loading json");
+			tryParseJson(container, input);
+			log.debug("loading json array");
+			tryParseJsonArray(container, input);
+			log.debug("loading xml");
+			tryParseXml(container, input);
 		}
-		container.rawText = input;
-
-		JTextArea textArea = new JTextArea(container.rawText);
-		textArea.setWrapStyleWord(true);
-		textArea.setLineWrap(true);
-		container.rawTextArea = new JScrollPane(textArea);
-		DefaultStyledDocument doc = new DefaultStyledDocument();
-		AttributeSet a = null;
-		try {
-			doc.insertString(0, container.rawText, a);
-			container.rawDoc = doc;
-		} catch (BadLocationException e) {
-			log.error(e.getMessage(), e);
-		}
-
-		input = StringUtils.trimToEmpty(input);
-
-		tryParseJson(container, input);
-		tryParseJsonArray(container, input);
-		tryParseXml(container, input);
-
 		log.debug("done parsing input");
 		return container;
+	}
+
+	private void tryParsingImage(DocumentContainer container, byte[] data) {
+		try {
+			BufferedImage img = ImageIO.read(new ByteArrayInputStream(data));
+			container.image = img;
+		} catch (IOException e) {
+			log.warn(e.getMessage(), e);
+		}
 	}
 
 	private void setFormatted(DocumentContainer container, String formatted) {

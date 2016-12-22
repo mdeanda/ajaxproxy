@@ -106,8 +106,8 @@ class HexTable extends JTable {
 		FontMetrics fm = getFontMetrics(getFont());
 		Font headerFont = UIManager.getFont("TableHeader.font");
 		FontMetrics headerFM = hexEditor.getFontMetrics(headerFont);
-		int w = fm.stringWidth("wwww"); // cell contents, 0-255
-		w = Math.max(w, headerFM.stringWidth("+999"));
+		int w = fm.stringWidth("www"); // cell contents, 0-255
+		w = Math.max(w, headerFM.stringWidth("+99"));
 		for (int i=0; i<getColumnCount(); i++) {
 			TableColumn column = getColumnModel().getColumn(i);
 			if (i<16) {
