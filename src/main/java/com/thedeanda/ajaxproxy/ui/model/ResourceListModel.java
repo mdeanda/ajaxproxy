@@ -17,6 +17,8 @@ import javax.swing.AbstractListModel;
 import org.apache.http.Header;
 
 import com.thedeanda.ajaxproxy.service.ResourceService;
+import com.thedeanda.ajaxproxy.ui.resourceviewer.filter.RequestFilter;
+import com.thedeanda.ajaxproxy.ui.resourceviewer.filter.RequestType;
 
 public class ResourceListModel extends AbstractListModel<Resource> {
 	private static final long serialVersionUID = -8347782415802894185L;
@@ -24,11 +26,12 @@ public class ResourceListModel extends AbstractListModel<Resource> {
 	private List<Resource> items = new ArrayList<>();
 	private Map<String, Resource> resourceMap = new HashMap<>();
 
-	private Pattern filterRegEx;
 	private ResourceService resourceService;
-	
+	private RequestFilter requestFilter;
+
 	public ResourceListModel(ResourceService resourceService) {
 		this.resourceService = resourceService;
+		requestFilter = new RequestFilter();
 	}
 
 	public void add(Resource item) {
@@ -38,8 +41,7 @@ public class ResourceListModel extends AbstractListModel<Resource> {
 			}
 			unfilteredItems.add(item);
 		}
-		if (filterRegEx == null
-				|| filterRegEx.matcher(item.getPath()).matches()) {
+		if (requestFilter.accept(item)) {
 			addSorted(item, items);
 		}
 	}
@@ -74,14 +76,9 @@ public class ResourceListModel extends AbstractListModel<Resource> {
 			copyOfAllItems = new TreeSet<>(unfilteredItems);
 		}
 
-		if (filterRegEx == null) {
-			// just add all
-			items.addAll(copyOfAllItems);
-		} else {
-			for (Resource item : copyOfAllItems) {
-				if (filterRegEx.matcher(item.getPath()).matches()) {
-					items.add(item);
-				}
+		for (Resource item : copyOfAllItems) {
+			if (requestFilter.accept(item)) {
+				items.add(item);
 			}
 		}
 
@@ -167,8 +164,7 @@ public class ResourceListModel extends AbstractListModel<Resource> {
 		fireIntervalRemoved(this, index, index);
 	}
 
-	public void startRequest(UUID id, URL url, Header[] requestHeaders,
-			byte[] data) {
+	public void startRequest(UUID id, URL url, Header[] requestHeaders, byte[] data) {
 
 		Resource resource = get(id);
 		if (resource != null) {
@@ -179,8 +175,8 @@ public class ResourceListModel extends AbstractListModel<Resource> {
 		}
 	}
 
-	public void requestComplete(UUID id, int status, String reason,
-			long duration, Header[] responseHeaders, byte[] data) {
+	public void requestComplete(UUID id, int status, String reason, long duration, Header[] responseHeaders,
+			byte[] data) {
 		Resource resource = get(id);
 		if (resource != null) {
 			resource.setStatus(status);
@@ -202,8 +198,10 @@ public class ResourceListModel extends AbstractListModel<Resource> {
 		}
 	}
 
-	public void setFilter(Pattern filterRegEx) {
-		this.filterRegEx = filterRegEx;
+	public void setFilter(Pattern filterRegEx, List<RequestType> checkedItems) {
+		requestFilter.setRegEx(filterRegEx);
+		requestFilter.setRequestTypes(checkedItems);
 		resetFilter();
 	}
+
 }

@@ -3,6 +3,8 @@ package com.thedeanda.ajaxproxy.ui.resourceviewer;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -17,6 +19,8 @@ import javax.swing.event.DocumentListener;
 
 import org.apache.commons.lang3.StringUtils;
 import org.japura.gui.CheckComboBox;
+import org.japura.gui.event.ListCheckListener;
+import org.japura.gui.event.ListEvent;
 import org.japura.gui.model.ListCheckModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +29,6 @@ import com.thedeanda.ajaxproxy.ui.SwingUtils;
 import com.thedeanda.ajaxproxy.ui.border.BottomBorder;
 import com.thedeanda.ajaxproxy.ui.model.ResourceListModel;
 import com.thedeanda.ajaxproxy.ui.resourceviewer.filter.RequestType;
-import com.thedeanda.ajaxproxy.ui.resourceviewer.filter.RequestTypeFilter;
 
 public class FilterPanel extends JPanel {
 	private static final Logger log = LoggerFactory.getLogger(FilterPanel.class);
@@ -41,6 +44,7 @@ public class FilterPanel extends JPanel {
 	private Color filterBadColor;
 
 	private ResourceListModel model;
+	private ListCheckModel requestTypeFilterModel;
 
 	public FilterPanel() {
 		log.warn("new filter panel");
@@ -106,23 +110,34 @@ public class FilterPanel extends JPanel {
 		rtFilter.setTextFor(CheckComboBox.MULTIPLE, "...");
 		rtFilter.setTextFor(CheckComboBox.ALL, "-- ALL --");
 
-		ListCheckModel checkModel = rtFilter.getModel();
+		requestTypeFilterModel = rtFilter.getModel();
 		for (RequestType color : RequestType.values()) {
-			checkModel.addElement(color);
+			requestTypeFilterModel.addElement(color);
 		}
+		requestTypeFilterModel.addListCheckListener(new ListCheckListener() {
+			@Override
+			public void removeCheck(ListEvent event) {
+				resetFilter();
+			}
+
+			@Override
+			public void addCheck(ListEvent event) {
+				resetFilter();
+			}
+		});
 
 		// rtFilter = new RequestTypeFilter();
 		add(rtFilter);
-		rtFilter.setEnabled(false);
+		// rtFilter.setEnabled(false);
 
 		clearBtn = new JButton("Clear");
-		
+
 		exportBtn = new JButton("Export");
 		exportBtn.setEnabled(false);
-		
+
 		toggleBtn = new JCheckBox("Monitor Resources");
 		toggleBtn.setEnabled(false);
-		
+
 		clearBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -150,6 +165,8 @@ public class FilterPanel extends JPanel {
 	}
 
 	private void resetFilter() {
+		// TODO: throttle processing here since it works as you type
+
 		Pattern filterRegEx = null;
 		if (!StringUtils.isBlank(filter.getText())) {
 			try {
@@ -160,12 +177,21 @@ public class FilterPanel extends JPanel {
 				filter.setBackground(filterBadColor);
 			}
 		}
+
+		List<Object> checked = requestTypeFilterModel.getCheckeds();
+		final List<RequestType> checkedItems = new ArrayList<>();
+		if (checked != null && !checked.isEmpty()) {
+			for (Object o : checked) {
+				checkedItems.add((RequestType) o);
+			}
+		}
+
 		final Pattern filter = filterRegEx;
 		SwingUtils.executNonUi(new Runnable() {
 			@Override
 			public void run() {
 				if (model != null) {
-					model.setFilter(filter);
+					model.setFilter(filter, checkedItems);
 				}
 			}
 		});

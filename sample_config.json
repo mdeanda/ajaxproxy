@@ -1,6 +1,7 @@
 {
   "merge":[],
   "options":{
+    "cacheTime":0,
     "forcedLatency":0,
     "maxBitrate":0
   },
@@ -8,16 +9,18 @@
   "proxy":[
     {
       "cache":true,
+      "cacheDuration":0,
       "host":"jsonplaceholder.typicode.com",
-      "path":"/.*",
+      "path":".*",
       "port":80
     }
   ],
-  "resource":{
-    "track":true
-  },
+  "resource":{},
   "resourceBase":"",
   "showIndex":false,
+  "tamper":{
+    "items":[]
+  },
   "tracker":{
     "track":false
   },
