@@ -29,7 +29,7 @@ import com.thedeanda.javajson.JsonObject;
 
 public class DocumentParser {
 	private static final Logger log = LoggerFactory.getLogger(DocumentParser.class);
-	public static final int MAX_TEXT_SIZE = 300000;
+	public static final int MAX_TEXT_SIZE = 1000000;
 
 	public DocumentContainer parse(byte[] data) {
 		log.debug("start parsing byte input");

@@ -30,7 +30,6 @@ import com.thedeanda.ajaxproxy.ui.viewer.ImageViewer;
  */
 public class ContentViewer extends JPanel {
 	private static final long serialVersionUID = 1L;
-	private static final int MAX_TEXT_SIZE = 300000;
 	private static final Logger log = LoggerFactory.getLogger(ContentViewer.class);
 	private JTabbedPane tabs;
 	private CardLayout cardLayout;
@@ -115,7 +114,7 @@ public class ContentViewer extends JPanel {
 					scroll.setBorder(BorderFactory.createEmptyBorder());
 					tabs.add("Tree View", scroll);
 				}
-				if (data.rawText != null && data.rawText.length() < MAX_TEXT_SIZE) {
+				if (data.rawText != null && data.rawText.length() < DocumentParser.MAX_TEXT_SIZE) {
 					log.info("setting raw: " + data.rawText.length());
 					tabs.add("Raw Text", data.rawTextArea);
 				}
