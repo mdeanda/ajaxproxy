@@ -11,18 +11,19 @@ import org.slf4j.LoggerFactory;
 
 import com.thedeanda.ajaxproxy.model.config.Convertor;
 import com.thedeanda.ajaxproxy.model.config.ProxyConfig;
+import com.thedeanda.ajaxproxy.model.config.ProxyConfigFile;
+import com.thedeanda.ajaxproxy.model.config.ProxyConfigRequest;
 import com.thedeanda.javajson.JsonArray;
 import com.thedeanda.javajson.JsonValue;
 
 public class ProxyTableModel extends AbstractTableModel {
-	private static final Logger log = LoggerFactory
-			.getLogger(ProxyTableModel.class);
+	private static final Logger log = LoggerFactory.getLogger(ProxyTableModel.class);
 	private static final long serialVersionUID = 1L;
 	private List<ProxyConfig> data;
 	private final static String DOMAIN = "domain";
 	private final static String PORT = "port";
 	private final static String PATH = "path";
-	//private final static String NEW_PROXY = "newProxy";
+	// private final static String NEW_PROXY = "newProxy";
 	private final static String[] COLS = { DOMAIN, PORT, PATH };
 
 	public ProxyTableModel() {
@@ -47,8 +48,14 @@ public class ProxyTableModel extends AbstractTableModel {
 		JsonArray arr = new JsonArray();
 		Convertor converter = Convertor.get();
 		for (ProxyConfig config : data) {
-			config.setCacheDuration(cacheTime);
-			arr.add(converter.toJson(config));
+			if (config instanceof ProxyConfigRequest) {
+				ProxyConfigRequest proxyConfigRequest = (ProxyConfigRequest) config;
+				proxyConfigRequest.setCacheDuration(cacheTime);
+				arr.add(converter.toJson(proxyConfigRequest));
+			} else if (config instanceof ProxyConfigFile) {
+				ProxyConfigFile proxyConfigRequest = (ProxyConfigFile) config;
+				arr.add(converter.toJson(proxyConfigRequest));
+			}
 		}
 		return arr;
 	}
@@ -75,6 +82,14 @@ public class ProxyTableModel extends AbstractTableModel {
 		if (data.size() <= row || row < 0)
 			return null;
 		ProxyConfig config = data.get(row);
+		if (config instanceof ProxyConfigRequest) {
+			return getValueForRequest((ProxyConfigRequest) config, col);
+		} else {
+			return getValueForFile((ProxyConfigFile) config, col);
+		}
+	}
+
+	public Object getValueForRequest(ProxyConfigRequest config, int col) {
 
 		switch (col) {
 		case 0:
@@ -83,10 +98,20 @@ public class ProxyTableModel extends AbstractTableModel {
 			return config.getPort();
 		case 2:
 			return config.getPath();
-		//case 3:
-		//	return config.isNewProxy();
+		// case 3:
+		// return config.isNewProxy();
 		case 3:
 			return config.isEnableCache();
+		}
+		return null;
+	}
+
+	public Object getValueForFile(ProxyConfigFile file, int col) {
+		switch (col) {
+		case 0:
+			return file.getBasePath();
+		case 2:
+			return file.getPath();
 		}
 		return null;
 	}
@@ -99,7 +124,7 @@ public class ProxyTableModel extends AbstractTableModel {
 		return config;
 	}
 
-	public void setValue(int row, ProxyConfig config) {
+	public void setValue(int row, ProxyConfigRequest config) {
 		if (data.size() > row) {
 			data.remove(row);
 			data.add(row, config);
@@ -113,16 +138,26 @@ public class ProxyTableModel extends AbstractTableModel {
 
 	private void normalizeData() {
 		List<ProxyConfig> toRemove = new ArrayList<>();
-		for (ProxyConfig config : data) {
+		for (ProxyConfig proxyConfig : data) {
 			boolean keep = true;
-			if (config.getPort() <= 0)
-				keep = false;
-			if (StringUtils.isBlank(config.getHost()))
-				keep = false;
-			if (StringUtils.isBlank(config.getPath()))
-				keep = false;
+			if (proxyConfig instanceof ProxyConfigRequest) {
+				ProxyConfigRequest config = (ProxyConfigRequest) proxyConfig;
+				if (config.getPort() <= 0)
+					keep = false;
+				if (StringUtils.isBlank(config.getHost()))
+					keep = false;
+				if (StringUtils.isBlank(config.getPath()))
+					keep = false;
+			} else {
+				ProxyConfigFile fileConfig = (ProxyConfigFile) proxyConfig;
+				if (StringUtils.isBlank(fileConfig.getPath()))
+					keep = false;
+				if (StringUtils.isBlank(fileConfig.getBasePath()))
+					keep = false;
+			}
+
 			if (!keep) {
-				toRemove.add(config);
+				toRemove.add(proxyConfig);
 			}
 		}
 		if (!toRemove.isEmpty()) {

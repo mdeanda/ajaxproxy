@@ -11,6 +11,7 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
 import com.thedeanda.ajaxproxy.model.config.ProxyConfig;
+import com.thedeanda.ajaxproxy.model.config.ProxyConfigRequest;
 import com.thedeanda.ajaxproxy.ui.SettingsChangedListener;
 
 public class ProxyPanel extends JPanel implements EditorListener {
@@ -21,25 +22,22 @@ public class ProxyPanel extends JPanel implements EditorListener {
 	private ProxyTableModel proxyModel;
 	private ProxyEditorPanel editor;
 
-	public ProxyPanel(final SettingsChangedListener listener,
-			final ProxyTableModel proxyModel) {
+	public ProxyPanel(final SettingsChangedListener listener, final ProxyTableModel proxyModel) {
 		layout = new SpringLayout();
 		setLayout(layout);
 		this.proxyModel = proxyModel;
 		proxyTable = new JTable(proxyModel);
 		proxyTable.setColumnModel(new ProxyColumnModel());
 		proxyTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		final ListSelectionModel cellSelectionModel = proxyTable
-				.getSelectionModel();
-		cellSelectionModel
-				.addListSelectionListener(new ListSelectionListener() {
-					public void valueChanged(ListSelectionEvent e) {
-						if (!e.getValueIsAdjusting()) {
-							startEdit();
-						}
-					}
+		final ListSelectionModel cellSelectionModel = proxyTable.getSelectionModel();
+		cellSelectionModel.addListSelectionListener(new ListSelectionListener() {
+			public void valueChanged(ListSelectionEvent e) {
+				if (!e.getValueIsAdjusting()) {
+					startEdit();
+				}
+			}
 
-				});
+		});
 		scroll = new JScrollPane(proxyTable);
 		add(scroll);
 
@@ -59,11 +57,13 @@ public class ProxyPanel extends JPanel implements EditorListener {
 	private void startEdit() {
 		int row = proxyTable.getSelectedRow();
 		ProxyConfig config = proxyModel.getProxyConfig(row);
-		editor.startEdit(config);
+		if (config instanceof ProxyConfigRequest) {
+			editor.startEdit((ProxyConfigRequest) config);
+		}
 	}
 
 	@Override
-	public void commitChanges(ProxyConfig config) {
+	public void commitChanges(ProxyConfigRequest config) {
 		int row = proxyTable.getSelectedRow();
 		if (row < 0) {
 			row = proxyModel.getRowCount() - 1;
@@ -74,22 +74,15 @@ public class ProxyPanel extends JPanel implements EditorListener {
 	}
 
 	private void initLayout() {
-		layout.putConstraint(SpringLayout.SOUTH, editor, -10,
-				SpringLayout.SOUTH, this);
-		layout.putConstraint(SpringLayout.EAST, editor, -10, SpringLayout.EAST,
-				this);
-		layout.putConstraint(SpringLayout.WEST, editor, 10, SpringLayout.WEST,
-				this);
+		layout.putConstraint(SpringLayout.SOUTH, editor, -10, SpringLayout.SOUTH, this);
+		layout.putConstraint(SpringLayout.EAST, editor, -10, SpringLayout.EAST, this);
+		layout.putConstraint(SpringLayout.WEST, editor, 10, SpringLayout.WEST, this);
 
 		// table
-		layout.putConstraint(SpringLayout.NORTH, scroll, 10,
-				SpringLayout.NORTH, this);
-		layout.putConstraint(SpringLayout.EAST, scroll, -10, SpringLayout.EAST,
-				this);
-		layout.putConstraint(SpringLayout.WEST, scroll, 10, SpringLayout.WEST,
-				this);
-		layout.putConstraint(SpringLayout.SOUTH, scroll, -10,
-				SpringLayout.NORTH, editor);
+		layout.putConstraint(SpringLayout.NORTH, scroll, 10, SpringLayout.NORTH, this);
+		layout.putConstraint(SpringLayout.EAST, scroll, -10, SpringLayout.EAST, this);
+		layout.putConstraint(SpringLayout.WEST, scroll, 10, SpringLayout.WEST, this);
+		layout.putConstraint(SpringLayout.SOUTH, scroll, -10, SpringLayout.NORTH, editor);
 
 	}
 }

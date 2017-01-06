@@ -36,12 +36,15 @@ import com.thedeanda.ajaxproxy.AjaxProxy;
 import com.thedeanda.ajaxproxy.cache.MemProxyCache;
 import com.thedeanda.ajaxproxy.cache.NoOpCache;
 import com.thedeanda.ajaxproxy.cache.model.CachedResponse;
+import com.thedeanda.ajaxproxy.filter.handler.FileRequestHandler;
 import com.thedeanda.ajaxproxy.http.HttpClient;
 import com.thedeanda.ajaxproxy.http.HttpClient.RequestMethod;
 import com.thedeanda.ajaxproxy.http.RequestListener;
 import com.thedeanda.ajaxproxy.model.ProxyContainer;
 import com.thedeanda.ajaxproxy.model.config.AjaxProxyConfig;
 import com.thedeanda.ajaxproxy.model.config.ProxyConfig;
+import com.thedeanda.ajaxproxy.model.config.ProxyConfigFile;
+import com.thedeanda.ajaxproxy.model.config.ProxyConfigRequest;
 
 /**
  * new method of proxying requests that does not use jetty's transparent proxy
@@ -75,24 +78,30 @@ public class ProxyFilter implements Filter {
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
 
+		boolean doChain = true;
 		if (request instanceof HttpServletRequest && response instanceof HttpServletResponse) {
-			ProxyContainer proxy = getProxyMatcher((HttpServletRequest) request);
-			if (proxy != null) {
-				doFilterInternal((HttpServletRequest) request, (HttpServletResponse) response, chain, proxy);
-			} else {
-				chain.doFilter(request, response);
+			ProxyContainer proxy = getProxy((HttpServletRequest) request);
+			if (proxy != null && proxy.getRequestHandler() != null) {
+				doChain = !proxy.getRequestHandler().handleRequest((HttpServletRequest) request,
+						(HttpServletResponse) response);
+			} else if (proxy != null && proxy.getProxyConfig() instanceof ProxyConfigRequest) {
+				doFilterInternal((HttpServletRequest) request, (HttpServletResponse) response, chain,
+						(ProxyContainer) proxy);
+				doChain = false;
 			}
-		} else {
+		}
+
+		if (doChain) {
 			chain.doFilter(request, response);
 		}
 	}
 
-	private ProxyContainer getProxyMatcher(final HttpServletRequest request) {
+	private ProxyContainer getProxy(final HttpServletRequest request) {
 		String uri = request.getRequestURI();
 		log.trace(uri);
-		ProxyContainer matcher = getProxyForPath(uri);
-		if (matcher != null) {
-			return matcher;
+		ProxyContainer proxyContainer = getProxyForPath(uri);
+		if (proxyContainer != null) {
+			return proxyContainer;
 		}
 		return null;
 	}
@@ -113,7 +122,7 @@ public class ProxyFilter implements Filter {
 		String requestPath = request.getRequestURL().toString();
 		String queryString = request.getQueryString();
 		String fullUrl = CachedResponse.getFullUrl(requestPath, queryString);
-		ProxyConfig proxyConfig = proxy.getProxyConfig();
+		ProxyConfigRequest proxyConfig = (ProxyConfigRequest) proxy.getProxyConfig();
 
 		StringBuilder inputHeaders = new StringBuilder();
 		List<Header> hdrs = new LinkedList<Header>();
@@ -287,26 +296,30 @@ public class ProxyFilter implements Filter {
 		AjaxProxyConfig config = ajaxProxy.getAjaxProxyConfig();
 		proxyContainers = new HashSet<ProxyContainer>();
 		for (ProxyConfig proxyConfig : config.getProxyConfig()) {
-			try {
-				Pattern pattern = Pattern.compile(proxyConfig.getPath());
-				ProxyContainer proxyContainer = new ProxyContainer();
-				proxyContainer.setPattern(pattern);
-				proxyContainer.setProxyConfig(proxyConfig);
-				proxyContainers.add(proxyContainer);
+			loadProxyConfigRequest(proxyConfig);
+		}
+	}
 
-				if (proxyConfig.isEnableCache()) {
-					String hashParts = proxyConfig.getHost() + "_" + proxyConfig.getPort() + "_"
-							+ proxyConfig.getPath();
-					
+	private void loadProxyConfigRequest(ProxyConfig proxyConfig) {
+		try {
+			Pattern pattern = Pattern.compile(proxyConfig.getPath());
+			ProxyContainer proxyContainer = new ProxyContainer();
+			proxyContainer.setPattern(pattern);
+			proxyContainer.setProxyConfig(proxyConfig);
+			proxyContainers.add(proxyContainer);
 
-					long cacheTime = TimeUnit.SECONDS.toMillis(proxyConfig.getCacheDuration());
-					proxyContainer.setCache(new MemProxyCache(cacheTime));
-				} else {
-					proxyContainer.setCache(new NoOpCache());
-				}
-			} catch (Exception e) {
-				log.debug("skipping: {}", proxyConfig, e);
+			if (proxyConfig instanceof ProxyConfigFile) {
+				proxyContainer.setRequestHandler(new FileRequestHandler((ProxyConfigFile) proxyConfig));
 			}
+
+			if (proxyConfig.isEnableCache()) {
+				long cacheTime = TimeUnit.SECONDS.toMillis(proxyConfig.getCacheDuration());
+				proxyContainer.setCache(new MemProxyCache(cacheTime));
+			} else {
+				proxyContainer.setCache(new NoOpCache());
+			}
+		} catch (Exception e) {
+			log.debug("skipping: {}", proxyConfig, e);
 		}
 	}
 

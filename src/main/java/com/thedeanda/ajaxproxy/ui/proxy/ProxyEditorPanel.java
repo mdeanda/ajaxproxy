@@ -19,7 +19,7 @@ import javax.swing.SpringLayout;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.thedeanda.ajaxproxy.model.config.ProxyConfig;
+import com.thedeanda.ajaxproxy.model.config.ProxyConfigRequest;
 import com.thedeanda.ajaxproxy.ui.SwingUtils;
 
 public class ProxyEditorPanel extends JPanel {
@@ -140,9 +140,9 @@ public class ProxyEditorPanel extends JPanel {
 
 	}
 
-	public void startEdit(ProxyConfig config) {
+	public void startEdit(ProxyConfigRequest config) {
 		if (config == null) {
-			config = new ProxyConfig();
+			config = new ProxyConfigRequest();
 		}
 		String sport = "";
 		if (config.getPort() > 0)
@@ -168,7 +168,7 @@ public class ProxyEditorPanel extends JPanel {
 		}
 		String path = pathField.getText();
 
-		ProxyConfig config = new ProxyConfig();
+		ProxyConfigRequest config = new ProxyConfigRequest();
 		config.setHost(host);
 		config.setPort(port);
 		config.setPath(path);

@@ -1,17 +1,21 @@
 {
   "merge":[],
   "options":{
-    "cacheTime":0,
+    "cacheTime":2,
     "forcedLatency":0,
     "maxBitrate":0
   },
   "port":9247,
   "proxy":[
     {
-      "cache":true,
-      "cacheDuration":0,
+      "basePath":"/home/mdeanda/tmp",
+      "path":"/foo/.*",
+      "filterPath": "/foo/"
+    },
+    {
+      "cache":false,
       "host":"jsonplaceholder.typicode.com",
-      "path":".*",
+      "cache":false,
       "port":80
     }
   ],

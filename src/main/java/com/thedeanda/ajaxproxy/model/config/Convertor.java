@@ -22,6 +22,9 @@ public class Convertor {
 	public static final String PROXY_CACHE = "cache";
 	public static final String PROXY_CACHE_DUR = "cacheDuration";
 
+	private static final String PROXY_BASE_PATH = "basePath";
+	private static final String PROXY_FILTER_PATH = "filterPath";
+
 	private Convertor() {
 
 	}
@@ -37,11 +40,13 @@ public class Convertor {
 		Map<String, String> vars = config.getVariables();
 		List<ProxyConfig> configs = config.getProxyConfig();
 		for (ProxyConfig proxyConfig : configs) {
-			processVariables(proxyConfig, vars);
+			if (proxyConfig instanceof ProxyConfigRequest) {
+				processVariables((ProxyConfigRequest) proxyConfig, vars);
+			}
 		}
 	}
 
-	public void processVariables(ProxyConfig config, Map<String, String> vars) {
+	public void processVariables(ProxyConfigRequest config, Map<String, String> vars) {
 		for (String key : vars.keySet()) {
 			String var = "${" + key + "}";
 			String val = vars.get(key);
@@ -81,29 +86,37 @@ public class Convertor {
 	}
 
 	public ProxyConfig readProxyConfig(JsonObject json) {
-		ProxyConfig config = new ProxyConfig();
+		if (json.hasKey(PROXY_BASE_PATH)) {
+			ProxyConfigFile config = new ProxyConfigFile();
+			config.setPath(json.getString(PROXY_PATH));
+			config.setBasePath(json.getString(PROXY_BASE_PATH));
+			config.setFilterPath(json.getString(PROXY_FILTER_PATH));
+			return config;
+		} else {
+			ProxyConfigRequest config = new ProxyConfigRequest();
 
-		if (json.hasKey(PROXY_HOST))
-			config.setHost(json.getString(PROXY_HOST));
+			if (json.hasKey(PROXY_HOST))
+				config.setHost(json.getString(PROXY_HOST));
 
-		if (json.isInt(PROXY_PORT))
-			config.setPort(json.getInt(PROXY_PORT));
-		else {
-			try {
-				String value = json.getString(PROXY_PORT);
-				config.setPort(Integer.parseInt(value));
-			} catch (NumberFormatException nfe) {
-				config.setPort(0);
+			if (json.isInt(PROXY_PORT))
+				config.setPort(json.getInt(PROXY_PORT));
+			else {
+				try {
+					String value = json.getString(PROXY_PORT);
+					config.setPort(Integer.parseInt(value));
+				} catch (NumberFormatException nfe) {
+					config.setPort(0);
+				}
 			}
-		}
-		config.setPath(json.getString(PROXY_PATH));
-		config.setEnableCache(json.getBoolean(PROXY_CACHE));
-		config.setCacheDuration(json.getInt(PROXY_CACHE_DUR));
+			config.setPath(json.getString(PROXY_PATH));
+			config.setEnableCache(json.getBoolean(PROXY_CACHE));
+			config.setCacheDuration(json.getInt(PROXY_CACHE_DUR));
 
-		return config;
+			return config;
+		}
 	}
 
-	public JsonObject toJson(ProxyConfig config) {
+	public JsonObject toJson(ProxyConfigRequest config) {
 		JsonObject json = new JsonObject();
 
 		json.put(PROXY_HOST, config.getHost());
@@ -111,6 +124,15 @@ public class Convertor {
 		json.put(PROXY_PATH, config.getPath());
 		json.put(PROXY_CACHE, config.isEnableCache());
 		json.put(PROXY_CACHE_DUR, config.getCacheDuration());
+
+		return json;
+	}
+
+	public JsonObject toJson(ProxyConfigFile config) {
+		JsonObject json = new JsonObject();
+
+		json.put(PROXY_BASE_PATH, config.getBasePath());
+		json.put(PROXY_PATH, config.getPath());
 
 		return json;
 	}
