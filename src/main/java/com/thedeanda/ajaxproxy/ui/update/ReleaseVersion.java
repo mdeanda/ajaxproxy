@@ -25,8 +25,10 @@ public class ReleaseVersion implements Comparable<ReleaseVersion> {
 			version = version.substring(0, version.length() - 9);
 		}
 
-		Pattern reg = Pattern
-				.compile("(\\d+)(\\.(\\d+)(\\.(\\d+)(-SNAPSHOT)?)?)?");
+		if (!StringUtils.isEmpty(version))
+			return;
+
+		Pattern reg = Pattern.compile("(\\d+)(\\.(\\d+)(\\.(\\d+)(-SNAPSHOT)?)?)?");
 		Matcher matcher = reg.matcher(version);
 		if (!matcher.matches())
 			return;
