@@ -31,6 +31,8 @@ public class ProxyEditorPanel extends JPanel {
 	private JTextField portField;
 	private JLabel pathLabel;
 	private JTextField pathField;
+	private JLabel hostHeaderLabel;
+	private JTextField hostHeaderField;
 	private JButton btn;
 	private EditorListener listener;
 	private JCheckBox cacheCheckbox;
@@ -58,6 +60,12 @@ public class ProxyEditorPanel extends JPanel {
 		add(pathLabel);
 		add(pathField);
 
+		hostHeaderLabel = new JLabel("Host Header");
+		hostHeaderField = SwingUtils.newJTextField();
+		addListeners(hostHeaderField);
+		add(hostHeaderLabel);
+		add(hostHeaderField);
+
 		btn = new JButton("Ok");
 		btn.setMargin(new Insets(2, 14, 2, 14));
 		btn.addActionListener(new ActionListener() {
@@ -73,8 +81,8 @@ public class ProxyEditorPanel extends JPanel {
 		add(cacheCheckbox);
 
 		initLayout();
-		setPreferredSize(new Dimension(700, 80));
-		setMinimumSize(new Dimension(500, 80));
+		setPreferredSize(new Dimension(700, 120));
+		setMinimumSize(new Dimension(500, 120));
 	}
 
 	private void addListeners(final JTextField txtField) {
@@ -135,8 +143,15 @@ public class ProxyEditorPanel extends JPanel {
 		layout.putConstraint(SpringLayout.BASELINE, btn, 0, SpringLayout.BASELINE, hostField);
 		layout.putConstraint(SpringLayout.EAST, btn, 0, SpringLayout.EAST, this);
 
-		layout.putConstraint(SpringLayout.NORTH, cacheCheckbox, 5, SpringLayout.SOUTH, fields[0]);
-		layout.putConstraint(SpringLayout.WEST, cacheCheckbox, 0, SpringLayout.WEST, labels[0]);
+		layout.putConstraint(SpringLayout.NORTH, hostHeaderLabel, 5, SpringLayout.SOUTH, fields[0]);
+		layout.putConstraint(SpringLayout.WEST, hostHeaderLabel, 0, SpringLayout.WEST, labels[0]);
+
+		layout.putConstraint(SpringLayout.NORTH, hostHeaderField, 5, SpringLayout.SOUTH, hostHeaderLabel);
+		layout.putConstraint(SpringLayout.WEST, hostHeaderField, 0, SpringLayout.WEST, this);
+		layout.putConstraint(SpringLayout.EAST, hostHeaderField, 0, SpringLayout.EAST, this);
+
+		layout.putConstraint(SpringLayout.NORTH, cacheCheckbox, 5, SpringLayout.SOUTH, hostHeaderField);
+		layout.putConstraint(SpringLayout.WEST, cacheCheckbox, 0, SpringLayout.WEST, hostHeaderLabel);
 
 	}
 
