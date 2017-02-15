@@ -1,5 +1,8 @@
 package com.thedeanda.ajaxproxy.model.config;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ProxyConfigRequest implements ProxyConfig {
 	private String host;
 	private int port;
@@ -7,6 +10,7 @@ public class ProxyConfigRequest implements ProxyConfig {
 	private boolean enableCache;
 	/** cache duration in seconds */
 	private int cacheDuration = 500;
+	private List<CustomHeader> headers = new ArrayList<>();
 
 	public String getHost() {
 		return host;
@@ -46,5 +50,13 @@ public class ProxyConfigRequest implements ProxyConfig {
 
 	public void setCacheDuration(int cacheDuration) {
 		this.cacheDuration = cacheDuration;
+	}
+
+	public List<CustomHeader> getHeaders() {
+		return headers;
+	}
+
+	public void setHeaders(List<CustomHeader> headers) {
+		this.headers = headers;
 	}
 }

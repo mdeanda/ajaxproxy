@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import com.thedeanda.javajson.JsonArray;
 import com.thedeanda.javajson.JsonObject;
 import com.thedeanda.javajson.JsonValue;
 
@@ -21,6 +22,9 @@ public class Convertor {
 	public static final String PROXY_PATH = "path";
 	public static final String PROXY_CACHE = "cache";
 	public static final String PROXY_CACHE_DUR = "cacheDuration";
+	public static final String PROXY_HEADERS = "headers";
+	public static final String PROXY_HEADERS_NAME = "name";
+	public static final String PROXY_HEADERS_VALUE = "value";
 
 	private static final String PROXY_BASE_PATH = "basePath";
 	private static final String PROXY_FILTER_PATH = "filterPath";
@@ -112,6 +116,18 @@ public class Convertor {
 			config.setEnableCache(json.getBoolean(PROXY_CACHE));
 			config.setCacheDuration(json.getInt(PROXY_CACHE_DUR));
 
+
+			if (json.isJsonArray(PROXY_HEADERS)) {
+				JsonValue headersValue = json.get(PROXY_HEADERS);
+				JsonArray headers = headersValue.getJsonArray();
+				for (JsonValue v : headers) {
+					JsonObject headerObj = v.getJsonObject();
+					String name = headerObj.getString(PROXY_HEADERS_NAME);
+					String value = headerObj.getString(PROXY_HEADERS_VALUE);
+					CustomHeader hdr = new CustomHeader(name, value);
+					config.getHeaders().add(hdr);
+				}
+			}
 			return config;
 		}
 	}

@@ -129,9 +129,21 @@ public class ProxyFilter implements Filter {
 		@SuppressWarnings("unchecked")
 		Enumeration<String> hnames = request.getHeaderNames();
 
+		/*
+		 * TODO: might want a way to toggle host header, had to remove for
+		 * specific application
+		 */
+		Header hostHeader2 = new BasicHeader("Host", proxyConfig.getHost());
+		hdrs.add(hostHeader2);
+		String hostHeaderValue = proxyConfig.getHost() + ":" + ajaxProxy.getPort();
+		inputHeaders.append("Host: " + hostHeaderValue + "\n");
+		// */
+
+		/*
 		Header hostHeader = new BasicHeader("Host", proxyConfig.getHost());
 		hdrs.add(hostHeader);
 		inputHeaders.append("Host: " + proxyConfig.getHost() + "\n");
+		//*/
 
 		while (hnames.hasMoreElements()) {
 			String hn = hnames.nextElement();
@@ -168,7 +180,7 @@ public class ProxyFilter implements Filter {
 			proxy.getCache().clearCache();
 		}
 		if (cachedResponse == null || cachedResponse.getData() == null) {
-			cachedResponse = makeRequest(request, response, proxyUrl, inputHeaders, inputData);
+			cachedResponse = makeRequest(request, response, proxyUrl.toString(), inputHeaders.toString(), inputData);
 			cachedResponse.setRequestPath(requestPath);
 			cachedResponse.setQueryString(queryString);
 			if (cachedResponse.getStatus() > 0 && "GET".equals(request.getMethod())) {
@@ -218,11 +230,11 @@ public class ProxyFilter implements Filter {
 				cachedResponse.getData());
 	}
 
-	private CachedResponse makeRequest(HttpServletRequest request, final HttpServletResponse response,
-			StringBuilder proxyUrl, StringBuilder inputHeaders, byte[] inputData) {
+	private CachedResponse makeRequest(HttpServletRequest request, final HttpServletResponse response, String proxyUrl,
+			String inputHeaders, byte[] inputData) {
 		final CachedResponse cachedResponse = new CachedResponse();
-		client.makeRequest(RequestMethod.valueOf(request.getMethod()), proxyUrl.toString(), inputHeaders.toString(),
-				inputData, new RequestListener() {
+		client.makeRequest(RequestMethod.valueOf(request.getMethod()), proxyUrl, inputHeaders, inputData,
+				new RequestListener() {
 
 					@Override
 					public void newRequest(UUID id, String url, String method) {
