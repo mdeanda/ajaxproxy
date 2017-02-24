@@ -19,14 +19,14 @@ public class ReleaseVersion implements Comparable<ReleaseVersion> {
 	}
 
 	public ReleaseVersion(String version) {
+		if (StringUtils.isBlank(version)) {
+			throw new NullPointerException("empty version string");
+		}
 		input = version;
 
 		if (StringUtils.endsWith(version, "-SNAPSHOT")) {
 			version = version.substring(0, version.length() - 9);
 		}
-
-		if (!StringUtils.isEmpty(version))
-			return;
 
 		Pattern reg = Pattern.compile("(\\d+)(\\.(\\d+)(\\.(\\d+)(-SNAPSHOT)?)?)?");
 		Matcher matcher = reg.matcher(version);

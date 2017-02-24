@@ -19,8 +19,7 @@ import com.thedeanda.ajaxproxy.http.SimpleHttpClient;
 import com.thedeanda.ajaxproxy.ui.ConfigService;
 
 public class UpdateCheckWorker extends SwingWorker<Boolean, Void> {
-	private static final Logger log = LoggerFactory
-			.getLogger(UpdateCheckWorker.class);
+	private static final Logger log = LoggerFactory.getLogger(UpdateCheckWorker.class);
 	public static String RELEASE_CHECK_URL = "https://github.com/mdeanda/ajaxproxy/releases.atom";
 	public static String RELEASE_URL = "https://github.com/mdeanda/ajaxproxy/releases";
 
@@ -33,13 +32,16 @@ public class UpdateCheckWorker extends SwingWorker<Boolean, Void> {
 	@Override
 	protected Boolean doInBackground() throws Exception {
 		boolean retVal = false;
+		String version = ConfigService.get().getVersionString();
+		if (StringUtils.isBlank(version)) {
+			return false;
+		}
 		try {
-			long delay = (System.currentTimeMillis() % RANDOM_DELAY)
-					+ MIN_DELAY;
+			long delay = (System.currentTimeMillis() % RANDOM_DELAY) + MIN_DELAY;
 			Thread.sleep(delay);
 			loadAtomFeed();
 			ReleaseEntry entry = getEntry();
-			retVal = verifyUpdateAvailable(entry);
+			retVal = verifyUpdateAvailable(entry, version);
 			log.warn("latest: {}", entry);
 		} catch (Throwable e) {
 			log.warn(e.getMessage(), e);
@@ -48,15 +50,13 @@ public class UpdateCheckWorker extends SwingWorker<Boolean, Void> {
 		return retVal;
 	}
 
-	private boolean verifyUpdateAvailable(ReleaseEntry entry) {
+	private boolean verifyUpdateAvailable(ReleaseEntry entry, String version) {
 		boolean retVal = false;
 		if (entry != null) {
-			String version = ConfigService.get().getVersionString();
 			ReleaseVersion currentVersion = new ReleaseVersion(version);
 
 			if (currentVersion.compareTo(entry.version) < 0) {
-				message = String.format(
-						"Version %s is available for download.", entry.version);
+				message = String.format("Version %s is available for download.", entry.version);
 				retVal = true;
 			}
 		}
@@ -86,8 +86,7 @@ public class UpdateCheckWorker extends SwingWorker<Boolean, Void> {
 		for (Element element : elements) {
 
 			if ("ENTRY".equals(element.getName().toUpperCase())
-					&& DefaultElement.class
-							.isAssignableFrom(element.getClass())) {
+					&& DefaultElement.class.isAssignableFrom(element.getClass())) {
 				log.trace("element: {}", element);
 				ReleaseEntry entry = parseEntry((DefaultElement) element);
 				if (entry != null) {
@@ -112,6 +111,9 @@ public class UpdateCheckWorker extends SwingWorker<Boolean, Void> {
 
 		int trimStart = StringUtils.lastIndexOf(entry.link, '/') + 1;
 		String version = entry.link.substring(trimStart);
+		if (StringUtils.isBlank(version)) {
+			return null;
+		}
 		entry.version = new ReleaseVersion(version);
 		return entry;
 	}
