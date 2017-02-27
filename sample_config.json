@@ -9,13 +9,14 @@
   "proxy":[
     {
       "basePath":"/home/mdeanda/tmp",
-      "path":"/foo/.*",
-      "filterPath": "/foo/"
+      "filterPath":"/foo/",
+      "path":"/foo/.*"
     },
     {
       "cache":false,
+      "cacheDuration":30,
       "host":"jsonplaceholder.typicode.com",
-      "cache":false,
+      "path":"/.*d",
       "port":80
     }
   ],

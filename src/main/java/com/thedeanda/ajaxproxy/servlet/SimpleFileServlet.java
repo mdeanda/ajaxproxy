@@ -12,14 +12,14 @@ public class SimpleFileServlet extends AbstractFileServlet {
 	private static final Logger log = LoggerFactory.getLogger(SimpleFileServlet.class);
 	private static final long serialVersionUID = -3760579412885003066L;
 
-	private String basePath;
+	private File basePath;
 	/**
 	 * remove prefix of request uri
 	 */
 	private String filterPath;
 
 	public SimpleFileServlet(String basePath, String filterPath) {
-		this.basePath = basePath;
+		this.basePath = new File(basePath);
 		this.filterPath = filterPath;
 	}
 
@@ -35,7 +35,7 @@ public class SimpleFileServlet extends AbstractFileServlet {
 		}
 
 		// TODO: prevent ../../../ paths from going outside of basePath
-		file = new File(basePath + requestPath);
+		file = new File(basePath, requestPath);
 		log.warn("get file: " + file.getAbsolutePath());
 
 		return new ResponseContentFile(file);

@@ -114,13 +114,10 @@ public class MainFrame extends JFrame implements ProxyListener, WindowListListen
 
 	private void updateTitle() {
 		String title = "Ajax Proxy";
-		String version = ConfigService.get().getVersionString();
 		if (file != null) {
 			title += " - " + file.getAbsolutePath();
 		}
-		if (version != null) {
-			title += " - " + version;
-		}
+		title = ConfigService.get().generateWindowTitle(title);
 
 		setTitle(title);
 		Windows.get().notifyOfChange();

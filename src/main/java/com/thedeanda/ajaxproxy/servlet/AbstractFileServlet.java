@@ -42,8 +42,8 @@ import javax.servlet.http.HttpServletResponse;
  * files, GZIP would decrease network bandwidth.
  * 
  * Original source from: <a href=
- * "http://balusc.blogspot.com/2009/02/fileservlet-supporting-resume-and.html"
- * >http
+ * "http://balusc.blogspot.com/2009/02/fileservlet-supporting-resume-and.html" >
+ * http
  * ://balusc.blogspot.com/2009/02/fileservlet-supporting-resume-and.html</a>
  * 
  * @author Miguel De Anda originally written by BalusC
@@ -60,8 +60,7 @@ abstract public class AbstractFileServlet extends HttpServlet {
 																// week.
 	private static final String MULTIPART_BOUNDARY = "MULTIPART_BYTERANGES";
 
-	abstract public ResponseContent getFile(HttpServletRequest request)
-			throws FileServletException;
+	abstract public ResponseContent getFile(HttpServletRequest request) throws FileServletException;
 
 	/**
 	 * Process HEAD request. This returns the same headers as GET request, but
@@ -70,8 +69,7 @@ abstract public class AbstractFileServlet extends HttpServlet {
 	 * @see HttpServlet#doHead(HttpServletRequest, HttpServletResponse).
 	 */
 	@Override
-	public void doHead(HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {
+	public void doHead(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// Process request without content.
 		processRequest(request, response, false);
 	}
@@ -82,8 +80,7 @@ abstract public class AbstractFileServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest, HttpServletResponse).
 	 */
 	@Override
-	public void doGet(HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {
+	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// Process request with content.
 		processRequest(request, response, true);
 	}
@@ -101,8 +98,8 @@ abstract public class AbstractFileServlet extends HttpServlet {
 	 * @throws IOException
 	 *             If something fails at I/O level.
 	 */
-	private void processRequest(HttpServletRequest request,
-			HttpServletResponse response, boolean content) throws IOException {
+	private void processRequest(HttpServletRequest request, HttpServletResponse response, boolean content)
+			throws IOException {
 		// Validate the requested file
 		// ------------------------------------------------------------
 
@@ -153,8 +150,7 @@ abstract public class AbstractFileServlet extends HttpServlet {
 		// then return 304.
 		// This header is ignored if any If-None-Match header is specified.
 		long ifModifiedSince = request.getDateHeader("If-Modified-Since");
-		if (eTag != null && ifNoneMatch == null && ifModifiedSince != -1
-				&& ifModifiedSince + 1000 > lastModified) {
+		if (eTag != null && ifNoneMatch == null && ifModifiedSince != -1 && ifModifiedSince + 1000 > lastModified) {
 			response.setHeader("ETag", eTag); // Required in 304.
 			response.sendError(HttpServletResponse.SC_NOT_MODIFIED);
 			return;
@@ -226,8 +222,7 @@ abstract public class AbstractFileServlet extends HttpServlet {
 					// 50-80 (50 to 80), 40- (40 to length=100), -20
 					// (length-20=80 to length=100).
 					long start = sublong(part, 0, part.indexOf("-"));
-					long end = sublong(part, part.indexOf("-") + 1,
-							part.length());
+					long end = sublong(part, part.indexOf("-") + 1, part.length());
 
 					if (start == -1) {
 						start = length - end;
@@ -261,7 +256,7 @@ abstract public class AbstractFileServlet extends HttpServlet {
 		}
 
 		if (contentType == null) {
-			contentType = getServletContext().getMimeType(fileName);
+			// contentType = getServletContext().getMimeType(fileName);
 		}
 
 		// If content type is unknown, then set the default value.
@@ -278,8 +273,7 @@ abstract public class AbstractFileServlet extends HttpServlet {
 		// encoding.
 		if (contentType.startsWith("text")) {
 			String acceptEncoding = request.getHeader("Accept-Encoding");
-			acceptsGzip = acceptEncoding != null
-					&& accepts(acceptEncoding, "gzip");
+			acceptsGzip = acceptEncoding != null && accepts(acceptEncoding, "gzip");
 			contentType += ";charset=UTF-8";
 		}
 
@@ -289,8 +283,7 @@ abstract public class AbstractFileServlet extends HttpServlet {
 		// 'save as' dialogue.
 		else if (!contentType.startsWith("image")) {
 			String accept = request.getHeader("Accept");
-			disposition = accept != null && accepts(accept, contentType) ? "inline"
-					: "attachment";
+			disposition = accept != null && accepts(accept, contentType) ? "inline" : "attachment";
 		}
 
 		// force download mode
@@ -302,22 +295,18 @@ abstract public class AbstractFileServlet extends HttpServlet {
 		response.reset();
 		response.setBufferSize(DEFAULT_BUFFER_SIZE);
 		if (responseFile.isDownload()) {
-			response.setHeader("Content-Disposition", disposition
-					+ ";filename=\"" + fileName + "\"");
+			response.setHeader("Content-Disposition", disposition + ";filename=\"" + fileName + "\"");
 		}
 
 		if (responseFile.isStreamingOnly()) {
-			sendStreaming(responseFile, eTag, lastModified, response,
-					contentType, acceptsGzip);
+			sendStreaming(responseFile, eTag, lastModified, response, contentType, acceptsGzip);
 		} else {
-			sendRandom(responseFile, eTag, lastModified, response, ranges,
-					contentType, acceptsGzip, content, full);
+			sendRandom(responseFile, eTag, lastModified, response, ranges, contentType, acceptsGzip, content, full);
 		}
 	}
 
-	private void sendStreaming(ResponseContent responseFile, String eTag,
-			long lastModified, HttpServletResponse response,
-			String contentType, boolean acceptsGzip) throws IOException {
+	private void sendStreaming(ResponseContent responseFile, String eTag, long lastModified,
+			HttpServletResponse response, String contentType, boolean acceptsGzip) throws IOException {
 		OutputStream output = null;
 		InputStream input = null;
 		try {
@@ -335,8 +324,7 @@ abstract public class AbstractFileServlet extends HttpServlet {
 				// GZIP.
 				// So only add it if there is no means of GZIP, else
 				// browser will hang.
-				response.setHeader("Content-Length",
-						String.valueOf(responseFile.getLength()));
+				response.setHeader("Content-Length", String.valueOf(responseFile.getLength()));
 			}
 			byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
 			int read;
@@ -349,16 +337,14 @@ abstract public class AbstractFileServlet extends HttpServlet {
 		}
 	}
 
-	private void sendRandom(ResponseContent responseFile, String eTag,
-			long lastModified, HttpServletResponse response,
-			List<Range> ranges, String contentType, boolean acceptsGzip,
-			boolean content, Range full) throws IOException {
+	private void sendRandom(ResponseContent responseFile, String eTag, long lastModified, HttpServletResponse response,
+			List<Range> ranges, String contentType, boolean acceptsGzip, boolean content, Range full)
+			throws IOException {
 		response.setHeader("Accept-Ranges", "bytes");
 		if (eTag != null)
 			response.setHeader("ETag", eTag);
 		response.setDateHeader("Last-Modified", lastModified);
-		response.setDateHeader("Expires", System.currentTimeMillis()
-				+ DEFAULT_EXPIRE_TIME);
+		response.setDateHeader("Expires", System.currentTimeMillis() + DEFAULT_EXPIRE_TIME);
 
 		// Send requested file (part(s)) to client
 		// ------------------------------------------------
@@ -377,22 +363,19 @@ abstract public class AbstractFileServlet extends HttpServlet {
 				// Return full file.
 				Range r = full;
 				response.setContentType(contentType);
-				response.setHeader("Content-Range", "bytes " + r.start + "-"
-						+ r.end + "/" + r.total);
+				response.setHeader("Content-Range", "bytes " + r.start + "-" + r.end + "/" + r.total);
 
 				if (content) {
 					if (acceptsGzip) {
 						// The browser accepts GZIP, so GZIP the content.
 						response.setHeader("Content-Encoding", "gzip");
-						output = new GZIPOutputStream(output,
-								DEFAULT_BUFFER_SIZE);
+						output = new GZIPOutputStream(output, DEFAULT_BUFFER_SIZE);
 					} else {
 						// Content length is not directly predictable in case of
 						// GZIP.
 						// So only add it if there is no means of GZIP, else
 						// browser will hang.
-						response.setHeader("Content-Length",
-								String.valueOf(r.length));
+						response.setHeader("Content-Length", String.valueOf(r.length));
 					}
 
 					// Copy full range.
@@ -404,8 +387,7 @@ abstract public class AbstractFileServlet extends HttpServlet {
 				// Return single part of file.
 				Range r = ranges.get(0);
 				response.setContentType(contentType);
-				response.setHeader("Content-Range", "bytes " + r.start + "-"
-						+ r.end + "/" + r.total);
+				response.setHeader("Content-Range", "bytes " + r.start + "-" + r.end + "/" + r.total);
 				response.setHeader("Content-Length", String.valueOf(r.length));
 				response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT); // 206.
 
@@ -417,8 +399,7 @@ abstract public class AbstractFileServlet extends HttpServlet {
 			} else {
 
 				// Return multiple parts of file.
-				response.setContentType("multipart/byteranges; boundary="
-						+ MULTIPART_BOUNDARY);
+				response.setContentType("multipart/byteranges; boundary=" + MULTIPART_BOUNDARY);
 				response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT); // 206.
 
 				if (content) {
@@ -433,8 +414,7 @@ abstract public class AbstractFileServlet extends HttpServlet {
 						sos.println();
 						sos.println("--" + MULTIPART_BOUNDARY);
 						sos.println("Content-Type: " + contentType);
-						sos.println("Content-Range: bytes " + r.start + "-"
-								+ r.end + "/" + r.total);
+						sos.println("Content-Range: bytes " + r.start + "-" + r.end + "/" + r.total);
 
 						// Copy single part range of multi part range.
 						copy(input, output, r.start, r.length);
@@ -468,8 +448,7 @@ abstract public class AbstractFileServlet extends HttpServlet {
 		String[] acceptValues = acceptHeader.split("\\s*(,|;)\\s*");
 		Arrays.sort(acceptValues);
 		return Arrays.binarySearch(acceptValues, toAccept) > -1
-				|| Arrays.binarySearch(acceptValues,
-						toAccept.replaceAll("/.*$", "/*")) > -1
+				|| Arrays.binarySearch(acceptValues, toAccept.replaceAll("/.*$", "/*")) > -1
 				|| Arrays.binarySearch(acceptValues, "*/*") > -1;
 	}
 
@@ -485,8 +464,7 @@ abstract public class AbstractFileServlet extends HttpServlet {
 	private static boolean matches(String matchHeader, String toMatch) {
 		String[] matchValues = matchHeader.split("\\s*,\\s*");
 		Arrays.sort(matchValues);
-		return Arrays.binarySearch(matchValues, toMatch) > -1
-				|| Arrays.binarySearch(matchValues, "*") > -1;
+		return Arrays.binarySearch(matchValues, toMatch) > -1 || Arrays.binarySearch(matchValues, "*") > -1;
 	}
 
 	/**
@@ -522,8 +500,7 @@ abstract public class AbstractFileServlet extends HttpServlet {
 	 * @throws IOException
 	 *             If something fails at I/O level.
 	 */
-	private static void copy(RandomAccessFile input, OutputStream output,
-			long start, long length) throws IOException {
+	private static void copy(RandomAccessFile input, OutputStream output, long start, long length) throws IOException {
 		byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
 		int read;
 
@@ -662,18 +639,12 @@ abstract public class AbstractFileServlet extends HttpServlet {
 		map.put("ppa", "application/vnd.ms-powerpoint");
 		map.put("doc", "application/msword");
 		map.put("odt", "application/vnd.oasis.opendocument.text");
-		map.put("docx",
-				"application/vnd.openxmlformats-officedocument.wordprocessingml.document");
-		map.put("xlsx",
-				"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-		map.put("xltx",
-				"application/vnd.openxmlformats-officedocument.spreadsheetml.template");
-		map.put("pptx",
-				"application/vnd.openxmlformats-officedocument.presentationml.presentation");
-		map.put("potx",
-				"application/vnd.openxmlformats-officedocument.presentationml.template");
-		map.put("ppsx",
-				"application/vnd.openxmlformats-officedocument.presentationml.slideshow");
+		map.put("docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+		map.put("xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+		map.put("xltx", "application/vnd.openxmlformats-officedocument.spreadsheetml.template");
+		map.put("pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation");
+		map.put("potx", "application/vnd.openxmlformats-officedocument.presentationml.template");
+		map.put("ppsx", "application/vnd.openxmlformats-officedocument.presentationml.slideshow");
 		map.put("xlr", "application/vnd.ms-works");
 		map.put("rtf", "application/rtf");
 

@@ -148,6 +148,7 @@ public class Convertor {
 		JsonObject json = new JsonObject();
 
 		json.put(PROXY_BASE_PATH, config.getBasePath());
+		json.put(PROXY_FILTER_PATH, config.getFilterPath());
 		json.put(PROXY_PATH, config.getPath());
 
 		return json;

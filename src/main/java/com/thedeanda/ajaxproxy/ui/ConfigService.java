@@ -3,11 +3,9 @@ package com.thedeanda.ajaxproxy.ui;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,6 +62,14 @@ public class ConfigService {
 
 	public String getVersionString() {
 		return version;
+	}
+
+	/** generates a title that appens a version string */
+	public String generateWindowTitle(String title) {
+		if (!StringUtils.isBlank(version)) {
+			title += " - " + version;
+		}
+		return title;
 	}
 
 	public File getConfigFile() {
