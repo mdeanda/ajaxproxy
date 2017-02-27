@@ -11,6 +11,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JSplitPane;
@@ -38,6 +39,12 @@ public class SwingUtils {
 		return ret;
 	}
 
+	public static JButton newJButton(String label) {
+		JButton btn = new JButton(label);
+		btn.setMargin(new Insets(2, 20, 2, 20));
+		return btn;
+	}
+	
 	public static JComboBox<?> newJComboBox(Object[] items) {
 		JComboBox<Object> combo = new JComboBox<>(items);
 		// Insets insets = new Insets(4, 4, 4, 4);

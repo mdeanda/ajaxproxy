@@ -70,7 +70,7 @@ public class ProxyPanel extends JPanel {
 			}
 		});
 
-		//TODO: make this a toolbar perhaps to add "add new proxy" button
+		// TODO: make this a toolbar perhaps to add "add new proxy" button
 		editor = new JPanel();
 		add(editor);
 		initLayout();
@@ -78,23 +78,15 @@ public class ProxyPanel extends JPanel {
 
 	private void startEdit() {
 		int row = proxyTable.getSelectedRow();
-		ProxyConfig config = proxyModel.getProxyConfig(row);
-		ProxyConfig updatedValue = ProxyEditorDialog.showEditDialog(config, proxyTable);
-		if (updatedValue != null) {
-			// it got updated/added
-
-		}
-	}
-
-	// TODO: edit should end up here
-	private void commitChanges(ProxyConfigRequest config) {
-		int row = proxyTable.getSelectedRow();
 		if (row < 0) {
 			row = proxyModel.getRowCount() - 1;
 		}
-		proxyModel.setValue(row, config);
-		proxyTable.changeSelection(row, 0, false, true);
-
+		ProxyConfig config = proxyModel.getProxyConfig(row);
+		ProxyConfig updatedValue = ProxyEditorDialog.showEditDialog(config, scroll);
+		if (updatedValue != null) {
+			proxyModel.setValue(row, updatedValue);
+			proxyTable.changeSelection(row, 0, false, true);
+		}
 	}
 
 	private void initLayout() {

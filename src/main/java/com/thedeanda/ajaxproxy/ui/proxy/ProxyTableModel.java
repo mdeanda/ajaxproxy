@@ -124,7 +124,7 @@ public class ProxyTableModel extends AbstractTableModel {
 		return config;
 	}
 
-	public void setValue(int row, ProxyConfigRequest config) {
+	public void setValue(int row, ProxyConfig config) {
 		if (data.size() > row) {
 			data.remove(row);
 			data.add(row, config);
@@ -176,7 +176,9 @@ public class ProxyTableModel extends AbstractTableModel {
 		Convertor converter = Convertor.get();
 		for (JsonValue v : data) {
 			ProxyConfig config = converter.readProxyConfig(v.getJsonObject());
-			this.data.add(config);
+			if (config != null) {
+				this.data.add(config);
+			}
 		}
 		this.fireTableDataChanged();
 		this.normalizeData();

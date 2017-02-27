@@ -2,24 +2,26 @@ package com.thedeanda.ajaxproxy.ui.proxy;
 
 import java.awt.Component;
 
-import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 
 import com.thedeanda.ajaxproxy.model.config.ProxyConfig;
 
 public class ProxyEditorDialog {
+
 	private static ProxyConfig showDialog(ProxyConfig value, String title, Component parent) {
 		ProxyEditorPanel panel = new ProxyEditorPanel();
-		final JDialog frame = new JDialog();
-		frame.setModal(true);
-		frame.setTitle(title);
-		frame.getContentPane().add(panel);
-		frame.pack();
-		frame.setLocationRelativeTo(parent);
-		frame.setVisible(true);
-		
-		value = panel.getResult();
-		
-		return value;
+		panel.setValue(value);
+
+		String[] options = new String[] { "OK", "Cancel" };
+		int option = JOptionPane.showOptionDialog(null, panel, title, JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
+				null, options, options[1]);
+
+		ProxyConfig result = null;
+		if (option == 0) {
+			result = panel.getResult();
+		}
+
+		return result;
 	}
 
 	public static ProxyConfig showEditDialog(ProxyConfig config, Component parent) {
@@ -27,4 +29,5 @@ public class ProxyEditorDialog {
 
 		return result;
 	}
+
 }
