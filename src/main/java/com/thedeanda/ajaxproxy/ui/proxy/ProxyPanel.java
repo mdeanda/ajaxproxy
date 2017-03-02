@@ -1,5 +1,10 @@
 package com.thedeanda.ajaxproxy.ui.proxy;
 
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -14,13 +19,13 @@ import com.thedeanda.ajaxproxy.model.config.ProxyConfig;
 import com.thedeanda.ajaxproxy.model.config.ProxyConfigRequest;
 import com.thedeanda.ajaxproxy.ui.SettingsChangedListener;
 
-public class ProxyPanel extends JPanel implements EditorListener {
+public class ProxyPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private JTable proxyTable;
 	private SpringLayout layout;
 	private JScrollPane scroll;
 	private ProxyTableModel proxyModel;
-	private ProxyEditorPanel editor;
+	private JPanel editor;
 
 	public ProxyPanel(final SettingsChangedListener listener, final ProxyTableModel proxyModel) {
 		layout = new SpringLayout();
@@ -33,10 +38,26 @@ public class ProxyPanel extends JPanel implements EditorListener {
 		cellSelectionModel.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
 				if (!e.getValueIsAdjusting()) {
+					// startEdit();
+				}
+			}
+		});
+		proxyTable.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (KeyEvent.VK_ENTER != e.getKeyCode()) {
+					return;
+				}
+				startEdit();
+			}
+		});
+		proxyTable.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() == 2) {
 					startEdit();
 				}
 			}
-
 		});
 		scroll = new JScrollPane(proxyTable);
 		add(scroll);
@@ -49,7 +70,8 @@ public class ProxyPanel extends JPanel implements EditorListener {
 			}
 		});
 
-		editor = new ProxyEditorPanel(this);
+		//TODO: make this a toolbar perhaps to add "add new proxy" button
+		editor = new JPanel();
 		add(editor);
 		initLayout();
 	}
@@ -57,13 +79,15 @@ public class ProxyPanel extends JPanel implements EditorListener {
 	private void startEdit() {
 		int row = proxyTable.getSelectedRow();
 		ProxyConfig config = proxyModel.getProxyConfig(row);
-		if (config instanceof ProxyConfigRequest) {
-			editor.startEdit((ProxyConfigRequest) config);
+		ProxyConfig updatedValue = ProxyEditorDialog.showEditDialog(config, proxyTable);
+		if (updatedValue != null) {
+			// it got updated/added
+
 		}
 	}
 
-	@Override
-	public void commitChanges(ProxyConfigRequest config) {
+	// TODO: edit should end up here
+	private void commitChanges(ProxyConfigRequest config) {
 		int row = proxyTable.getSelectedRow();
 		if (row < 0) {
 			row = proxyModel.getRowCount() - 1;

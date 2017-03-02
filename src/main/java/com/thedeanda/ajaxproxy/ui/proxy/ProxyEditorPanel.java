@@ -5,8 +5,6 @@ import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
@@ -34,11 +32,11 @@ public class ProxyEditorPanel extends JPanel {
 	private JLabel hostHeaderLabel;
 	private JTextField hostHeaderField;
 	private JButton btn;
-	private EditorListener listener;
 	private JCheckBox cacheCheckbox;
 
-	public ProxyEditorPanel(EditorListener listener) {
-		this.listener = listener;
+	private ProxyConfigRequest result = null;
+
+	public ProxyEditorPanel() {
 		layout = new SpringLayout();
 		setLayout(layout);
 
@@ -188,6 +186,11 @@ public class ProxyEditorPanel extends JPanel {
 		config.setPort(port);
 		config.setPath(path);
 		config.setEnableCache(cacheCheckbox.isSelected());
-		listener.commitChanges(config);
+
+		result = config;
+	}
+
+	public ProxyConfigRequest getResult() {
+		return result;
 	}
 }
