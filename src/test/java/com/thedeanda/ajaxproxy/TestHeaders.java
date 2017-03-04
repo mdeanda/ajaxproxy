@@ -81,7 +81,7 @@ public class TestHeaders {
 			@Override
 			public void run() {
 				lock.lock();
-				client.makeRequest(RequestMethod.GET, url, "", new byte[] {},
+				client.makeRequest(RequestMethod.GET, url, null, new byte[] {},
 						new RequestListener() {
 
 							@Override

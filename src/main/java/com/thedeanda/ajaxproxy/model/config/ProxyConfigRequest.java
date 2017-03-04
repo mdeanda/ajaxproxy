@@ -11,7 +11,7 @@ public class ProxyConfigRequest implements ProxyConfig {
 	/** cache duration in seconds */
 	private int cacheDuration = 500;
 	private String hostHeader;
-	private List<CustomHeader> headers = new ArrayList<>();
+	private List<HttpHeader> headers = new ArrayList<>();
 
 	public String getHost() {
 		return host;
@@ -53,11 +53,11 @@ public class ProxyConfigRequest implements ProxyConfig {
 		this.cacheDuration = cacheDuration;
 	}
 
-	public List<CustomHeader> getHeaders() {
+	public List<HttpHeader> getHeaders() {
 		return headers;
 	}
 
-	public void setHeaders(List<CustomHeader> headers) {
+	public void setHeaders(List<HttpHeader> headers) {
 		this.headers = headers;
 	}
 

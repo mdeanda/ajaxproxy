@@ -125,7 +125,7 @@ public class Convertor {
 					JsonObject headerObj = v.getJsonObject();
 					String name = headerObj.getString(PROXY_HEADERS_NAME);
 					String value = headerObj.getString(PROXY_HEADERS_VALUE);
-					CustomHeader hdr = new CustomHeader(name, value);
+					HttpHeader hdr = new HttpHeader(name, value);
 					config.getHeaders().add(hdr);
 				}
 			}

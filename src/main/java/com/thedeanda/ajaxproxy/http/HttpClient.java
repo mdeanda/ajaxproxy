@@ -6,6 +6,7 @@ import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -38,6 +39,7 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.thedeanda.ajaxproxy.model.config.HttpHeader;
 import com.thedeanda.ajaxproxy.ui.ConfigService;
 
 public class HttpClient {
@@ -163,7 +165,7 @@ public class HttpClient {
 		}
 	}
 
-	public void makeRequest(RequestMethod method, String url, String headers,
+	public void makeRequest(RequestMethod method, String url, List<HttpHeader> headers,
 			byte[] input, RequestListener... listener) {
 
 		UUID uuid = UUID.randomUUID();
@@ -176,11 +178,9 @@ public class HttpClient {
 		}
 
 		Map<String, String> hds = new HashMap<>();
-		if (!StringUtils.isBlank(headers)) {
-			String[] lines = StringUtils.split(headers, "\n");
-			for (String line : lines) {
-				String[] parts = StringUtils.split(line, ":", 2);
-				hds.put(parts[0], parts[1]);
+		if (headers !=null && !headers.isEmpty()) {
+			for (HttpHeader line : headers) {
+				hds.put(line.getName(), line.getValue());
 			}
 		}
 		Header[] requestHeaders = null;

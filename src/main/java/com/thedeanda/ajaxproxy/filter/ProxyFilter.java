@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -42,6 +43,7 @@ import com.thedeanda.ajaxproxy.http.HttpClient.RequestMethod;
 import com.thedeanda.ajaxproxy.http.RequestListener;
 import com.thedeanda.ajaxproxy.model.ProxyContainer;
 import com.thedeanda.ajaxproxy.model.config.AjaxProxyConfig;
+import com.thedeanda.ajaxproxy.model.config.HttpHeader;
 import com.thedeanda.ajaxproxy.model.config.ProxyConfig;
 import com.thedeanda.ajaxproxy.model.config.ProxyConfigFile;
 import com.thedeanda.ajaxproxy.model.config.ProxyConfigRequest;
@@ -124,19 +126,19 @@ public class ProxyFilter implements Filter {
 		String fullUrl = CachedResponse.getFullUrl(requestPath, queryString);
 		ProxyConfigRequest proxyConfig = (ProxyConfigRequest) proxy.getProxyConfig();
 
-		StringBuilder inputHeaders = new StringBuilder();
+		List<HttpHeader> inputHeaders = new ArrayList<>();
 		List<Header> hdrs = new LinkedList<Header>();
 		@SuppressWarnings("unchecked")
 		Enumeration<String> hnames = request.getHeaderNames();
 
-		String hostHeaderString = proxyConfig.getHost(); //default header
+		String hostHeaderString = proxyConfig.getHost(); // default header
 		if (!StringUtils.isBlank(proxyConfig.getHostHeader())) {
 			hostHeaderString = proxyConfig.getHostHeader();
 		}
-		
+
 		Header hostHeader = new BasicHeader("Host", hostHeaderString);
 		hdrs.add(hostHeader);
-		inputHeaders.append("Host: " + hostHeaderString + "\n");
+		inputHeaders.add(new HttpHeader("Host", hostHeaderString));
 
 		while (hnames.hasMoreElements()) {
 			String hn = hnames.nextElement();
@@ -145,7 +147,7 @@ public class ProxyFilter implements Filter {
 				// TODO: consider allowing header replacement via config
 				Header h = new BasicHeader(hn, request.getHeader(hn));
 				hdrs.add(h);
-				inputHeaders.append(hn + ": " + request.getHeader(hn) + "\n");
+				inputHeaders.add(new HttpHeader(hn, request.getHeader(hn)));
 			}
 		}
 		log.trace("headers: {}", inputHeaders);
@@ -173,7 +175,7 @@ public class ProxyFilter implements Filter {
 			proxy.getCache().clearCache();
 		}
 		if (cachedResponse == null || cachedResponse.getData() == null) {
-			cachedResponse = makeRequest(request, response, proxyUrl.toString(), inputHeaders.toString(), inputData);
+			cachedResponse = makeRequest(request, response, proxyUrl.toString(), inputHeaders, inputData);
 			cachedResponse.setRequestPath(requestPath);
 			cachedResponse.setQueryString(queryString);
 			if (cachedResponse.getStatus() > 0 && "GET".equals(request.getMethod())) {
@@ -224,7 +226,7 @@ public class ProxyFilter implements Filter {
 	}
 
 	private CachedResponse makeRequest(HttpServletRequest request, final HttpServletResponse response, String proxyUrl,
-			String inputHeaders, byte[] inputData) {
+			List<HttpHeader> inputHeaders, byte[] inputData) {
 		final CachedResponse cachedResponse = new CachedResponse();
 		client.makeRequest(RequestMethod.valueOf(request.getMethod()), proxyUrl, inputHeaders, inputData,
 				new RequestListener() {

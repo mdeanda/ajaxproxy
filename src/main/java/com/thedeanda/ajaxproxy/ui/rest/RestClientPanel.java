@@ -30,14 +30,14 @@ import org.slf4j.LoggerFactory;
 import com.thedeanda.ajaxproxy.http.HttpClient;
 import com.thedeanda.ajaxproxy.http.HttpClient.RequestMethod;
 import com.thedeanda.ajaxproxy.http.RequestListener;
+import com.thedeanda.ajaxproxy.model.config.HttpHeader;
 import com.thedeanda.ajaxproxy.ui.SwingUtils;
 import com.thedeanda.ajaxproxy.ui.border.BottomBorder;
 import com.thedeanda.ajaxproxy.ui.viewer.RequestViewer;
 
 public class RestClientPanel extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 1L;
-	private static final Logger log = LoggerFactory
-			.getLogger(RestClientPanel.class);
+	private static final Logger log = LoggerFactory.getLogger(RestClientPanel.class);
 
 	private JTextField urlField;
 	private JTextArea headersField;
@@ -78,23 +78,15 @@ public class RestClientPanel extends JPanel implements ActionListener {
 		mainSplit.setRightComponent(outputPanel);
 		mainSplit.setDividerLocation(400);
 
-		layout.putConstraint(SpringLayout.NORTH, urlPanel, 0,
-				SpringLayout.NORTH, this);
-		layout.putConstraint(SpringLayout.EAST, urlPanel, 0, SpringLayout.EAST,
-				this);
-		layout.putConstraint(SpringLayout.WEST, urlPanel, 0, SpringLayout.WEST,
-				this);
-		layout.putConstraint(SpringLayout.SOUTH, urlPanel, 50,
-				SpringLayout.NORTH, this);
+		layout.putConstraint(SpringLayout.NORTH, urlPanel, 0, SpringLayout.NORTH, this);
+		layout.putConstraint(SpringLayout.EAST, urlPanel, 0, SpringLayout.EAST, this);
+		layout.putConstraint(SpringLayout.WEST, urlPanel, 0, SpringLayout.WEST, this);
+		layout.putConstraint(SpringLayout.SOUTH, urlPanel, 50, SpringLayout.NORTH, this);
 
-		layout.putConstraint(SpringLayout.EAST, historySplit, 0,
-				SpringLayout.EAST, this);
-		layout.putConstraint(SpringLayout.WEST, historySplit, 0,
-				SpringLayout.WEST, this);
-		layout.putConstraint(SpringLayout.SOUTH, historySplit, 0,
-				SpringLayout.SOUTH, this);
-		layout.putConstraint(SpringLayout.NORTH, historySplit, 0,
-				SpringLayout.SOUTH, urlPanel);
+		layout.putConstraint(SpringLayout.EAST, historySplit, 0, SpringLayout.EAST, this);
+		layout.putConstraint(SpringLayout.WEST, historySplit, 0, SpringLayout.WEST, this);
+		layout.putConstraint(SpringLayout.SOUTH, historySplit, 0, SpringLayout.SOUTH, this);
+		layout.putConstraint(SpringLayout.NORTH, historySplit, 0, SpringLayout.SOUTH, urlPanel);
 	}
 
 	private void initHistoryPanel(JSplitPane historySplit) {
@@ -125,14 +117,10 @@ public class RestClientPanel extends JPanel implements ActionListener {
 			}
 		});
 
-		layout.putConstraint(SpringLayout.NORTH, historyScroll, 10,
-				SpringLayout.NORTH, panel);
-		layout.putConstraint(SpringLayout.WEST, historyScroll, 10,
-				SpringLayout.WEST, panel);
-		layout.putConstraint(SpringLayout.EAST, historyScroll, -10,
-				SpringLayout.EAST, panel);
-		layout.putConstraint(SpringLayout.SOUTH, historyScroll, -10,
-				SpringLayout.SOUTH, panel);
+		layout.putConstraint(SpringLayout.NORTH, historyScroll, 10, SpringLayout.NORTH, panel);
+		layout.putConstraint(SpringLayout.WEST, historyScroll, 10, SpringLayout.WEST, panel);
+		layout.putConstraint(SpringLayout.EAST, historyScroll, -10, SpringLayout.EAST, panel);
+		layout.putConstraint(SpringLayout.SOUTH, historyScroll, -10, SpringLayout.SOUTH, panel);
 
 		historySplit.setLeftComponent(panel);
 	}
@@ -172,30 +160,21 @@ public class RestClientPanel extends JPanel implements ActionListener {
 		panel.add(methods);
 
 		// url label
-		layout.putConstraint(SpringLayout.WEST, urlLabel, 10,
-				SpringLayout.WEST, panel);
-		layout.putConstraint(SpringLayout.VERTICAL_CENTER, urlLabel, 0,
-				SpringLayout.VERTICAL_CENTER, methods);
+		layout.putConstraint(SpringLayout.WEST, urlLabel, 10, SpringLayout.WEST, panel);
+		layout.putConstraint(SpringLayout.VERTICAL_CENTER, urlLabel, 0, SpringLayout.VERTICAL_CENTER, methods);
 
 		// submit button
-		layout.putConstraint(SpringLayout.EAST, submitButton, -10,
-				SpringLayout.EAST, panel);
-		layout.putConstraint(SpringLayout.VERTICAL_CENTER, submitButton, 0,
-				SpringLayout.VERTICAL_CENTER, panel);
+		layout.putConstraint(SpringLayout.EAST, submitButton, -10, SpringLayout.EAST, panel);
+		layout.putConstraint(SpringLayout.VERTICAL_CENTER, submitButton, 0, SpringLayout.VERTICAL_CENTER, panel);
 
 		// method list
-		layout.putConstraint(SpringLayout.EAST, methods, -10,
-				SpringLayout.WEST, submitButton);
-		layout.putConstraint(SpringLayout.VERTICAL_CENTER, methods, 0,
-				SpringLayout.VERTICAL_CENTER, panel);
+		layout.putConstraint(SpringLayout.EAST, methods, -10, SpringLayout.WEST, submitButton);
+		layout.putConstraint(SpringLayout.VERTICAL_CENTER, methods, 0, SpringLayout.VERTICAL_CENTER, panel);
 
 		// input field
-		layout.putConstraint(SpringLayout.WEST, urlField, 10,
-				SpringLayout.EAST, urlLabel);
-		layout.putConstraint(SpringLayout.VERTICAL_CENTER, urlField, 0,
-				SpringLayout.VERTICAL_CENTER, methods);
-		layout.putConstraint(SpringLayout.EAST, urlField, -10,
-				SpringLayout.WEST, methods);
+		layout.putConstraint(SpringLayout.WEST, urlField, 10, SpringLayout.EAST, urlLabel);
+		layout.putConstraint(SpringLayout.VERTICAL_CENTER, urlField, 0, SpringLayout.VERTICAL_CENTER, methods);
+		layout.putConstraint(SpringLayout.EAST, urlField, -10, SpringLayout.WEST, methods);
 
 		return panel;
 	}
@@ -214,14 +193,10 @@ public class RestClientPanel extends JPanel implements ActionListener {
 		panel.add(split);
 
 		// split
-		layout.putConstraint(SpringLayout.NORTH, split, 24, SpringLayout.NORTH,
-				panel);
-		layout.putConstraint(SpringLayout.EAST, split, 0, SpringLayout.EAST,
-				panel);
-		layout.putConstraint(SpringLayout.WEST, split, 0, SpringLayout.WEST,
-				panel);
-		layout.putConstraint(SpringLayout.SOUTH, split, -10,
-				SpringLayout.SOUTH, panel);
+		layout.putConstraint(SpringLayout.NORTH, split, 24, SpringLayout.NORTH, panel);
+		layout.putConstraint(SpringLayout.EAST, split, 0, SpringLayout.EAST, panel);
+		layout.putConstraint(SpringLayout.WEST, split, 0, SpringLayout.WEST, panel);
+		layout.putConstraint(SpringLayout.SOUTH, split, -10, SpringLayout.SOUTH, panel);
 
 		return panel;
 	}
@@ -252,20 +227,14 @@ public class RestClientPanel extends JPanel implements ActionListener {
 		panel.add(inputScroll);
 
 		// input label
-		layout.putConstraint(SpringLayout.WEST, inputLabel, 10,
-				SpringLayout.WEST, panel);
-		layout.putConstraint(SpringLayout.NORTH, inputLabel, 5,
-				SpringLayout.NORTH, panel);
+		layout.putConstraint(SpringLayout.WEST, inputLabel, 10, SpringLayout.WEST, panel);
+		layout.putConstraint(SpringLayout.NORTH, inputLabel, 5, SpringLayout.NORTH, panel);
 
 		// input area
-		layout.putConstraint(SpringLayout.WEST, inputScroll, 10,
-				SpringLayout.WEST, panel);
-		layout.putConstraint(SpringLayout.EAST, inputScroll, -10,
-				SpringLayout.EAST, panel);
-		layout.putConstraint(SpringLayout.NORTH, inputScroll, 10,
-				SpringLayout.SOUTH, inputLabel);
-		layout.putConstraint(SpringLayout.SOUTH, inputScroll, 0,
-				SpringLayout.SOUTH, panel);
+		layout.putConstraint(SpringLayout.WEST, inputScroll, 10, SpringLayout.WEST, panel);
+		layout.putConstraint(SpringLayout.EAST, inputScroll, -10, SpringLayout.EAST, panel);
+		layout.putConstraint(SpringLayout.NORTH, inputScroll, 10, SpringLayout.SOUTH, inputLabel);
+		layout.putConstraint(SpringLayout.SOUTH, inputScroll, 0, SpringLayout.SOUTH, panel);
 
 		return panel;
 	}
@@ -287,28 +256,19 @@ public class RestClientPanel extends JPanel implements ActionListener {
 		panel.add(headersScroll);
 
 		// headers label
-		layout.putConstraint(SpringLayout.WEST, headersLabel, 10,
-				SpringLayout.WEST, panel);
-		layout.putConstraint(SpringLayout.NORTH, headersLabel, 0,
-				SpringLayout.NORTH, panel);
+		layout.putConstraint(SpringLayout.WEST, headersLabel, 10, SpringLayout.WEST, panel);
+		layout.putConstraint(SpringLayout.NORTH, headersLabel, 0, SpringLayout.NORTH, panel);
 
 		// add header drop down
-		layout.putConstraint(SpringLayout.WEST, dropDown, 10,
-				SpringLayout.WEST, panel);
-		layout.putConstraint(SpringLayout.EAST, dropDown, -10,
-				SpringLayout.EAST, panel);
-		layout.putConstraint(SpringLayout.NORTH, dropDown, 10,
-				SpringLayout.SOUTH, headersLabel);
+		layout.putConstraint(SpringLayout.WEST, dropDown, 10, SpringLayout.WEST, panel);
+		layout.putConstraint(SpringLayout.EAST, dropDown, -10, SpringLayout.EAST, panel);
+		layout.putConstraint(SpringLayout.NORTH, dropDown, 10, SpringLayout.SOUTH, headersLabel);
 
 		// headers field
-		layout.putConstraint(SpringLayout.NORTH, headersScroll, 10,
-				SpringLayout.SOUTH, dropDown);
-		layout.putConstraint(SpringLayout.WEST, headersScroll, 10,
-				SpringLayout.WEST, panel);
-		layout.putConstraint(SpringLayout.EAST, headersScroll, -10,
-				SpringLayout.EAST, panel);
-		layout.putConstraint(SpringLayout.SOUTH, headersScroll, -5,
-				SpringLayout.SOUTH, panel);
+		layout.putConstraint(SpringLayout.NORTH, headersScroll, 10, SpringLayout.SOUTH, dropDown);
+		layout.putConstraint(SpringLayout.WEST, headersScroll, 10, SpringLayout.WEST, panel);
+		layout.putConstraint(SpringLayout.EAST, headersScroll, -10, SpringLayout.EAST, panel);
+		layout.putConstraint(SpringLayout.SOUTH, headersScroll, -5, SpringLayout.SOUTH, panel);
 
 		return panel;
 	}
@@ -336,8 +296,7 @@ public class RestClientPanel extends JPanel implements ActionListener {
 
 	private String[] getAddHeaderOptions() {
 		String[] lines = null;
-		InputStream is = getClass().getResourceAsStream(
-				"predefined-headers.txt");
+		InputStream is = getClass().getResourceAsStream("predefined-headers.txt");
 		if (is != null) {
 			try {
 				List<String> tmp = IOUtils.readLines(is);
@@ -357,8 +316,7 @@ public class RestClientPanel extends JPanel implements ActionListener {
 		if (e.getSource() == addHeaderCombo) {
 			String hdrToAdd = (String) addHeaderCombo.getSelectedItem();
 			if (!StringUtils.isBlank(hdrToAdd)) {
-				headersField
-						.setText(addHeader(headersField.getText(), hdrToAdd));
+				headersField.setText(addHeader(headersField.getText(), hdrToAdd));
 				addHeaderCombo.setSelectedIndex(0);
 			}
 		} else if (e.getSource() == submitButton) {
@@ -413,8 +371,7 @@ public class RestClientPanel extends JPanel implements ActionListener {
 	private void handleSubmit() {
 		log.info("handle submit!");
 
-		final RequestMethod method = RequestMethod.valueOf((String) methodCombo
-				.getSelectedItem());
+		final RequestMethod method = RequestMethod.valueOf((String) methodCombo.getSelectedItem());
 		final String url = urlField.getText();
 		final String headers = headersField.getText();
 		final byte[] input = inputField.getText().getBytes();
@@ -434,8 +391,8 @@ public class RestClientPanel extends JPanel implements ActionListener {
 
 				try {
 					log.info("making request");
-					httpClient.makeRequest(method, url, headers, input,
-							listeners);
+					List<HttpHeader> headerList = HttpHeader.fromString(headers);
+					httpClient.makeRequest(method, url, headerList, input, listeners);
 				} catch (Exception e) {
 					log.warn(e.getMessage(), e);
 				}
