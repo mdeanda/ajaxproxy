@@ -112,6 +112,7 @@ public class ProxyEditorPanel extends JPanel {
 		config.setHost(host);
 		config.setPort(port);
 		config.setPath(path);
+		config.setHostHeader(hostHeaderField.getText());
 		config.setEnableCache(cacheCheckbox.isSelected());
 
 		return config;
@@ -130,6 +131,7 @@ public class ProxyEditorPanel extends JPanel {
 
 			this.hostField.setText(configRequest.getHost());
 			this.portField.setText(sport);
+			this.hostHeaderField.setText(configRequest.getHostHeader());
 		}
 
 		this.pathField.setText(config.getPath());

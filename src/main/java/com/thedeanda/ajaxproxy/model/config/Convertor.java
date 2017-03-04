@@ -22,6 +22,7 @@ public class Convertor {
 	public static final String PROXY_PATH = "path";
 	public static final String PROXY_CACHE = "cache";
 	public static final String PROXY_CACHE_DUR = "cacheDuration";
+	public static final String PROXY_HOST_HEADER = "hostHeader";
 	public static final String PROXY_HEADERS = "headers";
 	public static final String PROXY_HEADERS_NAME = "name";
 	public static final String PROXY_HEADERS_VALUE = "value";
@@ -115,7 +116,7 @@ public class Convertor {
 			config.setPath(json.getString(PROXY_PATH));
 			config.setEnableCache(json.getBoolean(PROXY_CACHE));
 			config.setCacheDuration(json.getInt(PROXY_CACHE_DUR));
-
+			config.setHostHeader(json.getString(PROXY_HOST_HEADER));
 
 			if (json.isJsonArray(PROXY_HEADERS)) {
 				JsonValue headersValue = json.get(PROXY_HEADERS);
@@ -140,6 +141,7 @@ public class Convertor {
 		json.put(PROXY_PATH, config.getPath());
 		json.put(PROXY_CACHE, config.isEnableCache());
 		json.put(PROXY_CACHE_DUR, config.getCacheDuration());
+		json.put(PROXY_HOST_HEADER, config.getHostHeader());
 
 		return json;
 	}

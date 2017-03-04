@@ -129,21 +129,14 @@ public class ProxyFilter implements Filter {
 		@SuppressWarnings("unchecked")
 		Enumeration<String> hnames = request.getHeaderNames();
 
-		/*
-		 * TODO: might want a way to toggle host header, had to remove for
-		 * specific application
-		 */
-		Header hostHeader2 = new BasicHeader("Host", proxyConfig.getHost());
-		hdrs.add(hostHeader2);
-		String hostHeaderValue = proxyConfig.getHost() + ":" + ajaxProxy.getPort();
-		inputHeaders.append("Host: " + hostHeaderValue + "\n");
-		// */
-
-		/*
-		Header hostHeader = new BasicHeader("Host", proxyConfig.getHost());
+		String hostHeaderString = proxyConfig.getHost(); //default header
+		if (!StringUtils.isBlank(proxyConfig.getHostHeader())) {
+			hostHeaderString = proxyConfig.getHostHeader();
+		}
+		
+		Header hostHeader = new BasicHeader("Host", hostHeaderString);
 		hdrs.add(hostHeader);
-		inputHeaders.append("Host: " + proxyConfig.getHost() + "\n");
-		//*/
+		inputHeaders.append("Host: " + hostHeaderString + "\n");
 
 		while (hnames.hasMoreElements()) {
 			String hn = hnames.nextElement();
