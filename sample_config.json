@@ -8,16 +8,11 @@
   "port":9247,
   "proxy":[
     {
-      "basePath":"/home/mdeanda/tmp",
-      "filterPath":"/foo/",
-      "path":"/foo/.*"
-    },
-    {
       "cache":false,
       "cacheDuration":30,
       "host":"jsonplaceholder.typicode.com",
-      "hostHeader":"asdf33",
-      "path":"/.*d",
+      "hostHeader":"",
+      "path":"/.*",
       "port":80
     }
   ],
