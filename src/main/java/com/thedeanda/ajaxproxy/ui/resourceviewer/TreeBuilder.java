@@ -102,11 +102,13 @@ public class TreeBuilder {
 
 	@SuppressWarnings("rawtypes")
 	private void initTree(DefaultMutableTreeNode root, Element element) {
+		int count = 0;
 		for (Iterator i = element.elementIterator(); i.hasNext();) {
 			Element el = (Element) i.next();
 			DefaultMutableTreeNode tmp = createElementNodes(el);
 			if (tmp == null)
 				continue;
+			count++;
 			root.add(tmp);
 			initTree(tmp, el);
 
@@ -115,6 +117,11 @@ public class TreeBuilder {
 				DefaultMutableTreeNode txtNode = new DefaultMutableTreeNode(txt);
 				tmp.add(txtNode);
 			}
+		}
+		if (count > 0) {
+			String title = (String) root.getUserObject();
+			title += " [" + count + "]";
+			root.setUserObject(title);
 		}
 	}
 
