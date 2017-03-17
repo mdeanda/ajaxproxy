@@ -30,17 +30,21 @@ repositories {
 
 dependencies {
 	compile 'com.thedeanda.javajson:javajson-parser:1.+'
-	compile 'org.mortbay.jetty:jetty-sslengine:6.1.+'
-	compile 'org.mortbay.jetty:jetty-client:6.1.+'
-	compile 'org.mortbay.jetty:jetty-util:6.1.+'
+	//compile 'org.mortbay.jetty:jetty-sslengine:6.1.+'
+	//compile 'org.mortbay.jetty:jetty-client:6.1.+'
+	//compile 'org.mortbay.jetty:jetty-util:6.1.+'
+	
+	compile 'org.eclipse.jetty:jetty-server:9.4.2.v20170220'
+	compile 'org.eclipse.jetty:jetty-servlet:9.4.2.v20170220'
+	
 
 	compile 'com.yahoo.platform.yui:yuicompressor:2.+'
 	compile 'commons-cli:commons-cli:1.+'
 	compile 'commons-io:commons-io:2.+'
 	compile 'org.apache.commons:commons-lang3:3.+'
 	compile 'dom4j:dom4j:1.+'
-	compile 'org.slf4j:slf4j-api:1.7.7'
-	compile 'org.slf4j:slf4j-simple:1.7.7'
+	compile 'org.slf4j:slf4j-api:1.+'
+	compile 'org.slf4j:slf4j-simple:1.+'
 	compile 'org.apache.httpcomponents:httpclient:4.+'
 	compile 'com.h2database:h2:1.4.191'
 	compile 'com.j256.ormlite:ormlite-core:4.48'

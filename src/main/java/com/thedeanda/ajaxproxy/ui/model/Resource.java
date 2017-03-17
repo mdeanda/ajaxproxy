@@ -6,10 +6,12 @@ import java.net.URL;
 import java.util.UUID;
 
 import org.apache.http.Header;
-import org.mortbay.log.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Resource implements Serializable, Comparable<Resource> {
 	private static final long serialVersionUID = -2666007600337135608L;
+	private static final Logger log = LoggerFactory.getLogger(Resource.class);
 
 	private UUID id;
 	private String url;
@@ -42,7 +44,7 @@ public class Resource implements Serializable, Comparable<Resource> {
 			URL urlObject = new URL(url);
 			setPath(urlObject.getPath());
 		} catch (MalformedURLException e) {
-			Log.warn(e.getMessage(), e);
+			log.warn(e.getMessage(), e);
 		} finally {
 
 		}

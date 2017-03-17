@@ -5,18 +5,19 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
+import javax.servlet.DispatcherType;
+
 import org.apache.http.Header;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.handler.ContextHandlerCollection;
-import org.mortbay.jetty.servlet.Context;
-import org.mortbay.jetty.servlet.DefaultServlet;
-import org.mortbay.jetty.servlet.FilterHolder;
-import org.mortbay.jetty.servlet.ServletHolder;
-import org.mortbay.proxy.AsyncProxyServlet;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.DefaultServlet;
+import org.eclipse.jetty.servlet.FilterHolder;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -185,8 +186,7 @@ public class AjaxProxy implements Runnable {
 				tmp = new File(rb);
 			}
 			if (!tmp.exists()) {
-				throw new FileNotFoundException("Resource base not found: "
-						+ rb);
+				throw new FileNotFoundException("Resource base not found: " + rb);
 			}
 			resourceBase = tmp.getCanonicalPath();
 		} else {
@@ -218,8 +218,7 @@ public class AjaxProxy implements Runnable {
 				newProxy = obj.getBoolean(NEW_PROXY);
 
 				if (domain != null && path != null && port > 0) {
-					ProxyPath proxyPath = new ProxyPath(domain, port, path,
-							newProxy);
+					ProxyPath proxyPath = new ProxyPath(domain, port, path, newProxy);
 					ret.add(proxyPath);
 				}
 			}
@@ -239,16 +238,16 @@ public class AjaxProxy implements Runnable {
 
 			jettyServer = new Server(port);
 
-			ContextHandlerCollection contexts = new ContextHandlerCollection();
-			jettyServer.setHandler(contexts);
-
-			Context root = new Context(contexts, "/", Context.SESSIONS);
+			ServletContextHandler root = new ServletContextHandler(ServletContextHandler.SESSIONS);
+			root.setContextPath("/");
+			jettyServer.setHandler(root);
 
 			FilterHolder throttleFilterHolder = new FilterHolder(throttleFilter);
-			root.addFilter(throttleFilterHolder, "/*", 1);
+			EnumSet<DispatcherType> dispatches = EnumSet.allOf(DispatcherType.class);
+			root.addFilter(throttleFilterHolder, "/*", dispatches);
 
 			FilterHolder proxyFilterHolder = new FilterHolder(proxyFilter);
-			root.addFilter(proxyFilterHolder, "/*", 1);
+			root.addFilter(proxyFilterHolder, "/*", dispatches);
 			proxyFilter.reset();
 
 			ServletHolder servlet;
@@ -261,23 +260,6 @@ public class AjaxProxy implements Runnable {
 			servlet.setForcedPath("/");
 			root.addServlet(servlet, "/");
 
-			if (!mergeMode && config.isJsonArray(PROXY_ARRAY)) {
-				List<ProxyPath> proxyPaths = getProxyPaths();
-				for (ProxyPath proxyPath : proxyPaths) {
-					if (!proxyPath.isNewProxy()) {
-						log.debug("adding proxy servlet: "
-								+ proxyPath.getDomain() + ":"
-								+ proxyPath.getPort() + " "
-								+ proxyPath.getPath());
-						root.addServlet(
-								new ServletHolder(
-										new AsyncProxyServlet.Transparent("",
-												proxyPath.getDomain(),
-												proxyPath.getPort())),
-								proxyPath.getPath());
-					}
-				}
-			}
 			if (config.isJsonArray(MERGE_ARRAY)) {
 				JsonArray a = config.getJsonArray(MERGE_ARRAY);
 				for (JsonValue val : a) {
@@ -285,28 +267,22 @@ public class AjaxProxy implements Runnable {
 						JsonObject obj = val.getJsonObject();
 						String path = obj.getString(PATH);
 						String filePath = obj.getString(FILE_PATH);
-						File fPath = new File(resourceBase + File.separator
-								+ filePath);
+						File fPath = new File(resourceBase + File.separator + filePath);
 						if (!fPath.exists()) {
-							log.warn("file not found: "
-									+ fPath.getCanonicalPath());
+							log.warn("file not found: " + fPath.getCanonicalPath());
 							// TODO: this throws exception if filePath is null
 							// and its hard to identify
 							fPath = new File(filePath);
 						}
 						if (!fPath.exists()) {
-							throw new FileNotFoundException(
-									fPath.getAbsolutePath());
+							throw new FileNotFoundException(fPath.getAbsolutePath());
 						}
 						filePath = fPath.getCanonicalPath();
 						log.debug("{}", obj);
 						boolean minify = obj.getBoolean(MINIFY);
-						MergeMode mode = obj.hasKey(MODE) ? MergeMode
-								.valueOf(obj.getString(MODE)) : MergeMode.PLAIN;
-						log.debug("adding merge servlet: " + path
-								+ " to merge " + filePath);
-						MergeServlet ms = new MergeServlet(filePath, mode,
-								minify, path);
+						MergeMode mode = obj.hasKey(MODE) ? MergeMode.valueOf(obj.getString(MODE)) : MergeMode.PLAIN;
+						log.debug("adding merge servlet: " + path + " to merge " + filePath);
+						MergeServlet ms = new MergeServlet(filePath, mode, minify, path);
 						mergeServlets.add(ms);
 						root.addServlet(new ServletHolder(ms), path);
 					}
@@ -387,8 +363,7 @@ public class AjaxProxy implements Runnable {
 				}
 
 				@Override
-				public void startRequest(UUID id, URL url,
-						Header[] requestHeaders, byte[] data) {
+				public void startRequest(UUID id, URL url, Header[] requestHeaders, byte[] data) {
 					for (RequestListener listener : proxyListeners) {
 						try {
 							listener.startRequest(id, url, requestHeaders, data);
@@ -399,12 +374,11 @@ public class AjaxProxy implements Runnable {
 				}
 
 				@Override
-				public void requestComplete(UUID id, int status, String reason,
-						long duration, Header[] responseHeaders, byte[] data) {
+				public void requestComplete(UUID id, int status, String reason, long duration, Header[] responseHeaders,
+						byte[] data) {
 					for (RequestListener listener : proxyListeners) {
 						try {
-							listener.requestComplete(id, status, reason,
-									duration, responseHeaders, data);
+							listener.requestComplete(id, status, reason, duration, responseHeaders, data);
 						} catch (Exception e) {
 							log.warn(e.getMessage(), e);
 						}
