@@ -42,7 +42,7 @@ public class MergeTableModel extends AbstractTableModel {
 	}
 
 	public JsonArray getConfig() {
-		normalizeData();
+		//normalizeData();
 		JsonArray arr = new JsonArray();
 		for (JsonValue v : data) {
 			arr.add(v.getJsonObject());

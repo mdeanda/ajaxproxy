@@ -44,7 +44,7 @@ public class ProxyTableModel extends AbstractTableModel {
 	}
 
 	public JsonArray getConfig(final int cacheTime) {
-		normalizeData();
+		//normalizeData();
 		JsonArray arr = new JsonArray();
 		Convertor converter = Convertor.get();
 		for (ProxyConfig config : data) {

@@ -392,6 +392,7 @@ public class MainFrame extends JFrame implements ProxyListener, WindowListListen
 	}
 
 	private void save(File file) {
+		log.debug("saving to {}", file);
 		Writer writer = null;
 		Exception ex = null;
 		try {
