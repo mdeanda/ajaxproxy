@@ -10,15 +10,18 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpringLayout;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
 import com.thedeanda.ajaxproxy.model.config.ProxyConfig;
-import com.thedeanda.ajaxproxy.model.config.ProxyConfigRequest;
 import com.thedeanda.ajaxproxy.ui.SettingsChangedListener;
 
+/**
+ * top level proxy panel with list of configured proxy settings
+ * 
+ * @author mdeanda
+ *
+ */
 public class ProxyPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private JTable proxyTable;
@@ -34,14 +37,6 @@ public class ProxyPanel extends JPanel {
 		proxyTable = new JTable(proxyModel);
 		proxyTable.setColumnModel(new ProxyColumnModel());
 		proxyTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		final ListSelectionModel cellSelectionModel = proxyTable.getSelectionModel();
-		cellSelectionModel.addListSelectionListener(new ListSelectionListener() {
-			public void valueChanged(ListSelectionEvent e) {
-				if (!e.getValueIsAdjusting()) {
-					// startEdit();
-				}
-			}
-		});
 		proxyTable.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {

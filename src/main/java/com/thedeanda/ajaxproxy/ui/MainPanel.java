@@ -44,7 +44,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 	private static final Logger log = LoggerFactory.getLogger(MainPanel.class);
 	private static final int CACHE_SIZE = 50;
 
-	private JButton btn;
+	private JButton startStopBtn;
 	private boolean started = false;
 	private AjaxProxy proxy = null;
 	private ProxyTableModel proxyModel;
@@ -61,7 +61,6 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 
 	private List<ProxyListener> listeners = new ArrayList<ProxyListener>();
 	private ResourceViewerPanel resourceViewerPanel;
-	private JButton restartButton;
 	private ResourceService resourceService;
 	private JButton releasesButton;
 	private VariablesPanel variablePanel;
@@ -73,8 +72,8 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		File dbFile = ConfigService.get().getResourceHistoryDb();
 		resourceService = new ResourceService(CACHE_SIZE, dbFile);
 
-		btn = new JButton(START);
-		btn.addActionListener(new ActionListener() {
+		startStopBtn = new JButton(START);
+		startStopBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
 				if (started)
@@ -109,32 +108,18 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		resourceViewerPanel = new ResourceViewerPanel(resourceService);
 		tabs.add("Resource Viewer", resourceViewerPanel);
 
-		add(btn);
-		restartButton = new JButton("Restart Required");
-		add(restartButton);
-		restartButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent event) {
-				if (started) {
-					stop();
-					start();
-				}
-			}
-		});
+		add(startStopBtn);
 		prepareReleasesButton();
 		add(releasesButton);
 
-		layout.putConstraint(SpringLayout.SOUTH, btn, -10, SpringLayout.SOUTH, this);
-		layout.putConstraint(SpringLayout.EAST, btn, -10, SpringLayout.EAST, this);
+		layout.putConstraint(SpringLayout.SOUTH, startStopBtn, -10, SpringLayout.SOUTH, this);
+		layout.putConstraint(SpringLayout.EAST, startStopBtn, -10, SpringLayout.EAST, this);
 		layout.putConstraint(SpringLayout.NORTH, tabs, 15, SpringLayout.NORTH, this);
 		layout.putConstraint(SpringLayout.WEST, tabs, 10, SpringLayout.WEST, this);
 		layout.putConstraint(SpringLayout.EAST, tabs, -10, SpringLayout.EAST, this);
-		layout.putConstraint(SpringLayout.SOUTH, tabs, -10, SpringLayout.NORTH, btn);
+		layout.putConstraint(SpringLayout.SOUTH, tabs, -10, SpringLayout.NORTH, startStopBtn);
 
-		layout.putConstraint(SpringLayout.SOUTH, restartButton, 0, SpringLayout.SOUTH, btn);
-		layout.putConstraint(SpringLayout.EAST, restartButton, -10, SpringLayout.WEST, btn);
-
-		layout.putConstraint(SpringLayout.SOUTH, releasesButton, 0, SpringLayout.SOUTH, btn);
+		layout.putConstraint(SpringLayout.SOUTH, releasesButton, 0, SpringLayout.SOUTH, startStopBtn);
 		layout.putConstraint(SpringLayout.WEST, releasesButton, 10, SpringLayout.WEST, this);
 
 		clearAll();
@@ -237,7 +222,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 			return;
 
 		try {
-			btn.setText(STOP);
+			startStopBtn.setText(STOP);
 			JsonObject json = JsonObject.parse(getConfig().toString());
 			File workingDir = configFile.getParentFile();
 			if (workingDir == null)
@@ -271,7 +256,6 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 	}
 
 	public void stop() {
-		restartButton.setVisible(false);
 		try {
 			if (proxy != null) {
 				log.info("stopping server");
@@ -285,7 +269,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		} finally {
 			proxy = null;
 			started = false;
-			btn.setText(START);
+			startStopBtn.setText(START);
 			fireProxyStopped();
 		}
 	}
@@ -349,7 +333,8 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 	@Override
 	public void restartRequired() {
 		if (started) {
-			restartButton.setVisible(true);
+			stop();
+			start();
 		}
 	}
 
