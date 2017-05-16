@@ -33,7 +33,11 @@ import com.thedeanda.javajson.JsonValue;
 
 public class AjaxProxy implements Runnable {
 	private static final Logger log = LoggerFactory.getLogger(AjaxProxy.class);
-	private int port = 8080;
+	private int port = 0;
+	private int httpsPort = 0;
+	private String keystoreFile = "";
+	private String keystorePassword = "";
+
 	private String resourceBase = "";
 	private boolean showIndex;
 	private JsonObject config;
@@ -236,7 +240,22 @@ public class AjaxProxy implements Runnable {
 			fireEvent(ProxyEvent.START);
 			init(config, workingDir);
 
-			jettyServer = new Server(port);
+			jettyServer = new Server();
+			if (port > 0) {
+				SocketConnector sc = new SocketConnector();
+				sc.setPort(port);
+				jettyServer.addConnector(sc);
+				sc.setHeaderBufferSize(8192);
+			}
+			if (httpsPort > 0 && !StringUtils.isBlank(keystoreFile)) {
+				SslSocketConnector sc = new SslSocketConnector();
+				sc.setPort(httpsPort);
+				sc.setKeystore(keystoreFile);
+				if (!StringUtils.isBlank(keystorePassword)) {
+					sc.setKeyPassword(keystorePassword);
+				}
+				jettyServer.addConnector(sc);
+			}
 
 			ServletContextHandler root = new ServletContextHandler(ServletContextHandler.SESSIONS);
 			root.setContextPath("/");
