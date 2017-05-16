@@ -12,13 +12,13 @@
       "cacheDuration":30,
       "host":"jsonplaceholder.typicode.com",
       "hostHeader":"",
-      "path":"/.*",
+      "path":"/users/.*",
       "port":80
     }
   ],
   "resource":{},
-  "resourceBase":"",
-  "showIndex":false,
+  "resourceBase":".",
+  "showIndex":true,
   "tamper":{
     "items":[]
   },
