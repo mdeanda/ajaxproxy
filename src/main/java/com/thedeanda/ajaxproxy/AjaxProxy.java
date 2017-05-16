@@ -12,12 +12,20 @@ import java.util.regex.Pattern;
 
 import javax.servlet.DispatcherType;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
+import org.eclipse.jetty.http.HttpVersion;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.SecureRequestCustomizer;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.SslConnectionFactory;
 import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -234,6 +242,51 @@ public class AjaxProxy implements Runnable {
 		return ajaxProxyConfig;
 	}
 
+	private void initConnectors(Server jettyServer) {
+		HttpConfiguration http_config = new HttpConfiguration();
+		http_config.setSecureScheme("https");
+		if (httpsPort > 0) {
+			http_config.setSecurePort(httpsPort);
+		}
+		http_config.setOutputBufferSize(32768);
+		http_config.setRequestHeaderSize(8192);
+		http_config.setResponseHeaderSize(8192);
+		http_config.setSendServerVersion(true);
+		http_config.setSendDateHeader(false);
+
+		if (port > 0) {
+			ServerConnector http = new ServerConnector(jettyServer, new HttpConnectionFactory(http_config));
+			http.setPort(port);
+			http.setIdleTimeout(30000);
+			jettyServer.addConnector(http);
+		}
+		if (httpsPort > 0 && !StringUtils.isBlank(keystoreFile)) {
+			SslContextFactory sslContextFactory = new SslContextFactory();
+			sslContextFactory.setKeyStorePath(keystoreFile);
+
+			if (!StringUtils.isBlank(keystorePassword)) {
+				sslContextFactory.setKeyStorePassword(keystorePassword);
+			}
+			// sslContextFactory.setKeyManagerPassword("OBF:1u2u1wml1z7s1z7a1wnl1u2g");
+			// sslContextFactory.setTrustStorePath(jetty_home +
+			// "/../../../jetty-server/src/test/config/etc/keystore");
+			// sslContextFactory.setTrustStorePassword("OBF:1vny1zlo1x8e1vnw1vn61x8g1zlu1vn4");
+			sslContextFactory.setExcludeCipherSuites("SSL_RSA_WITH_DES_CBC_SHA", "SSL_DHE_RSA_WITH_DES_CBC_SHA",
+					"SSL_DHE_DSS_WITH_DES_CBC_SHA", "SSL_RSA_EXPORT_WITH_RC4_40_MD5",
+					"SSL_RSA_EXPORT_WITH_DES40_CBC_SHA", "SSL_DHE_RSA_EXPORT_WITH_DES40_CBC_SHA",
+					"SSL_DHE_DSS_EXPORT_WITH_DES40_CBC_SHA");
+
+			HttpConfiguration https_config = new HttpConfiguration(http_config);
+			https_config.addCustomizer(new SecureRequestCustomizer());
+
+			ServerConnector sslConnector = new ServerConnector(jettyServer,
+					new SslConnectionFactory(sslContextFactory, HttpVersion.HTTP_1_1.asString()),
+					new HttpConnectionFactory(https_config));
+			sslConnector.setPort(httpsPort);
+			jettyServer.addConnector(sslConnector);
+		}
+	}
+
 	public void run() {
 		log.info("starting jetty server");
 		try {
@@ -241,21 +294,7 @@ public class AjaxProxy implements Runnable {
 			init(config, workingDir);
 
 			jettyServer = new Server();
-			if (port > 0) {
-				SocketConnector sc = new SocketConnector();
-				sc.setPort(port);
-				jettyServer.addConnector(sc);
-				sc.setHeaderBufferSize(8192);
-			}
-			if (httpsPort > 0 && !StringUtils.isBlank(keystoreFile)) {
-				SslSocketConnector sc = new SslSocketConnector();
-				sc.setPort(httpsPort);
-				sc.setKeystore(keystoreFile);
-				if (!StringUtils.isBlank(keystorePassword)) {
-					sc.setKeyPassword(keystorePassword);
-				}
-				jettyServer.addConnector(sc);
-			}
+			initConnectors(jettyServer);
 
 			ServletContextHandler root = new ServletContextHandler(ServletContextHandler.SESSIONS);
 			root.setContextPath("/");
@@ -277,7 +316,7 @@ public class AjaxProxy implements Runnable {
 			servlet.setInitParameter("maxCacheSize", "0");
 			servlet.setName("default servlet");
 			root.addServlet(servlet, "/");
-			
+
 			if (config.isJsonArray(MERGE_ARRAY)) {
 				JsonArray a = config.getJsonArray(MERGE_ARRAY);
 				for (JsonValue val : a) {
