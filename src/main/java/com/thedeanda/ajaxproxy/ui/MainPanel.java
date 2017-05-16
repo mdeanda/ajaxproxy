@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import com.thedeanda.ajaxproxy.AjaxProxy;
 import com.thedeanda.ajaxproxy.ProxyListener;
 import com.thedeanda.ajaxproxy.service.ResourceService;
+import com.thedeanda.ajaxproxy.ui.logger.LoggerPanel;
 import com.thedeanda.ajaxproxy.ui.merge.MergePanel;
 import com.thedeanda.ajaxproxy.ui.merge.MergeTableModel;
 import com.thedeanda.ajaxproxy.ui.proxy.ProxyPanel;
@@ -34,7 +35,6 @@ import com.thedeanda.ajaxproxy.ui.resourceviewer.ResourceViewerPanel;
 import com.thedeanda.ajaxproxy.ui.tamper.TamperPanel;
 import com.thedeanda.ajaxproxy.ui.tracker.FileTrackerPanel;
 import com.thedeanda.ajaxproxy.ui.update.UpdateCheckWorker;
-import com.thedeanda.ajaxproxy.ui.variable.VariableTableModel;
 import com.thedeanda.ajaxproxy.ui.variable.VariablesPanel;
 import com.thedeanda.javajson.JsonException;
 import com.thedeanda.javajson.JsonObject;
@@ -64,6 +64,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 	private ResourceService resourceService;
 	private JButton releasesButton;
 	private VariablesPanel variablePanel;
+	private LoggerPanel loggerPanel;
 
 	public MainPanel() {
 		SpringLayout layout = new SpringLayout();
@@ -108,6 +109,9 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		resourceViewerPanel = new ResourceViewerPanel(resourceService);
 		tabs.add("Resource Viewer", resourceViewerPanel);
 
+		loggerPanel = new LoggerPanel();
+		tabs.add("Logger", loggerPanel);
+		
 		add(startStopBtn);
 		prepareReleasesButton();
 		add(releasesButton);
