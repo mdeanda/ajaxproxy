@@ -187,7 +187,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 
 		generalPanel.updateConfig(json);
 
-		log.info(json.toString(2));
+		log.trace(json.toString(2));
 		return json;
 	}
 
