@@ -257,9 +257,8 @@ public class AjaxProxy implements Runnable {
 			servlet.setInitParameter("resourceBase", resourceBase);
 			servlet.setInitParameter("maxCacheSize", "0");
 			servlet.setName("default servlet");
-			servlet.setForcedPath("/");
 			root.addServlet(servlet, "/");
-
+			
 			if (config.isJsonArray(MERGE_ARRAY)) {
 				JsonArray a = config.getJsonArray(MERGE_ARRAY);
 				for (JsonValue val : a) {

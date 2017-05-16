@@ -30,12 +30,10 @@ repositories {
 
 dependencies {
 	compile 'com.thedeanda.javajson:javajson-parser:1.+'
-	//compile 'org.mortbay.jetty:jetty-sslengine:6.1.+'
-	//compile 'org.mortbay.jetty:jetty-client:6.1.+'
-	//compile 'org.mortbay.jetty:jetty-util:6.1.+'
 	
-	compile 'org.eclipse.jetty:jetty-server:9.4.2.v20170220'
-	compile 'org.eclipse.jetty:jetty-servlet:9.4.2.v20170220'
+	compile 'org.eclipse.jetty:jetty-server:9.2.21.v20170120'
+	compile 'org.eclipse.jetty:jetty-servlet:9.2.21.v20170120'
+	compile 'org.eclipse.jetty:apache-jsp:9.2.21.v20170120'
 	
 
 	compile 'com.yahoo.platform.yui:yuicompressor:2.+'
