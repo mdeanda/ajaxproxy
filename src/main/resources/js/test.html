@@ -1,0 +1,36 @@
+<!DOCTYPE HTML>
+
+<html>
+<head>
+	<title>Ajax Proxy Logger Test Page</title>
+	<script src="./logger.js"></script>
+	<script>
+"use strict";
+
+function batch1() {
+	Logger.log("b1", "monkey");
+}
+
+
+
+var fnList = [ batch1 ];
+var index = 0;
+var timer = 0;
+
+var timer = setInterval(function() {
+	if (fnList.length <= index) {
+		clearInterval(timer);
+		return;
+	}
+
+	var fn = fnList[index];
+	index++;
+	fn();
+}, 5000);
+	</script>
+</head>
+<body>
+
+
+</body>
+</html>
