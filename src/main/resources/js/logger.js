@@ -1,4 +1,14 @@
+"use strict";
+
 var Logger = new (function() {
+	var startTime = new Date().getTime();
+	var uid = ("" + startTime).substring(4) + '.' + getRandomString();
+
+	function getRandomString() {
+		var s = "0000" + ("" + Math.random()).replace('.', '');
+		return s.substring(s.length - 5);
+	}
+	
 	function sendData(data) {
 		var URL = "%PATH%";
 		var request;
@@ -22,13 +32,16 @@ var Logger = new (function() {
 	}
 
 
-
-	var uid = 0;
-
 	return {
 		log: function(tag, message) {
+			var now = new Date().getTime();
+			var ts = now - startTime;
+			
+			var t = ("" + now).substring(4);
 			var obj = {
 				uid: uid,
+				ts: ts,
+				time: t,
 				tag: tag
 			}
 
