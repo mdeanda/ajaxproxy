@@ -76,6 +76,7 @@ public class Convertor {
 		config.setShowIndex(json.getBoolean(AP_SHOW_INDEX));
 
 		List<ProxyConfig> proxies = config.getProxyConfig();
+		proxies.add(new ProxyConfigLogger("/logger"));
 		for (JsonValue val : json.getJsonArray(AP_PROXY)) {
 			ProxyConfig pc = readProxyConfig(val.getJsonObject());
 			proxies.add(pc);
