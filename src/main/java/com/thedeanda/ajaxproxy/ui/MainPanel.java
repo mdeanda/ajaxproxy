@@ -190,7 +190,8 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		json.put("tamper", tamperPanel.getConfig());
 
 		generalPanel.updateConfig(json);
-
+		loggerPanel.updateConfig(json);
+		
 		log.trace(json.toString(2));
 		return json;
 	}
@@ -237,6 +238,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 			proxy.addRequestListener(resourceService);
 			generalPanel.setProxy(proxy);
 			trackerPanel.setProxy(proxy);
+			loggerPanel.setProxy(proxy);
 			resourceViewerPanel.setProxy(proxy);
 			started = true;
 			fireProxyStarted();

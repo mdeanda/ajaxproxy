@@ -12,8 +12,10 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 
+import com.thedeanda.ajaxproxy.AjaxProxy;
 import com.thedeanda.ajaxproxy.ui.SwingUtils;
 import com.thedeanda.ajaxproxy.ui.border.BottomBorder;
+import com.thedeanda.javajson.JsonObject;
 
 public class LoggerPanel extends JPanel {
 	public LoggerPanel() {
@@ -100,5 +102,17 @@ public class LoggerPanel extends JPanel {
 	private JPanel initRightPanel() {
 		JPanel panel = new JPanel();
 		return panel;
+	}
+
+	public void updateConfig(JsonObject json) {
+		// TODO Auto-generated method stub
+		//TODO: set request path
+		
+	}
+
+	public void setProxy(AjaxProxy proxy) {
+		if (proxy != null) {
+			//ajaxProxy.addRequestListener(resourceListPanel);
+		}
 	}
 }
