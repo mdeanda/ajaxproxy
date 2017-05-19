@@ -1,6 +1,6 @@
 var Logger = new (function() {
 	function sendData(data) {
-		var URL = "http://localhost:8080/users/";
+		var URL = "%PATH%";
 		var request;
 		if (window.XMLHttpRequest) {
 			request = new XMLHttpRequest();
