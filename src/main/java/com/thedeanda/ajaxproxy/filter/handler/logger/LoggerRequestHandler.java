@@ -1,9 +1,13 @@
-package com.thedeanda.ajaxproxy.filter.handler;
+package com.thedeanda.ajaxproxy.filter.handler.logger;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -15,10 +19,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.thedeanda.ajaxproxy.cache.LruCache;
+import com.thedeanda.ajaxproxy.filter.handler.RequestHandler;
 import com.thedeanda.ajaxproxy.http.RequestListener;
 import com.thedeanda.ajaxproxy.model.ProxyContainer;
-import com.thedeanda.javajson.JsonArray;
-import com.thedeanda.javajson.JsonException;
 
 public class LoggerRequestHandler implements RequestHandler {
 	private static final Logger log = LoggerFactory.getLogger(LoggerRequestHandler.class);
@@ -31,13 +34,17 @@ public class LoggerRequestHandler implements RequestHandler {
 
 	private String jsContents;
 
+	private ThreadPoolExecutor executor;
+
 	public LoggerRequestHandler() throws IOException {
 		loadResource();
+		executor = new ThreadPoolExecutor(1, 6, 3, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+		executor.allowCoreThreadTimeOut(true);
 	}
 
 	@Override
 	public boolean handleRequest(HttpServletRequest request, HttpServletResponse response,
-			ProxyContainer proxyContainer, final RequestListener requestListener) throws ServletException, IOException {
+			ProxyContainer proxyContainer, RequestListener requestListener) throws ServletException, IOException {
 
 		String uri = request.getRequestURI();
 		log.debug(uri);
@@ -45,12 +52,11 @@ public class LoggerRequestHandler implements RequestHandler {
 		String method = request.getMethod();
 
 		if ("POST".equals(method)) {
-			try {
-				JsonArray array = JsonArray.parse(request.getInputStream());
-				handleLogMessages(array);
-			} catch (JsonException e) {
-				log.warn(e.getMessage(), e);
-			}
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			IOUtils.copy(request.getInputStream(), baos);
+			byte[] inputData = baos.toByteArray();
+			executor.execute(new LogParser(inputData));
+			handlePostResponse(uri, response);
 		} else {
 			// ignore input and just return javascript
 			handleJsResponse(uri, response);
@@ -71,8 +77,9 @@ public class LoggerRequestHandler implements RequestHandler {
 		response.flushBuffer();
 	}
 
-	private void handleLogMessages(JsonArray array) {
-		log.warn("array data: {}", array);
+	private void handlePostResponse(String uri, HttpServletResponse response) throws IOException {
+		response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+		response.flushBuffer();
 	}
 
 	private void loadResource() throws IOException {
