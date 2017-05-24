@@ -13,9 +13,9 @@ function batch1() {
 
 function batch2() {
 	Logger.log("b2", "monkey 2");
-	Logger.log("b2", "monkey 3");
+	Logger.log("b2", "monkey 3", {a:1});
 	Logger.log("b2", "monkey 4");
-	Logger.log("b2", "monkey 5");
+	Logger.log("b2", "monkey 5", this);
 	Logger.log("b2", "monkey 6");
 }
 

@@ -3,6 +3,7 @@
 var Logger = new (function() {
 	var startTime = new Date().getTime();
 	var uid = ("" + startTime).substring(4) + '.' + getRandomString();
+	var index = 0;
 
 	function getRandomString() {
 		var s = "0000" + ("" + Math.random()).replace('.', '');
@@ -28,9 +29,23 @@ var Logger = new (function() {
 
 		request.open('POST', URL, true);
 		request.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
-		request.send(JSON.stringify(data));
+		request.send(toJson(data));
+	}
+	
+	function toJson(o) {
+		return JSON.stringify(o);
 	}
 
+	function getMessage(tag, message) {
+		var output = [];
+		var index = 0;
+		
+		for (var i=1; i<arguments.length; i++) {
+			output.push(arguments[i]);
+		}
+		
+		return output;
+	}
 
 	return {
 		log: function(tag, message) {
@@ -40,10 +55,11 @@ var Logger = new (function() {
 			var t = ("" + now).substring(4);
 			var obj = {
 				uid: uid,
+				index: index++,
 				ts: ts,
 				time: t,
 				tag: tag,
-				message: [message/* the rest of the args */]
+				message: getMessage.apply(this, arguments)
 			}
 
 			sendData([obj]);

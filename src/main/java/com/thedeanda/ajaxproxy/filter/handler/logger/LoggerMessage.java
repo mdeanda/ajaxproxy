@@ -7,6 +7,7 @@ public class LoggerMessage {
 	private long ts;
 	private long time;
 	private String uid;
+	private int index;
 	private JsonArray message;
 
 	public String getTag() {
@@ -47,5 +48,13 @@ public class LoggerMessage {
 
 	public void setMessage(JsonArray message) {
 		this.message = message;
+	}
+
+	public int getIndex() {
+		return index;
+	}
+
+	public void setIndex(int index) {
+		this.index = index;
 	}
 }

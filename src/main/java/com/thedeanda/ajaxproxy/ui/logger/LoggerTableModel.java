@@ -7,6 +7,7 @@ import javax.swing.table.AbstractTableModel;
 
 import com.thedeanda.ajaxproxy.filter.handler.logger.LoggerMessage;
 import com.thedeanda.ajaxproxy.filter.handler.logger.LoggerMessageListener;
+import com.thedeanda.javajson.JsonArray;
 
 public class LoggerTableModel extends AbstractTableModel implements LoggerMessageListener {
 	private static final long serialVersionUID = 4961880986671181480L;
@@ -20,7 +21,7 @@ public class LoggerTableModel extends AbstractTableModel implements LoggerMessag
 
 	@Override
 	public int getColumnCount() {
-		return 4;
+		return 5;
 	}
 
 	@Override
@@ -37,14 +38,36 @@ public class LoggerTableModel extends AbstractTableModel implements LoggerMessag
 		case 0:
 			return message.getUid();
 		case 1:
-			return message.getTs();
+			return message.getIndex();
 		case 2:
-			return message.getTime();
+			return message.getTs();
 		case 3:
+			return message.getTime();
+		case 4:
 			return message.getTag();
+		case 5:
+			return getMessage(message);
 		default:
 			return null;
 		}
+	}
+
+	private String getMessage(LoggerMessage msg) {
+		String output = "";
+
+		JsonArray arr = msg.getMessage();
+		// TODO: json library needs isEmpty on array
+		if (arr != null && arr.size() > 0) {
+			if (arr.size() == 1) {
+				// TODO: first item may not be a string, json library needs a
+				// get jsonvalue method
+				output = arr.getString(0);
+			} else {
+				output = arr.toString();
+			}
+		}
+
+		return output;
 	}
 
 	@Override
