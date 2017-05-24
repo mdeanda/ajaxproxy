@@ -125,7 +125,7 @@ public class ProxyFilter implements Filter {
 			if (proxyConfig instanceof ProxyConfigFile) {
 				proxyContainer.setRequestHandler(new FileRequestHandler((ProxyConfigFile) proxyConfig));
 			} else if (proxyConfig instanceof ProxyConfigLogger) {
-				proxyContainer.setRequestHandler(new LoggerRequestHandler());
+				proxyContainer.setRequestHandler(new LoggerRequestHandler(ajaxProxy));
 			} else if (proxyConfig instanceof ProxyConfigRequest) {
 				proxyContainer.setRequestHandler(new ProxyRequestHandler((ProxyConfigRequest) proxyConfig));
 			}

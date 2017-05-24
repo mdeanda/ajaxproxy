@@ -36,10 +36,16 @@ public class LoggerRequestHandler implements RequestHandler {
 
 	private ThreadPoolExecutor executor;
 
-	public LoggerRequestHandler() throws IOException {
+	private LoggerMessageListener listener;
+
+	public LoggerRequestHandler(LoggerMessageListener listener) throws IOException {
+		this.listener = listener;
+		
 		loadResource();
+		
 		executor = new ThreadPoolExecutor(1, 6, 3, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
 		executor.allowCoreThreadTimeOut(true);
+		
 	}
 
 	@Override
@@ -55,7 +61,7 @@ public class LoggerRequestHandler implements RequestHandler {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			IOUtils.copy(request.getInputStream(), baos);
 			byte[] inputData = baos.toByteArray();
-			executor.execute(new LogParser(inputData));
+			executor.execute(new LogParser(inputData, listener));
 			handlePostResponse(uri, response);
 		} else {
 			// ignore input and just return javascript

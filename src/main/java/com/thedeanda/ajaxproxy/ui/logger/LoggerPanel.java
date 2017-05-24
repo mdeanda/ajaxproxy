@@ -13,11 +13,15 @@ import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 
 import com.thedeanda.ajaxproxy.AjaxProxy;
+import com.thedeanda.ajaxproxy.filter.handler.logger.LoggerMessage;
+import com.thedeanda.ajaxproxy.filter.handler.logger.LoggerMessageListener;
 import com.thedeanda.ajaxproxy.ui.SwingUtils;
 import com.thedeanda.ajaxproxy.ui.border.BottomBorder;
 import com.thedeanda.javajson.JsonObject;
 
 public class LoggerPanel extends JPanel {
+	private LoggerTableModel loggerTableModel = new LoggerTableModel();
+
 	public LoggerPanel() {
 		SpringLayout layout = new SpringLayout();
 		setLayout(layout);
@@ -83,8 +87,7 @@ public class LoggerPanel extends JPanel {
 		JPanel panel = new JPanel();
 		SpringLayout layout = new SpringLayout();
 		panel.setLayout(layout);
-		
-		LoggerTableModel loggerTableModel = new LoggerTableModel();
+
 		LoggerColumnModel lcm = new LoggerColumnModel();
 		JTable table = new JTable(loggerTableModel, lcm);
 		JScrollPane scroll = new JScrollPane(table);
@@ -106,13 +109,14 @@ public class LoggerPanel extends JPanel {
 
 	public void updateConfig(JsonObject json) {
 		// TODO Auto-generated method stub
-		//TODO: set request path
-		
+		// TODO: set request path
+
 	}
 
 	public void setProxy(AjaxProxy proxy) {
 		if (proxy != null) {
-			//ajaxProxy.addRequestListener(resourceListPanel);
+			proxy.addLoggerMessageListener(loggerTableModel);
 		}
 	}
+
 }

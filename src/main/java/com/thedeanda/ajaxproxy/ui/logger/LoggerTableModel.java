@@ -1,14 +1,20 @@
 package com.thedeanda.ajaxproxy.ui.logger;
 
+import java.util.List;
+
 import javax.swing.table.AbstractTableModel;
 
-public class LoggerTableModel extends AbstractTableModel {
+import com.thedeanda.ajaxproxy.filter.handler.logger.LoggerMessage;
+import com.thedeanda.ajaxproxy.filter.handler.logger.LoggerMessageListener;
+
+public class LoggerTableModel extends AbstractTableModel implements LoggerMessageListener {
 	private static final long serialVersionUID = 4961880986671181480L;
+
+	private List<LoggerMessage> items = new ArrayList<>();
 
 	@Override
 	public int getRowCount() {
-		// TODO Auto-generated method stub
-		return 0;
+		return items.size();
 	}
 
 	@Override
@@ -23,4 +29,9 @@ public class LoggerTableModel extends AbstractTableModel {
 		return null;
 	}
 
+	@Override
+	public void messageReceived(LoggerMessage message) {
+		// TODO: swing worker/thread
+		this.items.add(messages);
+	}
 }
