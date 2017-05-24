@@ -11,16 +11,19 @@ import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import com.thedeanda.ajaxproxy.AjaxProxy;
 import com.thedeanda.ajaxproxy.filter.handler.logger.LoggerMessage;
-import com.thedeanda.ajaxproxy.filter.handler.logger.LoggerMessageListener;
 import com.thedeanda.ajaxproxy.ui.SwingUtils;
 import com.thedeanda.ajaxproxy.ui.border.BottomBorder;
 import com.thedeanda.javajson.JsonObject;
 
 public class LoggerPanel extends JPanel {
 	private LoggerTableModel loggerTableModel = new LoggerTableModel();
+
+	private LoggerMessagePanel loggerMessagePanel;
 
 	public LoggerPanel() {
 		SpringLayout layout = new SpringLayout();
@@ -29,8 +32,10 @@ public class LoggerPanel extends JPanel {
 		JPanel topPanel = initTopPanel();
 		add(topPanel);
 
+		loggerMessagePanel = new LoggerMessagePanel();
+
 		JPanel leftPanel = initLeftPanel();
-		JPanel rightPanel = initRightPanel();
+		JPanel rightPanel = loggerMessagePanel;
 
 		JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		split.setLeftComponent(leftPanel);
@@ -92,6 +97,18 @@ public class LoggerPanel extends JPanel {
 		JTable table = new JTable(loggerTableModel, lcm);
 		JScrollPane scroll = new JScrollPane(table);
 
+		table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				if (e.getValueIsAdjusting())
+					return;
+
+				int index = e.getLastIndex();
+				LoggerMessage message = loggerTableModel.getMessage(index);
+				itemSelected(message);
+			}
+		});
+
 		panel.add(scroll, BorderLayout.CENTER);
 
 		layout.putConstraint(SpringLayout.NORTH, scroll, 10, SpringLayout.NORTH, panel);
@@ -99,11 +116,6 @@ public class LoggerPanel extends JPanel {
 		layout.putConstraint(SpringLayout.WEST, scroll, 10, SpringLayout.WEST, panel);
 		layout.putConstraint(SpringLayout.EAST, scroll, -10, SpringLayout.EAST, panel);
 
-		return panel;
-	}
-
-	private JPanel initRightPanel() {
-		JPanel panel = new JPanel();
 		return panel;
 	}
 
@@ -117,6 +129,10 @@ public class LoggerPanel extends JPanel {
 		if (proxy != null) {
 			proxy.addLoggerMessageListener(loggerTableModel);
 		}
+	}
+
+	private void itemSelected(LoggerMessage message) {
+		loggerMessagePanel.setLoggerMessage(message);
 	}
 
 }

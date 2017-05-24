@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import com.thedeanda.ajaxproxy.ui.resourceviewer.util.DocumentContainer;
 import com.thedeanda.ajaxproxy.ui.resourceviewer.util.DocumentParser;
 import com.thedeanda.ajaxproxy.ui.viewer.ImageViewer;
+import com.thedeanda.javajson.JsonArray;
 
 /**
  * this is a content viewer used to show input/ouput content of http requests.
@@ -52,9 +53,13 @@ public class ContentViewer extends JPanel {
 		tabs.setBorder(BorderFactory.createEmptyBorder());
 	}
 
-	public void setContent(final byte[] input) {
+	private void clearContents() {
 		cardLayout.show(this, EMPTY_CARD);
 		tabs.removeAll();
+	}
+
+	public void setContent(final byte[] input) {
+		clearContents();
 
 		if (ArrayUtils.isEmpty(input)) {
 			log.debug("empty content, stop here");
@@ -65,9 +70,26 @@ public class ContentViewer extends JPanel {
 		new TreeLoader(input).execute();
 	}
 
+	public void setContent(JsonArray message) {
+		clearContents();
+
+		if (message == null) {
+			log.debug("empty content, stop here");
+			return;
+		}
+
+		log.debug("setting content");
+		new TreeLoader(message).execute();
+	}
+
 	private class TreeLoader extends SwingWorker<DocumentContainer, DocumentContainer> {
 
 		private byte[] bytes;
+		private JsonArray message;
+
+		public TreeLoader(JsonArray message) {
+			this.message = message;
+		}
 
 		public TreeLoader(byte[] input) {
 			this.bytes = input;
@@ -79,7 +101,11 @@ public class ContentViewer extends JPanel {
 
 			DocumentParser parser = new DocumentParser();
 			DocumentContainer document;
-			document = parser.parse(bytes);
+			if (bytes != null) {
+				document = parser.parse(bytes);
+			} else {
+				document = parser.parse(message);
+			}
 
 			log.info("done parsing");
 

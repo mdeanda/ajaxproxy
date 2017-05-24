@@ -52,6 +52,7 @@ public class LogParser implements Runnable {
 		ret.setTime(json.getLong("time"));
 		ret.setTs(json.getLong("ts"));
 		ret.setUid(json.getString("uid"));
+		ret.setMessage(json.getJsonArray("message"));
 
 		log.info("parsed object: {}", ret);
 		return ret;

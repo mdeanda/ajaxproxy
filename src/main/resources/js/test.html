@@ -11,9 +11,17 @@ function batch1() {
 	Logger.log("b1", "monkey");
 }
 
+function batch2() {
+	Logger.log("b2", "monkey 2");
+	Logger.log("b2", "monkey 3");
+	Logger.log("b2", "monkey 4");
+	Logger.log("b2", "monkey 5");
+	Logger.log("b2", "monkey 6");
+}
 
 
-var fnList = [ batch1 ];
+
+var fnList = [ batch1, batch2 ];
 var index = 0;
 var timer = 0;
 

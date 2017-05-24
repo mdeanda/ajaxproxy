@@ -42,7 +42,8 @@ var Logger = new (function() {
 				uid: uid,
 				ts: ts,
 				time: t,
-				tag: tag
+				tag: tag,
+				message: [message/* the rest of the args */]
 			}
 
 			sendData([obj]);

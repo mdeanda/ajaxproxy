@@ -1,10 +1,13 @@
 package com.thedeanda.ajaxproxy.filter.handler.logger;
 
+import com.thedeanda.javajson.JsonArray;
+
 public class LoggerMessage {
 	private String tag;
 	private long ts;
 	private long time;
 	private String uid;
+	private JsonArray message;
 
 	public String getTag() {
 		return tag;
@@ -36,5 +39,13 @@ public class LoggerMessage {
 
 	public void setUid(String uid) {
 		this.uid = uid;
+	}
+
+	public JsonArray getMessage() {
+		return message;
+	}
+
+	public void setMessage(JsonArray message) {
+		this.message = message;
 	}
 }
