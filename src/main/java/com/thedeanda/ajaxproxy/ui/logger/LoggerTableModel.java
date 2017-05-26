@@ -85,4 +85,10 @@ public class LoggerTableModel extends AbstractTableModel implements LoggerMessag
 		}
 		return null;
 	}
+
+	public void clear() {
+		int size = items.size();
+		items.clear();
+		fireTableRowsDeleted(0, size);
+	}
 }

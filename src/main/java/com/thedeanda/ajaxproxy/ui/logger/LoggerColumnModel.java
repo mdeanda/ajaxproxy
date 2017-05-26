@@ -5,7 +5,7 @@ import javax.swing.table.TableColumn;
 
 public class LoggerColumnModel extends DefaultTableColumnModel {
 	private static final long serialVersionUID = -4286144913875203965L;
-	private static final int COL_WIDTH_UID = 100;
+	private static final int COL_WIDTH_UID = 150;
 	private static final int COL_WIDTH_INDEX = 70;
 	private static final int COL_WIDTH_TS = 50;
 	private static final int COL_WIDTH_TIME = 70;

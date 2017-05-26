@@ -1,6 +1,8 @@
 package com.thedeanda.ajaxproxy.ui.logger;
 
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -21,6 +23,8 @@ import com.thedeanda.ajaxproxy.ui.border.BottomBorder;
 import com.thedeanda.javajson.JsonObject;
 
 public class LoggerPanel extends JPanel {
+	private static final long serialVersionUID = -2124288848339204131L;
+
 	private LoggerTableModel loggerTableModel = new LoggerTableModel();
 
 	private LoggerMessagePanel loggerMessagePanel;
@@ -40,7 +44,7 @@ public class LoggerPanel extends JPanel {
 		JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		split.setLeftComponent(leftPanel);
 		split.setRightComponent(rightPanel);
-		split.setDividerLocation(450);
+		split.setDividerLocation(650);
 		split.setBorder(BorderFactory.createEmptyBorder());
 		SwingUtils.flattenSplitPane(split);
 		add(split);
@@ -71,6 +75,16 @@ public class LoggerPanel extends JPanel {
 		loggerPath.setToolTipText("path to logger");
 		panel.add(loggerPath);
 
+		
+		JButton clearBtn = new JButton("Clear");
+		panel.add(clearBtn);
+		clearBtn.addActionListener(new ActionListener()  {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				loggerTableModel.clear();
+			}
+		});
+		
 		JButton helpBtn = new JButton("?");
 		panel.add(helpBtn);
 
@@ -84,6 +98,9 @@ public class LoggerPanel extends JPanel {
 		layout.putConstraint(SpringLayout.WEST, loggerPath, 10, SpringLayout.EAST, lbl);
 		layout.putConstraint(SpringLayout.EAST, loggerPath, 250, SpringLayout.WEST, loggerPath);
 		layout.putConstraint(SpringLayout.BASELINE, loggerPath, 0, SpringLayout.BASELINE, helpBtn);
+
+		layout.putConstraint(SpringLayout.WEST, clearBtn, 10, SpringLayout.EAST, loggerPath);
+		layout.putConstraint(SpringLayout.BASELINE, clearBtn, 0, SpringLayout.BASELINE, helpBtn);
 
 		return panel;
 	}
