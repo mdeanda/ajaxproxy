@@ -2,6 +2,7 @@ package com.thedeanda.ajaxproxy.ui.logger;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import javax.swing.table.AbstractTableModel;
 
@@ -90,5 +91,10 @@ public class LoggerTableModel extends AbstractTableModel implements LoggerMessag
 		int size = items.size();
 		items.clear();
 		fireTableRowsDeleted(0, size);
+	}
+
+	public void setFilter(Pattern filter, List<String> checkedItems) {
+		// TODO Auto-generated method stub
+		
 	}
 }

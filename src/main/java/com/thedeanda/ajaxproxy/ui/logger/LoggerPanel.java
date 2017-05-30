@@ -28,6 +28,7 @@ public class LoggerPanel extends JPanel {
 	private LoggerTableModel loggerTableModel = new LoggerTableModel();
 
 	private LoggerMessagePanel loggerMessagePanel;
+	private FilterPanel filterPanel;
 
 	public LoggerPanel() {
 		SpringLayout layout = new SpringLayout();
@@ -62,6 +63,8 @@ public class LoggerPanel extends JPanel {
 	}
 
 	private JPanel initTopPanel() {
+		this.filterPanel = new FilterPanel();
+		
 		JPanel panel = new JPanel();
 		SpringLayout layout = new SpringLayout();
 		panel.setLayout(layout);
@@ -102,7 +105,8 @@ public class LoggerPanel extends JPanel {
 		layout.putConstraint(SpringLayout.WEST, clearBtn, 10, SpringLayout.EAST, loggerPath);
 		layout.putConstraint(SpringLayout.BASELINE, clearBtn, 0, SpringLayout.BASELINE, helpBtn);
 
-		return panel;
+				//return panel;
+		return filterPanel;
 	}
 
 	private JPanel initLeftPanel() {
