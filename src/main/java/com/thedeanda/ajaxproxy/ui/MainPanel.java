@@ -16,6 +16,7 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.SpringLayout;
 
@@ -87,7 +88,9 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		add(tabs);
 
 		generalPanel = new GeneralPanel(this);
-		tabs.add("General", generalPanel);
+		JScrollPane scrollPane = new JScrollPane(generalPanel);
+		scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+		tabs.add("General", scrollPane);
 
 		proxyModel = new ProxyTableModel();
 		tabs.add("Proxy", new ProxyPanel(this, proxyModel));
