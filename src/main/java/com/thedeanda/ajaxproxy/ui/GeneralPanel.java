@@ -86,7 +86,7 @@ public class GeneralPanel extends JPanel implements ChangeListener, ActionListen
 		sslPortLabel = new JLabel("SSL Port");
 		sslPortLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 
-		sslFileLabel = new JLabel("Keyfile");
+		sslFileLabel = new JLabel("Keystore");
 		sslFileLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		sslFile = SwingUtils.newJTextField();
 		sslFileButton = new JButton("...");
@@ -151,50 +151,56 @@ public class GeneralPanel extends JPanel implements ChangeListener, ActionListen
 	}
 
 	private void initLayout() {
+		final int V_PADDING_SECTION = 40;
+		final int V_PADDING = 10;
+		final int V_PADDING_SMALL = 5;
+		final int EDGE_PADDING = 20;
+		final int SMALL_FIELD_WIDTH = 70;
 		SpringLayout layout = new SpringLayout();
 		setLayout(layout);
-		setPreferredSize(new Dimension(700, 500));
+		setPreferredSize(new Dimension(700, 550));
 
-		layout.putConstraint(SpringLayout.WEST, portLabel, 10, SpringLayout.WEST, this);
+		layout.putConstraint(SpringLayout.WEST, portLabel, EDGE_PADDING, SpringLayout.WEST, this);
 		layout.putConstraint(SpringLayout.WEST, port, 5, SpringLayout.EAST, portLabel);
-		layout.putConstraint(SpringLayout.NORTH, port, 60, SpringLayout.NORTH, this);
-		layout.putConstraint(SpringLayout.EAST, port, -10, SpringLayout.EAST, this);
+		layout.putConstraint(SpringLayout.NORTH, port, EDGE_PADDING*2, SpringLayout.NORTH, this);
+		layout.putConstraint(SpringLayout.EAST, port, SMALL_FIELD_WIDTH, SpringLayout.WEST, port);
 		layout.putConstraint(SpringLayout.BASELINE, portLabel, 0, SpringLayout.BASELINE, port);
 
-		/* ssl row 2 */
-		layout.putConstraint(SpringLayout.NORTH, enableSsl, 20, SpringLayout.SOUTH, port);
+		/* next ssl row */
+		layout.putConstraint(SpringLayout.NORTH, enableSsl, V_PADDING_SECTION, SpringLayout.SOUTH, port);
 		layout.putConstraint(SpringLayout.WEST, enableSsl, 0, SpringLayout.WEST, port);
 		layout.putConstraint(SpringLayout.EAST, enableSsl, 150, SpringLayout.WEST, enableSsl);
 
 		layout.putConstraint(SpringLayout.WEST, saveSslPassword, 0, SpringLayout.EAST, enableSsl);
 		layout.putConstraint(SpringLayout.BASELINE, saveSslPassword, 0, SpringLayout.BASELINE, enableSsl);
 
-		/* ssl row 2 */
-		layout.putConstraint(SpringLayout.WEST, sslPortLabel, 0, SpringLayout.WEST, portLabel);
+		/* next ssl row */
+		layout.putConstraint(SpringLayout.WEST, sslPortLabel, EDGE_PADDING, SpringLayout.WEST, this);
 		layout.putConstraint(SpringLayout.EAST, sslPortLabel, 0, SpringLayout.EAST, portLabel);
 		layout.putConstraint(SpringLayout.BASELINE, sslPortLabel, 0, SpringLayout.BASELINE, sslPort);
 
-		layout.putConstraint(SpringLayout.NORTH, sslPort, 10, SpringLayout.SOUTH, enableSsl);
+		layout.putConstraint(SpringLayout.NORTH, sslPort, V_PADDING_SMALL, SpringLayout.SOUTH, enableSsl);
 		layout.putConstraint(SpringLayout.WEST, sslPort, 0, SpringLayout.WEST, port);
-		layout.putConstraint(SpringLayout.EAST, sslPort, 60, SpringLayout.WEST, sslPort);
+		layout.putConstraint(SpringLayout.EAST, sslPort, SMALL_FIELD_WIDTH, SpringLayout.WEST, sslPort);
 
-		layout.putConstraint(SpringLayout.BASELINE, sslFileLabel, 0, SpringLayout.BASELINE, sslPort);
-		layout.putConstraint(SpringLayout.WEST, sslFileLabel, 10, SpringLayout.EAST, sslPort);
-		layout.putConstraint(SpringLayout.EAST, sslFileLabel, 100, SpringLayout.WEST, sslFileLabel);
+		/* next ssl row */
+		layout.putConstraint(SpringLayout.BASELINE, sslFileLabel, 0, SpringLayout.BASELINE, sslFile);
+		layout.putConstraint(SpringLayout.WEST, sslFileLabel, EDGE_PADDING, SpringLayout.WEST, this);
+		layout.putConstraint(SpringLayout.EAST, sslFileLabel, 0, SpringLayout.EAST, sslPortLabel);
 
-		layout.putConstraint(SpringLayout.BASELINE, sslFile, 0, SpringLayout.BASELINE, sslPort);
-		layout.putConstraint(SpringLayout.WEST, sslFile, 10, SpringLayout.EAST, sslFileLabel);
+		layout.putConstraint(SpringLayout.NORTH, sslFile, V_PADDING, SpringLayout.SOUTH, sslPort);
+		layout.putConstraint(SpringLayout.WEST, sslFile, 0, SpringLayout.WEST, sslPort);
 		layout.putConstraint(SpringLayout.EAST, sslFile, 0, SpringLayout.WEST, sslFileButton);
 
-		layout.putConstraint(SpringLayout.BASELINE, sslFileButton, 0, SpringLayout.BASELINE, sslPort);
-		layout.putConstraint(SpringLayout.EAST, sslFileButton, 0, SpringLayout.EAST, port);
+		layout.putConstraint(SpringLayout.BASELINE, sslFileButton, 0, SpringLayout.BASELINE, sslFile);
+		layout.putConstraint(SpringLayout.EAST, sslFileButton, -EDGE_PADDING, SpringLayout.EAST, this);
 
-		/* ssl row 3 */
+		/* next ssl row */
 		layout.putConstraint(SpringLayout.BASELINE, sslKeystorePassLabel, 0, SpringLayout.BASELINE, sslKeystorePass);
-		layout.putConstraint(SpringLayout.WEST, sslKeystorePassLabel, 0, SpringLayout.WEST, portLabel);
+		layout.putConstraint(SpringLayout.WEST, sslKeystorePassLabel, EDGE_PADDING, SpringLayout.WEST, this);
 		layout.putConstraint(SpringLayout.EAST, sslKeystorePassLabel, 0, SpringLayout.EAST, portLabel);
 
-		layout.putConstraint(SpringLayout.NORTH, sslKeystorePass, 10, SpringLayout.SOUTH, sslPort);
+		layout.putConstraint(SpringLayout.NORTH, sslKeystorePass, V_PADDING, SpringLayout.SOUTH, sslFile);
 		layout.putConstraint(SpringLayout.WEST, sslKeystorePass, 0, SpringLayout.WEST, sslPort);
 		layout.putConstraint(SpringLayout.EAST, sslKeystorePass, 200, SpringLayout.WEST, sslKeystorePass);
 
@@ -209,7 +215,7 @@ public class GeneralPanel extends JPanel implements ChangeListener, ActionListen
 		/* end ssl */
 
 		layout.putConstraint(SpringLayout.NORTH, folderButton, 40, SpringLayout.SOUTH, sslKeystorePass);
-		layout.putConstraint(SpringLayout.EAST, folderButton, 0, SpringLayout.EAST, port);
+		layout.putConstraint(SpringLayout.EAST, folderButton, -EDGE_PADDING, SpringLayout.EAST, this);
 
 		layout.putConstraint(SpringLayout.BASELINE, resourceBase, 0, SpringLayout.BASELINE, folderButton);
 		layout.putConstraint(SpringLayout.WEST, resourceBase, 0, SpringLayout.WEST, port);
@@ -218,22 +224,27 @@ public class GeneralPanel extends JPanel implements ChangeListener, ActionListen
 		layout.putConstraint(SpringLayout.BASELINE, baseLabel, 0, SpringLayout.BASELINE, resourceBase);
 		layout.putConstraint(SpringLayout.EAST, baseLabel, 0, SpringLayout.EAST, portLabel);
 
-		layout.putConstraint(SpringLayout.NORTH, indexCheck, 5, SpringLayout.SOUTH, resourceBase);
+		layout.putConstraint(SpringLayout.NORTH, indexCheck, V_PADDING_SMALL, SpringLayout.SOUTH, resourceBase);
 		layout.putConstraint(SpringLayout.WEST, indexCheck, 0, SpringLayout.WEST, resourceBase);
 
-		layout.putConstraint(SpringLayout.NORTH, forcedLabel, 60, SpringLayout.SOUTH, indexCheck);
+		
+		/* new row */
+		
+		layout.putConstraint(SpringLayout.NORTH, forcedLabel, V_PADDING_SECTION*2, SpringLayout.SOUTH, indexCheck);
 		layout.putConstraint(SpringLayout.EAST, forcedLabel, 0, SpringLayout.EAST, baseLabel);
 
-		layout.putConstraint(SpringLayout.VERTICAL_CENTER, forcedLatency, 0, SpringLayout.VERTICAL_CENTER, forcedLabel);
-		layout.putConstraint(SpringLayout.WEST, forcedLatency, 5, SpringLayout.EAST, forcedLabel);
-		layout.putConstraint(SpringLayout.EAST, forcedLatency, -10, SpringLayout.EAST, this);
+		layout.putConstraint(SpringLayout.BASELINE, forcedLatency, 0, SpringLayout.BASELINE, forcedLabel);
+		layout.putConstraint(SpringLayout.WEST, forcedLatency, 0, SpringLayout.WEST, port);
+		layout.putConstraint(SpringLayout.EAST, forcedLatency, -EDGE_PADDING, SpringLayout.EAST, this);
 
-		layout.putConstraint(SpringLayout.NORTH, cacheLabel, 40, SpringLayout.SOUTH, forcedLatency);
+		/* new row */
+		
+		layout.putConstraint(SpringLayout.NORTH, cacheLabel, V_PADDING_SECTION, SpringLayout.SOUTH, forcedLatency);
 		layout.putConstraint(SpringLayout.EAST, cacheLabel, 0, SpringLayout.EAST, baseLabel);
 
-		layout.putConstraint(SpringLayout.VERTICAL_CENTER, cacheSlider, 0, SpringLayout.VERTICAL_CENTER, cacheLabel);
-		layout.putConstraint(SpringLayout.WEST, cacheSlider, 5, SpringLayout.EAST, cacheLabel);
-		layout.putConstraint(SpringLayout.EAST, cacheSlider, -10, SpringLayout.EAST, this);
+		layout.putConstraint(SpringLayout.BASELINE, cacheSlider, 0, SpringLayout.BASELINE, cacheLabel);
+		layout.putConstraint(SpringLayout.WEST, cacheSlider, 0, SpringLayout.WEST, port);
+		layout.putConstraint(SpringLayout.EAST, cacheSlider, -EDGE_PADDING, SpringLayout.EAST, this);
 
 	}
 
