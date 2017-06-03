@@ -34,11 +34,17 @@ public class GeneralPanel extends JPanel implements ChangeListener, ActionListen
 	private JLabel portLabel;
 	private JTextField port;
 
+	private JCheckBox enableSsl;
+	private JCheckBox saveSslPassword;
 	private JLabel sslPortLabel;
 	private JTextField sslPort;
 	private JLabel sslFileLabel;
 	private JTextField sslFile;
 	private JButton sslFileButton;
+	private JLabel sslKeystorePassLabel;
+	private JTextField sslKeystorePass;
+	private JLabel sslKeystorePass2Label;
+	private JTextField sslKeystorePass2;
 
 	private JTextField resourceBase;
 	private JCheckBox indexCheck;
@@ -71,6 +77,11 @@ public class GeneralPanel extends JPanel implements ChangeListener, ActionListen
 		add(portLabel);
 		add(port);
 
+		enableSsl = new JCheckBox("Enable SSL");
+		saveSslPassword = new JCheckBox("Save Passwords");
+		add(enableSsl);
+		add(saveSslPassword);
+
 		sslPort = SwingUtils.newJTextField();
 		sslPortLabel = new JLabel("SSL Port");
 		sslPortLabel.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -85,6 +96,18 @@ public class GeneralPanel extends JPanel implements ChangeListener, ActionListen
 		add(sslFileLabel);
 		add(sslFile);
 		add(sslFileButton);
+
+		sslKeystorePassLabel = new JLabel("Keystore Password");
+		sslKeystorePassLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+		sslKeystorePass = SwingUtils.newJTextField();
+		sslKeystorePass2Label = new JLabel("Key Password");
+		sslKeystorePass2Label.setHorizontalAlignment(SwingConstants.RIGHT);
+		sslKeystorePass2 = SwingUtils.newJTextField();
+
+		add(sslKeystorePassLabel);
+		add(sslKeystorePass);
+		add(sslKeystorePass2Label);
+		add(sslKeystorePass2);
 
 		resourceBase = SwingUtils.newJTextField();
 		baseLabel = new JLabel("Resource Base");
@@ -138,12 +161,20 @@ public class GeneralPanel extends JPanel implements ChangeListener, ActionListen
 		layout.putConstraint(SpringLayout.EAST, port, -10, SpringLayout.EAST, this);
 		layout.putConstraint(SpringLayout.BASELINE, portLabel, 0, SpringLayout.BASELINE, port);
 
-		/* start ssl row 1 */
+		/* ssl row 2 */
+		layout.putConstraint(SpringLayout.NORTH, enableSsl, 20, SpringLayout.SOUTH, port);
+		layout.putConstraint(SpringLayout.WEST, enableSsl, 0, SpringLayout.WEST, port);
+		layout.putConstraint(SpringLayout.EAST, enableSsl, 150, SpringLayout.WEST, enableSsl);
+
+		layout.putConstraint(SpringLayout.WEST, saveSslPassword, 0, SpringLayout.EAST, enableSsl);
+		layout.putConstraint(SpringLayout.BASELINE, saveSslPassword, 0, SpringLayout.BASELINE, enableSsl);
+
+		/* ssl row 2 */
 		layout.putConstraint(SpringLayout.WEST, sslPortLabel, 0, SpringLayout.WEST, portLabel);
 		layout.putConstraint(SpringLayout.EAST, sslPortLabel, 0, SpringLayout.EAST, portLabel);
 		layout.putConstraint(SpringLayout.BASELINE, sslPortLabel, 0, SpringLayout.BASELINE, sslPort);
 
-		layout.putConstraint(SpringLayout.NORTH, sslPort, 10, SpringLayout.SOUTH, port);
+		layout.putConstraint(SpringLayout.NORTH, sslPort, 10, SpringLayout.SOUTH, enableSsl);
 		layout.putConstraint(SpringLayout.WEST, sslPort, 0, SpringLayout.WEST, port);
 		layout.putConstraint(SpringLayout.EAST, sslPort, 60, SpringLayout.WEST, sslPort);
 
@@ -158,9 +189,26 @@ public class GeneralPanel extends JPanel implements ChangeListener, ActionListen
 		layout.putConstraint(SpringLayout.BASELINE, sslFileButton, 0, SpringLayout.BASELINE, sslPort);
 		layout.putConstraint(SpringLayout.EAST, sslFileButton, 0, SpringLayout.EAST, port);
 
-		/* end ssl row 1 */
+		/* ssl row 3 */
+		layout.putConstraint(SpringLayout.BASELINE, sslKeystorePassLabel, 0, SpringLayout.BASELINE, sslKeystorePass);
+		layout.putConstraint(SpringLayout.WEST, sslKeystorePassLabel, 0, SpringLayout.WEST, portLabel);
+		layout.putConstraint(SpringLayout.EAST, sslKeystorePassLabel, 0, SpringLayout.EAST, portLabel);
 
-		layout.putConstraint(SpringLayout.NORTH, folderButton, 40, SpringLayout.SOUTH, sslPort);
+		layout.putConstraint(SpringLayout.NORTH, sslKeystorePass, 10, SpringLayout.SOUTH, sslPort);
+		layout.putConstraint(SpringLayout.WEST, sslKeystorePass, 0, SpringLayout.WEST, sslPort);
+		layout.putConstraint(SpringLayout.EAST, sslKeystorePass, 200, SpringLayout.WEST, sslKeystorePass);
+
+		layout.putConstraint(SpringLayout.BASELINE, sslKeystorePass2Label, 0, SpringLayout.BASELINE, sslKeystorePass);
+		layout.putConstraint(SpringLayout.WEST, sslKeystorePass2Label, 10, SpringLayout.EAST, sslKeystorePass);
+		layout.putConstraint(SpringLayout.EAST, sslKeystorePass2Label, 100, SpringLayout.WEST, sslKeystorePass2Label);
+
+		layout.putConstraint(SpringLayout.BASELINE, sslKeystorePass2, 0, SpringLayout.BASELINE, sslKeystorePass);
+		layout.putConstraint(SpringLayout.WEST, sslKeystorePass2, 10, SpringLayout.EAST, sslKeystorePass2Label);
+		layout.putConstraint(SpringLayout.EAST, sslKeystorePass2, 200, SpringLayout.WEST, sslKeystorePass2);
+
+		/* end ssl */
+
+		layout.putConstraint(SpringLayout.NORTH, folderButton, 40, SpringLayout.SOUTH, sslKeystorePass);
 		layout.putConstraint(SpringLayout.EAST, folderButton, 0, SpringLayout.EAST, port);
 
 		layout.putConstraint(SpringLayout.BASELINE, resourceBase, 0, SpringLayout.BASELINE, folderButton);
