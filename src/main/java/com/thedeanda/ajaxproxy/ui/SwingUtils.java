@@ -54,6 +54,11 @@ public class SwingUtils {
 		return combo;
 	}
 
+	public static JTextField newIntegerField() {
+		//TODO: add code to limit input to integers only
+		return prepJTextField(new JTextField());
+	}
+
 	public static JTextField newJTextField() {
 		return prepJTextField(new JTextField());
 	}

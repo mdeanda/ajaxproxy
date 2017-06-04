@@ -180,6 +180,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 	 * @return the json object representing the config
 	 */
 	public JsonObject getConfig() {
+		//TODO: convert to model object with config settings instead
 		JsonObject json = config;
 		json.put("proxy", proxyModel.getConfig(generalPanel.getCacheTime()));
 		json.put("merge", mergeModel.getConfig());

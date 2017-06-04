@@ -37,7 +37,7 @@ public class ProxyEditorPanel extends JPanel {
 		add(hostField);
 
 		portLabel = new JLabel("Port");
-		portField = SwingUtils.newJTextField();
+		portField = SwingUtils.newIntegerField();
 		add(portLabel);
 		add(portField);
 

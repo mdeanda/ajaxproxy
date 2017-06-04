@@ -65,7 +65,7 @@ public class GeneralPanel extends JPanel implements ChangeListener, ActionListen
 		fileChooser = new JFileChooser();
 		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 
-		port = SwingUtils.newJTextField();
+		port = SwingUtils.newIntegerField();
 
 		portLabel = new JLabel("HTTP Port");
 		portLabel.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -82,7 +82,7 @@ public class GeneralPanel extends JPanel implements ChangeListener, ActionListen
 		add(enableSsl);
 		add(saveSslPassword);
 
-		sslPort = SwingUtils.newJTextField();
+		sslPort = SwingUtils.newIntegerField();
 		sslPortLabel = new JLabel("SSL Port");
 		sslPortLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 
@@ -149,7 +149,7 @@ public class GeneralPanel extends JPanel implements ChangeListener, ActionListen
 
 		initListeners();
 		initLayout();
-		
+
 		sslToggled();
 	}
 
@@ -165,7 +165,7 @@ public class GeneralPanel extends JPanel implements ChangeListener, ActionListen
 
 		layout.putConstraint(SpringLayout.WEST, portLabel, EDGE_PADDING, SpringLayout.WEST, this);
 		layout.putConstraint(SpringLayout.WEST, port, 5, SpringLayout.EAST, portLabel);
-		layout.putConstraint(SpringLayout.NORTH, port, EDGE_PADDING*2, SpringLayout.NORTH, this);
+		layout.putConstraint(SpringLayout.NORTH, port, EDGE_PADDING * 2, SpringLayout.NORTH, this);
 		layout.putConstraint(SpringLayout.EAST, port, SMALL_FIELD_WIDTH, SpringLayout.WEST, port);
 		layout.putConstraint(SpringLayout.BASELINE, portLabel, 0, SpringLayout.BASELINE, port);
 
@@ -230,10 +230,9 @@ public class GeneralPanel extends JPanel implements ChangeListener, ActionListen
 		layout.putConstraint(SpringLayout.NORTH, indexCheck, V_PADDING_SMALL, SpringLayout.SOUTH, resourceBase);
 		layout.putConstraint(SpringLayout.WEST, indexCheck, 0, SpringLayout.WEST, resourceBase);
 
-		
 		/* new row */
-		
-		layout.putConstraint(SpringLayout.NORTH, forcedLabel, V_PADDING_SECTION*2, SpringLayout.SOUTH, indexCheck);
+
+		layout.putConstraint(SpringLayout.NORTH, forcedLabel, V_PADDING_SECTION * 2, SpringLayout.SOUTH, indexCheck);
 		layout.putConstraint(SpringLayout.EAST, forcedLabel, 0, SpringLayout.EAST, baseLabel);
 
 		layout.putConstraint(SpringLayout.BASELINE, forcedLatency, 0, SpringLayout.BASELINE, forcedLabel);
@@ -241,7 +240,7 @@ public class GeneralPanel extends JPanel implements ChangeListener, ActionListen
 		layout.putConstraint(SpringLayout.EAST, forcedLatency, -EDGE_PADDING, SpringLayout.EAST, this);
 
 		/* new row */
-		
+
 		layout.putConstraint(SpringLayout.NORTH, cacheLabel, V_PADDING_SECTION, SpringLayout.SOUTH, forcedLatency);
 		layout.putConstraint(SpringLayout.EAST, cacheLabel, 0, SpringLayout.EAST, baseLabel);
 
@@ -259,23 +258,23 @@ public class GeneralPanel extends JPanel implements ChangeListener, ActionListen
 			}
 		});
 	}
-	
+
 	private void sslToggled() {
 		boolean enabled = enableSsl.isSelected();
-		
+
 		saveSslPassword.setEnabled(enabled);
 		sslPort.setEnabled(enabled);
 		sslFile.setEnabled(enabled);
 		sslFileButton.setEnabled(enabled);
 		sslKeystorePass.setEnabled(enabled);
 		sslKeystorePass2.setEnabled(enabled);
-		
+
 		sslPortLabel.setEnabled(enabled);
 		sslFileLabel.setEnabled(enabled);
 		sslKeystorePassLabel.setEnabled(enabled);
 		sslKeystorePass2Label.setEnabled(enabled);
 	}
-	
+
 	private List<OptionValue> initDelayOptionValues() {
 		List<OptionValue> values = new ArrayList<>();
 
@@ -397,13 +396,39 @@ public class GeneralPanel extends JPanel implements ChangeListener, ActionListen
 			forcedLatency.setValue(options.getInt("forcedLatency"));
 			cacheSlider.setValue(options.getInt("cacheTime"));
 		}
+
+		JsonObject ssl = config.getJsonObject("ssl");
+		if (ssl != null) {
+			enableSsl.setSelected(ssl.getBoolean("enable"));
+			saveSslPassword.setSelected(ssl.getBoolean("savePassword"));
+			sslPort.setText(ssl.getString("port"));
+			sslFile.setText(ssl.getString("keystore"));
+			if (saveSslPassword.isSelected()) {
+				sslKeystorePass.setText(ssl.getString("keystorePassword"));
+				sslKeystorePass2.setText(ssl.getString("sslKeyPassword"));
+			}
+		}
+
+		sslToggled();
 	}
 
 	/** update values from current ui state into config object */
 	public void updateConfig(JsonObject config) {
-		config.put("port", getPort());
-		config.put("resourceBase", getResourceBase());
+		config.put(AjaxProxy.PORT, getPort());
+		config.put(AjaxProxy.RESOURCE_BASE, getResourceBase());
 		config.put(AjaxProxy.SHOW_INDEX, isShowIndex());
+
+		JsonObject ssl = new JsonObject();
+		config.put("ssl", ssl);
+		ssl.put("enable", enableSsl.isSelected());
+		ssl.put("savePassword", saveSslPassword.isSelected());
+		ssl.put("port", sslPort.getText());
+		ssl.put("keystore", sslFile.getText());
+		if (saveSslPassword.isSelected()) {
+			//TODO: add simple encryption at least
+			ssl.put("keystorePassword", sslKeystorePass.getText());
+			ssl.put("sslKeyPassword", sslKeystorePass2.getText());
+		}
 
 		JsonObject options = config.getJsonObject("options");
 		if (options == null) {
