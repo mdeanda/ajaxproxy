@@ -14,6 +14,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JPasswordField;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -55,6 +56,10 @@ public class SwingUtils {
 
 	public static JTextField newJTextField() {
 		return prepJTextField(new JTextField());
+	}
+
+	public static JTextField newJPasswordField() {
+		return prepJTextField(new JPasswordField());
 	}
 
 	public static JTextField prepJTextField(final JTextField field) {

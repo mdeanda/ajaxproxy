@@ -99,10 +99,10 @@ public class GeneralPanel extends JPanel implements ChangeListener, ActionListen
 
 		sslKeystorePassLabel = new JLabel("Keystore Password");
 		sslKeystorePassLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-		sslKeystorePass = SwingUtils.newJTextField();
+		sslKeystorePass = SwingUtils.newJPasswordField();
 		sslKeystorePass2Label = new JLabel("Key Password");
 		sslKeystorePass2Label.setHorizontalAlignment(SwingConstants.RIGHT);
-		sslKeystorePass2 = SwingUtils.newJTextField();
+		sslKeystorePass2 = SwingUtils.newJPasswordField();
 
 		add(sslKeystorePassLabel);
 		add(sslKeystorePass);
@@ -147,7 +147,10 @@ public class GeneralPanel extends JPanel implements ChangeListener, ActionListen
 		add(cacheLabel);
 		add(cacheSlider);
 
+		initListeners();
 		initLayout();
+		
+		sslToggled();
 	}
 
 	private void initLayout() {
@@ -248,6 +251,31 @@ public class GeneralPanel extends JPanel implements ChangeListener, ActionListen
 
 	}
 
+	private void initListeners() {
+		enableSsl.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				sslToggled();
+			}
+		});
+	}
+	
+	private void sslToggled() {
+		boolean enabled = enableSsl.isSelected();
+		
+		saveSslPassword.setEnabled(enabled);
+		sslPort.setEnabled(enabled);
+		sslFile.setEnabled(enabled);
+		sslFileButton.setEnabled(enabled);
+		sslKeystorePass.setEnabled(enabled);
+		sslKeystorePass2.setEnabled(enabled);
+		
+		sslPortLabel.setEnabled(enabled);
+		sslFileLabel.setEnabled(enabled);
+		sslKeystorePassLabel.setEnabled(enabled);
+		sslKeystorePass2Label.setEnabled(enabled);
+	}
+	
 	private List<OptionValue> initDelayOptionValues() {
 		List<OptionValue> values = new ArrayList<>();
 
