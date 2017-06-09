@@ -9,7 +9,6 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -27,8 +26,6 @@ import org.slf4j.LoggerFactory;
 
 import com.thedeanda.ajaxproxy.ui.SwingUtils;
 import com.thedeanda.ajaxproxy.ui.border.BottomBorder;
-import com.thedeanda.ajaxproxy.ui.model.ResourceListModel;
-import com.thedeanda.ajaxproxy.ui.resourceviewer.filter.RequestType;
 
 public class FilterPanel extends JPanel {
 	private static final Logger log = LoggerFactory.getLogger(FilterPanel.class);
@@ -38,14 +35,12 @@ public class FilterPanel extends JPanel {
 	private CheckComboBox rtFilter;
 	private JButton clearBtn;
 	private JButton exportBtn;
-	private JCheckBox toggleBtn;
 
 	private Color filterOkColor;
 	private Color filterBadColor;
 
 	private LoggerTableModel model;
-	// private ResourceListModel model;
-	// private ListCheckModel requestTypeFilterModel;
+	private ListCheckModel tagModel;
 
 	public FilterPanel() {
 		log.warn("new filter panel");
@@ -78,9 +73,6 @@ public class FilterPanel extends JPanel {
 		layout.putConstraint(SpringLayout.WEST, clearBtn, 10, SpringLayout.EAST, rtFilter);
 		layout.putConstraint(SpringLayout.NORTH, exportBtn, 0, SpringLayout.NORTH, clearBtn);
 		layout.putConstraint(SpringLayout.WEST, exportBtn, 10, SpringLayout.EAST, clearBtn);
-		layout.putConstraint(SpringLayout.BASELINE, toggleBtn, 0, SpringLayout.BASELINE, clearBtn);
-		layout.putConstraint(SpringLayout.EAST, toggleBtn, -10, SpringLayout.EAST, this);
-
 	}
 
 	private void initButtons() {
@@ -138,9 +130,6 @@ public class FilterPanel extends JPanel {
 		exportBtn = new JButton("Export");
 		exportBtn.setEnabled(false);
 
-		toggleBtn = new JCheckBox("Monitor Resources");
-		toggleBtn.setEnabled(false);
-
 		clearBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -155,16 +144,9 @@ public class FilterPanel extends JPanel {
 				// export();
 			}
 		});
-		toggleBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// handleMonitorCheckboxChanged();
-			}
-		});
 
 		add(clearBtn);
 		add(exportBtn);
-		add(toggleBtn);
 	}
 
 	private void resetFilter() {
@@ -201,8 +183,39 @@ public class FilterPanel extends JPanel {
 			}
 		});
 	}
+	
+	private void resetFilterSoon() {
+		final List<String> checkedItems = new ArrayList<>();
+		final Pattern filter = null;
+		
+		SwingUtils.executNonUi(new Runnable() {
+			@Override
+			public void run() {
+				if (model != null) {
+					model.setFilter(filter, checkedItems);
+				}
+			}
+		});
+	}
 
 	public void setModel(LoggerTableModel model) {
 		this.model = model;
+		tagModel = rtFilter.getModel();
+		model.setTagModel(tagModel);
+
+		//TODO: move this
+		/*
+		tagModel.addListCheckListener(new ListCheckListener() {
+			@Override
+			public void removeCheck(ListEvent event) {
+				resetFilterSoon();
+			}
+
+			@Override
+			public void addCheck(ListEvent event) {
+				resetFilterSoon();
+			}
+		});
+		//*/
 	}
 }

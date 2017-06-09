@@ -1,17 +1,13 @@
 package com.thedeanda.ajaxproxy.ui.logger;
 
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
-import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.SpringLayout;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -19,7 +15,6 @@ import javax.swing.event.ListSelectionListener;
 import com.thedeanda.ajaxproxy.AjaxProxy;
 import com.thedeanda.ajaxproxy.filter.handler.logger.LoggerMessage;
 import com.thedeanda.ajaxproxy.ui.SwingUtils;
-import com.thedeanda.ajaxproxy.ui.border.BottomBorder;
 import com.thedeanda.javajson.JsonObject;
 
 public class LoggerPanel extends JPanel {
@@ -64,48 +59,8 @@ public class LoggerPanel extends JPanel {
 
 	private JPanel initTopPanel() {
 		this.filterPanel = new FilterPanel();
-		
-		JPanel panel = new JPanel();
-		SpringLayout layout = new SpringLayout();
-		panel.setLayout(layout);
-		panel.setBorder(new BottomBorder());
+		filterPanel.setModel(loggerTableModel);
 
-		JLabel lbl = new JLabel("Path to JavaScript");
-		panel.add(lbl);
-
-		JTextField loggerPath = new JTextField("/logger");
-		SwingUtils.prepJTextField(loggerPath);
-		loggerPath.setToolTipText("path to logger");
-		panel.add(loggerPath);
-
-		
-		JButton clearBtn = new JButton("Clear");
-		panel.add(clearBtn);
-		clearBtn.addActionListener(new ActionListener()  {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				loggerTableModel.clear();
-			}
-		});
-		
-		JButton helpBtn = new JButton("?");
-		panel.add(helpBtn);
-
-		layout.putConstraint(SpringLayout.NORTH, helpBtn, 20, SpringLayout.NORTH, panel);
-		layout.putConstraint(SpringLayout.EAST, helpBtn, -10, SpringLayout.EAST, panel);
-		layout.putConstraint(SpringLayout.SOUTH, panel, 10, SpringLayout.SOUTH, helpBtn);
-
-		layout.putConstraint(SpringLayout.WEST, lbl, 10, SpringLayout.WEST, panel);
-		layout.putConstraint(SpringLayout.BASELINE, lbl, 0, SpringLayout.BASELINE, helpBtn);
-
-		layout.putConstraint(SpringLayout.WEST, loggerPath, 10, SpringLayout.EAST, lbl);
-		layout.putConstraint(SpringLayout.EAST, loggerPath, 250, SpringLayout.WEST, loggerPath);
-		layout.putConstraint(SpringLayout.BASELINE, loggerPath, 0, SpringLayout.BASELINE, helpBtn);
-
-		layout.putConstraint(SpringLayout.WEST, clearBtn, 10, SpringLayout.EAST, loggerPath);
-		layout.putConstraint(SpringLayout.BASELINE, clearBtn, 0, SpringLayout.BASELINE, helpBtn);
-
-				//return panel;
 		return filterPanel;
 	}
 
@@ -115,16 +70,19 @@ public class LoggerPanel extends JPanel {
 		panel.setLayout(layout);
 
 		LoggerColumnModel lcm = new LoggerColumnModel();
-		JTable table = new JTable(loggerTableModel, lcm);
+		final JTable table = new JTable(loggerTableModel, lcm);
 		JScrollPane scroll = new JScrollPane(table);
 
+		table.getColumnModel().setColumnSelectionAllowed(false);
+		table.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
-				if (e.getValueIsAdjusting())
+				if (e.getValueIsAdjusting()) {
 					return;
+				}
 
-				int index = e.getLastIndex();
+				int index = table.getSelectedRow();
 				LoggerMessage message = loggerTableModel.getMessage(index);
 				itemSelected(message);
 			}

@@ -2,9 +2,15 @@ package com.thedeanda.ajaxproxy.ui.logger;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 import javax.swing.table.AbstractTableModel;
+
+import org.japura.gui.model.ListCheckModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.thedeanda.ajaxproxy.filter.handler.logger.LoggerMessage;
 import com.thedeanda.ajaxproxy.filter.handler.logger.LoggerMessageListener;
@@ -12,8 +18,17 @@ import com.thedeanda.javajson.JsonArray;
 
 public class LoggerTableModel extends AbstractTableModel implements LoggerMessageListener {
 	private static final long serialVersionUID = 4961880986671181480L;
+	private static final Logger log = LoggerFactory.getLogger(LoggerTableModel.class);
 
+	private List<LoggerMessage> allItems = new ArrayList<>();
 	private List<LoggerMessage> items = new ArrayList<>();
+
+	private Pattern filterPattern;
+
+	private List<String> filterTags;
+
+	private Set<String> tags = new TreeSet<>();
+	private ListCheckModel tagModel;
 
 	@Override
 	public int getRowCount() {
@@ -73,11 +88,19 @@ public class LoggerTableModel extends AbstractTableModel implements LoggerMessag
 
 	@Override
 	public void messageReceived(LoggerMessage message) {
-		// TODO: swing worker/thread ?
-		int row = items.size();
-		items.add(message);
+		allItems.add(message);
+		message = filter(message);
+		if (message != null) {
+			// TODO: swing worker/thread ?
+			int row = items.size();
+			items.add(message);
 
-		fireTableRowsInserted(row, row);
+			if (!tags.contains(message.getTag())) {
+				updateTags();
+			}
+
+			fireTableRowsInserted(row, row);
+		}
 	}
 
 	public LoggerMessage getMessage(int index) {
@@ -87,14 +110,79 @@ public class LoggerTableModel extends AbstractTableModel implements LoggerMessag
 		return null;
 	}
 
-	public void clear() {
+	public void clear() {	
 		int size = items.size();
 		items.clear();
+		allItems.clear();
 		fireTableRowsDeleted(0, size);
 	}
 
-	public void setFilter(Pattern filter, List<String> checkedItems) {
-		// TODO Auto-generated method stub
-		
+	public void setFilter(Pattern filter, List<String> tags) {
+		this.filterPattern = filter;
+		this.filterTags = tags;
+		filterReset();
+	}
+
+	private void filterReset() {
+		items.clear();
+		tagModel.clear();
+
+		for (LoggerMessage message : allItems) {
+			message = filter(message);
+			if (message != null) {
+				items.add(message);
+			}
+		}
+
+		updateTags();
+		fireTableDataChanged();
+	}
+
+	private void updateTags() {
+		Set<String> newTags = new TreeSet<>();
+
+		for (LoggerMessage message : allItems) {
+			newTags.add(message.getTag());
+		}
+
+		if (!newTags.containsAll(tags) || !tags.containsAll(newTags)) {
+			for (String tag : newTags) {
+				if (!tags.contains(tag)) {
+					tags.add(tag);
+					tagModel.addElement(tag);
+				}
+			}
+			for (String tag : tags) {
+				if (!newTags.contains(tag)) {
+					tagModel.removeElement(tag);
+				}
+			}
+			tags.clear();
+			tags.addAll(newTags);
+		}
+	}
+
+	private LoggerMessage filter(LoggerMessage message) {
+		if (message != null && filterTags != null && !filterTags.isEmpty()) {
+			log.info("tags found, filter by tags");
+			if (!filterTags.contains(message.getTag())) {
+				log.info("tag doesn't match, filter {}", message);
+				message = null;
+			}
+		}
+		if (message != null && filterPattern != null) {
+			String ms = message.getMessage().toString();
+			if (!filterPattern.matcher(ms).matches()) {
+				log.info("regex doesn't match, filter {}", message);
+				message = null;
+			}
+		}
+
+		return message;
+	}
+
+	public void setTagModel(ListCheckModel tagModel) {
+		this.tagModel = tagModel;
+		updateTags();
 	}
 }

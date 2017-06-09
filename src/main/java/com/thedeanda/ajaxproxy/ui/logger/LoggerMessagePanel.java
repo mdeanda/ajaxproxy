@@ -25,7 +25,11 @@ public class LoggerMessagePanel extends JPanel {
 	}
 
 	public void setLoggerMessage(LoggerMessage message) {
-		cv.setContent(message.getMessage());
+		if (message == null) {
+			cv.setContent((byte[]) null);
+		} else {
+			cv.setContent(message.getMessage());
+		}
 	}
 
 }

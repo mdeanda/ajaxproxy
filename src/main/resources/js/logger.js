@@ -4,6 +4,9 @@ var Logger = new (function() {
 	var startTime = new Date().getTime();
 	var uid = ("" + startTime).substring(4) + '.' + getRandomString();
 	var index = 0;
+	var delay = 500;
+	var timer = null;
+	var queue = [];
 
 	function getRandomString() {
 		var s = "0000" + ("" + Math.random()).replace('.', '');
@@ -11,6 +14,20 @@ var Logger = new (function() {
 	}
 	
 	function sendData(data) {
+		queue.push(data);
+		if (timer) {
+			clearTimeout(timer);
+		}
+		timer = setTimeout(function() {
+			actuallySendData();
+		}, delay);
+	}
+	
+	function actuallySendData() {
+		var data = queue;
+		queue = [];
+		timer = null;
+		
 		var URL = "%PATH%";
 		var request;
 		if (window.XMLHttpRequest) {
@@ -62,7 +79,7 @@ var Logger = new (function() {
 				message: getMessage.apply(this, arguments)
 			}
 
-			sendData([obj]);
+			sendData(obj);
 		}
 	};
 })();
