@@ -102,28 +102,7 @@ public class FilterPanel extends JPanel {
 		rtFilter.setTextFor(CheckComboBox.NONE, "-- ANY --");
 		rtFilter.setTextFor(CheckComboBox.MULTIPLE, "...");
 		rtFilter.setTextFor(CheckComboBox.ALL, "-- ALL --");
-
-		/*
-		requestTypeFilterModel = rtFilter.getModel();
-		for (RequestType color : RequestType.values()) {
-			requestTypeFilterModel.addElement(color);
-		}
-		requestTypeFilterModel.addListCheckListener(new ListCheckListener() {
-			@Override
-			public void removeCheck(ListEvent event) {
-				resetFilter();
-			}
-
-			@Override
-			public void addCheck(ListEvent event) {
-				resetFilter();
-			}
-		});
-		// */
-
-		// rtFilter = new RequestTypeFilter();
 		add(rtFilter);
-		// rtFilter.setEnabled(false);
 
 		clearBtn = new JButton("Clear");
 
@@ -164,30 +143,15 @@ public class FilterPanel extends JPanel {
 		}
 
 		final List<String> checkedItems = new ArrayList<>();
-		/*
-		List<Object> checked = requestTypeFilterModel.getCheckeds();
+
+		List<Object> checked = rtFilter.getModel().getCheckeds();
 		if (checked != null && !checked.isEmpty()) {
 			for (Object o : checked) {
-				checkedItems.add((RequestType) o);
+				checkedItems.add((String) o);
 			}
 		}
-		// */
 
 		final Pattern filter = filterRegEx;
-		SwingUtils.executNonUi(new Runnable() {
-			@Override
-			public void run() {
-				if (model != null) {
-					model.setFilter(filter, checkedItems);
-				}
-			}
-		});
-	}
-	
-	private void resetFilterSoon() {
-		final List<String> checkedItems = new ArrayList<>();
-		final Pattern filter = null;
-		
 		SwingUtils.executNonUi(new Runnable() {
 			@Override
 			public void run() {
@@ -203,19 +167,18 @@ public class FilterPanel extends JPanel {
 		tagModel = rtFilter.getModel();
 		model.setTagModel(tagModel);
 
-		//TODO: move this
-		/*
 		tagModel.addListCheckListener(new ListCheckListener() {
+
 			@Override
 			public void removeCheck(ListEvent event) {
-				resetFilterSoon();
+				resetFilter();
 			}
 
 			@Override
 			public void addCheck(ListEvent event) {
-				resetFilterSoon();
+				resetFilter();
 			}
 		});
-		//*/
+
 	}
 }

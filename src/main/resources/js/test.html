@@ -8,14 +8,14 @@
 "use strict";
 
 function batch1() {
-	Logger.log("b1", "monkey");
+	Logger.log("b1", "monkey hello");
 }
 
 function batch2() {
-	Logger.log("b2", "monkey 2");
+	Logger.log("b2", "monkey help 2");
 	Logger.log("b2", "monkey 3", {a:1});
 	Logger.log("b2", "monkey 4");
-	Logger.log("b2", "monkey 5", this);
+	Logger.log("b2", "monkey 5", {b:true,c:"monkey"}, {a:3}, 32);
 	Logger.log("b2", "monkey 6");
 }
 
@@ -34,11 +34,14 @@ var timer = setInterval(function() {
 	var fn = fnList[index];
 	index++;
 	fn();
-}, 2000);
+}, 1000);
 	</script>
 </head>
 <body>
 
+<h1>Test Logger</h1>
+
+<p>This is a sample page that uses the built in logger</p>
 
 </body>
 </html>

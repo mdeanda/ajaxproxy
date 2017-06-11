@@ -2,15 +2,20 @@
 
 var Logger = new (function() {
 	var startTime = new Date().getTime();
-	var uid = ("" + startTime).substring(4) + '.' + getRandomString();
+	var uid = getUid(startTime);
 	var index = 0;
 	var delay = 500;
 	var timer = null;
 	var queue = [];
 
-	function getRandomString() {
-		var s = "0000" + ("" + Math.random()).replace('.', '');
-		return s.substring(s.length - 5);
+	function getUid(startTime) {
+		var s = '0000' + (Math.floor(Math.random() * 1679616)).toString(36);
+		s = '-' + s.substring(s.length - 4);
+		
+		var dt = startTime.toString(36);
+		dt = dt.substring(0, dt.length-4) + '-' + dt.substring(dt.length-4);
+		s = dt + s;
+		return s;
 	}
 	
 	function sendData(data) {

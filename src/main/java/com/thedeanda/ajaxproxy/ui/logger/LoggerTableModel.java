@@ -115,9 +115,11 @@ public class LoggerTableModel extends AbstractTableModel implements LoggerMessag
 		items.clear();
 		allItems.clear();
 		fireTableRowsDeleted(0, size);
+		updateTags();
 	}
 
 	public void setFilter(Pattern filter, List<String> tags) {
+		log.warn("is event dispatch thread: {}", javax.swing.SwingUtilities.isEventDispatchThread());
 		this.filterPattern = filter;
 		this.filterTags = tags;
 		filterReset();
@@ -125,7 +127,6 @@ public class LoggerTableModel extends AbstractTableModel implements LoggerMessag
 
 	private void filterReset() {
 		items.clear();
-		tagModel.clear();
 
 		for (LoggerMessage message : allItems) {
 			message = filter(message);
