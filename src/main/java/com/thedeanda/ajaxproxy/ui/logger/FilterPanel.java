@@ -32,7 +32,8 @@ public class FilterPanel extends JPanel {
 	private static final long serialVersionUID = 3266059093827619992L;
 
 	private JTextField filter;
-	private CheckComboBox rtFilter;
+	private CheckComboBox tagFilter;
+	private CheckComboBox uidFilter;
 	private JButton clearBtn;
 	private JButton exportBtn;
 
@@ -41,6 +42,7 @@ public class FilterPanel extends JPanel {
 
 	private LoggerTableModel model;
 	private ListCheckModel tagModel;
+	private ListCheckModel uidModel;
 
 	public FilterPanel() {
 		log.warn("new filter panel");
@@ -65,12 +67,16 @@ public class FilterPanel extends JPanel {
 		layout.putConstraint(SpringLayout.WEST, filter, 10, SpringLayout.EAST, lbl);
 		layout.putConstraint(SpringLayout.EAST, filter, 200, SpringLayout.WEST, filter);
 
-		layout.putConstraint(SpringLayout.NORTH, rtFilter, 0, SpringLayout.NORTH, filter);
-		layout.putConstraint(SpringLayout.WEST, rtFilter, 10, SpringLayout.EAST, filter);
-		layout.putConstraint(SpringLayout.EAST, rtFilter, 100, SpringLayout.WEST, rtFilter);
+		layout.putConstraint(SpringLayout.NORTH, tagFilter, 0, SpringLayout.NORTH, filter);
+		layout.putConstraint(SpringLayout.WEST, tagFilter, 10, SpringLayout.EAST, filter);
+		layout.putConstraint(SpringLayout.EAST, tagFilter, 100, SpringLayout.WEST, tagFilter);
+
+		layout.putConstraint(SpringLayout.NORTH, uidFilter, 0, SpringLayout.NORTH, filter);
+		layout.putConstraint(SpringLayout.WEST, uidFilter, 10, SpringLayout.EAST, tagFilter);
+		layout.putConstraint(SpringLayout.EAST, uidFilter, 100, SpringLayout.WEST, uidFilter);
 
 		layout.putConstraint(SpringLayout.NORTH, clearBtn, 20, SpringLayout.NORTH, this);
-		layout.putConstraint(SpringLayout.WEST, clearBtn, 10, SpringLayout.EAST, rtFilter);
+		layout.putConstraint(SpringLayout.WEST, clearBtn, 10, SpringLayout.EAST, uidFilter);
 		layout.putConstraint(SpringLayout.NORTH, exportBtn, 0, SpringLayout.NORTH, clearBtn);
 		layout.putConstraint(SpringLayout.WEST, exportBtn, 10, SpringLayout.EAST, clearBtn);
 	}
@@ -98,11 +104,17 @@ public class FilterPanel extends JPanel {
 			}
 		});
 
-		rtFilter = new CheckComboBox();
-		rtFilter.setTextFor(CheckComboBox.NONE, "-- ANY --");
-		rtFilter.setTextFor(CheckComboBox.MULTIPLE, "...");
-		rtFilter.setTextFor(CheckComboBox.ALL, "-- ALL --");
-		add(rtFilter);
+		tagFilter = new CheckComboBox();
+		tagFilter.setTextFor(CheckComboBox.NONE, "-- ANY --");
+		tagFilter.setTextFor(CheckComboBox.MULTIPLE, "...");
+		tagFilter.setTextFor(CheckComboBox.ALL, "-- ALL --");
+		add(tagFilter);
+
+		uidFilter = new CheckComboBox();
+		uidFilter.setTextFor(CheckComboBox.NONE, "-- ANY --");
+		uidFilter.setTextFor(CheckComboBox.MULTIPLE, "...");
+		uidFilter.setTextFor(CheckComboBox.ALL, "-- ALL --");
+		add(uidFilter);
 
 		clearBtn = new JButton("Clear");
 
@@ -128,6 +140,19 @@ public class FilterPanel extends JPanel {
 		add(exportBtn);
 	}
 
+	private List<String> getCheckedItems(CheckComboBox checkbox) {
+		final List<String> checkedItems = new ArrayList<>();
+
+		List<Object> checked = checkbox.getModel().getCheckeds();
+		if (checked != null && !checked.isEmpty()) {
+			for (Object o : checked) {
+				checkedItems.add((String) o);
+			}
+		}
+
+		return checkedItems;
+	}
+
 	private void resetFilter() {
 		// TODO: throttle processing here since it works as you type
 
@@ -141,22 +166,15 @@ public class FilterPanel extends JPanel {
 				filter.setBackground(filterBadColor);
 			}
 		}
-
-		final List<String> checkedItems = new ArrayList<>();
-
-		List<Object> checked = rtFilter.getModel().getCheckeds();
-		if (checked != null && !checked.isEmpty()) {
-			for (Object o : checked) {
-				checkedItems.add((String) o);
-			}
-		}
+		final List<String> checkedTags = getCheckedItems(tagFilter);
+		final List<String> checkedUids = getCheckedItems(uidFilter);
 
 		final Pattern filter = filterRegEx;
 		SwingUtils.executNonUi(new Runnable() {
 			@Override
 			public void run() {
 				if (model != null) {
-					model.setFilter(filter, checkedItems);
+					model.setFilter(filter, checkedTags, checkedUids);
 				}
 			}
 		});
@@ -164,10 +182,26 @@ public class FilterPanel extends JPanel {
 
 	public void setModel(LoggerTableModel model) {
 		this.model = model;
-		tagModel = rtFilter.getModel();
+		tagModel = tagFilter.getModel();
 		model.setTagModel(tagModel);
 
 		tagModel.addListCheckListener(new ListCheckListener() {
+
+			@Override
+			public void removeCheck(ListEvent event) {
+				resetFilter();
+			}
+
+			@Override
+			public void addCheck(ListEvent event) {
+				resetFilter();
+			}
+		});
+
+		uidModel = uidFilter.getModel();
+		model.setUidModel(uidModel);
+
+		uidModel.addListCheckListener(new ListCheckListener() {
 
 			@Override
 			public void removeCheck(ListEvent event) {

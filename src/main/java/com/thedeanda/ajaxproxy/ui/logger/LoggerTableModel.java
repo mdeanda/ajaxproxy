@@ -30,6 +30,10 @@ public class LoggerTableModel extends AbstractTableModel implements LoggerMessag
 	private Set<String> tags = new TreeSet<>();
 	private ListCheckModel tagModel;
 
+	private Set<String> uids = new TreeSet<>();
+	private ListCheckModel uidModel;
+	private List<String> filterUids;
+
 	@Override
 	public int getRowCount() {
 		return items.size();
@@ -99,6 +103,10 @@ public class LoggerTableModel extends AbstractTableModel implements LoggerMessag
 				updateTags();
 			}
 
+			if (!uids.contains(message.getUid())) {
+				updateUids();
+			}
+
 			fireTableRowsInserted(row, row);
 		}
 	}
@@ -110,18 +118,20 @@ public class LoggerTableModel extends AbstractTableModel implements LoggerMessag
 		return null;
 	}
 
-	public void clear() {	
+	public void clear() {
 		int size = items.size();
 		items.clear();
 		allItems.clear();
 		fireTableRowsDeleted(0, size);
 		updateTags();
+		updateUids();
 	}
 
-	public void setFilter(Pattern filter, List<String> tags) {
+	public void setFilter(Pattern filter, List<String> tags, List<String> uids) {
 		log.warn("is event dispatch thread: {}", javax.swing.SwingUtilities.isEventDispatchThread());
 		this.filterPattern = filter;
 		this.filterTags = tags;
+		this.filterUids = uids;
 		filterReset();
 	}
 
@@ -136,6 +146,7 @@ public class LoggerTableModel extends AbstractTableModel implements LoggerMessag
 		}
 
 		updateTags();
+		updateUids();
 		fireTableDataChanged();
 	}
 
@@ -163,10 +174,41 @@ public class LoggerTableModel extends AbstractTableModel implements LoggerMessag
 		}
 	}
 
+	private void updateUids() {
+		Set<String> newUids = new TreeSet<>();
+
+		for (LoggerMessage message : allItems) {
+			newUids.add(message.getUid());
+		}
+
+		if (!newUids.containsAll(uids) || !uids.containsAll(newUids)) {
+			for (String uid : newUids) {
+				if (!uids.contains(uid)) {
+					uids.add(uid);
+					uidModel.addElement(uid);
+				}
+			}
+			for (String uid : uids) {
+				if (!newUids.contains(uid)) {
+					uidModel.removeElement(uid);
+				}
+			}
+			uids.clear();
+			uids.addAll(newUids);
+		}
+	}
+
 	private LoggerMessage filter(LoggerMessage message) {
 		if (message != null && filterTags != null && !filterTags.isEmpty()) {
 			log.info("tags found, filter by tags");
 			if (!filterTags.contains(message.getTag())) {
+				log.info("tag doesn't match, filter {}", message);
+				message = null;
+			}
+		}
+		if (message != null && filterUids != null && !filterUids.isEmpty()) {
+			log.info("tags found, filter by uids");
+			if (!filterUids.contains(message.getUid())) {
 				log.info("tag doesn't match, filter {}", message);
 				message = null;
 			}
@@ -185,5 +227,10 @@ public class LoggerTableModel extends AbstractTableModel implements LoggerMessag
 	public void setTagModel(ListCheckModel tagModel) {
 		this.tagModel = tagModel;
 		updateTags();
+	}
+
+	public void setUidModel(ListCheckModel uidModel) {
+		this.uidModel = uidModel;
+		updateUids();
 	}
 }
