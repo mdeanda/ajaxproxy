@@ -67,16 +67,16 @@ public class FilterPanel extends JPanel {
 		layout.putConstraint(SpringLayout.WEST, filter, 10, SpringLayout.EAST, lbl);
 		layout.putConstraint(SpringLayout.EAST, filter, 200, SpringLayout.WEST, filter);
 
-		layout.putConstraint(SpringLayout.NORTH, tagFilter, 0, SpringLayout.NORTH, filter);
-		layout.putConstraint(SpringLayout.WEST, tagFilter, 10, SpringLayout.EAST, filter);
-		layout.putConstraint(SpringLayout.EAST, tagFilter, 100, SpringLayout.WEST, tagFilter);
-
 		layout.putConstraint(SpringLayout.NORTH, uidFilter, 0, SpringLayout.NORTH, filter);
-		layout.putConstraint(SpringLayout.WEST, uidFilter, 10, SpringLayout.EAST, tagFilter);
+		layout.putConstraint(SpringLayout.WEST, uidFilter, 10, SpringLayout.EAST, filter);
 		layout.putConstraint(SpringLayout.EAST, uidFilter, 100, SpringLayout.WEST, uidFilter);
 
+		layout.putConstraint(SpringLayout.NORTH, tagFilter, 0, SpringLayout.NORTH, filter);
+		layout.putConstraint(SpringLayout.WEST, tagFilter, 10, SpringLayout.EAST, uidFilter);
+		layout.putConstraint(SpringLayout.EAST, tagFilter, 100, SpringLayout.WEST, tagFilter);
+
 		layout.putConstraint(SpringLayout.NORTH, clearBtn, 20, SpringLayout.NORTH, this);
-		layout.putConstraint(SpringLayout.WEST, clearBtn, 10, SpringLayout.EAST, uidFilter);
+		layout.putConstraint(SpringLayout.WEST, clearBtn, 10, SpringLayout.EAST, tagFilter);
 		layout.putConstraint(SpringLayout.NORTH, exportBtn, 0, SpringLayout.NORTH, clearBtn);
 		layout.putConstraint(SpringLayout.WEST, exportBtn, 10, SpringLayout.EAST, clearBtn);
 	}
