@@ -5,7 +5,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -31,6 +33,8 @@ import org.slf4j.LoggerFactory;
 
 import com.thedeanda.ajaxproxy.filter.ProxyFilter;
 import com.thedeanda.ajaxproxy.filter.ThrottleFilter;
+import com.thedeanda.ajaxproxy.filter.handler.logger.LoggerMessage;
+import com.thedeanda.ajaxproxy.filter.handler.logger.LoggerMessageListener;
 import com.thedeanda.ajaxproxy.http.RequestListener;
 import com.thedeanda.ajaxproxy.model.ProxyPath;
 import com.thedeanda.ajaxproxy.model.config.AjaxProxyConfig;
@@ -39,7 +43,7 @@ import com.thedeanda.javajson.JsonArray;
 import com.thedeanda.javajson.JsonObject;
 import com.thedeanda.javajson.JsonValue;
 
-public class AjaxProxy implements Runnable {
+public class AjaxProxy implements Runnable, LoggerMessageListener {
 	private static final Logger log = LoggerFactory.getLogger(AjaxProxy.class);
 	private int port = 0;
 	private int httpsPort = 0;
@@ -56,6 +60,7 @@ public class AjaxProxy implements Runnable {
 	private ThrottleFilter throttleFilter;
 	private boolean mergeMode = false;
 	private List<MergeServlet> mergeServlets = new ArrayList<MergeServlet>();
+	private Collection<LoggerMessageListener> messageListeners = new HashSet<>();
 	private ArrayList<RequestListener> proxyListeners;
 	private RequestListener listener;
 
@@ -114,6 +119,12 @@ public class AjaxProxy implements Runnable {
 	public void addProxyListener(ProxyListener pl) {
 		synchronized (listeners) {
 			listeners.add(pl);
+		}
+	}
+
+	public void addLoggerMessageListener(LoggerMessageListener listener) {
+		synchronized (messageListeners) {
+			this.messageListeners.add(listener);
 		}
 	}
 
@@ -372,6 +383,8 @@ public class AjaxProxy implements Runnable {
 		}
 	}
 
+	// TODO: needs to reset or add a reset to clear all listener lists to avoid
+	// memory leak from ui
 	public void stop() {
 		try {
 			if (jettyServer != null) {
@@ -460,6 +473,22 @@ public class AjaxProxy implements Runnable {
 
 	public ThrottleFilter getThrottleFilter() {
 		return throttleFilter;
+	}
+
+	@Override
+	public void messageReceived(LoggerMessage message) {
+		Collection<LoggerMessageListener> tmp = new HashSet<>();
+		synchronized (messageListeners) {
+			tmp.addAll(messageListeners);
+		}
+
+		for (LoggerMessageListener l : tmp) {
+			try {
+				l.messageReceived(message);
+			} catch (Exception e) {
+				log.warn(e.getMessage(), e);
+			}
+		}
 	}
 
 }

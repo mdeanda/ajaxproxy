@@ -38,6 +38,12 @@ public class DocumentParser {
 		return container;
 	}
 
+	public DocumentContainer parse(JsonArray message) {
+		DocumentContainer container = new DocumentContainer();
+		tryParseJsonArray(container, message);
+		return container;
+	}
+
 	private DocumentContainer parseInternal(byte[] data) {
 		DocumentContainer container = new DocumentContainer();
 
@@ -129,14 +135,18 @@ public class DocumentParser {
 			log.debug("start parsing json");
 			try {
 				JsonArray json = JsonArray.parse(input);
-				TreeBuilder treeBuilder = new TreeBuilder();
-				container.treeNode = treeBuilder.buildTree(json);
-				setFormatted(container, json.toString(4));
+				tryParseJsonArray(container, json);
 			} catch (Exception e) {
 				log.trace(e.getMessage(), e);
 			}
 			log.debug("done parsing json");
 		}
+	}
+
+	private void tryParseJsonArray(DocumentContainer container, JsonArray json) {
+		TreeBuilder treeBuilder = new TreeBuilder();
+		container.treeNode = treeBuilder.buildTree(json);
+		setFormatted(container, json.toString(4));
 	}
 
 	private void tryParseXml(DocumentContainer container, String input) {
@@ -167,4 +177,5 @@ public class DocumentParser {
 		}
 		return out.toString();
 	}
+
 }
