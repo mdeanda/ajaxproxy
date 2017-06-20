@@ -70,6 +70,17 @@ var Logger = new (function() {
 	}
 
 	return {
+		applyLogger: function(obj, tag) {
+			var me = this;
+			obj.log = function() {
+				var args = [];
+				args.push(tag);
+				for (var i in arguments) {
+					args.push(arguments[i]);
+				}
+				me.log.apply(me, args);
+			}
+		},	
 		log: function(tag, message) {
 			var now = new Date().getTime();
 			var ts = now - startTime;
