@@ -53,6 +53,7 @@ public class GeneralPanel extends JPanel implements ChangeListener, ActionListen
 	private JSlider forcedLatency;
 	private List<OptionValue> delayOptionValues;
 	private JButton folderButton;
+	final JFileChooser folderChooser;
 	final JFileChooser fileChooser;
 	private List<OptionValue> cacheOptionsValues;
 	private JSlider cacheSlider;
@@ -62,8 +63,9 @@ public class GeneralPanel extends JPanel implements ChangeListener, ActionListen
 
 	public GeneralPanel(final SettingsChangedListener listener) {
 		// TODO: track changes to text fields
+		folderChooser = new JFileChooser();
+		folderChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		fileChooser = new JFileChooser();
-		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 
 		port = SwingUtils.newIntegerField();
 
@@ -90,6 +92,7 @@ public class GeneralPanel extends JPanel implements ChangeListener, ActionListen
 		sslFileLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		sslFile = SwingUtils.newJTextField();
 		sslFileButton = new JButton("...");
+		sslFileButton.addActionListener(this);
 
 		add(sslPortLabel);
 		add(sslPort);
@@ -425,7 +428,7 @@ public class GeneralPanel extends JPanel implements ChangeListener, ActionListen
 		ssl.put("port", sslPort.getText());
 		ssl.put("keystore", sslFile.getText());
 		if (saveSslPassword.isSelected()) {
-			//TODO: add simple encryption at least
+			// TODO: add simple encryption at least
 			ssl.put("keystorePassword", sslKeystorePass.getText());
 			ssl.put("sslKeyPassword", sslKeystorePass2.getText());
 		}
@@ -448,6 +451,8 @@ public class GeneralPanel extends JPanel implements ChangeListener, ActionListen
 		Object source = e.getSource();
 		if (source == folderButton) {
 			pickResourceBase();
+		} else if (source == sslFileButton) {
+			pickSslKeystore();
 		}
 	}
 
@@ -456,6 +461,22 @@ public class GeneralPanel extends JPanel implements ChangeListener, ActionListen
 			// TODO: have a method to resolve relative path
 			File file = new File(resourceBase.getText());
 			if (file.exists()) {
+				folderChooser.setCurrentDirectory(file);
+			}
+		}
+		int retVal = folderChooser.showOpenDialog(this);
+		if (retVal == JFileChooser.APPROVE_OPTION) {
+			File file = folderChooser.getSelectedFile();
+			// TODO: convert to relative path when possible
+			resourceBase.setText(file.getAbsolutePath());
+		}
+	}
+
+	private void pickSslKeystore() {
+		if (!StringUtils.isBlank(sslFile.getText())) {
+			// TODO: have a method to resolve relative path
+			File file = new File(sslFile.getText());
+			if (file.exists()) {
 				fileChooser.setCurrentDirectory(file);
 			}
 		}
@@ -463,7 +484,7 @@ public class GeneralPanel extends JPanel implements ChangeListener, ActionListen
 		if (retVal == JFileChooser.APPROVE_OPTION) {
 			File file = fileChooser.getSelectedFile();
 			// TODO: convert to relative path when possible
-			resourceBase.setText(file.getAbsolutePath());
+			sslFile.setText(file.getAbsolutePath());
 		}
 	}
 }
