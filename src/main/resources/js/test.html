@@ -1,0 +1,47 @@
+<!DOCTYPE HTML>
+
+<html>
+<head>
+	<title>Ajax Proxy Logger Test Page</title>
+	<script src="/logger"></script>
+	<script>
+"use strict";
+
+function batch1() {
+	Logger.log("b1", "monkey hello");
+}
+
+function batch2() {
+	Logger.log("b2", "monkey help 2");
+	Logger.log("b2", "monkey 3", {a:1});
+	Logger.log("b2", "monkey 4");
+	Logger.log("b2", "monkey 5", {b:true,c:"monkey"}, {a:3}, 32);
+	Logger.log("b2", "monkey 6");
+}
+
+
+
+var fnList = [ batch1, batch2 ];
+var index = 0;
+var timer = 0;
+
+var timer = setInterval(function() {
+	if (fnList.length <= index) {
+		clearInterval(timer);
+		return;
+	}
+
+	var fn = fnList[index];
+	index++;
+	fn();
+}, 1000);
+	</script>
+</head>
+<body>
+
+<h1>Test Logger</h1>
+
+<p>This is a sample page that uses the built in logger</p>
+
+</body>
+</html>

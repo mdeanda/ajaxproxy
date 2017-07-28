@@ -5,7 +5,7 @@
     "forcedLatency":0,
     "maxBitrate":0
   },
-  "port":9247,
+  "port":8080,
   "proxy":[
     {
       "cache":false,
