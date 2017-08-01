@@ -1,5 +1,6 @@
 package com.thedeanda.ajaxproxy.model.config;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,6 +12,14 @@ public class AjaxProxyConfig {
 	private boolean showIndex;
 	private List<ProxyConfig> proxyConfig = new ArrayList<>();
 	private Map<String, String> variables = new HashMap<>();
+	/**
+	 * file points to this objects "saved" location to use as reference for
+	 * relative paths
+	 */
+	private File configFile;
+
+	// missing request delay, cache time, merge
+	// add config version
 
 	public Map<String, String> getVariables() {
 		return variables;
@@ -50,5 +59,13 @@ public class AjaxProxyConfig {
 
 	public void setProxyConfig(List<ProxyConfig> proxyConfig) {
 		this.proxyConfig = proxyConfig;
+	}
+
+	public File getConfigFile() {
+		return configFile;
+	}
+
+	public void setConfigFile(File configFile) {
+		this.configFile = configFile;
 	}
 }
