@@ -12,6 +12,7 @@ public class AjaxProxyConfig {
 	private boolean showIndex;
 	private List<ProxyConfig> proxyConfig = new ArrayList<>();
 	private Map<String, String> variables = new HashMap<>();
+	
 	/**
 	 * file points to this objects "saved" location to use as reference for
 	 * relative paths

@@ -23,6 +23,7 @@ import org.eclipse.jetty.server.SecureRequestCustomizer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.SslConnectionFactory;
+import org.eclipse.jetty.server.handler.AllowSymLinkAliasChecker;
 import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
@@ -311,6 +312,9 @@ public class AjaxProxy implements Runnable, LoggerMessageListener {
 			root.setContextPath("/");
 			jettyServer.setHandler(root);
 
+			AllowSymLinkAliasChecker alias = new AllowSymLinkAliasChecker();
+			root.addAliasCheck(alias);
+			
 			FilterHolder throttleFilterHolder = new FilterHolder(throttleFilter);
 			EnumSet<DispatcherType> dispatches = EnumSet.allOf(DispatcherType.class);
 			root.addFilter(throttleFilterHolder, "/*", dispatches);

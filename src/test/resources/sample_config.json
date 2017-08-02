@@ -14,6 +14,14 @@
       "hostHeader":"",
       "path":"${path}/.*",
       "port":80
+    },
+    {
+      "cache":false,
+      "cacheDuration":20,
+      "host":"example.com",
+      "hostHeader":"",
+      "path":"/example/.*",
+      "port":8080
     }
   ],
   "resource":{},
