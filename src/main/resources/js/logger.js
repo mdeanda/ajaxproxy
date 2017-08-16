@@ -68,6 +68,32 @@ var Logger = new (function() {
 		
 		return output;
 	}
+	
+	function proxyFunction(object, key, objectName) {
+		var fn = object[key];
+		var field = objectName + "." + key;
+		Logger.log("ProxyConfig", field);
+		object[key] = function() {
+			var ctx = this;
+			Logger.log("Proxy", field);
+			try {
+				return fn.apply(ctx, arguments);
+			} catch(e) {
+				Logger.log("ProxyError", field, e);
+				throw e;
+			}
+		}
+	}
+	function proxyObject(object, objectName) {
+		if (typeof object != 'object' || !object) return;
+
+		for (var key in object) {
+			var f = object[key];
+			if (typeof f == 'function') {
+				proxyFunction(object, key, objectName);
+			}
+		}
+	}
 
 	return {
 		applyLogger: function(obj, tag) {
@@ -80,7 +106,7 @@ var Logger = new (function() {
 				}
 				me.log.apply(me, args);
 			}
-		},	
+		},
 		log: function(tag, message) {
 			var now = new Date().getTime();
 			var ts = now - startTime;
@@ -96,6 +122,9 @@ var Logger = new (function() {
 			}
 
 			sendData(obj);
+		},
+		proxy: function(object, objectName) {
+			proxyObject(object, objectName);
 		}
 	};
 })();
