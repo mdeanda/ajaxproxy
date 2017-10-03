@@ -4,10 +4,11 @@ var Logger = new (function() {
 	var startTime = new Date().getTime();
 	var uid = getUid(startTime);
 	var index = 0;
-	var delay = 500;
+	var delay = 300;
 	var timer = null;
 	var queue = [];
 	var proxyTabIndex = 0;
+	var MAX = 50;
 
 	function getUid(startTime) {
 		var s = '0000' + (Math.floor(Math.random() * 1679616)).toString(36);
@@ -21,6 +22,10 @@ var Logger = new (function() {
 	
 	function sendData(data) {
 		queue.push(data);
+		sendLater();
+	}
+
+	function sendLater() {
 		if (timer) {
 			clearTimeout(timer);
 		}
@@ -30,9 +35,14 @@ var Logger = new (function() {
 	}
 	
 	function actuallySendData() {
-		var data = queue;
-		queue = [];
+		var data = null;
 		timer = null;
+		if (queue.length > MAX) {
+			data = queue.splice(0, MAX);
+		} else {
+			data = queue;
+			queue = [];
+		}
 		
 		var URL = "%PATH%";
 		var request;
