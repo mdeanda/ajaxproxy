@@ -76,6 +76,8 @@ public class Convertor {
 		config.setShowIndex(json.getBoolean(AP_SHOW_INDEX));
 
 		List<ProxyConfig> proxies = config.getProxyConfig();
+		//logger gets added first so it has priority
+		//TODO: externalize "/logger" path
 		proxies.add(new ProxyConfigLogger("/logger"));
 		for (JsonValue val : json.getJsonArray(AP_PROXY)) {
 			ProxyConfig pc = readProxyConfig(val.getJsonObject());
