@@ -4,6 +4,11 @@ import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
+/**
+ * TODO: move this to "model" package
+ * @author mdeanda
+ *
+ */
 @DatabaseTable(tableName = "resource")
 public class StoredResource {
 	@DatabaseField(id = true, width = 64)

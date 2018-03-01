@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 
 import javax.swing.table.AbstractTableModel;
 
+import org.apache.commons.lang3.StringUtils;
 import org.japura.gui.model.ListCheckModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -99,8 +100,10 @@ public class LoggerTableModel extends AbstractTableModel implements LoggerMessag
 			int row = items.size();
 			items.add(message);
 
-			if (!tags.contains(message.getTag())) {
-				updateTags();
+			if (!StringUtils.isBlank(message.getTag())) {
+				if (!tags.contains(message.getTag())) {
+					updateTags();
+				}
 			}
 
 			if (!uids.contains(message.getUid())) {
@@ -154,7 +157,9 @@ public class LoggerTableModel extends AbstractTableModel implements LoggerMessag
 		Set<String> newTags = new TreeSet<>();
 
 		for (LoggerMessage message : allItems) {
-			newTags.add(message.getTag());
+			if (!StringUtils.isBlank(message.getTag())) {
+				newTags.add(message.getTag());
+			}
 		}
 
 		if (!newTags.containsAll(tags) || !tags.containsAll(newTags)) {
@@ -200,23 +205,23 @@ public class LoggerTableModel extends AbstractTableModel implements LoggerMessag
 
 	private LoggerMessage filter(LoggerMessage message) {
 		if (message != null && filterTags != null && !filterTags.isEmpty()) {
-			log.info("tags found, filter by tags");
+			log.debug("tags found, filter by tags");
 			if (!filterTags.contains(message.getTag())) {
-				log.info("tag doesn't match, filter {}", message);
+				log.debug("tag doesn't match, filter {}", message);
 				message = null;
 			}
 		}
 		if (message != null && filterUids != null && !filterUids.isEmpty()) {
-			log.info("tags found, filter by uids");
+			log.debug("tags found, filter by uids");
 			if (!filterUids.contains(message.getUid())) {
-				log.info("tag doesn't match, filter {}", message);
+				log.debug("tag doesn't match, filter {}", message);
 				message = null;
 			}
 		}
 		if (message != null && filterPattern != null) {
 			String ms = message.getMessage().toString();
 			if (!filterPattern.matcher(ms).matches()) {
-				log.info("regex doesn't match, filter {}", message);
+				log.debug("regex doesn't match, filter {}", message);
 				message = null;
 			}
 		}

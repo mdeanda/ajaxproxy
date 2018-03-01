@@ -1,8 +1,8 @@
 package com.thedeanda.ajaxproxy.filter;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
@@ -24,7 +24,6 @@ import com.thedeanda.ajaxproxy.cache.NoOpCache;
 import com.thedeanda.ajaxproxy.filter.handler.FileRequestHandler;
 import com.thedeanda.ajaxproxy.filter.handler.ProxyRequestHandler;
 import com.thedeanda.ajaxproxy.filter.handler.logger.LoggerRequestHandler;
-import com.thedeanda.ajaxproxy.http.HttpClient;
 import com.thedeanda.ajaxproxy.http.RequestListener;
 import com.thedeanda.ajaxproxy.model.ProxyContainer;
 import com.thedeanda.ajaxproxy.model.config.AjaxProxyConfig;
@@ -45,7 +44,7 @@ public class ProxyFilter implements Filter {
 
 	private AjaxProxy ajaxProxy;
 
-	private Set<ProxyContainer> proxyContainers;
+	private List<ProxyContainer> proxyContainers;
 
 	private RequestListener listener;
 
@@ -107,7 +106,7 @@ public class ProxyFilter implements Filter {
 
 	public void reset() {
 		AjaxProxyConfig config = ajaxProxy.getAjaxProxyConfig();
-		proxyContainers = new HashSet<ProxyContainer>();
+		proxyContainers = new ArrayList<ProxyContainer>();
 		for (ProxyConfig proxyConfig : config.getProxyConfig()) {
 			loadProxyConfigRequest(proxyConfig);
 		}

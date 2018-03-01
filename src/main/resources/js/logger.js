@@ -4,9 +4,11 @@ var Logger = new (function() {
 	var startTime = new Date().getTime();
 	var uid = getUid(startTime);
 	var index = 0;
-	var delay = 500;
+	var delay = 300;
 	var timer = null;
 	var queue = [];
+	var proxyTabIndex = 0;
+	var MAX = 50;
 
 	function getUid(startTime) {
 		var s = '0000' + (Math.floor(Math.random() * 1679616)).toString(36);
@@ -20,6 +22,10 @@ var Logger = new (function() {
 	
 	function sendData(data) {
 		queue.push(data);
+		sendLater();
+	}
+
+	function sendLater() {
 		if (timer) {
 			clearTimeout(timer);
 		}
@@ -29,9 +35,14 @@ var Logger = new (function() {
 	}
 	
 	function actuallySendData() {
-		var data = queue;
-		queue = [];
+		var data = null;
 		timer = null;
+		if (queue.length > MAX) {
+			data = queue.splice(0, MAX);
+		} else {
+			data = queue;
+			queue = [];
+		}
 		
 		var URL = "%PATH%";
 		var request;
@@ -68,6 +79,95 @@ var Logger = new (function() {
 		
 		return output;
 	}
+	
+	function proxyTabs(n) {
+		var ret = '';
+		for (var i=0; i<n; i++) {
+			ret += '--';
+		}
+		return ret;
+	}
+
+	function toStringShort(v) {
+		var t = typeof v;
+		if (v == null || t == 'undefined'
+				|| t == 'number' || t == 'boolean') {
+			return v;
+		}
+		if (typeof v == 'string') {
+			var l = v.length;
+			if (l > 30) {
+				return '"' + v.substring(0,30) + '..."';
+			} else {
+				return '"' + v + '"';
+			}
+		}
+		if (v instanceof Array) {
+			return '[Array]';
+		} else {
+			return '[Object]';
+		}
+	}
+	
+	function proxyFunction(object, key, objectName) {
+		var fn = object[key];
+		var field = objectName + "." + key;
+		Logger.log("Proxy Config", field);
+		object[key] = function() {
+			var ctx = this;
+			var params = [];
+			try {
+				for (var a in arguments) {
+					params.push(toStringShort(arguments[a]));
+				}
+			} catch(e) {};
+			var msg = proxyTabs(proxyTabIndex) + field + '(' + params.join(',') + ')';
+			proxyTabIndex++;
+			try {
+				var ret = fn.apply(ctx, arguments);
+				proxyTabIndex--;
+				Logger.log("Proxy Method Called", msg, params, ret);
+				return ret;
+			} catch(e) {
+				proxyTabIndex--;
+				Logger.log("Proxy Error", msg, params, e);
+				throw e;
+			}
+		}
+	}
+	function isInIgnoreList(ignoreList, name) {
+		var ret = false;
+		if (ignoreList) {
+			for (var i=0; i<ignoreList.length; i++) {
+				//TODO: support regex as well
+				var item = ignoreList[i];
+				if (item instanceof RegExp) {
+					if (item.test(name)) {
+						ret = true;
+						break;
+					}
+				} else if (item == name) {
+					ret = true;
+					break;
+				}
+			}
+		}
+		return ret;
+	}
+	function proxyObject(object, objectName, ignoreList) {
+		if (typeof object != 'object' || !object) return;
+
+		for (var key in object) {
+			if (!isInIgnoreList(ignoreList, key)) {
+				var f = object[key];
+				if (typeof f == 'function') {
+					proxyFunction(object, key, objectName);
+				}
+			} else {
+				Logger.log("Proxy Filter", key);	
+			}
+		}
+	}
 
 	return {
 		applyLogger: function(obj, tag) {
@@ -80,7 +180,7 @@ var Logger = new (function() {
 				}
 				me.log.apply(me, args);
 			}
-		},	
+		},
 		log: function(tag, message) {
 			var now = new Date().getTime();
 			var ts = now - startTime;
@@ -96,6 +196,9 @@ var Logger = new (function() {
 			}
 
 			sendData(obj);
+		},
+		proxy: function(object, objectName, ignoreList) {
+			proxyObject(object, objectName, ignoreList);
 		}
 	};
 })();

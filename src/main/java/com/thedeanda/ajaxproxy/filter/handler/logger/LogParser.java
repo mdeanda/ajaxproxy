@@ -35,7 +35,7 @@ public class LogParser implements Runnable {
 	}
 
 	private void handleLogMessages(JsonArray array) {
-		log.warn("array data: {}", array);
+		log.debug("array data: {}", array);
 		for (JsonValue v : array) {
 			if (v.isJsonObject()) {
 				LoggerMessage msg = parse(v.getJsonObject());
@@ -55,7 +55,7 @@ public class LogParser implements Runnable {
 		ret.setIndex(json.getInt("index"));
 		ret.setMessage(json.getJsonArray("message"));
 
-		log.info("parsed object: {}", ret);
+		log.debug("parsed object: {}", ret);
 		return ret;
 	}
 
