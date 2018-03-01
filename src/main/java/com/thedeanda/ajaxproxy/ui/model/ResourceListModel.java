@@ -198,7 +198,8 @@ public class ResourceListModel extends AbstractListModel<Resource> {
 		}
 	}
 
-	public void setFilter(Pattern filterRegEx, List<RequestType> checkedItems) {
+	public void setFilter(Pattern filterOutRegEx, Pattern filterRegEx, List<RequestType> checkedItems) {
+		requestFilter.setFilterOutRegEx(filterOutRegEx);
 		requestFilter.setRegEx(filterRegEx);
 		requestFilter.setRequestTypes(checkedItems);
 		resetFilter();

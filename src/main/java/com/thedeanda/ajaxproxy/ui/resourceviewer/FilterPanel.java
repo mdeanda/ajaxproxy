@@ -34,6 +34,7 @@ public class FilterPanel extends JPanel {
 	private static final Logger log = LoggerFactory.getLogger(FilterPanel.class);
 	private static final long serialVersionUID = 3266059093827619992L;
 
+	private JTextField filterOut;
 	private JTextField filter;
 	private CheckComboBox rtFilter;
 	private JButton clearBtn;
@@ -59,24 +60,34 @@ public class FilterPanel extends JPanel {
 		SpringLayout layout = new SpringLayout();
 		setLayout(layout);
 
-		JLabel lbl = new JLabel("Filter");
+		JLabel lbl = new JLabel("Exclude");
 		add(lbl);
+
+		JLabel lbl2 = new JLabel("Include");
+		add(lbl2);
 
 		layout.putConstraint(SpringLayout.BASELINE, lbl, 0, SpringLayout.BASELINE, clearBtn);
 		layout.putConstraint(SpringLayout.WEST, lbl, 10, SpringLayout.WEST, this);
 
+		layout.putConstraint(SpringLayout.BASELINE, filterOut, 0, SpringLayout.BASELINE, lbl);
+		layout.putConstraint(SpringLayout.WEST, filterOut, 10, SpringLayout.EAST, lbl);
+		layout.putConstraint(SpringLayout.EAST, filterOut, 150, SpringLayout.WEST, filterOut);
+
+		layout.putConstraint(SpringLayout.BASELINE, lbl2, 0, SpringLayout.BASELINE, lbl);
+		layout.putConstraint(SpringLayout.WEST, lbl2, 20, SpringLayout.EAST, filterOut);
+
 		layout.putConstraint(SpringLayout.BASELINE, filter, 0, SpringLayout.BASELINE, lbl);
-		layout.putConstraint(SpringLayout.WEST, filter, 10, SpringLayout.EAST, lbl);
-		layout.putConstraint(SpringLayout.EAST, filter, 200, SpringLayout.WEST, filter);
+		layout.putConstraint(SpringLayout.WEST, filter, 10, SpringLayout.EAST, lbl2);
+		layout.putConstraint(SpringLayout.EAST, filter, 150, SpringLayout.WEST, filter);
 
 		layout.putConstraint(SpringLayout.NORTH, rtFilter, 0, SpringLayout.NORTH, filter);
 		layout.putConstraint(SpringLayout.WEST, rtFilter, 10, SpringLayout.EAST, filter);
 		layout.putConstraint(SpringLayout.EAST, rtFilter, 100, SpringLayout.WEST, rtFilter);
 
 		layout.putConstraint(SpringLayout.NORTH, clearBtn, 20, SpringLayout.NORTH, this);
-		layout.putConstraint(SpringLayout.WEST, clearBtn, 10, SpringLayout.EAST, rtFilter);
+		layout.putConstraint(SpringLayout.WEST, clearBtn, 40, SpringLayout.EAST, rtFilter);
 		layout.putConstraint(SpringLayout.NORTH, exportBtn, 0, SpringLayout.NORTH, clearBtn);
-		layout.putConstraint(SpringLayout.WEST, exportBtn, 10, SpringLayout.EAST, clearBtn);
+		layout.putConstraint(SpringLayout.WEST, exportBtn, 5, SpringLayout.EAST, clearBtn);
 		layout.putConstraint(SpringLayout.BASELINE, toggleBtn, 0, SpringLayout.BASELINE, clearBtn);
 		layout.putConstraint(SpringLayout.EAST, toggleBtn, -10, SpringLayout.EAST, this);
 
@@ -85,13 +96,34 @@ public class FilterPanel extends JPanel {
 	private void initButtons() {
 		filter = new JTextField(".*");
 		SwingUtils.prepJTextField(filter);
-		filter.setToolTipText("Filter path by java regex");
+		filter.setToolTipText("Filter path by java regex. Include items that match");
 		add(filter);
+		
+		
+		filterOut = new JTextField("");
+		SwingUtils.prepJTextField(filterOut);
+		filterOut.setToolTipText("Filter path by java regex. Exclude items that match.");
+		add(filterOut);
 
 		// Listen for changes in the text
 		filterOkColor = filter.getBackground();
 		filterBadColor = new Color(250, 210, 200);
+
 		filter.getDocument().addDocumentListener(new DocumentListener() {
+			public void changedUpdate(DocumentEvent e) {
+				resetFilter();
+			}
+
+			public void removeUpdate(DocumentEvent e) {
+				resetFilter();
+			}
+
+			public void insertUpdate(DocumentEvent e) {
+				resetFilter();
+			}
+		});
+
+		filterOut.getDocument().addDocumentListener(new DocumentListener() {
 			public void changedUpdate(DocumentEvent e) {
 				resetFilter();
 			}
@@ -167,6 +199,17 @@ public class FilterPanel extends JPanel {
 	private void resetFilter() {
 		// TODO: throttle processing here since it works as you type
 
+		Pattern filterRegExOut = null;
+		if (!StringUtils.isBlank(filterOut.getText())) {
+			try {
+				filterRegExOut = Pattern.compile(filterOut.getText());
+				filterOut.setBackground(filterOkColor);
+			} catch (PatternSyntaxException ex) {
+				filterRegExOut = null;
+				filterOut.setBackground(filterBadColor);
+			}
+		}
+
 		Pattern filterRegEx = null;
 		if (!StringUtils.isBlank(filter.getText())) {
 			try {
@@ -187,11 +230,12 @@ public class FilterPanel extends JPanel {
 		}
 
 		final Pattern filter = filterRegEx;
+		final Pattern filterOut = filterRegExOut;
 		SwingUtils.executNonUi(new Runnable() {
 			@Override
 			public void run() {
 				if (model != null) {
-					model.setFilter(filter, checkedItems);
+					model.setFilter(filterOut, filter, checkedItems);
 				}
 			}
 		});
