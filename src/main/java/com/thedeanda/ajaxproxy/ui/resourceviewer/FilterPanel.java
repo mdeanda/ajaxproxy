@@ -1,6 +1,7 @@
 package com.thedeanda.ajaxproxy.ui.resourceviewer;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -81,14 +82,15 @@ public class FilterPanel extends JPanel {
 		layout.putConstraint(SpringLayout.EAST, filter, 150, SpringLayout.WEST, filter);
 
 		layout.putConstraint(SpringLayout.NORTH, rtFilter, 0, SpringLayout.NORTH, filter);
+		layout.putConstraint(SpringLayout.SOUTH, rtFilter, 0, SpringLayout.SOUTH, filter);
 		layout.putConstraint(SpringLayout.WEST, rtFilter, 10, SpringLayout.EAST, filter);
 		layout.putConstraint(SpringLayout.EAST, rtFilter, 100, SpringLayout.WEST, rtFilter);
 
-		layout.putConstraint(SpringLayout.NORTH, clearBtn, 20, SpringLayout.NORTH, this);
-		layout.putConstraint(SpringLayout.WEST, clearBtn, 40, SpringLayout.EAST, rtFilter);
-		layout.putConstraint(SpringLayout.NORTH, exportBtn, 0, SpringLayout.NORTH, clearBtn);
-		layout.putConstraint(SpringLayout.WEST, exportBtn, 5, SpringLayout.EAST, clearBtn);
-		layout.putConstraint(SpringLayout.BASELINE, toggleBtn, 0, SpringLayout.BASELINE, clearBtn);
+		layout.putConstraint(SpringLayout.NORTH, clearBtn, 20, SpringLayout.NORTH, this); //everything follows this
+		layout.putConstraint(SpringLayout.EAST, clearBtn, -10, SpringLayout.WEST, exportBtn);
+		layout.putConstraint(SpringLayout.BASELINE, exportBtn, 0, SpringLayout.BASELINE, lbl);
+		layout.putConstraint(SpringLayout.EAST, exportBtn, -10, SpringLayout.WEST, toggleBtn);
+		layout.putConstraint(SpringLayout.BASELINE, toggleBtn, 0, SpringLayout.BASELINE, lbl);
 		layout.putConstraint(SpringLayout.EAST, toggleBtn, -10, SpringLayout.EAST, this);
 
 	}
