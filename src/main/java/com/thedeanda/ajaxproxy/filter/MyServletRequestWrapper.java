@@ -39,4 +39,9 @@ public class MyServletRequestWrapper extends HttpServletRequestWrapper {
 	public ByteArrayInputStream getClonedInputStream() {
 		return new ByteArrayInputStream(data);
 	}
+	
+	@Override
+	public String getQueryString() {
+		return null;
+	}
 }

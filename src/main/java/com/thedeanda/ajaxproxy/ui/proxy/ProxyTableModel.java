@@ -136,6 +136,11 @@ public class ProxyTableModel extends AbstractTableModel {
 		normalizeData();
 	}
 
+	public int addValue(ProxyConfig updatedValue) {
+		data.add(updatedValue);
+		return data.size();
+	}
+
 	private void normalizeData() {
 		List<ProxyConfig> toRemove = new ArrayList<>();
 		for (ProxyConfig proxyConfig : data) {

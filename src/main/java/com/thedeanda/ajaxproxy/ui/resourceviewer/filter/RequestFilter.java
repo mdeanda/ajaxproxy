@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 import com.thedeanda.ajaxproxy.ui.model.Resource;
 
 public class RequestFilter {
+	private Pattern filterOutRegEx;
 	private Pattern filterRegEx;
 	private List<RequestType> items;
 
@@ -14,6 +15,10 @@ public class RequestFilter {
 	}
 
 	public boolean accept(Resource item) {
+		if (filterOutRegEx != null && filterOutRegEx.matcher(item.getPath()).matches()) {
+			return false;
+		}
+		
 		if (filterRegEx != null && !filterRegEx.matcher(item.getPath()).matches()) {
 			return false;
 		}
@@ -38,5 +43,9 @@ public class RequestFilter {
 
 	public void setRegEx(Pattern filterRegEx) {
 		this.filterRegEx = filterRegEx;
+	}
+	
+	public void setFilterOutRegEx(Pattern regex) {
+		this.filterOutRegEx = regex;
 	}
 }
