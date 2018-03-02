@@ -33,7 +33,6 @@ import com.thedeanda.ajaxproxy.ui.proxy.ProxyPanel;
 import com.thedeanda.ajaxproxy.ui.proxy.ProxyTableModel;
 import com.thedeanda.ajaxproxy.ui.resourceviewer.ResourceViewerPanel;
 import com.thedeanda.ajaxproxy.ui.tamper.TamperPanel;
-import com.thedeanda.ajaxproxy.ui.tracker.FileTrackerPanel;
 import com.thedeanda.ajaxproxy.ui.update.UpdateCheckWorker;
 import com.thedeanda.ajaxproxy.ui.variable.VariablesPanel;
 import com.thedeanda.javajson.JsonException;
@@ -51,7 +50,6 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 	private MergeTableModel mergeModel;
 	private File configFile;
 	private JsonObject config;
-	private FileTrackerPanel trackerPanel;
 	private JTabbedPane tabs;
 	private GeneralPanel generalPanel;
 	private TamperPanel tamperPanel;
@@ -102,9 +100,6 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 
 		tamperPanel = new TamperPanel();
 		// tabs.add("Tamper", tamperPanel);
-
-		trackerPanel = new FileTrackerPanel();
-		// tabs.add("Tracker", trackerPanel);
 
 		resourceViewerPanel = new ResourceViewerPanel(resourceService);
 		tabs.add("Resource Viewer", resourceViewerPanel);
@@ -185,7 +180,6 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		json.put("proxy", proxyModel.getConfig(generalPanel.getCacheTime()));
 		json.put("merge", mergeModel.getConfig());
 		json.put("variables", variablePanel.getConfig());
-		json.put("tracker", trackerPanel.getConfig());
 		json.put("resource", resourceViewerPanel.getConfig());
 		json.put("tamper", tamperPanel.getConfig());
 
@@ -237,7 +231,6 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 			new Thread(proxy).start();
 			proxy.addRequestListener(resourceService);
 			generalPanel.setProxy(proxy);
-			trackerPanel.setProxy(proxy);
 			loggerPanel.setProxy(proxy);
 			resourceViewerPanel.setProxy(proxy);
 			started = true;
@@ -269,7 +262,6 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 				proxy = null;
 				p.stop();
 				generalPanel.setProxy(null);
-				trackerPanel.setProxy(null);
 				resourceViewerPanel.setProxy(null);
 			}
 		} finally {
@@ -315,7 +307,6 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		mergeModel.setConfig(config.getJsonArray("merge"));
 		variablePanel.setConfig(config.getJsonObject("variables"));
 		generalPanel.setConfig(config);
-		trackerPanel.setConfig(json.getJsonObject("tracker"));
 		resourceViewerPanel.setConfig(json.getJsonObject("resource"));
 		tamperPanel.setConfig(json.getJsonObject("tamper"));
 	}
