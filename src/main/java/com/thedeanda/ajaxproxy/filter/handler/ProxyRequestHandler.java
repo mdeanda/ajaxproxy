@@ -67,7 +67,7 @@ public class ProxyRequestHandler implements RequestHandler {
 
 		Header hostHeader = new BasicHeader("Host", hostHeaderString);
 		hdrs.add(hostHeader);
-		inputHeaders.add(new HttpHeader("Host", hostHeaderString));
+		inputHeaders.add(HttpHeader.builder().name("Host").value(hostHeaderString).build());
 
 		while (hnames.hasMoreElements()) {
 			String hn = hnames.nextElement();
@@ -76,7 +76,7 @@ public class ProxyRequestHandler implements RequestHandler {
 				// TODO: consider allowing header replacement via config
 				Header h = new BasicHeader(hn, request.getHeader(hn));
 				hdrs.add(h);
-				inputHeaders.add(new HttpHeader(hn, request.getHeader(hn)));
+				inputHeaders.add(HttpHeader.builder().name(hn).value(request.getHeader(hn)).build());
 			}
 		}
 		log.trace("headers: {}", inputHeaders);

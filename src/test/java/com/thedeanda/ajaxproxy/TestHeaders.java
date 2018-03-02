@@ -51,7 +51,6 @@ public class TestHeaders {
 		proxyPath.put(AjaxProxy.DOMAIN, REAL_HOST);
 		proxyPath.put(AjaxProxy.PATH, ".*");
 		proxyPath.put(AjaxProxy.PORT, 80);
-		proxyPath.put(AjaxProxy.NEW_PROXY, true);
 
 		AjaxProxy proxy = new AjaxProxy(config, new File("."));
 		new Thread(proxy).start();
