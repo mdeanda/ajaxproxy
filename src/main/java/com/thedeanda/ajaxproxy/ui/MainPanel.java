@@ -1,5 +1,6 @@
 package com.thedeanda.ajaxproxy.ui;
 
+import java.awt.CardLayout;
 import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -11,15 +12,15 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.SpringLayout;
 
-import org.apache.commons.lang3.StringUtils;
+import org.h2.value.CaseInsensitiveMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,6 +28,9 @@ import com.thedeanda.ajaxproxy.AjaxProxy;
 import com.thedeanda.ajaxproxy.ProxyListener;
 import com.thedeanda.ajaxproxy.service.ResourceService;
 import com.thedeanda.ajaxproxy.ui.logger.LoggerPanel;
+import com.thedeanda.ajaxproxy.ui.main.nav.MainNavPanel;
+import com.thedeanda.ajaxproxy.ui.main.nav.NavItem;
+import com.thedeanda.ajaxproxy.ui.main.nav.NavListener;
 import com.thedeanda.ajaxproxy.ui.merge.MergePanel;
 import com.thedeanda.ajaxproxy.ui.merge.MergeTableModel;
 import com.thedeanda.ajaxproxy.ui.proxy.ProxyPanel;
@@ -38,7 +42,7 @@ import com.thedeanda.ajaxproxy.ui.variable.VariablesPanel;
 import com.thedeanda.javajson.JsonException;
 import com.thedeanda.javajson.JsonObject;
 
-public class MainPanel extends JPanel implements ProxyListener, SettingsChangedListener, ActionListener {
+public class MainPanel extends JPanel implements ProxyListener, SettingsChangedListener, ActionListener, NavListener {
 	private static final long serialVersionUID = 1L;
 	private static final Logger log = LoggerFactory.getLogger(MainPanel.class);
 	private static final int CACHE_SIZE = 50;
@@ -60,9 +64,14 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 	private List<ProxyListener> listeners = new ArrayList<ProxyListener>();
 	private ResourceViewerPanel resourceViewerPanel;
 	private ResourceService resourceService;
-	private JButton releasesButton;
 	private VariablesPanel variablePanel;
 	private LoggerPanel loggerPanel;
+
+	private JPanel cardPanel;
+	private CardLayout cardLayout;
+	private static final String CARD_SERVER = "card_server";
+	private static final String CARD_RESOURCE_VIEWER = "card_resource_viewer";
+	private static final String CARD_LOGGER = "card_logger";
 
 	public MainPanel() {
 		SpringLayout layout = new SpringLayout();
@@ -82,8 +91,14 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 			}
 		});
 
+		cardPanel = new JPanel();
+		cardLayout = new CardLayout();
+		cardPanel.setLayout(cardLayout);
+
+		add(cardPanel);
+
 		this.tabs = new JTabbedPane();
-		add(tabs);
+		cardPanel.add(tabs, CARD_SERVER);
 
 		generalPanel = new GeneralPanel(this);
 		tabs.add("General", generalPanel);
@@ -102,51 +117,34 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		// tabs.add("Tamper", tamperPanel);
 
 		resourceViewerPanel = new ResourceViewerPanel(resourceService);
-		tabs.add("Resource Viewer", resourceViewerPanel);
+		// tabs.add("Resource Viewer", resourceViewerPanel);
+		cardPanel.add(resourceViewerPanel, CARD_RESOURCE_VIEWER);
 
 		loggerPanel = new LoggerPanel();
-		tabs.add("Logger", loggerPanel);
-		
+		// tabs.add("Logger", loggerPanel);
+		cardPanel.add(loggerPanel, CARD_LOGGER);
+
 		add(startStopBtn);
-		prepareReleasesButton();
-		add(releasesButton);
+
+		MainNavPanel navPanel = new MainNavPanel();
+		JScrollPane navComponent = new JScrollPane(navPanel);
+		add(navComponent);
+		navComponent.setBorder(null);
+		navPanel.addNavListener(this);
+
+		layout.putConstraint(SpringLayout.NORTH, navComponent, 0, SpringLayout.NORTH, this);
+		layout.putConstraint(SpringLayout.SOUTH, navComponent, 0, SpringLayout.SOUTH, this);
+		layout.putConstraint(SpringLayout.WEST, navComponent, 0, SpringLayout.WEST, this);
+		layout.putConstraint(SpringLayout.EAST, navComponent, 100, SpringLayout.WEST, navComponent);
 
 		layout.putConstraint(SpringLayout.SOUTH, startStopBtn, -10, SpringLayout.SOUTH, this);
 		layout.putConstraint(SpringLayout.EAST, startStopBtn, -10, SpringLayout.EAST, this);
-		layout.putConstraint(SpringLayout.NORTH, tabs, 15, SpringLayout.NORTH, this);
-		layout.putConstraint(SpringLayout.WEST, tabs, 10, SpringLayout.WEST, this);
-		layout.putConstraint(SpringLayout.EAST, tabs, -10, SpringLayout.EAST, this);
-		layout.putConstraint(SpringLayout.SOUTH, tabs, -10, SpringLayout.NORTH, startStopBtn);
-
-		layout.putConstraint(SpringLayout.SOUTH, releasesButton, 0, SpringLayout.SOUTH, startStopBtn);
-		layout.putConstraint(SpringLayout.WEST, releasesButton, 10, SpringLayout.WEST, this);
+		layout.putConstraint(SpringLayout.NORTH, cardPanel, 15, SpringLayout.NORTH, this);
+		layout.putConstraint(SpringLayout.WEST, cardPanel, 4, SpringLayout.EAST, navComponent);
+		layout.putConstraint(SpringLayout.EAST, cardPanel, -10, SpringLayout.EAST, this);
+		layout.putConstraint(SpringLayout.SOUTH, cardPanel, -10, SpringLayout.NORTH, startStopBtn);
 
 		clearAll();
-
-	}
-
-	private void prepareReleasesButton() {
-		releasesButton = new JButton("Update Available");
-		releasesButton.addActionListener(this);
-		releasesButton.setVisible(false);
-
-		new UpdateCheckWorker() {
-			@Override
-			protected void done() {
-				Boolean updateAvailable = null;
-				try {
-					updateAvailable = get();
-				} catch (InterruptedException | ExecutionException e) {
-				}
-				if (updateAvailable == Boolean.TRUE) {
-					releasesButton.setVisible(true);
-					String message = getMessage();
-					if (!StringUtils.isBlank(message)) {
-						releasesButton.setToolTipText(message);
-					}
-				}
-			}
-		}.execute();
 	}
 
 	public void addProxyListener(ProxyListener listener) {
@@ -185,7 +183,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 
 		generalPanel.updateConfig(json);
 		loggerPanel.updateConfig(json);
-		
+
 		log.trace(json.toString(2));
 		return json;
 	}
@@ -362,9 +360,20 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		Object source = e.getSource();
-		if (source == releasesButton) {
-			openReleasesPage();
+	}
+
+	@Override
+	public void navEvent(NavItem navItem, int index) {
+		switch (navItem) {
+		case Logger:
+			cardLayout.show(cardPanel, CARD_LOGGER);
+			break;
+		case RequestViewer:
+			cardLayout.show(cardPanel, CARD_RESOURCE_VIEWER);
+			break;
+		case Server:
+			cardLayout.show(cardPanel, CARD_SERVER);
+			break;
 		}
 	}
 }
