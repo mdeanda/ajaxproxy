@@ -26,6 +26,7 @@ import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
+import org.apache.http.client.methods.HttpPatch;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
@@ -218,21 +219,18 @@ public class HttpClient {
 		HttpRequestBase request = null;
 		try {
 			String target = url.toString();
-			HttpEntity requestBody;
+			HttpEntity requestBody = new ByteArrayEntity(data,
+					ContentType.APPLICATION_OCTET_STREAM);
 			switch (method) {
 			case GET:
 				request = new HttpGet(target);
 				break;
 			case POST:
-				requestBody = new ByteArrayEntity(data,
-						ContentType.APPLICATION_OCTET_STREAM);
 				HttpPost post = new HttpPost(target);
 				post.setEntity(requestBody);
 				request = post;
 				break;
 			case PUT:
-				requestBody = new ByteArrayEntity(data,
-						ContentType.APPLICATION_OCTET_STREAM);
 				HttpPut put = new HttpPut(target);
 				put.setEntity(requestBody);
 				request = put;
@@ -244,6 +242,11 @@ public class HttpClient {
 			case HEAD:
 				HttpHead head = new HttpHead(target);
 				request = head;
+				break;
+			case PATCH:
+				HttpPatch patch = new HttpPatch(target);
+				patch.setEntity(requestBody);
+				request = patch;
 				break;
 			}
 			request.setHeaders(requestHeaders);
