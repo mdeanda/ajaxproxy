@@ -1,5 +1,6 @@
 package com.thedeanda.ajaxproxy.ui.main.nav;
 
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -7,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
@@ -21,6 +23,11 @@ public class MainNavPanel extends JPanel {
 
 	private Set<NavListener> listeners = new HashSet<>();
 
+	private boolean started = false;
+	private JButton startButton;
+	private static final String START_LABEL = "Start";
+	private static final String STOP_LABEL = "Stop";
+
 	public MainNavPanel() {
 		JPanel panel = this;
 
@@ -28,9 +35,48 @@ public class MainNavPanel extends JPanel {
 		createNavButton(this, "Request Viewer", NavItem.RequestViewer, 0);
 		createNavButton(this, "Logger", NavItem.Logger, 0);
 
-		resetLayout(this);
+		initStartButton(panel);
 
-		//setBackground(getBackground().darker());
+		resetLayout(this);
+	}
+
+	public void selectNavItem(NavItem ni, int index) {
+		if (ni == NavItem.Start || ni == NavItem.Stop) {
+			started = (ni == NavItem.Start);
+			updateStartButton();
+		} else {
+			// TODO: implement this mode
+		}
+	}
+
+	private void initStartButton(JPanel panel) {
+		startButton = new JButton(START_LABEL);
+		panel.add(startButton);
+		startButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				toggleStart();
+			}
+		});
+	}
+
+	private void toggleStart() {
+		started = !started;
+		if (started) {
+			fireSelected(NavItem.Start, 0);
+		} else {
+			fireSelected(NavItem.Stop, 0);
+		}
+		updateStartButton();
+	}
+
+	private void updateStartButton() {
+		if (started) {
+			startButton.setText(STOP_LABEL);
+		} else {
+			startButton.setText(START_LABEL);
+		}
+
 	}
 
 	public void addNavListener(NavListener listener) {
@@ -83,10 +129,19 @@ public class MainNavPanel extends JPanel {
 			// layout.putConstraint(SpringLayout.SOUTH, btn, 0, SpringLayout.SOUTH, panel);
 
 			layout.putConstraint(SpringLayout.WEST, btn, 5, SpringLayout.WEST, panel);
-			layout.putConstraint(SpringLayout.EAST, btn, -5, SpringLayout.EAST, panel);
+			layout.putConstraint(SpringLayout.EAST, btn, -8, SpringLayout.EAST, panel);
 
 			lastButton = btn;
 		}
-		layout.putConstraint(SpringLayout.SOUTH, panel, 10, SpringLayout.SOUTH, lastButton);
+
+		layout.putConstraint(SpringLayout.WEST, startButton, 5, SpringLayout.WEST, panel);
+		layout.putConstraint(SpringLayout.EAST, startButton, -8, SpringLayout.EAST, panel);
+		layout.putConstraint(SpringLayout.SOUTH, startButton, -10, SpringLayout.SOUTH, panel);
+
+		// layout.putConstraint(SpringLayout.SOUTH, panel, 100, SpringLayout.SOUTH,
+		// lastButton);
+
+		// TODO: calculate this based on total number of buttons
+		setPreferredSize(new Dimension(1, 200));
 	}
 }
