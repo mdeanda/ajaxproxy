@@ -214,6 +214,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 			loggerPanel.setProxy(proxy);
 			resourceViewerPanel.setProxy(proxy);
 			started = true;
+			navPanel.selectNavItem(NavItem.Start, 0);
 			fireProxyStarted();
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
