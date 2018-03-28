@@ -75,7 +75,6 @@ public class AjaxProxy implements Runnable, LoggerMessageListener {
 	public static final String PORT = "port";
 	public static final String RESOURCE_BASE = "resourceBase";
 	public static final String SHOW_INDEX = "showIndex";
-	public static final String NEW_PROXY = "newProxy";
 	public static final String PROXY_ARRAY = "proxy";
 	public static final String DOMAIN = "domain";
 	public static final String PATH = "path";
@@ -229,7 +228,6 @@ public class AjaxProxy implements Runnable, LoggerMessageListener {
 				int port = 80;
 				String domain = null;
 				String path = null;
-				boolean newProxy = false;
 				JsonObject obj = val.getJsonObject();
 				if (obj.isString(DOMAIN))
 					domain = obj.getString(DOMAIN);
@@ -239,10 +237,13 @@ public class AjaxProxy implements Runnable, LoggerMessageListener {
 					port = obj.getInt(PORT);
 				else if (obj.isString(PORT))
 					port = Integer.parseInt(obj.getString(PORT));
-				newProxy = obj.getBoolean(NEW_PROXY);
 
 				if (domain != null && path != null && port > 0) {
-					ProxyPath proxyPath = new ProxyPath(domain, port, path, newProxy);
+					ProxyPath proxyPath = ProxyPath.builder()
+							.domain(domain)
+							.port(port)
+							.path(path)
+							.build();
 					ret.add(proxyPath);
 				}
 			}

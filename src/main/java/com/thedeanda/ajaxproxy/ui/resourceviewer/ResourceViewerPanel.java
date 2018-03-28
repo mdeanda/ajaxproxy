@@ -8,7 +8,6 @@ import javax.swing.SpringLayout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.thedeanda.ajaxproxy.AccessTracker;
 import com.thedeanda.ajaxproxy.AjaxProxy;
 import com.thedeanda.ajaxproxy.service.ResourceService;
 import com.thedeanda.ajaxproxy.ui.SwingUtils;
@@ -19,7 +18,7 @@ import com.thedeanda.ajaxproxy.ui.resourceviewer.list.ResourceListPanelListener;
 import com.thedeanda.javajson.JsonObject;
 
 /** tracks files that get loaded */
-public class ResourceViewerPanel extends JPanel implements AccessTracker, ResourceListPanelListener {
+public class ResourceViewerPanel extends JPanel implements ResourceListPanelListener {
 	private static final Logger log = LoggerFactory.getLogger(ResourceViewerPanel.class);
 	private static final long serialVersionUID = 1L;
 	private ResourcePanel resourcePanel;

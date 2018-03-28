@@ -1,8 +1,8 @@
 package com.thedeanda.ajaxproxy.ui;
 
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Desktop;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -11,49 +11,48 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
-import javax.swing.JButton;
+import javax.swing.BorderFactory;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.SpringLayout;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.thedeanda.ajaxproxy.AjaxProxy;
 import com.thedeanda.ajaxproxy.ProxyListener;
 import com.thedeanda.ajaxproxy.service.ResourceService;
+import com.thedeanda.ajaxproxy.ui.border.RightBorder;
 import com.thedeanda.ajaxproxy.ui.logger.LoggerPanel;
+import com.thedeanda.ajaxproxy.ui.main.nav.MainNavPanel;
+import com.thedeanda.ajaxproxy.ui.main.nav.NavItem;
+import com.thedeanda.ajaxproxy.ui.main.nav.NavListener;
 import com.thedeanda.ajaxproxy.ui.merge.MergePanel;
 import com.thedeanda.ajaxproxy.ui.merge.MergeTableModel;
 import com.thedeanda.ajaxproxy.ui.proxy.ProxyPanel;
 import com.thedeanda.ajaxproxy.ui.proxy.ProxyTableModel;
 import com.thedeanda.ajaxproxy.ui.resourceviewer.ResourceViewerPanel;
 import com.thedeanda.ajaxproxy.ui.tamper.TamperPanel;
-import com.thedeanda.ajaxproxy.ui.tracker.FileTrackerPanel;
 import com.thedeanda.ajaxproxy.ui.update.UpdateCheckWorker;
 import com.thedeanda.ajaxproxy.ui.variable.VariablesPanel;
 import com.thedeanda.javajson.JsonException;
 import com.thedeanda.javajson.JsonObject;
 
-public class MainPanel extends JPanel implements ProxyListener, SettingsChangedListener, ActionListener {
+public class MainPanel extends JPanel implements ProxyListener, SettingsChangedListener, NavListener {
 	private static final long serialVersionUID = 1L;
 	private static final Logger log = LoggerFactory.getLogger(MainPanel.class);
 	private static final int CACHE_SIZE = 50;
 
-	private JButton startStopBtn;
 	private boolean started = false;
 	private AjaxProxy proxy = null;
 	private ProxyTableModel proxyModel;
 	private MergeTableModel mergeModel;
 	private File configFile;
 	private JsonObject config;
-	private FileTrackerPanel trackerPanel;
-	private JTabbedPane tabs;
+	// private JTabbedPane tabs;
 	private GeneralPanel generalPanel;
 	private TamperPanel tamperPanel;
 
@@ -63,9 +62,15 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 	private List<ProxyListener> listeners = new ArrayList<ProxyListener>();
 	private ResourceViewerPanel resourceViewerPanel;
 	private ResourceService resourceService;
-	private JButton releasesButton;
 	private VariablesPanel variablePanel;
 	private LoggerPanel loggerPanel;
+
+	private JPanel cardPanel;
+	private CardLayout cardLayout;
+	private MainNavPanel navPanel;
+	private static final String CARD_SERVER = "card_server";
+	private static final String CARD_RESOURCE_VIEWER = "card_resource_viewer";
+	private static final String CARD_LOGGER = "card_logger";
 
 	public MainPanel() {
 		SpringLayout layout = new SpringLayout();
@@ -74,19 +79,18 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		File dbFile = ConfigService.get().getResourceHistoryDb();
 		resourceService = new ResourceService(CACHE_SIZE, dbFile);
 
-		startStopBtn = new JButton(START);
-		startStopBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent event) {
-				if (started)
-					stop();
-				else
-					start();
-			}
-		});
+		cardPanel = new JPanel();
+		cardLayout = new CardLayout();
+		cardPanel.setLayout(cardLayout);
 
-		this.tabs = new JTabbedPane();
-		add(tabs);
+		add(cardPanel);
+
+		JTabbedPane tabs = new JTabbedPane();
+		JPanel tabsPanel = new JPanel();
+		tabsPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+		tabsPanel.setLayout(new BorderLayout());
+		tabsPanel.add(tabs, BorderLayout.CENTER);
+		cardPanel.add(tabsPanel, CARD_SERVER);
 
 		generalPanel = new GeneralPanel(this);
 		JScrollPane scrollPane = new JScrollPane(generalPanel);
@@ -106,55 +110,32 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		tamperPanel = new TamperPanel();
 		// tabs.add("Tamper", tamperPanel);
 
-		trackerPanel = new FileTrackerPanel();
-		// tabs.add("Tracker", trackerPanel);
-
 		resourceViewerPanel = new ResourceViewerPanel(resourceService);
-		tabs.add("Resource Viewer", resourceViewerPanel);
+		// tabs.add("Resource Viewer", resourceViewerPanel);
+		cardPanel.add(resourceViewerPanel, CARD_RESOURCE_VIEWER);
 
 		loggerPanel = new LoggerPanel();
-		tabs.add("Logger", loggerPanel);
-		
-		add(startStopBtn);
-		prepareReleasesButton();
-		add(releasesButton);
+		// tabs.add("Logger", loggerPanel);
+		cardPanel.add(loggerPanel, CARD_LOGGER);
 
-		layout.putConstraint(SpringLayout.SOUTH, startStopBtn, -10, SpringLayout.SOUTH, this);
-		layout.putConstraint(SpringLayout.EAST, startStopBtn, -10, SpringLayout.EAST, this);
-		layout.putConstraint(SpringLayout.NORTH, tabs, 15, SpringLayout.NORTH, this);
-		layout.putConstraint(SpringLayout.WEST, tabs, 10, SpringLayout.WEST, this);
-		layout.putConstraint(SpringLayout.EAST, tabs, -10, SpringLayout.EAST, this);
-		layout.putConstraint(SpringLayout.SOUTH, tabs, -10, SpringLayout.NORTH, startStopBtn);
+		navPanel = new MainNavPanel();
+		JScrollPane navComponent = new JScrollPane(navPanel);
+		add(navComponent);
+		navComponent.setBorder(null);
+		navPanel.addNavListener(this);
+		navPanel.setBorder(new RightBorder());
 
-		layout.putConstraint(SpringLayout.SOUTH, releasesButton, 0, SpringLayout.SOUTH, startStopBtn);
-		layout.putConstraint(SpringLayout.WEST, releasesButton, 10, SpringLayout.WEST, this);
+		layout.putConstraint(SpringLayout.NORTH, navComponent, 0, SpringLayout.NORTH, this);
+		layout.putConstraint(SpringLayout.SOUTH, navComponent, 0, SpringLayout.SOUTH, this);
+		layout.putConstraint(SpringLayout.WEST, navComponent, 0, SpringLayout.WEST, this);
+		layout.putConstraint(SpringLayout.EAST, navComponent, 125, SpringLayout.WEST, navComponent);
+
+		layout.putConstraint(SpringLayout.NORTH, cardPanel, 0, SpringLayout.NORTH, this);
+		layout.putConstraint(SpringLayout.WEST, cardPanel, 0, SpringLayout.EAST, navComponent);
+		layout.putConstraint(SpringLayout.EAST, cardPanel, 0, SpringLayout.EAST, this);
+		layout.putConstraint(SpringLayout.SOUTH, cardPanel, 0, SpringLayout.SOUTH, this);
 
 		clearAll();
-
-	}
-
-	private void prepareReleasesButton() {
-		releasesButton = new JButton("Update Available");
-		releasesButton.addActionListener(this);
-		releasesButton.setVisible(false);
-
-		new UpdateCheckWorker() {
-			@Override
-			protected void done() {
-				Boolean updateAvailable = null;
-				try {
-					updateAvailable = get();
-				} catch (InterruptedException | ExecutionException e) {
-				}
-				if (updateAvailable == Boolean.TRUE) {
-					releasesButton.setVisible(true);
-					String message = getMessage();
-					if (!StringUtils.isBlank(message)) {
-						releasesButton.setToolTipText(message);
-					}
-				}
-			}
-		}.execute();
 	}
 
 	public void addProxyListener(ProxyListener listener) {
@@ -189,13 +170,12 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		json.put("proxy", proxyModel.getConfig(generalPanel.getCacheTime()));
 		json.put("merge", mergeModel.getConfig());
 		json.put("variables", variablePanel.getConfig());
-		json.put("tracker", trackerPanel.getConfig());
 		json.put("resource", resourceViewerPanel.getConfig());
 		json.put("tamper", tamperPanel.getConfig());
 
 		generalPanel.updateConfig(json);
 		loggerPanel.updateConfig(json);
-		
+
 		log.trace(json.toString(2));
 		return json;
 	}
@@ -207,7 +187,6 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 	 */
 	public JsonObject getSettings() {
 		JsonObject ret = new JsonObject();
-		ret.put("currentTab", tabs.getSelectedIndex());
 		return ret;
 	}
 
@@ -219,11 +198,6 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 	public void setSettings(JsonObject json) {
 		if (json == null)
 			return;
-
-		int tab = json.getInt("currentTab");
-		if (tabs.getTabCount() > tab) {
-			tabs.setSelectedIndex(tab);
-		}
 	}
 
 	public void start() {
@@ -231,7 +205,6 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 			return;
 
 		try {
-			startStopBtn.setText(STOP);
 			JsonObject json = JsonObject.parse(getConfig().toString());
 			File workingDir = configFile.getParentFile();
 			if (workingDir == null)
@@ -241,10 +214,10 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 			new Thread(proxy).start();
 			proxy.addRequestListener(resourceService);
 			generalPanel.setProxy(proxy);
-			trackerPanel.setProxy(proxy);
 			loggerPanel.setProxy(proxy);
 			resourceViewerPanel.setProxy(proxy);
 			started = true;
+			navPanel.selectNavItem(NavItem.Start, 0);
 			fireProxyStarted();
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
@@ -273,13 +246,12 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 				proxy = null;
 				p.stop();
 				generalPanel.setProxy(null);
-				trackerPanel.setProxy(null);
 				resourceViewerPanel.setProxy(null);
 			}
 		} finally {
 			proxy = null;
 			started = false;
-			startStopBtn.setText(START);
+			navPanel.selectNavItem(NavItem.Stop, 0);
 			fireProxyStopped();
 		}
 	}
@@ -319,7 +291,6 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		mergeModel.setConfig(config.getJsonArray("merge"));
 		variablePanel.setConfig(config.getJsonObject("variables"));
 		generalPanel.setConfig(config);
-		trackerPanel.setConfig(json.getJsonObject("tracker"));
 		resourceViewerPanel.setConfig(json.getJsonObject("resource"));
 		tamperPanel.setConfig(json.getJsonObject("tamper"));
 	}
@@ -374,10 +345,23 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent e) {
-		Object source = e.getSource();
-		if (source == releasesButton) {
-			openReleasesPage();
+	public void navEvent(NavItem navItem, int index) {
+		switch (navItem) {
+		case Logger:
+			cardLayout.show(cardPanel, CARD_LOGGER);
+			break;
+		case RequestViewer:
+			cardLayout.show(cardPanel, CARD_RESOURCE_VIEWER);
+			break;
+		case Server:
+			cardLayout.show(cardPanel, CARD_SERVER);
+			break;
+		case Stop:
+			stop();
+			break;
+		case Start:
+			start();
+			break;
 		}
 	}
 }

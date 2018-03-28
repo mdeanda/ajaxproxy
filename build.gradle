@@ -29,6 +29,8 @@ repositories {
 }
 
 dependencies {
+	compileOnly "org.projectlombok:lombok:1.16.16"
+	
 	compile 'com.thedeanda.javajson:javajson-parser:1.+'
 	
 	compile 'org.eclipse.jetty:jetty-server:9.2.21.v20170120'
