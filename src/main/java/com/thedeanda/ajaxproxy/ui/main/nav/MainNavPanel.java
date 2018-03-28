@@ -31,9 +31,9 @@ public class MainNavPanel extends JPanel {
 	public MainNavPanel() {
 		JPanel panel = this;
 
-		createNavButton(this, "Server", NavItem.Server, 0);
-		createNavButton(this, "Request Viewer", NavItem.RequestViewer, 0);
-		createNavButton(this, "Logger", NavItem.Logger, 0);
+		createNavButton(this, "Server", "Server", NavItem.Server, 0);
+		createNavButton(this, "Requests", "Request Viewer", NavItem.RequestViewer, 0);
+		createNavButton(this, "Logger", "Logger", NavItem.Logger, 0);
 
 		initStartButton(panel);
 
@@ -83,10 +83,12 @@ public class MainNavPanel extends JPanel {
 		listeners.add(listener);
 	}
 
-	private JComponent createNavButton(JPanel pnl, String label, final NavItem navItem, final int index) {
+	private JComponent createNavButton(JPanel pnl, String label, final String tooltip, final NavItem navItem,
+			final int index) {
 		final JToggleButton btn = new JToggleButton(label);
 		// btn.setPreferredSize(btn.getMaximumSize());
 		buttons.add(btn);
+		btn.setToolTipText(tooltip);
 		pnl.add(btn);
 
 		btn.addActionListener(new ActionListener() {

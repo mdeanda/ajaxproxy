@@ -126,7 +126,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		layout.putConstraint(SpringLayout.NORTH, navComponent, 0, SpringLayout.NORTH, this);
 		layout.putConstraint(SpringLayout.SOUTH, navComponent, 0, SpringLayout.SOUTH, this);
 		layout.putConstraint(SpringLayout.WEST, navComponent, 0, SpringLayout.WEST, this);
-		layout.putConstraint(SpringLayout.EAST, navComponent, 100, SpringLayout.WEST, navComponent);
+		layout.putConstraint(SpringLayout.EAST, navComponent, 125, SpringLayout.WEST, navComponent);
 
 		layout.putConstraint(SpringLayout.NORTH, cardPanel, 0, SpringLayout.NORTH, this);
 		layout.putConstraint(SpringLayout.WEST, cardPanel, 0, SpringLayout.EAST, navComponent);
