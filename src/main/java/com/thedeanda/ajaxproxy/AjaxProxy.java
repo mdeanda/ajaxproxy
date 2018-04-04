@@ -99,10 +99,9 @@ public class AjaxProxy implements Runnable, LoggerMessageListener {
 		File configDir = cf.getParentFile();
 		if (configDir == null)
 			configDir = new File(".");
-		FileInputStream fis = new FileInputStream(cf);
-		JsonObject config = JsonObject.parse(fis);
-		fis.close();
-		this.config = config;
+		try (FileInputStream fis = new FileInputStream(cf)) {
+			config = JsonObject.parse(fis);
+		}
 		this.workingDir = configDir;
 		init();
 	}
@@ -239,11 +238,7 @@ public class AjaxProxy implements Runnable, LoggerMessageListener {
 					port = Integer.parseInt(obj.getString(PORT));
 
 				if (domain != null && path != null && port > 0) {
-					ProxyPath proxyPath = ProxyPath.builder()
-							.domain(domain)
-							.port(port)
-							.path(path)
-							.build();
+					ProxyPath proxyPath = ProxyPath.builder().domain(domain).port(port).path(path).build();
 					ret.add(proxyPath);
 				}
 			}
@@ -315,7 +310,7 @@ public class AjaxProxy implements Runnable, LoggerMessageListener {
 
 			AllowSymLinkAliasChecker alias = new AllowSymLinkAliasChecker();
 			root.addAliasCheck(alias);
-			
+
 			FilterHolder throttleFilterHolder = new FilterHolder(throttleFilter);
 			EnumSet<DispatcherType> dispatches = EnumSet.allOf(DispatcherType.class);
 			root.addFilter(throttleFilterHolder, "/*", dispatches);
