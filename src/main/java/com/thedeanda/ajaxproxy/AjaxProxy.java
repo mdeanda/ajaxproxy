@@ -32,6 +32,8 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.thedeanda.ajaxproxy.config.ConfigLoader;
+import com.thedeanda.ajaxproxy.config.model.Config;
 import com.thedeanda.ajaxproxy.filter.ProxyFilter;
 import com.thedeanda.ajaxproxy.filter.ThrottleFilter;
 import com.thedeanda.ajaxproxy.filter.handler.logger.LoggerMessage;
@@ -67,6 +69,7 @@ public class AjaxProxy implements Runnable, LoggerMessageListener {
 
 	private AjaxProxyConfig ajaxProxyConfig;
 	private Convertor converter;
+	private Config configObject;
 
 	private enum ProxyEvent {
 		START, STOP, FAIL
@@ -84,6 +87,10 @@ public class AjaxProxy implements Runnable, LoggerMessageListener {
 	private static final String MINIFY = "minify";
 
 	public AjaxProxy(JsonObject config, File workingDir) throws Exception {
+		//TODO: perhaps pass in config object
+		ConfigLoader cl = new ConfigLoader();
+		configObject = cl.loadConfig(config, workingDir);
+		
 		converter = Convertor.get();
 		this.config = config;
 		this.workingDir = workingDir;
