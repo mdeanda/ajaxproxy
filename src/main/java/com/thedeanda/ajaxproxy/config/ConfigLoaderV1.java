@@ -34,12 +34,23 @@ class ConfigLoaderV1 implements Loader {
 			return null;
 		}
 
-		Server server = Server.builder()
-				.port(VariableValue.builder().build())
-				.build();
+		Server server = loadServer(variables, config);
 
 		return Config.builder().variables(variables).workingDir(workingDir.getAbsolutePath())
 				.servers(Arrays.asList(server)).build();
+	}
+	
+	private Server loadServer(List<Variable> variables, JsonObject config) {
+		VariableHandler handler = new VariableHandler();
+		
+		String sPort = config.getString("port");
+		VariableValue portVar = handler.varForInt(variables, sPort);
+		
+		Server server = Server.builder()
+				.port(portVar)
+				.build();
+		
+		return server;
 	}
 
 	private boolean compatibleVersion(JsonObject config) {

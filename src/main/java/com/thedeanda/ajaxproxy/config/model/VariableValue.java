@@ -8,4 +8,9 @@ import lombok.Data;
 public class VariableValue {
 	private String originalValue;
 	private int intValue;
+
+	public VariableValue(String originalValue, int intValue) {
+		this.originalValue = originalValue;
+		this.intValue = intValue;
+	}
 }
