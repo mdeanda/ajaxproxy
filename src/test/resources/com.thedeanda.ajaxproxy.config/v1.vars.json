@@ -4,10 +4,10 @@
       "filePath":"donkey",
       "minify":true,
       "mode":"CSS",
-      "path":"/monkey/32/"
+      "path":"/monkey/${folder}/"
     },
     {
-      "filePath":"/home/mdeanda/32/file",
+      "filePath":"/home/mdeanda/${folder}/file",
       "mode":"JS",
       "path":"/balloon"
     }
@@ -17,12 +17,12 @@
     "forcedLatency":0,
     "maxBitrate":0
   },
-  "port":8080,
+  "port":"${host}",
   "proxy":[
     {
       "cache":false,
       "cacheDuration":30,
-      "host":"jsonplaceholder.typicode.com",
+      "host":"jsonplaceholder.${host}.com",
       "path":"/users/.*",
       "port":80
     },
@@ -30,12 +30,12 @@
       "cache":false,
       "cacheDuration":30,
       "host":"example.com",
-      "path":"/32/.*",
+      "path":"/${folder}/.*",
       "port":80
     }
   ],
   "resource":{},
-  "resourceBase":"./32",
+  "resourceBase":"./${folder}",
   "showIndex":true,
   "tamper":{
     "items":[]

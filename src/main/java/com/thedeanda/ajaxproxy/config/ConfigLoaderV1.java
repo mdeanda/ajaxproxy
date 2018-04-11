@@ -2,12 +2,15 @@ package com.thedeanda.ajaxproxy.config;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
 
 import com.thedeanda.ajaxproxy.config.model.Config;
+import com.thedeanda.ajaxproxy.config.model.Server;
 import com.thedeanda.ajaxproxy.config.model.Variable;
+import com.thedeanda.ajaxproxy.config.model.VariableValue;
 import com.thedeanda.javajson.JsonObject;
 
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +34,12 @@ class ConfigLoaderV1 implements Loader {
 			return null;
 		}
 
-		return Config.builder().variables(variables).build();
+		Server server = Server.builder()
+				.port(VariableValue.builder().build())
+				.build();
+
+		return Config.builder().variables(variables).workingDir(workingDir.getAbsolutePath())
+				.servers(Arrays.asList(server)).build();
 	}
 
 	private boolean compatibleVersion(JsonObject config) {

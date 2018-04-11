@@ -1,9 +1,11 @@
 package com.thedeanda.ajaxproxy.config;
 
-import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
-import static org.hamcrest.CoreMatchers.*;
 
 import java.io.File;
 
@@ -51,14 +53,34 @@ public class ConfigLoaderV1Test {
 		jsonConfig = JsonLoader.load("/com.thedeanda.ajaxproxy.config/v1.json");
 		config = loader.loadConfig(jsonConfig, workingDir);
 
+		validate();
+	}
+
+	@Test
+	public void v1vars() throws Exception {
+		jsonConfig = JsonLoader.load("/com.thedeanda.ajaxproxy.config/v1.vars.json");
+		config = loader.loadConfig(jsonConfig, workingDir);
+
+		validate();
+	}
+
+	private void validate() {
 		assertNotNull(config);
 		assertNotNull(config.getVariables());
-		assertThat(config.getVariables().size(), is(1));
+		assertThat(config.getVariables().size(), is(3));
 		assertThat(config.getVariables().get(0).getKey(), is("folder"));
 		assertThat(config.getVariables().get(0).getValue(), is("32"));
-		assertThat(config.getWorkingDir(), is("."));
+		assertThat(config.getVariables().get(1).getKey(), is("host"));
+		assertThat(config.getVariables().get(1).getValue(), is("typicode"));
+		assertThat(config.getVariables().get(2).getKey(), is("port"));
+		assertThat(config.getVariables().get(2).getValue(), is("8080"));
+		assertThat(config.getWorkingDir(), is(new File(".").getAbsolutePath()));
+
+		
+		/*
 		assertThat(config.getServers(), is(not(null)));
 		assertFalse(config.getServers().isEmpty());
+		//*/
 	}
 
 	/**
