@@ -5,11 +5,18 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.thedeanda.ajaxproxy.config.model.IntVariable;
+import com.thedeanda.ajaxproxy.config.model.StringVariable;
 import com.thedeanda.ajaxproxy.config.model.Variable;
-import com.thedeanda.ajaxproxy.config.model.VariableValue;
 
 public class VariableHandler {
-	public String sub(List<Variable> variables, String input) {
+	private List<Variable> variables;
+
+	public VariableHandler(List<Variable> variables) {
+		this.variables = variables;
+	}
+
+	public String sub(String input) {
 		String s = StringUtils.trimToEmpty(input);
 
 		if (variables != null) {
@@ -24,13 +31,18 @@ public class VariableHandler {
 		return s;
 	}
 
-	public int subForInt(List<Variable> variables, String input) {
-		input = sub(variables, input);
+	public int subForInt(String input) {
+		input = sub(input);
 		return Integer.parseInt(input);
 	}
-	
-	public VariableValue varForInt(List<Variable> variables, String input) {
-		int val = subForInt(variables, input);
-		return new VariableValue(input, val);
+
+	public IntVariable varForInt(String input) {
+		int val = subForInt(input);
+		return new IntVariable(input, val);
+	}
+
+	public StringVariable varForString(String input) {
+		String val = sub(input);
+		return new StringVariable(input, val);
 	}
 }

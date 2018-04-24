@@ -1,11 +1,6 @@
 package com.thedeanda.ajaxproxy.config;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
 
@@ -13,6 +8,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.thedeanda.ajaxproxy.config.model.Config;
+import com.thedeanda.ajaxproxy.config.model.Server;
+import com.thedeanda.ajaxproxy.config.model.Variable;
 import com.thedeanda.javajson.JsonObject;
 
 public class ConfigLoaderV1Test {
@@ -37,15 +34,15 @@ public class ConfigLoaderV1Test {
 	public void testEmpty() {
 		jsonConfig = new JsonObject();
 		config = loader.loadConfig(jsonConfig, workingDir);
-		assertNull(config);
+		assertThat(config).isNull();
 
 		jsonConfig = null;
 		config = loader.loadConfig(jsonConfig, workingDir);
-		assertNull(config);
+		assertThat(config).isNull();
 
 		jsonConfig = new JsonObject();
 		config = loader.loadConfig(jsonConfig, null);
-		assertNull(config);
+		assertThat(config).isNull();
 	}
 
 	@Test
@@ -65,22 +62,24 @@ public class ConfigLoaderV1Test {
 	}
 
 	private void validate() {
-		assertNotNull(config);
-		assertNotNull(config.getVariables());
-		assertThat(config.getVariables().size(), is(3));
-		assertThat(config.getVariables().get(0).getKey(), is("folder"));
-		assertThat(config.getVariables().get(0).getValue(), is("32"));
-		assertThat(config.getVariables().get(1).getKey(), is("host"));
-		assertThat(config.getVariables().get(1).getValue(), is("typicode"));
-		assertThat(config.getVariables().get(2).getKey(), is("port"));
-		assertThat(config.getVariables().get(2).getValue(), is("8080"));
-		assertThat(config.getWorkingDir(), is(new File(".").getAbsolutePath()));
+		assertThat(config).isNotNull();
+		assertThat(config.getVariables()).isNotNull();
+		assertThat(config.getVariables()).hasSize(3);
+		assertThat(config.getVariables()).contains(Variable.builder().key("folder").value("32").build());
+		assertThat(config.getVariables()).contains(Variable.builder().key("host").value("typicode").build());
+		assertThat(config.getVariables()).contains(Variable.builder().key("port").value("8080").build());
+		assertThat(config.getWorkingDir()).isEqualTo(new File(".").getAbsolutePath());
 
-		
-		/*
-		assertThat(config.getServers(), is(not(null)));
-		assertFalse(config.getServers().isEmpty());
-		//*/
+		assertThat(config.getServers()).hasSize(1);
+		Server server = config.getServers().get(0);
+		assertThat(server.getPort()).isNotNull();
+		assertThat(server.getPort().getValue()).isEqualTo(8080);
+		assertThat(server.getResourceBase()).isNotNull();
+		assertThat(server.getResourceBase().getValue()).isEqualTo("./32");
+		assertThat(server.isShowIndex()).isEqualTo(true);
+
+		assertThat(server.getMergeConfig()).hasSize(2);
+
 	}
 
 	/**
@@ -93,7 +92,7 @@ public class ConfigLoaderV1Test {
 		jsonConfig = JsonLoader.load("/com.thedeanda.ajaxproxy.config/v2.json");
 		config = loader.loadConfig(jsonConfig, workingDir);
 
-		assertNull(config);
+		assertThat(config).isNull();
 	}
 
 }

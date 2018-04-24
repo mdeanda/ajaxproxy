@@ -5,12 +5,12 @@ import lombok.Data;
 
 @Data
 @Builder
-public class VariableValue {
+public class StringVariable {
 	private String originalValue;
-	private int intValue;
+	private String value;
 
-	public VariableValue(String originalValue, int intValue) {
+	public StringVariable(String originalValue, String value) {
 		this.originalValue = originalValue;
-		this.intValue = intValue;
+		this.value = value;
 	}
 }

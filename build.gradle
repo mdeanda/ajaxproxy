@@ -53,6 +53,8 @@ dependencies {
 	compile 'org.japura:japura-gui:7.5.+'
 
 	testCompile 'junit:junit:4.+'
+	testCompile 'org.assertj:assertj-core:3.9.+'
+	
 	testCompile 'com.thedeanda:lorem:2.+'
 	compile 'com.github.jponge:lzma-java:1.3'
 	

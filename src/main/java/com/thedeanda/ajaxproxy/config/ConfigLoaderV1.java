@@ -8,10 +8,13 @@ import java.util.List;
 import org.apache.commons.collections4.CollectionUtils;
 
 import com.thedeanda.ajaxproxy.config.model.Config;
+import com.thedeanda.ajaxproxy.config.model.IntVariable;
+import com.thedeanda.ajaxproxy.config.model.MergeConfig;
 import com.thedeanda.ajaxproxy.config.model.Server;
+import com.thedeanda.ajaxproxy.config.model.StringVariable;
 import com.thedeanda.ajaxproxy.config.model.Variable;
-import com.thedeanda.ajaxproxy.config.model.VariableValue;
 import com.thedeanda.javajson.JsonObject;
+import com.thedeanda.javajson.JsonValue;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -39,18 +42,39 @@ class ConfigLoaderV1 implements Loader {
 		return Config.builder().variables(variables).workingDir(workingDir.getAbsolutePath())
 				.servers(Arrays.asList(server)).build();
 	}
-	
+
 	private Server loadServer(List<Variable> variables, JsonObject config) {
-		VariableHandler handler = new VariableHandler();
-		
+		VariableHandler handler = new VariableHandler(variables);
+
 		String sPort = config.getString("port");
-		VariableValue portVar = handler.varForInt(variables, sPort);
-		
-		Server server = Server.builder()
-				.port(portVar)
-				.build();
-		
+		IntVariable portVar = handler.varForInt(sPort);
+		String sResourceBase = config.getString("resourceBase");
+		StringVariable resourceBase = handler.varForString(sResourceBase);
+		boolean showIndex = config.getBoolean("showIndex");
+
+		List<MergeConfig> mergeConfig = loadMergeConfig(handler, config);
+
+		Server server = Server.builder().port(portVar).resourceBase(resourceBase).showIndex(showIndex)
+				.mergeConfig(mergeConfig).build();
+
 		return server;
+	}
+
+	private List<MergeConfig> loadMergeConfig(VariableHandler handler, JsonObject config) {
+		List<MergeConfig> merges = new ArrayList<>();
+		if (config.isJsonArray("merge")) {
+			for (JsonValue v : config.getJsonArray("merge")) {
+				JsonObject json = v.getJsonObject();
+				StringVariable filePath = handler.varForString(config.getString("filePath"));
+				StringVariable path = handler.varForString(config.getString("path"));
+				boolean minify = config.getBoolean("minify");
+				// TODO: mode
+
+				merges.add(MergeConfig.builder().filePath(filePath).path(path).minify(minify).build());
+			}
+		}
+
+		return merges;
 	}
 
 	private boolean compatibleVersion(JsonObject config) {
