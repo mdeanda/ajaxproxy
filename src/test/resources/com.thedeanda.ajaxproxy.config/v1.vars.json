@@ -17,7 +17,7 @@
     "forcedLatency":0,
     "maxBitrate":0
   },
-  "port":"${host}",
+  "port":"${port}",
   "proxy":[
     {
       "cache":false,
