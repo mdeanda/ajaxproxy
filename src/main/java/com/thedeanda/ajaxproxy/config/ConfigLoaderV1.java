@@ -65,9 +65,9 @@ class ConfigLoaderV1 implements Loader {
 		if (config.isJsonArray("merge")) {
 			for (JsonValue v : config.getJsonArray("merge")) {
 				JsonObject json = v.getJsonObject();
-				StringVariable filePath = handler.varForString(config.getString("filePath"));
-				StringVariable path = handler.varForString(config.getString("path"));
-				boolean minify = config.getBoolean("minify");
+				StringVariable filePath = handler.varForString(json.getString("filePath"));
+				StringVariable path = handler.varForString(json.getString("path"));
+				boolean minify = json.getBoolean("minify");
 				// TODO: mode
 
 				merges.add(MergeConfig.builder().filePath(filePath).path(path).minify(minify).build());
