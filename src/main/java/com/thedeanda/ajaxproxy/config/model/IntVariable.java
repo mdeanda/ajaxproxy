@@ -13,4 +13,9 @@ public class IntVariable {
 		this.originalValue = originalValue;
 		this.value = intValue;
 	}
+
+	public VariableValue(String originalValue, String stringValue) {
+		this.originalValue = originalValue;
+		this.stringValue = stringValue;
+	}
 }
