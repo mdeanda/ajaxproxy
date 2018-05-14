@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import com.thedeanda.ajaxproxy.config.ConfigLoader;
 import com.thedeanda.ajaxproxy.config.model.Config;
+import com.thedeanda.ajaxproxy.config.model.MergeMode;
 import com.thedeanda.ajaxproxy.filter.ProxyFilter;
 import com.thedeanda.ajaxproxy.filter.ThrottleFilter;
 import com.thedeanda.ajaxproxy.filter.handler.logger.LoggerMessage;

@@ -10,4 +10,6 @@ public class MergeConfig {
 	StringVariable path;
 	boolean minify;
 	// "mode":"CSS",
+	// MergeMode mode = obj.hasKey(MODE) ? MergeMode.valueOf(obj.getString(MODE)) :
+	// MergeMode.PLAIN;
 }

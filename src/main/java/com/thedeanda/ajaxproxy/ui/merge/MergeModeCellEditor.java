@@ -9,7 +9,7 @@ import javax.swing.JTable;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 
-import com.thedeanda.ajaxproxy.MergeMode;
+import com.thedeanda.ajaxproxy.config.model.MergeMode;
 
 public class MergeModeCellEditor extends AbstractCellEditor implements
 		TableCellEditor, TableCellRenderer {
