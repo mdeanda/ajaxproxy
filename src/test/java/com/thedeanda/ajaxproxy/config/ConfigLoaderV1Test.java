@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import com.thedeanda.ajaxproxy.config.model.Config;
 import com.thedeanda.ajaxproxy.config.model.MergeConfig;
+import com.thedeanda.ajaxproxy.config.model.MergeMode;
 import com.thedeanda.ajaxproxy.config.model.Server;
 import com.thedeanda.ajaxproxy.config.model.Variable;
 import com.thedeanda.javajson.JsonObject;
@@ -85,7 +86,15 @@ public class ConfigLoaderV1Test {
 		assertThat(merge).isNotNull();
 		assertThat(merge.getFilePath().getValue()).isEqualTo("donkey");
 		assertThat(merge.getPath().getValue()).isEqualTo("/monkey/32/");
+		assertThat(merge.getMode()).isEqualTo(MergeMode.CSS);
 		assertThat(merge.isMinify()).isTrue();
+
+		merge = server.getMergeConfig().get(1);
+		assertThat(merge).isNotNull();
+		assertThat(merge.getFilePath().getValue()).isEqualTo("/home/mdeanda/32/file");
+		assertThat(merge.getPath().getValue()).isEqualTo("/balloon");
+		assertThat(merge.getMode()).isEqualTo(MergeMode.JS);
+		assertThat(merge.isMinify()).isFalse();
 	}
 
 	/**

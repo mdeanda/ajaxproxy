@@ -10,6 +10,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import com.thedeanda.ajaxproxy.config.model.Config;
 import com.thedeanda.ajaxproxy.config.model.IntVariable;
 import com.thedeanda.ajaxproxy.config.model.MergeConfig;
+import com.thedeanda.ajaxproxy.config.model.MergeMode;
 import com.thedeanda.ajaxproxy.config.model.Server;
 import com.thedeanda.ajaxproxy.config.model.StringVariable;
 import com.thedeanda.ajaxproxy.config.model.Variable;
@@ -21,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 class ConfigLoaderV1 implements Loader {
 	private static final String VAR_KEY = "variables";
+	private static final String MODE = "mode";
 
 	@Override
 	public Config loadConfig(JsonObject config, File workingDir) {
@@ -69,8 +71,9 @@ class ConfigLoaderV1 implements Loader {
 				StringVariable path = handler.varForString(json.getString("path"));
 				boolean minify = json.getBoolean("minify");
 				// TODO: mode
+				MergeMode mode = json.hasKey(MODE) ? MergeMode.valueOf(json.getString(MODE)) : MergeMode.PLAIN;
 
-				merges.add(MergeConfig.builder().filePath(filePath).path(path).minify(minify).build());
+				merges.add(MergeConfig.builder().filePath(filePath).path(path).minify(minify).mode(mode).build());
 			}
 		}
 
