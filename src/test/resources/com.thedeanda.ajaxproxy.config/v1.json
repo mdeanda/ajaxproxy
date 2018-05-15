@@ -14,7 +14,7 @@
   ],
   "options":{
     "cacheTime":2,
-    "forcedLatency":0,
+    "forcedLatency":3,
     "maxBitrate":0
   },
   "port":8080,

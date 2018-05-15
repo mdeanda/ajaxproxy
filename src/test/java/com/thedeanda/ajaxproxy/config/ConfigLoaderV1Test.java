@@ -79,6 +79,8 @@ public class ConfigLoaderV1Test {
 		assertThat(server.getResourceBase()).isNotNull();
 		assertThat(server.getResourceBase().getValue()).isEqualTo("./32");
 		assertThat(server.isShowIndex()).isEqualTo(true);
+		assertThat(server.getCacheTimeSec()).isEqualTo(30);
+		assertThat(server.getForcedLatencyMs()).isEqualTo(500);		
 
 		assertThat(server.getMergeConfig()).hasSize(2);
 

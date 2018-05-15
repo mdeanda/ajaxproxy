@@ -12,6 +12,10 @@ public class Server {
 	private IntVariable port;
 	private StringVariable resourceBase;
 	private boolean showIndex;
+	
+	//TODO: allow cache time, force latency per proxy
+	private int cacheTimeSec;
+	private int forcedLatencyMs;
 
 	@Builder.Default
 	private List<MergeConfig> mergeConfig = new ArrayList<>();

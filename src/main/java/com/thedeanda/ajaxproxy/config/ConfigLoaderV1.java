@@ -53,11 +53,13 @@ class ConfigLoaderV1 implements Loader {
 		String sResourceBase = config.getString("resourceBase");
 		StringVariable resourceBase = handler.varForString(sResourceBase);
 		boolean showIndex = config.getBoolean("showIndex");
+		int forcedLatencyMs = getLatency(config.getJsonObject("options"));
+		int cacheTimeSec = getCacheTime(config.getJsonObject("options"));
 
 		List<MergeConfig> mergeConfig = loadMergeConfig(handler, config);
 
 		Server server = Server.builder().port(portVar).resourceBase(resourceBase).showIndex(showIndex)
-				.mergeConfig(mergeConfig).build();
+				.mergeConfig(mergeConfig).forcedLatencyMs(forcedLatencyMs).cacheTimeSec(cacheTimeSec).build();
 
 		return server;
 	}
@@ -78,6 +80,54 @@ class ConfigLoaderV1 implements Loader {
 		}
 
 		return merges;
+	}
+
+	private int getLatency(JsonObject json) {
+		if (json == null)
+			return 0;
+		int val = json.getInt("forcedLatency");
+		switch (val) {
+		case 1:
+			return 100;
+		case 2:
+			return 250;
+		case 3:
+			return 500;
+		case 4:
+			return 1000;
+		case 5:
+			return 2000;
+		case 6:
+			return 5000;
+		case 7:
+			return 10000;
+		case 8:
+			return 30000;
+		default:
+			return 0;
+		}
+	}
+
+	private int getCacheTime(JsonObject json) {
+		if (json == null)
+			return 0;
+		int val = json.getInt("cacheTime");
+		switch (val) {
+		case 1:
+			return 10;
+		case 2:
+			return 30;
+		case 3:
+			return 60;
+		case 4:
+			return 300;
+		case 5:
+			return 600;
+		case 6:
+			return 3600;
+		default:
+			return 0;
+		}
 	}
 
 	private boolean compatibleVersion(JsonObject config) {
