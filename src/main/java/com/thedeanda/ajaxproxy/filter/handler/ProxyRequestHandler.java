@@ -82,8 +82,9 @@ public class ProxyRequestHandler implements RequestHandler {
 		log.trace("headers: {}", inputHeaders);
 
 		StringBuilder proxyUrl = new StringBuilder();
-		proxyUrl.append("http://" + proxyConfig.getHost());
-		if (proxyConfig.getPort() != 80) {
+		proxyUrl.append(proxyConfig.getProtocol() + "://" + proxyConfig.getHost());
+		if (("http".equalsIgnoreCase(proxyConfig.getProtocol()) && proxyConfig.getPort() != 80)
+				|| ("https".equalsIgnoreCase(proxyConfig.getProtocol()) && proxyConfig.getPort() != 443)) {
 			proxyUrl.append(":" + proxyConfig.getPort());
 		}
 		proxyUrl.append(uri);

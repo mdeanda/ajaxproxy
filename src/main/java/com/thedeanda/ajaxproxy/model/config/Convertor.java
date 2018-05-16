@@ -17,6 +17,7 @@ public class Convertor {
 	public static final String AP_PROXY = "proxy";
 	public static final String AP_VARIABLES = "variables";
 
+	public static final String PROXY_PROTOCOL = "protocol";
 	public static final String PROXY_HOST = "host";
 	public static final String PROXY_PORT = "port";
 	public static final String PROXY_PATH = "path";
@@ -76,8 +77,8 @@ public class Convertor {
 		config.setShowIndex(json.getBoolean(AP_SHOW_INDEX));
 
 		List<ProxyConfig> proxies = config.getProxyConfig();
-		//logger gets added first so it has priority
-		//TODO: externalize "/logger" path
+		// logger gets added first so it has priority
+		// TODO: externalize "/logger" path
 		proxies.add(new ProxyConfigLogger("/logger"));
 		for (JsonValue val : json.getJsonArray(AP_PROXY)) {
 			ProxyConfig pc = readProxyConfig(val.getJsonObject());
@@ -102,6 +103,9 @@ public class Convertor {
 			return config;
 		} else {
 			ProxyConfigRequest config = new ProxyConfigRequest();
+
+			if (json.hasKey(PROXY_PROTOCOL))
+				config.setProtocol(json.getString(PROXY_PROTOCOL));
 
 			if (json.hasKey(PROXY_HOST))
 				config.setHost(json.getString(PROXY_HOST));
@@ -139,6 +143,7 @@ public class Convertor {
 	public JsonObject toJson(ProxyConfigRequest config) {
 		JsonObject json = new JsonObject();
 
+		json.put(PROXY_PROTOCOL, config.getProtocol());
 		json.put(PROXY_HOST, config.getHost());
 		json.put(PROXY_PORT, config.getPort());
 		json.put(PROXY_PATH, config.getPath());
