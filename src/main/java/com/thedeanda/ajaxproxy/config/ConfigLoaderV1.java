@@ -14,15 +14,34 @@ import com.thedeanda.ajaxproxy.config.model.MergeMode;
 import com.thedeanda.ajaxproxy.config.model.Server;
 import com.thedeanda.ajaxproxy.config.model.StringVariable;
 import com.thedeanda.ajaxproxy.config.model.Variable;
+import com.thedeanda.ajaxproxy.model.config.HttpHeader;
+import com.thedeanda.ajaxproxy.model.config.ProxyConfig;
+import com.thedeanda.ajaxproxy.model.config.ProxyConfigFile;
+import com.thedeanda.ajaxproxy.model.config.ProxyConfigRequest;
+import com.thedeanda.javajson.JsonArray;
 import com.thedeanda.javajson.JsonObject;
 import com.thedeanda.javajson.JsonValue;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-class ConfigLoaderV1 implements Loader {
+public class ConfigLoaderV1 implements Loader {
 	private static final String VAR_KEY = "variables";
 	private static final String MODE = "mode";
+
+	private static final String PROXY_PROTOCOL = "protocol";
+	private static final String PROXY_HOST = "host";
+	private static final String PROXY_PORT = "port";
+	private static final String PROXY_PATH = "path";
+	private static final String PROXY_CACHE = "cache";
+	private static final String PROXY_CACHE_DUR = "cacheDuration";
+	private static final String PROXY_HOST_HEADER = "hostHeader";
+	private static final String PROXY_HEADERS = "headers";
+	private static final String PROXY_HEADERS_NAME = "name";
+	private static final String PROXY_HEADERS_VALUE = "value";
+
+	private static final String PROXY_BASE_PATH = "basePath";
+	private static final String PROXY_FILTER_PATH = "filterPath";
 
 	@Override
 	public Config loadConfig(JsonObject config, File workingDir) {
@@ -153,6 +172,52 @@ class ConfigLoaderV1 implements Loader {
 		}
 
 		return ret;
+	}
+
+	public ProxyConfig readProxyConfig(JsonObject json) {
+		if (json.hasKey(PROXY_BASE_PATH)) {
+			ProxyConfigFile config = new ProxyConfigFile();
+			config.setPath(json.getString(PROXY_PATH));
+			config.setBasePath(json.getString(PROXY_BASE_PATH));
+			config.setFilterPath(json.getString(PROXY_FILTER_PATH));
+			return config;
+		} else {
+			ProxyConfigRequest config = new ProxyConfigRequest();
+
+			if (json.hasKey(PROXY_PROTOCOL))
+				config.setProtocol(json.getString(PROXY_PROTOCOL));
+
+			if (json.hasKey(PROXY_HOST))
+				config.setHost(json.getString(PROXY_HOST));
+
+			if (json.isInt(PROXY_PORT))
+				config.setPort(json.getInt(PROXY_PORT));
+			else {
+				try {
+					String value = json.getString(PROXY_PORT);
+					config.setPort(Integer.parseInt(value));
+				} catch (NumberFormatException nfe) {
+					config.setPort(0);
+				}
+			}
+			config.setPath(json.getString(PROXY_PATH));
+			config.setEnableCache(json.getBoolean(PROXY_CACHE));
+			config.setCacheDuration(json.getInt(PROXY_CACHE_DUR));
+			config.setHostHeader(json.getString(PROXY_HOST_HEADER));
+
+			if (json.isJsonArray(PROXY_HEADERS)) {
+				JsonValue headersValue = json.get(PROXY_HEADERS);
+				JsonArray headers = headersValue.getJsonArray();
+				for (JsonValue v : headers) {
+					JsonObject headerObj = v.getJsonObject();
+					String name = headerObj.getString(PROXY_HEADERS_NAME);
+					String value = headerObj.getString(PROXY_HEADERS_VALUE);
+					HttpHeader hdr = HttpHeader.builder().name(name).value(value).build();
+					config.getHeaders().add(hdr);
+				}
+			}
+			return config;
+		}
 	}
 
 }

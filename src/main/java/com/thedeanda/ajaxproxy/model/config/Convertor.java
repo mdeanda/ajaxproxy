@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import com.thedeanda.ajaxproxy.config.ConfigLoaderV1;
 import com.thedeanda.javajson.JsonArray;
 import com.thedeanda.javajson.JsonObject;
 import com.thedeanda.javajson.JsonValue;
@@ -31,6 +32,8 @@ public class Convertor {
 	private static final String PROXY_BASE_PATH = "basePath";
 	private static final String PROXY_FILTER_PATH = "filterPath";
 
+	private ConfigLoaderV1 v1Loader = new ConfigLoaderV1();
+	
 	private Convertor() {
 
 	}
@@ -95,49 +98,7 @@ public class Convertor {
 	}
 
 	public ProxyConfig readProxyConfig(JsonObject json) {
-		if (json.hasKey(PROXY_BASE_PATH)) {
-			ProxyConfigFile config = new ProxyConfigFile();
-			config.setPath(json.getString(PROXY_PATH));
-			config.setBasePath(json.getString(PROXY_BASE_PATH));
-			config.setFilterPath(json.getString(PROXY_FILTER_PATH));
-			return config;
-		} else {
-			ProxyConfigRequest config = new ProxyConfigRequest();
-
-			if (json.hasKey(PROXY_PROTOCOL))
-				config.setProtocol(json.getString(PROXY_PROTOCOL));
-
-			if (json.hasKey(PROXY_HOST))
-				config.setHost(json.getString(PROXY_HOST));
-
-			if (json.isInt(PROXY_PORT))
-				config.setPort(json.getInt(PROXY_PORT));
-			else {
-				try {
-					String value = json.getString(PROXY_PORT);
-					config.setPort(Integer.parseInt(value));
-				} catch (NumberFormatException nfe) {
-					config.setPort(0);
-				}
-			}
-			config.setPath(json.getString(PROXY_PATH));
-			config.setEnableCache(json.getBoolean(PROXY_CACHE));
-			config.setCacheDuration(json.getInt(PROXY_CACHE_DUR));
-			config.setHostHeader(json.getString(PROXY_HOST_HEADER));
-
-			if (json.isJsonArray(PROXY_HEADERS)) {
-				JsonValue headersValue = json.get(PROXY_HEADERS);
-				JsonArray headers = headersValue.getJsonArray();
-				for (JsonValue v : headers) {
-					JsonObject headerObj = v.getJsonObject();
-					String name = headerObj.getString(PROXY_HEADERS_NAME);
-					String value = headerObj.getString(PROXY_HEADERS_VALUE);
-					HttpHeader hdr = new HttpHeader(name, value);
-					config.getHeaders().add(hdr);
-				}
-			}
-			return config;
-		}
+		return v1Loader.readProxyConfig(json);
 	}
 
 	public JsonObject toJson(ProxyConfigRequest config) {
