@@ -7,6 +7,7 @@ import lombok.Data;
 
 @Data
 public class ProxyConfigRequest implements ProxyConfig {
+	private String protocol = "http";
 	private String host;
 	private int port;
 	private String path;

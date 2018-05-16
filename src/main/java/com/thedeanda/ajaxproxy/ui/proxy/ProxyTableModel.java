@@ -20,11 +20,12 @@ public class ProxyTableModel extends AbstractTableModel {
 	private static final Logger log = LoggerFactory.getLogger(ProxyTableModel.class);
 	private static final long serialVersionUID = 1L;
 	private List<ProxyConfig> data;
+	private final static String PROTOCOL = "protocol";
 	private final static String DOMAIN = "domain";
 	private final static String PORT = "port";
 	private final static String PATH = "path";
 	// private final static String NEW_PROXY = "newProxy";
-	private final static String[] COLS = { DOMAIN, PORT, PATH };
+	private final static String[] COLS = { PROTOCOL, DOMAIN, PORT, PATH };
 
 	public ProxyTableModel() {
 		log.debug("new table model");
@@ -44,7 +45,7 @@ public class ProxyTableModel extends AbstractTableModel {
 	}
 
 	public JsonArray getConfig(final int cacheTime) {
-		//normalizeData();
+		// normalizeData();
 		JsonArray arr = new JsonArray();
 		Convertor converter = Convertor.get();
 		for (ProxyConfig config : data) {
@@ -93,14 +94,14 @@ public class ProxyTableModel extends AbstractTableModel {
 
 		switch (col) {
 		case 0:
-			return config.getHost();
+			return config.getProtocol();
 		case 1:
-			return config.getPort();
+			return config.getHost();
 		case 2:
-			return config.getPath();
-		// case 3:
-		// return config.isNewProxy();
+			return config.getPort();
 		case 3:
+			return config.getPath();
+		case 4:
 			return config.isEnableCache();
 		}
 		return null;
