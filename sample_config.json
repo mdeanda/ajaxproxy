@@ -13,7 +13,8 @@
       "host":"jsonplaceholder.typicode.com",
       "hostHeader":"",
       "path":"/users/.*",
-      "port":80
+      "port":80,
+      "protocol":"http"
     }
   ],
   "resource":{},

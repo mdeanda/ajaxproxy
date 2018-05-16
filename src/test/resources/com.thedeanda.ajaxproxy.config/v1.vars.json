@@ -24,14 +24,16 @@
       "cacheDuration":30,
       "host":"jsonplaceholder.${host}.com",
       "path":"/users/.*",
-      "port":80
+      "port":80,
+      "protocol":"http"
     },
     {
       "cache":false,
       "cacheDuration":30,
       "host":"example.com",
       "path":"/${folder}/.*",
-      "port":80
+      "port":80,
+      "protocol":"https"
     }
   ],
   "resource":{},

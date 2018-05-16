@@ -31,7 +31,8 @@
       "cacheDuration":30,
       "host":"example.com",
       "path":"/32/.*",
-      "port":80
+      "port":80,
+      "protocol":"https"
     }
   ],
   "resource":{},
