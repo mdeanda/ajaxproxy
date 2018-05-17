@@ -3,6 +3,7 @@ package com.thedeanda.ajaxproxy.ui.proxy;
 import java.awt.Dimension;
 
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -16,6 +17,8 @@ import com.thedeanda.ajaxproxy.ui.SwingUtils;
 
 public class ProxyEditorPanel extends JPanel {
 	private static final long serialVersionUID = 5379224168584631339L;
+	private static final String[] protocolList = { "http", "https" };
+
 	private SpringLayout layout;
 	private JLabel domainLabel;
 	private JTextField hostField;
@@ -26,6 +29,8 @@ public class ProxyEditorPanel extends JPanel {
 	private JLabel hostHeaderLabel;
 	private JTextField hostHeaderField;
 	private JCheckBox cacheCheckbox;
+	private JComboBox<String> protocols;
+	private JLabel protLabel;
 
 	public ProxyEditorPanel() {
 		layout = new SpringLayout();
@@ -55,19 +60,31 @@ public class ProxyEditorPanel extends JPanel {
 		cacheCheckbox.setToolTipText("Any non-GET request clears the cache for this proxy mapping");
 		add(cacheCheckbox);
 
+		protLabel = new JLabel("Protocol");
+		add(protLabel);
+
+		protocols = new JComboBox<String>(protocolList);
+		add(protocols);
+
 		initLayout();
-		setPreferredSize(new Dimension(400, 240));
+		setPreferredSize(new Dimension(450, 240));
 		setMinimumSize(new Dimension(300, 120));
 	}
 
 	private void initLayout() {
+		layout.putConstraint(SpringLayout.NORTH, protLabel, 10, SpringLayout.NORTH, this);
+		layout.putConstraint(SpringLayout.WEST, protLabel, 10, SpringLayout.WEST, this);
+
+		layout.putConstraint(SpringLayout.NORTH, protocols, 10, SpringLayout.SOUTH, protLabel);
+		layout.putConstraint(SpringLayout.WEST, protocols, 10, SpringLayout.WEST, this);
+		layout.putConstraint(SpringLayout.EAST, protocols, 75 + 10, SpringLayout.WEST, this);
 
 		layout.putConstraint(SpringLayout.NORTH, domainLabel, 10, SpringLayout.NORTH, this);
-		layout.putConstraint(SpringLayout.WEST, domainLabel, 10, SpringLayout.WEST, this);
+		layout.putConstraint(SpringLayout.WEST, domainLabel, 10, SpringLayout.EAST, protocols);
 
 		layout.putConstraint(SpringLayout.NORTH, hostField, 10, SpringLayout.SOUTH, domainLabel);
-		layout.putConstraint(SpringLayout.WEST, hostField, 10, SpringLayout.WEST, this);
-		layout.putConstraint(SpringLayout.EAST, hostField, 275 + 10, SpringLayout.WEST, this);
+		layout.putConstraint(SpringLayout.WEST, hostField, 10, SpringLayout.EAST, protocols);
+		layout.putConstraint(SpringLayout.EAST, hostField, 350 + 10, SpringLayout.WEST, this);
 
 		layout.putConstraint(SpringLayout.NORTH, portLabel, 10, SpringLayout.NORTH, this);
 		layout.putConstraint(SpringLayout.WEST, portLabel, 0, SpringLayout.WEST, portField);
@@ -114,6 +131,7 @@ public class ProxyEditorPanel extends JPanel {
 		config.setPath(path);
 		config.setHostHeader(hostHeaderField.getText());
 		config.setEnableCache(cacheCheckbox.isSelected());
+		config.setProtocol(String.valueOf(protocols.getSelectedItem()));
 
 		return config;
 	}
@@ -129,6 +147,13 @@ public class ProxyEditorPanel extends JPanel {
 			if (configRequest.getPort() > 0)
 				sport = String.valueOf(configRequest.getPort());
 
+			for (int i = 0; i < protocolList.length; i++) {
+				String v = protocolList[i];
+				if (v.equalsIgnoreCase(configRequest.getProtocol())) {
+					this.protocols.setSelectedIndex(i);
+				}
+			}
+
 			this.hostField.setText(configRequest.getHost());
 			this.portField.setText(sport);
 			this.hostHeaderField.setText(configRequest.getHostHeader());
@@ -136,5 +161,6 @@ public class ProxyEditorPanel extends JPanel {
 
 		this.pathField.setText(config.getPath());
 		this.cacheCheckbox.setSelected(config.isEnableCache());
+
 	}
 }

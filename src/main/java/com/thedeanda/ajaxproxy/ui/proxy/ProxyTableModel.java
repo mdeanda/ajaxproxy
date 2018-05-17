@@ -13,10 +13,11 @@ import com.thedeanda.ajaxproxy.model.config.Convertor;
 import com.thedeanda.ajaxproxy.model.config.ProxyConfig;
 import com.thedeanda.ajaxproxy.model.config.ProxyConfigFile;
 import com.thedeanda.ajaxproxy.model.config.ProxyConfigRequest;
+import com.thedeanda.ajaxproxy.ui.util.Reorderable;
 import com.thedeanda.javajson.JsonArray;
 import com.thedeanda.javajson.JsonValue;
 
-public class ProxyTableModel extends AbstractTableModel {
+public class ProxyTableModel extends AbstractTableModel implements Reorderable {
 	private static final Logger log = LoggerFactory.getLogger(ProxyTableModel.class);
 	private static final long serialVersionUID = 1L;
 	private List<ProxyConfig> data;
@@ -188,5 +189,20 @@ public class ProxyTableModel extends AbstractTableModel {
 		}
 		this.fireTableDataChanged();
 		this.normalizeData();
+	}
+
+	@Override
+	public void reorder(int fromIndex, int toIndex) {
+		if (fromIndex < 0 || fromIndex >= data.size() || toIndex < 0)
+			return;
+		if (toIndex > data.size()) {
+			toIndex = data.size();
+		}
+
+		ProxyConfig item = data.remove(fromIndex);
+		if (fromIndex < toIndex) {
+			toIndex--;
+		}
+		data.add(toIndex, item);
 	}
 }

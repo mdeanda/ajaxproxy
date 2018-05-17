@@ -12,13 +12,58 @@
       "cacheDuration":30,
       "host":"jsonplaceholder.typicode.com",
       "hostHeader":"",
+      "path":"/albums/.*",
+      "port":80,
+      "protocol":"http"
+    },
+    {
+      "cache":false,
+      "cacheDuration":30,
+      "host":"jsonplaceholder.typicode.com",
+      "hostHeader":"",
+      "path":"/comments/.*",
+      "port":80,
+      "protocol":"http"
+    },
+    {
+      "cache":false,
+      "cacheDuration":30,
+      "host":"jsonplaceholder.typicode.com",
+      "hostHeader":"",
+      "path":"/photos/.*",
+      "port":80,
+      "protocol":"http"
+    },
+    {
+      "cache":false,
+      "cacheDuration":30,
+      "host":"jsonplaceholder.typicode.com",
+      "hostHeader":"",
+      "path":"/posts/.*",
+      "port":80,
+      "protocol":"http"
+    },
+    {
+      "cache":false,
+      "cacheDuration":30,
+      "host":"jsonplaceholder.typicode.com",
+      "hostHeader":"",
+      "path":"/todos/.*",
+      "port":80,
+      "protocol":"http"
+    },
+    {
+      "cache":false,
+      "cacheDuration":30,
+      "host":"jsonplaceholder.typicode.com",
+      "hostHeader":"",
       "path":"/users/.*",
       "port":80,
       "protocol":"http"
     }
   ],
   "resource":{},
-  "resourceBase":".",
+  "resourceBase":"./src/test/resources/web",
   "showIndex":true,
   "tamper":{
     "items":[]
