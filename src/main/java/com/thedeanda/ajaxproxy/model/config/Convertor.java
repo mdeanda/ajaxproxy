@@ -5,7 +5,10 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import com.thedeanda.ajaxproxy.config.ConfigLoaderV1;
-import com.thedeanda.javajson.JsonArray;
+import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfig;
+import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigFile;
+import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigLogger;
+import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigRequest;
 import com.thedeanda.javajson.JsonObject;
 import com.thedeanda.javajson.JsonValue;
 

@@ -21,16 +21,16 @@ import org.slf4j.LoggerFactory;
 import com.thedeanda.ajaxproxy.AjaxProxy;
 import com.thedeanda.ajaxproxy.cache.MemProxyCache;
 import com.thedeanda.ajaxproxy.cache.NoOpCache;
+import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfig;
+import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigFile;
+import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigLogger;
+import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigRequest;
 import com.thedeanda.ajaxproxy.filter.handler.FileRequestHandler;
 import com.thedeanda.ajaxproxy.filter.handler.ProxyRequestHandler;
 import com.thedeanda.ajaxproxy.filter.handler.logger.LoggerRequestHandler;
 import com.thedeanda.ajaxproxy.http.RequestListener;
 import com.thedeanda.ajaxproxy.model.ProxyContainer;
 import com.thedeanda.ajaxproxy.model.config.AjaxProxyConfig;
-import com.thedeanda.ajaxproxy.model.config.ProxyConfig;
-import com.thedeanda.ajaxproxy.model.config.ProxyConfigFile;
-import com.thedeanda.ajaxproxy.model.config.ProxyConfigLogger;
-import com.thedeanda.ajaxproxy.model.config.ProxyConfigRequest;
 
 /**
  * new method of proxying requests that does not use jetty's transparent proxy

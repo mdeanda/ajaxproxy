@@ -11,8 +11,8 @@ import javax.swing.SpringLayout;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.thedeanda.ajaxproxy.model.config.ProxyConfig;
-import com.thedeanda.ajaxproxy.model.config.ProxyConfigRequest;
+import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfig;
+import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigRequest;
 import com.thedeanda.ajaxproxy.ui.SwingUtils;
 
 public class ProxyEditorPanel extends JPanel {

@@ -27,10 +27,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.thedeanda.ajaxproxy.config.model.proxy.HttpHeader;
 import com.thedeanda.ajaxproxy.http.HttpClient;
 import com.thedeanda.ajaxproxy.http.HttpClient.RequestMethod;
 import com.thedeanda.ajaxproxy.http.RequestListener;
-import com.thedeanda.ajaxproxy.model.config.HttpHeader;
 import com.thedeanda.ajaxproxy.ui.SwingUtils;
 import com.thedeanda.ajaxproxy.ui.border.BottomBorder;
 import com.thedeanda.ajaxproxy.ui.viewer.RequestViewer;

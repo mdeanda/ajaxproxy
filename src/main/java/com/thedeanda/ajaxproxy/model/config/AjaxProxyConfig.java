@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfig;
+
 import lombok.Data;
 
 @Data

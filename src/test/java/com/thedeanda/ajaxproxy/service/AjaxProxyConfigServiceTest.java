@@ -1,6 +1,9 @@
 package com.thedeanda.ajaxproxy.service;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,10 +14,10 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfig;
+import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigLogger;
+import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigRequest;
 import com.thedeanda.ajaxproxy.model.config.AjaxProxyConfig;
-import com.thedeanda.ajaxproxy.model.config.ProxyConfig;
-import com.thedeanda.ajaxproxy.model.config.ProxyConfigLogger;
-import com.thedeanda.ajaxproxy.model.config.ProxyConfigRequest;
 
 public class AjaxProxyConfigServiceTest {
 	private AjaxProxyConfigService service;

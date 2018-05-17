@@ -1,4 +1,4 @@
-package com.thedeanda.ajaxproxy.model.config;
+package com.thedeanda.ajaxproxy.config.model.proxy;
 
 public interface ProxyConfig {
 	public String getPath();

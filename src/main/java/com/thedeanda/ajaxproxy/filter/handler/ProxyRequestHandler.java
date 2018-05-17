@@ -27,12 +27,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.thedeanda.ajaxproxy.cache.model.CachedResponse;
+import com.thedeanda.ajaxproxy.config.model.proxy.HttpHeader;
+import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigRequest;
 import com.thedeanda.ajaxproxy.http.HttpClient;
 import com.thedeanda.ajaxproxy.http.HttpClient.RequestMethod;
 import com.thedeanda.ajaxproxy.http.RequestListener;
 import com.thedeanda.ajaxproxy.model.ProxyContainer;
-import com.thedeanda.ajaxproxy.model.config.HttpHeader;
-import com.thedeanda.ajaxproxy.model.config.ProxyConfigRequest;
 
 public class ProxyRequestHandler implements RequestHandler {
 	private static final Logger log = LoggerFactory.getLogger(ProxyRequestHandler.class);

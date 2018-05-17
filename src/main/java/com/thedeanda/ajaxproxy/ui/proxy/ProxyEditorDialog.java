@@ -4,7 +4,7 @@ import java.awt.Component;
 
 import javax.swing.JOptionPane;
 
-import com.thedeanda.ajaxproxy.model.config.ProxyConfig;
+import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfig;
 
 public class ProxyEditorDialog {
 
