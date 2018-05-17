@@ -15,6 +15,11 @@ public class ConfigLoader {
 		loaders.add(new ConfigLoaderV1());
 	}
 
+	/**
+	 * TODO: change this so instead of returning the same object, it migrates from
+	 * v1, to v2 so more version can be added later without having to modify old
+	 * implementations.
+	 */
 	public Config loadConfig(JsonObject jsonConfig, File workingDir) {
 		Config config = null;
 		for (Loader loader : loaders) {
