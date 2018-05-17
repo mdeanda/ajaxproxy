@@ -9,7 +9,7 @@ import lombok.Data;
 public class ProxyConfigRequest implements ProxyConfig {
 	private String protocol = "http";
 	private String host;
-	private int port;
+	private int port = 80;
 	private String path;
 	private boolean enableCache;
 	/** cache duration in seconds */
