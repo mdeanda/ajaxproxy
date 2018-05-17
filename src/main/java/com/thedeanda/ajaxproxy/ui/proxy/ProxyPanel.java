@@ -156,7 +156,7 @@ public class ProxyPanel extends JPanel {
 	}
 
 	private void startAdd() {
-		ProxyConfig updatedValue = ProxyEditorDialog.showEditDialog(null, scroll);
+		ProxyConfig updatedValue = ProxyEditorDialog.showAddDialog(null, scroll);
 		if (updatedValue != null) {
 			int row = proxyModel.addValue(updatedValue);
 			proxyTable.changeSelection(row - 1, 0, false, true);
