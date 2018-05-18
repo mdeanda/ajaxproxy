@@ -10,6 +10,6 @@ import lombok.Data;
 public class Config {
 	private int version;
 	private String workingDir;
-	private List<Server> servers;
+	private List<ServerConfig> servers;
 	private List<Variable> variables;
 }

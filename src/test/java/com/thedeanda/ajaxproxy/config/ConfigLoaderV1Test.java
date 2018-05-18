@@ -10,7 +10,7 @@ import org.junit.Test;
 import com.thedeanda.ajaxproxy.config.model.Config;
 import com.thedeanda.ajaxproxy.config.model.MergeConfig;
 import com.thedeanda.ajaxproxy.config.model.MergeMode;
-import com.thedeanda.ajaxproxy.config.model.Server;
+import com.thedeanda.ajaxproxy.config.model.ServerConfig;
 import com.thedeanda.ajaxproxy.config.model.Variable;
 import com.thedeanda.javajson.JsonObject;
 
@@ -73,7 +73,7 @@ public class ConfigLoaderV1Test {
 		assertThat(config.getWorkingDir()).isEqualTo(new File(".").getAbsolutePath());
 
 		assertThat(config.getServers()).hasSize(1);
-		Server server = config.getServers().get(0);
+		ServerConfig server = config.getServers().get(0);
 		assertThat(server.getPort()).isNotNull();
 		assertThat(server.getPort().getValue()).isEqualTo(8080);
 		assertThat(server.getResourceBase()).isNotNull();

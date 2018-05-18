@@ -11,7 +11,7 @@ import com.thedeanda.ajaxproxy.config.model.Config;
 import com.thedeanda.ajaxproxy.config.model.IntVariable;
 import com.thedeanda.ajaxproxy.config.model.MergeConfig;
 import com.thedeanda.ajaxproxy.config.model.MergeMode;
-import com.thedeanda.ajaxproxy.config.model.Server;
+import com.thedeanda.ajaxproxy.config.model.ServerConfig;
 import com.thedeanda.ajaxproxy.config.model.StringVariable;
 import com.thedeanda.ajaxproxy.config.model.Variable;
 import com.thedeanda.ajaxproxy.config.model.proxy.HttpHeader;
@@ -53,18 +53,21 @@ public class ConfigLoaderV1 implements Loader {
 		List<Variable> variables;
 		variables = loadVars(config);
 
+		//variables _can_ be empty
+		/*
 		if (CollectionUtils.isEmpty(variables)) {
 			log.debug("nothing recognized in config, return null config");
 			return null;
 		}
-
-		Server server = loadServer(variables, config);
+		//*/
+		
+		ServerConfig server = loadServer(variables, config);
 
 		return Config.builder().variables(variables).workingDir(workingDir.getAbsolutePath())
 				.servers(Arrays.asList(server)).build();
 	}
 
-	private Server loadServer(List<Variable> variables, JsonObject config) {
+	private ServerConfig loadServer(List<Variable> variables, JsonObject config) {
 		VariableHandler handler = new VariableHandler(variables);
 
 		String sPort = config.getString("port");
@@ -77,7 +80,7 @@ public class ConfigLoaderV1 implements Loader {
 
 		List<MergeConfig> mergeConfig = loadMergeConfig(handler, config);
 
-		Server server = Server.builder().port(portVar).resourceBase(resourceBase).showIndex(showIndex)
+		ServerConfig server = ServerConfig.builder().port(portVar).resourceBase(resourceBase).showIndex(showIndex)
 				.mergeConfig(mergeConfig).forcedLatencyMs(forcedLatencyMs).cacheTimeSec(cacheTimeSec).build();
 
 		return server;

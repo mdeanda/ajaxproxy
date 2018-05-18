@@ -8,7 +8,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class Server {
+public class ServerConfig {
 	private IntVariable port;
 	private StringVariable resourceBase;
 	private boolean showIndex;

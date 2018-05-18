@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import com.thedeanda.ajaxproxy.config.ConfigLoader;
 import com.thedeanda.ajaxproxy.config.model.Config;
 import com.thedeanda.ajaxproxy.config.model.MergeMode;
+import com.thedeanda.ajaxproxy.config.model.ServerConfig;
 import com.thedeanda.ajaxproxy.filter.ProxyFilter;
 import com.thedeanda.ajaxproxy.filter.ThrottleFilter;
 import com.thedeanda.ajaxproxy.filter.handler.logger.LoggerMessage;
@@ -88,19 +89,11 @@ public class AjaxProxy implements Runnable, LoggerMessageListener {
 	private static final String MINIFY = "minify";
 
 	public AjaxProxy(JsonObject config, File workingDir) throws Exception {
-		//TODO: perhaps pass in config object
-		ConfigLoader cl = new ConfigLoader();
-		configObject = cl.loadConfig(config, workingDir);
-		
-		converter = Convertor.get();
-		this.config = config;
-		this.workingDir = workingDir;
-		init();
+		init(config, workingDir);
 	}
 
 	public AjaxProxy(String configFile) throws Exception {
 		log.info("using config file: " + configFile);
-		converter = Convertor.get();
 		File cf = new File(configFile);
 		if (!cf.exists())
 			throw new FileNotFoundException("config file not found");
@@ -110,11 +103,18 @@ public class AjaxProxy implements Runnable, LoggerMessageListener {
 		try (FileInputStream fis = new FileInputStream(cf)) {
 			config = JsonObject.parse(fis);
 		}
-		this.workingDir = configDir;
-		init();
+		init(config, configDir);
 	}
 
-	private void init() {
+	private void init(JsonObject config, File workingDir) {
+		//TODO: perhaps pass in config object
+		ConfigLoader cl = new ConfigLoader();
+		configObject = cl.loadConfig(config, workingDir);
+		
+		converter = Convertor.get();
+		this.config = config;
+		this.workingDir = workingDir;
+
 		ajaxProxyConfig = converter.readAjaxProxyConfig(config);
 
 		this.proxyListeners = new ArrayList<RequestListener>();
@@ -198,8 +198,7 @@ public class AjaxProxy implements Runnable, LoggerMessageListener {
 		}
 	}
 
-	private void init(JsonObject config, File workingDir) throws Exception {
-		this.config = config;
+	private void initRun() throws Exception {
 		converter.processVariables(ajaxProxyConfig);
 		doVars();
 
@@ -258,7 +257,7 @@ public class AjaxProxy implements Runnable, LoggerMessageListener {
 		return ajaxProxyConfig;
 	}
 
-	private void initConnectors(Server jettyServer) {
+	private void initConnectors(Server jettyServer, ServerConfig serverConfig) {
 		HttpConfiguration http_config = new HttpConfiguration();
 		http_config.setSecureScheme("https");
 		if (httpsPort > 0) {
@@ -270,6 +269,7 @@ public class AjaxProxy implements Runnable, LoggerMessageListener {
 		http_config.setSendServerVersion(true);
 		http_config.setSendDateHeader(false);
 
+		int port = serverConfig.getPort().getValue();
 		if (port > 0) {
 			ServerConnector http = new ServerConnector(jettyServer, new HttpConnectionFactory(http_config));
 			http.setPort(port);
@@ -307,10 +307,14 @@ public class AjaxProxy implements Runnable, LoggerMessageListener {
 		log.info("starting jetty server");
 		try {
 			fireEvent(ProxyEvent.START);
-			init(config, workingDir);
+			initRun();
+			
+			//for now assume just 1 server in config, later we'll loop through all
+			ServerConfig serverConfig = configObject.getServers().get(0);
+			boolean showIndex = serverConfig.isShowIndex();
 
 			jettyServer = new Server();
-			initConnectors(jettyServer);
+			initConnectors(jettyServer, serverConfig);
 
 			ServletContextHandler root = new ServletContextHandler(ServletContextHandler.SESSIONS);
 			root.setContextPath("/");
