@@ -1,4 +1,4 @@
-package com.thedeanda.ajaxproxy.model.config;
+package com.thedeanda.ajaxproxy.ui.variable.model;
 
 import lombok.Data;
 
