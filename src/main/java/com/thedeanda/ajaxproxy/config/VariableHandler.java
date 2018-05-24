@@ -31,13 +31,22 @@ public class VariableHandler {
 		return s;
 	}
 
+	public int subForInt(String input, int defaultValue) {
+		input = sub(input);
+		try {
+			return Integer.parseInt(input);
+		} catch (NumberFormatException ex) {
+			return defaultValue;
+		}
+	}
+
 	public int subForInt(String input) {
 		input = sub(input);
 		return Integer.parseInt(input);
 	}
 
-	public IntVariable varForInt(String input) {
-		int val = subForInt(input);
+	public IntVariable varForInt(String input, int defaultValue) {
+		int val = subForInt(input, defaultValue);
 		return new IntVariable(input, val);
 	}
 

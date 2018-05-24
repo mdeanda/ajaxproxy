@@ -3,6 +3,7 @@ package com.thedeanda.ajaxproxy.config;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -12,6 +13,7 @@ import com.thedeanda.ajaxproxy.config.model.MergeConfig;
 import com.thedeanda.ajaxproxy.config.model.MergeMode;
 import com.thedeanda.ajaxproxy.config.model.ServerConfig;
 import com.thedeanda.ajaxproxy.config.model.Variable;
+import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfig;
 import com.thedeanda.javajson.JsonObject;
 
 public class ConfigLoaderV1Test {
@@ -97,6 +99,10 @@ public class ConfigLoaderV1Test {
 		assertThat(merge.getPath().getValue()).isEqualTo("/balloon");
 		assertThat(merge.getMode()).isEqualTo(MergeMode.JS);
 		assertThat(merge.isMinify()).isFalse();
+	
+		List<ProxyConfig> proxies = server.getProxyConfig();
+		assertThat(proxies).isNotNull().hasSize(2);
+		
 	}
 
 	/**

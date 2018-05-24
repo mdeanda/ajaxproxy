@@ -53,14 +53,13 @@ public class ConfigLoaderV1 implements Loader {
 		List<Variable> variables;
 		variables = loadVars(config);
 
-		//variables _can_ be empty
+		// variables _can_ be empty
 		/*
-		if (CollectionUtils.isEmpty(variables)) {
-			log.debug("nothing recognized in config, return null config");
-			return null;
-		}
-		//*/
-		
+		 * if (CollectionUtils.isEmpty(variables)) {
+		 * log.debug("nothing recognized in config, return null config"); return null; }
+		 * //
+		 */
+
 		ServerConfig server = loadServer(variables, config);
 
 		return Config.builder().variables(variables).workingDir(workingDir.getAbsolutePath())
@@ -71,7 +70,7 @@ public class ConfigLoaderV1 implements Loader {
 		VariableHandler handler = new VariableHandler(variables);
 
 		String sPort = config.getString("port");
-		IntVariable portVar = handler.varForInt(sPort);
+		IntVariable portVar = handler.varForInt(sPort, 0);
 		String sResourceBase = config.getString("resourceBase");
 		StringVariable resourceBase = handler.varForString(sResourceBase);
 		boolean showIndex = config.getBoolean("showIndex");
@@ -79,6 +78,7 @@ public class ConfigLoaderV1 implements Loader {
 		int cacheTimeSec = getCacheTime(config.getJsonObject("options"));
 
 		List<MergeConfig> mergeConfig = loadMergeConfig(handler, config);
+		List<ProxyConfig> proxyConfig = loadProxyConfig(handler, config);
 
 		ServerConfig server = ServerConfig.builder().port(portVar).resourceBase(resourceBase).showIndex(showIndex)
 				.mergeConfig(mergeConfig).forcedLatencyMs(forcedLatencyMs).cacheTimeSec(cacheTimeSec).build();
@@ -159,8 +159,11 @@ public class ConfigLoaderV1 implements Loader {
 		if (config.hasKey("version") && config.getInt("version") != 1) {
 			return false;
 		}
+		// TODO: add check for a min set of fields
+		if (config.hasKey("port"))
+			return true;
 
-		return true;
+		return false;
 	}
 
 	private List<Variable> loadVars(JsonObject config) {
@@ -176,6 +179,17 @@ public class ConfigLoaderV1 implements Loader {
 
 		return ret;
 	}
+
+	private List<ProxyConfig> loadProxyConfig(VariableHandler handler, JsonObject config) {
+		List<ProxyConfig> proxyConfig = new ArrayList<>();
+		JsonArray configs = config.getJsonArray("proxy");
+		for (JsonValue v : configs) {
+			
+		}
+
+		return proxyConfig;
+	}
+
 
 	public ProxyConfig readProxyConfig(JsonObject json) {
 		if (json.hasKey(PROXY_BASE_PATH)) {

@@ -85,7 +85,7 @@ public class Convertor {
 		List<ProxyConfig> proxies = config.getProxyConfig();
 		// logger gets added first so it has priority
 		// TODO: externalize "/logger" path
-		proxies.add(new ProxyConfigLogger("/logger"));
+		proxies.add(new ProxyConfigLogger());
 		for (JsonValue val : json.getJsonArray(AP_PROXY)) {
 			ProxyConfig pc = readProxyConfig(val.getJsonObject());
 			proxies.add(pc);

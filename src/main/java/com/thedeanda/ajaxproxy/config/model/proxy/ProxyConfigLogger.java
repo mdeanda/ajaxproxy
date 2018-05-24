@@ -1,14 +1,12 @@
 package com.thedeanda.ajaxproxy.config.model.proxy;
 
+import lombok.Builder;
 import lombok.Data;
 
 @Data
 public class ProxyConfigLogger implements ProxyConfig {
-	private String path;
-
-	public ProxyConfigLogger(String path) {
-		this.setPath(path);
-	}
+	@Builder.Default
+	private String path = "/logger";
 
 	@Override
 	final public boolean isEnableCache() {
