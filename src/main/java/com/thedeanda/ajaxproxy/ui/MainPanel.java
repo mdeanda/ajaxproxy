@@ -26,6 +26,7 @@ import com.thedeanda.ajaxproxy.AjaxProxy;
 import com.thedeanda.ajaxproxy.ProxyListener;
 import com.thedeanda.ajaxproxy.service.ResourceService;
 import com.thedeanda.ajaxproxy.ui.border.RightBorder;
+import com.thedeanda.ajaxproxy.ui.help.HelpPanel;
 import com.thedeanda.ajaxproxy.ui.logger.LoggerPanel;
 import com.thedeanda.ajaxproxy.ui.main.nav.MainNavPanel;
 import com.thedeanda.ajaxproxy.ui.main.nav.NavItem;
@@ -68,9 +69,11 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 	private JPanel cardPanel;
 	private CardLayout cardLayout;
 	private MainNavPanel navPanel;
+	private HelpPanel helpPanel;
 	private static final String CARD_SERVER = "card_server";
 	private static final String CARD_RESOURCE_VIEWER = "card_resource_viewer";
 	private static final String CARD_LOGGER = "card_logger";
+	private static final String CARD_HELP = "card_help";
 
 	public MainPanel() {
 		SpringLayout layout = new SpringLayout();
@@ -106,15 +109,15 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		tabs.add("Variables", variablePanel);
 
 		tamperPanel = new TamperPanel();
-		// tabs.add("Tamper", tamperPanel);
 
 		resourceViewerPanel = new ResourceViewerPanel(resourceService);
-		// tabs.add("Resource Viewer", resourceViewerPanel);
 		cardPanel.add(resourceViewerPanel, CARD_RESOURCE_VIEWER);
 
 		loggerPanel = new LoggerPanel();
-		// tabs.add("Logger", loggerPanel);
 		cardPanel.add(loggerPanel, CARD_LOGGER);
+
+		helpPanel = new HelpPanel();
+		cardPanel.add(helpPanel, CARD_HELP);
 
 		navPanel = new MainNavPanel();
 		JScrollPane navComponent = new JScrollPane(navPanel);
@@ -353,6 +356,8 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		case Server:
 			cardLayout.show(cardPanel, CARD_SERVER);
 			break;
+		case Help:
+			cardLayout.show(cardPanel, CARD_HELP);
 		case Stop:
 			stop();
 			break;

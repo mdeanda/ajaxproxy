@@ -34,6 +34,7 @@ public class MainNavPanel extends JPanel {
 		createNavButton(this, "Server", "Server", NavItem.Server, 0);
 		createNavButton(this, "Requests", "Request Viewer", NavItem.RequestViewer, 0);
 		createNavButton(this, "Logger", "Logger", NavItem.Logger, 0);
+		createNavButton(this, "Help", "Help", NavItem.Help, 0);
 
 		initStartButton(panel);
 
