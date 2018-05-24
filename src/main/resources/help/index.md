@@ -1,11 +1,7 @@
-<html>
-<body>
+# AjaxProxy Help Document
 
-<h1>AjaxProxy Help Document</h1>
+this is an attempt at a help document
 
-<p>this is an attempt at a help document</p>
-
-<a href="server">see server</a>
-
-</body>
-</html>
+* [Server](server) see server
+* Requests
+* Logger

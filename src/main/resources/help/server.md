@@ -1,9 +1,3 @@
-<html>
-<body>
+# AjaxProxy - Server
 
-<h1>AjaxProxy - Server</h1>
-
-<p>this is an attempt at a help document</p>
-
-</body>
-</html>
+The Server section is where you setup the server.
