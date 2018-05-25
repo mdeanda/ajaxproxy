@@ -82,7 +82,7 @@ public class ConfigLoaderV1Test {
 		assertThat(server.getResourceBase().getValue()).isEqualTo("./32");
 		assertThat(server.isShowIndex()).isEqualTo(true);
 		assertThat(server.getCacheTimeSec()).isEqualTo(30);
-		assertThat(server.getForcedLatencyMs()).isEqualTo(500);		
+		assertThat(server.getForcedLatencyMs()).isEqualTo(500);
 
 		assertThat(server.getMergeConfig()).hasSize(2);
 
@@ -99,10 +99,11 @@ public class ConfigLoaderV1Test {
 		assertThat(merge.getPath().getValue()).isEqualTo("/balloon");
 		assertThat(merge.getMode()).isEqualTo(MergeMode.JS);
 		assertThat(merge.isMinify()).isFalse();
-	
+
 		List<ProxyConfig> proxies = server.getProxyConfig();
 		assertThat(proxies).isNotNull().hasSize(2);
-		
+
+		ProxyConfig proxy = proxies.get(0);
 	}
 
 	/**

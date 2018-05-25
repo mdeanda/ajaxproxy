@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.collections4.CollectionUtils;
-
 import com.thedeanda.ajaxproxy.config.model.Config;
 import com.thedeanda.ajaxproxy.config.model.IntVariable;
 import com.thedeanda.ajaxproxy.config.model.MergeConfig;
@@ -81,7 +79,8 @@ public class ConfigLoaderV1 implements Loader {
 		List<ProxyConfig> proxyConfig = loadProxyConfig(handler, config);
 
 		ServerConfig server = ServerConfig.builder().port(portVar).resourceBase(resourceBase).showIndex(showIndex)
-				.mergeConfig(mergeConfig).forcedLatencyMs(forcedLatencyMs).cacheTimeSec(cacheTimeSec).build();
+				.mergeConfig(mergeConfig).forcedLatencyMs(forcedLatencyMs).cacheTimeSec(cacheTimeSec)
+				.proxyConfig(proxyConfig).build();
 
 		return server;
 	}
@@ -184,12 +183,14 @@ public class ConfigLoaderV1 implements Loader {
 		List<ProxyConfig> proxyConfig = new ArrayList<>();
 		JsonArray configs = config.getJsonArray("proxy");
 		for (JsonValue v : configs) {
-			
+			ProxyConfig cfg = readProxyConfig(v.getJsonObject());
+			if (cfg != null) {
+				proxyConfig.add(cfg);
+			}
 		}
 
 		return proxyConfig;
 	}
-
 
 	public ProxyConfig readProxyConfig(JsonObject json) {
 		if (json.hasKey(PROXY_BASE_PATH)) {
