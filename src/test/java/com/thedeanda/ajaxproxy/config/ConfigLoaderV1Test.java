@@ -14,6 +14,7 @@ import com.thedeanda.ajaxproxy.config.model.MergeMode;
 import com.thedeanda.ajaxproxy.config.model.ServerConfig;
 import com.thedeanda.ajaxproxy.config.model.Variable;
 import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfig;
+import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigRequest;
 import com.thedeanda.javajson.JsonObject;
 
 public class ConfigLoaderV1Test {
@@ -104,6 +105,13 @@ public class ConfigLoaderV1Test {
 		assertThat(proxies).isNotNull().hasSize(2);
 
 		ProxyConfig proxy = proxies.get(0);
+		ProxyConfigRequest proxyR = (ProxyConfigRequest) proxy;
+		assertThat(proxyR.isEnableCache()).isFalse();
+		assertThat(proxyR.getCacheDuration()).isEqualTo(30);
+		assertThat(proxyR.getHost()).isEqualTo("jsonplaceholder.typicode.com");
+		assertThat(proxyR.getPath()).isEqualTo("/users/.*");
+		assertThat(proxyR.getPort()).isEqualTo(80);
+		assertThat(proxyR.getProtocol()).isEqualTo("http");
 	}
 
 	/**
