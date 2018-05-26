@@ -3,6 +3,8 @@ package com.thedeanda.ajaxproxy.config.model.proxy;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.thedeanda.ajaxproxy.config.model.StringVariable;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,10 +17,10 @@ import lombok.NoArgsConstructor;
 public class ProxyConfigRequest implements ProxyConfig {
 	@Builder.Default
 	private String protocol = "http";
-	private String host;
+	private StringVariable host;
 	@Builder.Default
 	private int port = 80;
-	private String path;
+	private StringVariable path;
 	private boolean enableCache;
 	/** cache duration in seconds */
 	@Builder.Default

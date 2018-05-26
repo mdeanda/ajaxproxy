@@ -60,7 +60,7 @@ public class ProxyRequestHandler implements RequestHandler {
 		@SuppressWarnings("unchecked")
 		Enumeration<String> hnames = request.getHeaderNames();
 
-		String hostHeaderString = proxyConfig.getHost(); // default header
+		String hostHeaderString = proxyConfig.getHost().getValue(); // default header
 		if (!StringUtils.isBlank(proxyConfig.getHostHeader())) {
 			hostHeaderString = proxyConfig.getHostHeader();
 		}
@@ -82,7 +82,7 @@ public class ProxyRequestHandler implements RequestHandler {
 		log.trace("headers: {}", inputHeaders);
 
 		StringBuilder proxyUrl = new StringBuilder();
-		proxyUrl.append(proxyConfig.getProtocol() + "://" + proxyConfig.getHost());
+		proxyUrl.append(proxyConfig.getProtocol() + "://" + proxyConfig.getHost().getValue());
 		if (("http".equalsIgnoreCase(proxyConfig.getProtocol()) && proxyConfig.getPort() != 80)
 				|| ("https".equalsIgnoreCase(proxyConfig.getProtocol()) && proxyConfig.getPort() != 443)) {
 			proxyUrl.append(":" + proxyConfig.getPort());

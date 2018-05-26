@@ -151,15 +151,15 @@ public class ProxyTableModel extends AbstractTableModel implements Reorderable {
 				ProxyConfigRequest config = (ProxyConfigRequest) proxyConfig;
 				if (config.getPort() <= 0)
 					keep = false;
-				if (StringUtils.isBlank(config.getHost()))
+				if (StringUtils.isBlank(config.getHost().getOriginalValue()))
 					keep = false;
-				if (StringUtils.isBlank(config.getPath()))
+				if (StringUtils.isBlank(config.getPath().getOriginalValue()))
 					keep = false;
 			} else {
 				ProxyConfigFile fileConfig = (ProxyConfigFile) proxyConfig;
-				if (StringUtils.isBlank(fileConfig.getPath()))
+				if (StringUtils.isBlank(fileConfig.getPath().getOriginalValue()))
 					keep = false;
-				if (StringUtils.isBlank(fileConfig.getBasePath()))
+				if (StringUtils.isBlank(fileConfig.getBasePath().getOriginalValue()))
 					keep = false;
 			}
 

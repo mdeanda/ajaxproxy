@@ -1,7 +1,9 @@
 package com.thedeanda.ajaxproxy.config.model.proxy;
 
+import com.thedeanda.ajaxproxy.config.model.StringVariable;
+
 public interface ProxyConfig {
-	public String getPath();
+	public StringVariable getPath();
 
 	public boolean isEnableCache();
 

@@ -11,6 +11,7 @@ import javax.swing.SpringLayout;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.thedeanda.ajaxproxy.config.model.StringVariable;
 import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfig;
 import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigRequest;
 import com.thedeanda.ajaxproxy.ui.SwingUtils;
@@ -126,9 +127,9 @@ public class ProxyEditorPanel extends JPanel {
 		String path = pathField.getText();
 
 		ProxyConfigRequest config = new ProxyConfigRequest();
-		config.setHost(host);
+		config.setHost(StringVariable.builder().originalValue(host).build());
 		config.setPort(port);
-		config.setPath(path);
+		config.setPath(StringVariable.builder().originalValue(path).build());
 		config.setHostHeader(hostHeaderField.getText());
 		config.setEnableCache(cacheCheckbox.isSelected());
 		config.setProtocol(String.valueOf(protocols.getSelectedItem()));
@@ -154,12 +155,12 @@ public class ProxyEditorPanel extends JPanel {
 				}
 			}
 
-			this.hostField.setText(configRequest.getHost());
+			this.hostField.setText(configRequest.getHost().getOriginalValue());
 			this.portField.setText(sport);
 			this.hostHeaderField.setText(configRequest.getHostHeader());
 		}
 
-		this.pathField.setText(config.getPath());
+		this.pathField.setText(config.getPath().getOriginalValue());
 		this.cacheCheckbox.setSelected(config.isEnableCache());
 
 	}

@@ -17,7 +17,7 @@ public class FileRequestHandler implements RequestHandler {
 
 	public FileRequestHandler(ProxyConfigFile config) {
 		// TODO: simple file servlet may need to mangle paths
-		servlet = new SimpleFileServlet(config.getBasePath(), config.getFilterPath());
+		servlet = new SimpleFileServlet(config.getBasePath().getValue(), config.getFilterPath());
 	}
 
 	@Override

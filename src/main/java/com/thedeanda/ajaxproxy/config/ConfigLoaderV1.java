@@ -183,7 +183,7 @@ public class ConfigLoaderV1 implements Loader {
 		List<ProxyConfig> proxyConfig = new ArrayList<>();
 		JsonArray configs = config.getJsonArray("proxy");
 		for (JsonValue v : configs) {
-			ProxyConfig cfg = readProxyConfig(v.getJsonObject());
+			ProxyConfig cfg = readProxyConfig(handler, v.getJsonObject());
 			if (cfg != null) {
 				proxyConfig.add(cfg);
 			}
@@ -192,21 +192,26 @@ public class ConfigLoaderV1 implements Loader {
 		return proxyConfig;
 	}
 
-	public ProxyConfig readProxyConfig(JsonObject json) {
+	private ProxyConfig readProxyConfig(VariableHandler handler, JsonObject json) {
 		if (json.hasKey(PROXY_BASE_PATH)) {
 			ProxyConfigFile config = new ProxyConfigFile();
-			config.setPath(json.getString(PROXY_PATH));
-			config.setBasePath(json.getString(PROXY_BASE_PATH));
+			StringVariable pathVar = handler.varForString(json.getString(PROXY_PATH));
+			StringVariable basePathVar = handler.varForString(json.getString(PROXY_BASE_PATH));
+			config.setPath(pathVar);
+			config.setBasePath(basePathVar);
 			config.setFilterPath(json.getString(PROXY_FILTER_PATH));
 			return config;
 		} else {
 			ProxyConfigRequest config = new ProxyConfigRequest();
 
-			if (json.hasKey(PROXY_PROTOCOL))
+			if (json.hasKey(PROXY_PROTOCOL)) {
 				config.setProtocol(json.getString(PROXY_PROTOCOL));
+			}
 
-			if (json.hasKey(PROXY_HOST))
-				config.setHost(json.getString(PROXY_HOST));
+			if (json.hasKey(PROXY_HOST)) {
+				StringVariable hostVar = handler.varForString(json.getString(PROXY_HOST));
+				config.setHost(hostVar);
+			}
 
 			if (json.isInt(PROXY_PORT))
 				config.setPort(json.getInt(PROXY_PORT));
@@ -218,7 +223,60 @@ public class ConfigLoaderV1 implements Loader {
 					config.setPort(0);
 				}
 			}
-			config.setPath(json.getString(PROXY_PATH));
+			StringVariable pathVar = handler.varForString(json.getString(PROXY_PATH));
+			config.setPath(pathVar);
+			config.setEnableCache(json.getBoolean(PROXY_CACHE));
+			config.setCacheDuration(json.getInt(PROXY_CACHE_DUR));
+			config.setHostHeader(json.getString(PROXY_HOST_HEADER));
+
+			if (json.isJsonArray(PROXY_HEADERS)) {
+				JsonValue headersValue = json.get(PROXY_HEADERS);
+				JsonArray headers = headersValue.getJsonArray();
+				for (JsonValue v : headers) {
+					JsonObject headerObj = v.getJsonObject();
+					String name = headerObj.getString(PROXY_HEADERS_NAME);
+					String value = headerObj.getString(PROXY_HEADERS_VALUE);
+					HttpHeader hdr = HttpHeader.builder().name(name).value(value).build();
+					config.getHeaders().add(hdr);
+				}
+			}
+			return config;
+		}
+	}
+
+	/**
+	 * TODO: remove this when the ui uses the new data structure
+	 * 
+	 * @param json
+	 * @return
+	 */
+	public ProxyConfig readProxyConfig(JsonObject json) {
+		if (json.hasKey(PROXY_BASE_PATH)) {
+			ProxyConfigFile config = new ProxyConfigFile();
+			config.setPath(StringVariable.builder().originalValue(json.getString(PROXY_PATH)).build());
+			config.setBasePath(StringVariable.builder().originalValue(json.getString(PROXY_BASE_PATH)).build());
+			config.setFilterPath(json.getString(PROXY_FILTER_PATH));
+			return config;
+		} else {
+			ProxyConfigRequest config = new ProxyConfigRequest();
+
+			if (json.hasKey(PROXY_PROTOCOL))
+				config.setProtocol(json.getString(PROXY_PROTOCOL));
+
+			if (json.hasKey(PROXY_HOST))
+				config.setHost(StringVariable.builder().originalValue(json.getString(PROXY_HOST)).build());
+
+			if (json.isInt(PROXY_PORT))
+				config.setPort(json.getInt(PROXY_PORT));
+			else {
+				try {
+					String value = json.getString(PROXY_PORT);
+					config.setPort(Integer.parseInt(value));
+				} catch (NumberFormatException nfe) {
+					config.setPort(0);
+				}
+			}
+			config.setPath(StringVariable.builder().originalValue(json.getString(PROXY_PATH)).build());
 			config.setEnableCache(json.getBoolean(PROXY_CACHE));
 			config.setCacheDuration(json.getInt(PROXY_CACHE_DUR));
 			config.setHostHeader(json.getString(PROXY_HOST_HEADER));

@@ -36,7 +36,7 @@ public class Convertor {
 	private static final String PROXY_FILTER_PATH = "filterPath";
 
 	private ConfigLoaderV1 v1Loader = new ConfigLoaderV1();
-	
+
 	private Convertor() {
 
 	}
@@ -48,58 +48,6 @@ public class Convertor {
 		return instance;
 	}
 
-	public void processVariables(AjaxProxyConfig config) {
-		Map<String, String> vars = config.getVariables();
-		List<ProxyConfig> configs = config.getProxyConfig();
-		for (ProxyConfig proxyConfig : configs) {
-			if (proxyConfig instanceof ProxyConfigRequest) {
-				processVariables((ProxyConfigRequest) proxyConfig, vars);
-			}
-		}
-	}
-
-	public void processVariables(ProxyConfigRequest config, Map<String, String> vars) {
-		for (String key : vars.keySet()) {
-			String var = "${" + key + "}";
-			String val = vars.get(key);
-
-			String configVal;
-			configVal = config.getHost();
-			configVal = configVal.replaceAll(Pattern.quote(var), val);
-			config.setHost(configVal);
-
-			configVal = config.getPath();
-			configVal = configVal.replaceAll(Pattern.quote(var), val);
-			config.setPath(configVal);
-		}
-
-	}
-
-	public AjaxProxyConfig readAjaxProxyConfig(JsonObject json) {
-		AjaxProxyConfig config = new AjaxProxyConfig();
-
-		config.setResourceBase(json.getString(AP_RESOURCE_BASE));
-		config.setPort(json.getInt(AP_PORT));
-		config.setShowIndex(json.getBoolean(AP_SHOW_INDEX));
-
-		List<ProxyConfig> proxies = config.getProxyConfig();
-		// logger gets added first so it has priority
-		// TODO: externalize "/logger" path
-		proxies.add(new ProxyConfigLogger());
-		for (JsonValue val : json.getJsonArray(AP_PROXY)) {
-			ProxyConfig pc = readProxyConfig(val.getJsonObject());
-			proxies.add(pc);
-		}
-
-		if (json.isJsonObject(AP_VARIABLES)) {
-			JsonObject vars = json.getJsonObject(AP_VARIABLES);
-			for (String key : vars) {
-				config.getVariables().put(key, vars.getString(key));
-			}
-		}
-		return config;
-	}
-
 	public ProxyConfig readProxyConfig(JsonObject json) {
 		return v1Loader.readProxyConfig(json);
 	}
@@ -108,9 +56,9 @@ public class Convertor {
 		JsonObject json = new JsonObject();
 
 		json.put(PROXY_PROTOCOL, config.getProtocol());
-		json.put(PROXY_HOST, config.getHost());
+		json.put(PROXY_HOST, config.getHost().getOriginalValue());
 		json.put(PROXY_PORT, config.getPort());
-		json.put(PROXY_PATH, config.getPath());
+		json.put(PROXY_PATH, config.getPath().getOriginalValue());
 		json.put(PROXY_CACHE, config.isEnableCache());
 		json.put(PROXY_CACHE_DUR, config.getCacheDuration());
 		json.put(PROXY_HOST_HEADER, config.getHostHeader());
@@ -121,9 +69,9 @@ public class Convertor {
 	public JsonObject toJson(ProxyConfigFile config) {
 		JsonObject json = new JsonObject();
 
-		json.put(PROXY_BASE_PATH, config.getBasePath());
+		json.put(PROXY_BASE_PATH, config.getBasePath().getOriginalValue());
 		json.put(PROXY_FILTER_PATH, config.getFilterPath());
-		json.put(PROXY_PATH, config.getPath());
+		json.put(PROXY_PATH, config.getPath().getOriginalValue());
 
 		return json;
 	}
