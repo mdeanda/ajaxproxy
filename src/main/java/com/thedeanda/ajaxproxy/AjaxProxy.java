@@ -42,7 +42,6 @@ import com.thedeanda.ajaxproxy.filter.handler.logger.LoggerMessage;
 import com.thedeanda.ajaxproxy.filter.handler.logger.LoggerMessageListener;
 import com.thedeanda.ajaxproxy.http.RequestListener;
 import com.thedeanda.ajaxproxy.model.ProxyPath;
-import com.thedeanda.ajaxproxy.model.config.AjaxProxyConfig;
 import com.thedeanda.ajaxproxy.model.config.Convertor;
 import com.thedeanda.javajson.JsonArray;
 import com.thedeanda.javajson.JsonObject;
@@ -69,7 +68,7 @@ public class AjaxProxy implements Runnable, LoggerMessageListener {
 	private ArrayList<RequestListener> proxyListeners;
 	private RequestListener listener;
 
-	private AjaxProxyConfig ajaxProxyConfig;
+//	private AjaxProxyConfig ajaxProxyConfig;
 	private Convertor converter;
 	private Config configObject;
 
@@ -115,11 +114,12 @@ public class AjaxProxy implements Runnable, LoggerMessageListener {
 		this.config = config;
 		this.workingDir = workingDir;
 
-		ajaxProxyConfig = converter.readAjaxProxyConfig(config);
-
 		this.proxyListeners = new ArrayList<RequestListener>();
 		throttleFilter = new ThrottleFilter();
-		proxyFilter = new ProxyFilter(this);
+		
+		//TODO: one filter per server?
+		ServerConfig firstServer = configObject.getServers().get(0);
+		proxyFilter = new ProxyFilter(this, firstServer);
 		getRequestListener();
 	}
 
@@ -199,7 +199,6 @@ public class AjaxProxy implements Runnable, LoggerMessageListener {
 	}
 
 	private void initRun() throws Exception {
-		converter.processVariables(ajaxProxyConfig);
 		doVars();
 
 		if (config.isInt(PORT)) {
@@ -251,10 +250,6 @@ public class AjaxProxy implements Runnable, LoggerMessageListener {
 			}
 		}
 		return ret;
-	}
-
-	public AjaxProxyConfig getAjaxProxyConfig() {
-		return ajaxProxyConfig;
 	}
 
 	private void initConnectors(Server jettyServer, ServerConfig serverConfig) {
