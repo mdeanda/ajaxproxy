@@ -19,7 +19,7 @@ apply plugin: "com.github.johnrengelman.shadow"
 apply plugin: 'com.jfrog.artifactory-upload'
 
 group = 'com.thedeanda'
-version = '2.2'
+version = '2.3'
 sourceCompatibility = "1.8"
 targetCompatibility = "1.8"
 
