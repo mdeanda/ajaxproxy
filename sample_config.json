@@ -1,7 +1,7 @@
 {
   "merge":[],
   "options":{
-    "cacheTime":6,
+    "cacheTime":1,
     "forcedLatency":0,
     "maxBitrate":0
   },
@@ -9,7 +9,7 @@
   "proxy":[
     {
       "cache":true,
-      "cacheDuration":3600,
+      "cacheDuration":10,
       "host":"jsonplaceholder.typicode.com",
       "hostHeader":"",
       "path":"/albums/.*",
@@ -18,7 +18,7 @@
     },
     {
       "cache":true,
-      "cacheDuration":3600,
+      "cacheDuration":10,
       "host":"jsonplaceholder.typicode.com",
       "hostHeader":"",
       "path":"/comments/.*",
@@ -27,7 +27,7 @@
     },
     {
       "cache":true,
-      "cacheDuration":3600,
+      "cacheDuration":10,
       "host":"jsonplaceholder.typicode.com",
       "hostHeader":"",
       "path":"/photos/.*",
@@ -36,7 +36,7 @@
     },
     {
       "cache":true,
-      "cacheDuration":3600,
+      "cacheDuration":10,
       "host":"jsonplaceholder.typicode.com",
       "hostHeader":"",
       "path":"/posts/.*",
@@ -45,7 +45,7 @@
     },
     {
       "cache":true,
-      "cacheDuration":3600,
+      "cacheDuration":10,
       "host":"jsonplaceholder.typicode.com",
       "hostHeader":"",
       "path":"/todos/.*",
@@ -54,7 +54,7 @@
     },
     {
       "cache":true,
-      "cacheDuration":3600,
+      "cacheDuration":10,
       "host":"jsonplaceholder.typicode.com",
       "hostHeader":"",
       "path":"/users/.*",
