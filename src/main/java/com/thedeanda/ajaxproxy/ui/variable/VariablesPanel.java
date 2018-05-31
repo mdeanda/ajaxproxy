@@ -13,8 +13,8 @@ import javax.swing.event.ListSelectionListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.thedeanda.ajaxproxy.model.config.Variable;
 import com.thedeanda.ajaxproxy.ui.SettingsChangedListener;
+import com.thedeanda.ajaxproxy.ui.variable.model.Variable;
 import com.thedeanda.javajson.JsonObject;
 
 public class VariablesPanel extends JPanel {

@@ -15,8 +15,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 
-import com.thedeanda.ajaxproxy.model.config.Variable;
 import com.thedeanda.ajaxproxy.ui.SwingUtils;
+import com.thedeanda.ajaxproxy.ui.variable.model.Variable;
 
 public class VariableEditor extends JPanel {
 	private SpringLayout layout;

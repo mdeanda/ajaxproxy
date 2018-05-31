@@ -4,8 +4,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.thedeanda.ajaxproxy.cache.ProxyCache;
+import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfig;
 import com.thedeanda.ajaxproxy.filter.handler.RequestHandler;
-import com.thedeanda.ajaxproxy.model.config.ProxyConfig;
 
 import lombok.Data;
 
