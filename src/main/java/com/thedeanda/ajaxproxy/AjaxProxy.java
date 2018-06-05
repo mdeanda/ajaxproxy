@@ -42,20 +42,17 @@ import com.thedeanda.ajaxproxy.filter.handler.logger.LoggerMessage;
 import com.thedeanda.ajaxproxy.filter.handler.logger.LoggerMessageListener;
 import com.thedeanda.ajaxproxy.http.RequestListener;
 import com.thedeanda.ajaxproxy.model.ProxyPath;
-import com.thedeanda.ajaxproxy.model.config.Convertor;
 import com.thedeanda.javajson.JsonArray;
 import com.thedeanda.javajson.JsonObject;
 import com.thedeanda.javajson.JsonValue;
 
 public class AjaxProxy implements Runnable, LoggerMessageListener {
 	private static final Logger log = LoggerFactory.getLogger(AjaxProxy.class);
-	private int port = 0;
-	private int httpsPort = 0;
+	//TODO: move to config
 	private String keystoreFile = "";
 	private String keystorePassword = "";
 
 	private String resourceBase = "";
-	private boolean showIndex;
 	private JsonObject config;
 	private Server jettyServer;
 	private File workingDir;
@@ -69,7 +66,6 @@ public class AjaxProxy implements Runnable, LoggerMessageListener {
 	private RequestListener listener;
 
 //	private AjaxProxyConfig ajaxProxyConfig;
-	private Convertor converter;
 	private Config configObject;
 
 	private enum ProxyEvent {
@@ -110,7 +106,6 @@ public class AjaxProxy implements Runnable, LoggerMessageListener {
 		ConfigLoader cl = new ConfigLoader();
 		configObject = cl.loadConfig(config, workingDir);
 		
-		converter = Convertor.get();
 		this.config = config;
 		this.workingDir = workingDir;
 
@@ -201,11 +196,6 @@ public class AjaxProxy implements Runnable, LoggerMessageListener {
 	private void initRun() throws Exception {
 		doVars();
 
-		if (config.isInt(PORT)) {
-			port = config.getInt(PORT);
-		}
-		log.debug("using port: " + port);
-
 		if (config.isString(RESOURCE_BASE)) {
 			String rb = config.getString(RESOURCE_BASE);
 			resourceBase = workingDir.getPath() + File.separator + rb;
@@ -220,7 +210,6 @@ public class AjaxProxy implements Runnable, LoggerMessageListener {
 		} else {
 			throw new Exception("resourceBase not defined in config file");
 		}
-		showIndex = config.getBoolean(SHOW_INDEX);
 		log.info("using resource base: " + resourceBase);
 	}
 
@@ -255,6 +244,7 @@ public class AjaxProxy implements Runnable, LoggerMessageListener {
 	private void initConnectors(Server jettyServer, ServerConfig serverConfig) {
 		HttpConfiguration http_config = new HttpConfiguration();
 		http_config.setSecureScheme("https");
+		int httpsPort = serverConfig.getHttpsPort().getValue();
 		if (httpsPort > 0) {
 			http_config.setSecurePort(httpsPort);
 		}
@@ -304,7 +294,7 @@ public class AjaxProxy implements Runnable, LoggerMessageListener {
 			fireEvent(ProxyEvent.START);
 			initRun();
 			
-			//for now assume just 1 server in config, later we'll loop through all
+			//TODO: for now assume just 1 server in config, later we'll loop through all
 			ServerConfig serverConfig = configObject.getServers().get(0);
 			boolean showIndex = serverConfig.isShowIndex();
 
@@ -417,10 +407,6 @@ public class AjaxProxy implements Runnable, LoggerMessageListener {
 
 	public void addRequestListener(RequestListener listener) {
 		this.proxyListeners.add(listener);
-	}
-
-	public int getPort() {
-		return port;
 	}
 
 	public RequestListener getRequestListener() {

@@ -11,7 +11,9 @@ import lombok.Data;
 @Data
 @Builder
 public class ServerConfig {
-	private IntVariable port;
+	@Builder.Default
+	private IntVariable port = new IntVariable(8080);
+	
 	private StringVariable resourceBase;
 	private boolean showIndex;
 
@@ -23,4 +25,10 @@ public class ServerConfig {
 	private List<MergeConfig> mergeConfig = new ArrayList<>();
 	@Builder.Default
 	private List<ProxyConfig> proxyConfig = new ArrayList<>();
+	
+	/**
+	 * https settings
+	 */
+	@Builder.Default
+	private IntVariable httpsPort = new IntVariable(0);
 }

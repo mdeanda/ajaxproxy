@@ -108,10 +108,19 @@ public class ConfigLoaderV1Test {
 		ProxyConfigRequest proxyR = (ProxyConfigRequest) proxy;
 		assertThat(proxyR.isEnableCache()).isFalse();
 		assertThat(proxyR.getCacheDuration()).isEqualTo(30);
-		assertThat(proxyR.getHost()).isEqualTo("jsonplaceholder.typicode.com");
-		assertThat(proxyR.getPath()).isEqualTo("/users/.*");
+		assertThat(proxyR.getHost().getValue()).isEqualTo("jsonplaceholder.typicode.com");
+		assertThat(proxyR.getPath().getValue()).isEqualTo("/users/.*");
 		assertThat(proxyR.getPort()).isEqualTo(80);
 		assertThat(proxyR.getProtocol()).isEqualTo("http");
+
+		proxy = proxies.get(1);
+		proxyR = (ProxyConfigRequest) proxy;
+		assertThat(proxyR.isEnableCache()).isFalse();
+		assertThat(proxyR.getCacheDuration()).isEqualTo(30);
+		assertThat(proxyR.getHost().getValue()).isEqualTo("example.com");
+		assertThat(proxyR.getPath().getValue()).isEqualTo("/32/.*");
+		assertThat(proxyR.getPort()).isEqualTo(80);
+		assertThat(proxyR.getProtocol()).isEqualTo("https");
 	}
 
 	/**
