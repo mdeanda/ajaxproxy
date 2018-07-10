@@ -32,27 +32,27 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.thedeanda.ajaxproxy.config.ConfigLoader;
+import com.thedeanda.ajaxproxy.config.model.Config;
+import com.thedeanda.ajaxproxy.config.model.MergeMode;
+import com.thedeanda.ajaxproxy.config.model.ServerConfig;
 import com.thedeanda.ajaxproxy.filter.ProxyFilter;
 import com.thedeanda.ajaxproxy.filter.ThrottleFilter;
 import com.thedeanda.ajaxproxy.filter.handler.logger.LoggerMessage;
 import com.thedeanda.ajaxproxy.filter.handler.logger.LoggerMessageListener;
 import com.thedeanda.ajaxproxy.http.RequestListener;
 import com.thedeanda.ajaxproxy.model.ProxyPath;
-import com.thedeanda.ajaxproxy.model.config.AjaxProxyConfig;
-import com.thedeanda.ajaxproxy.model.config.Convertor;
 import com.thedeanda.javajson.JsonArray;
 import com.thedeanda.javajson.JsonObject;
 import com.thedeanda.javajson.JsonValue;
 
 public class AjaxProxy implements Runnable, LoggerMessageListener {
 	private static final Logger log = LoggerFactory.getLogger(AjaxProxy.class);
-	private int port = 0;
-	private int httpsPort = 0;
+	//TODO: move to config
 	private String keystoreFile = "";
 	private String keystorePassword = "";
 
 	private String resourceBase = "";
-	private boolean showIndex;
 	private JsonObject config;
 	private Server jettyServer;
 	private File workingDir;
@@ -65,8 +65,8 @@ public class AjaxProxy implements Runnable, LoggerMessageListener {
 	private ArrayList<RequestListener> proxyListeners;
 	private RequestListener listener;
 
-	private AjaxProxyConfig ajaxProxyConfig;
-	private Convertor converter;
+//	private AjaxProxyConfig ajaxProxyConfig;
+	private Config configObject;
 
 	private enum ProxyEvent {
 		START, STOP, FAIL
@@ -84,35 +84,37 @@ public class AjaxProxy implements Runnable, LoggerMessageListener {
 	private static final String MINIFY = "minify";
 
 	public AjaxProxy(JsonObject config, File workingDir) throws Exception {
-		converter = Convertor.get();
-		this.config = config;
-		this.workingDir = workingDir;
-		init();
+		init(config, workingDir);
 	}
 
 	public AjaxProxy(String configFile) throws Exception {
 		log.info("using config file: " + configFile);
-		converter = Convertor.get();
 		File cf = new File(configFile);
 		if (!cf.exists())
 			throw new FileNotFoundException("config file not found");
 		File configDir = cf.getParentFile();
 		if (configDir == null)
 			configDir = new File(".");
-		FileInputStream fis = new FileInputStream(cf);
-		JsonObject config = JsonObject.parse(fis);
-		fis.close();
-		this.config = config;
-		this.workingDir = configDir;
-		init();
+		try (FileInputStream fis = new FileInputStream(cf)) {
+			config = JsonObject.parse(fis);
+		}
+		init(config, configDir);
 	}
 
-	private void init() {
-		ajaxProxyConfig = converter.readAjaxProxyConfig(config);
+	private void init(JsonObject config, File workingDir) {
+		//TODO: perhaps pass in config object
+		ConfigLoader cl = new ConfigLoader();
+		configObject = cl.loadConfig(config, workingDir);
+		
+		this.config = config;
+		this.workingDir = workingDir;
 
 		this.proxyListeners = new ArrayList<RequestListener>();
 		throttleFilter = new ThrottleFilter();
-		proxyFilter = new ProxyFilter(this);
+		
+		//TODO: one filter per server?
+		ServerConfig firstServer = configObject.getServers().get(0);
+		proxyFilter = new ProxyFilter(this, firstServer);
 		getRequestListener();
 	}
 
@@ -191,15 +193,8 @@ public class AjaxProxy implements Runnable, LoggerMessageListener {
 		}
 	}
 
-	private void init(JsonObject config, File workingDir) throws Exception {
-		this.config = config;
-		converter.processVariables(ajaxProxyConfig);
+	private void initRun() throws Exception {
 		doVars();
-
-		if (config.isInt(PORT)) {
-			port = config.getInt(PORT);
-		}
-		log.debug("using port: " + port);
 
 		if (config.isString(RESOURCE_BASE)) {
 			String rb = config.getString(RESOURCE_BASE);
@@ -215,7 +210,6 @@ public class AjaxProxy implements Runnable, LoggerMessageListener {
 		} else {
 			throw new Exception("resourceBase not defined in config file");
 		}
-		showIndex = config.getBoolean(SHOW_INDEX);
 		log.info("using resource base: " + resourceBase);
 	}
 
@@ -239,11 +233,7 @@ public class AjaxProxy implements Runnable, LoggerMessageListener {
 					port = Integer.parseInt(obj.getString(PORT));
 
 				if (domain != null && path != null && port > 0) {
-					ProxyPath proxyPath = ProxyPath.builder()
-							.domain(domain)
-							.port(port)
-							.path(path)
-							.build();
+					ProxyPath proxyPath = ProxyPath.builder().domain(domain).port(port).path(path).build();
 					ret.add(proxyPath);
 				}
 			}
@@ -251,13 +241,10 @@ public class AjaxProxy implements Runnable, LoggerMessageListener {
 		return ret;
 	}
 
-	public AjaxProxyConfig getAjaxProxyConfig() {
-		return ajaxProxyConfig;
-	}
-
-	private void initConnectors(Server jettyServer) {
+	private void initConnectors(Server jettyServer, ServerConfig serverConfig) {
 		HttpConfiguration http_config = new HttpConfiguration();
 		http_config.setSecureScheme("https");
+		int httpsPort = serverConfig.getHttpsPort().getValue();
 		if (httpsPort > 0) {
 			http_config.setSecurePort(httpsPort);
 		}
@@ -267,6 +254,7 @@ public class AjaxProxy implements Runnable, LoggerMessageListener {
 		http_config.setSendServerVersion(true);
 		http_config.setSendDateHeader(false);
 
+		int port = serverConfig.getPort().getValue();
 		if (port > 0) {
 			ServerConnector http = new ServerConnector(jettyServer, new HttpConnectionFactory(http_config));
 			http.setPort(port);
@@ -304,10 +292,14 @@ public class AjaxProxy implements Runnable, LoggerMessageListener {
 		log.info("starting jetty server");
 		try {
 			fireEvent(ProxyEvent.START);
-			init(config, workingDir);
+			initRun();
+			
+			//TODO: for now assume just 1 server in config, later we'll loop through all
+			ServerConfig serverConfig = configObject.getServers().get(0);
+			boolean showIndex = serverConfig.isShowIndex();
 
 			jettyServer = new Server();
-			initConnectors(jettyServer);
+			initConnectors(jettyServer, serverConfig);
 
 			ServletContextHandler root = new ServletContextHandler(ServletContextHandler.SESSIONS);
 			root.setContextPath("/");
@@ -315,7 +307,7 @@ public class AjaxProxy implements Runnable, LoggerMessageListener {
 
 			AllowSymLinkAliasChecker alias = new AllowSymLinkAliasChecker();
 			root.addAliasCheck(alias);
-			
+
 			FilterHolder throttleFilterHolder = new FilterHolder(throttleFilter);
 			EnumSet<DispatcherType> dispatches = EnumSet.allOf(DispatcherType.class);
 			root.addFilter(throttleFilterHolder, "/*", dispatches);
@@ -415,10 +407,6 @@ public class AjaxProxy implements Runnable, LoggerMessageListener {
 
 	public void addRequestListener(RequestListener listener) {
 		this.proxyListeners.add(listener);
-	}
-
-	public int getPort() {
-		return port;
 	}
 
 	public RequestListener getRequestListener() {

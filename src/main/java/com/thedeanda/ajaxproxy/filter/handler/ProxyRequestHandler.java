@@ -19,6 +19,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
@@ -27,12 +28,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.thedeanda.ajaxproxy.cache.model.CachedResponse;
+import com.thedeanda.ajaxproxy.config.model.proxy.HttpHeader;
+import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigRequest;
 import com.thedeanda.ajaxproxy.http.HttpClient;
 import com.thedeanda.ajaxproxy.http.HttpClient.RequestMethod;
 import com.thedeanda.ajaxproxy.http.RequestListener;
 import com.thedeanda.ajaxproxy.model.ProxyContainer;
-import com.thedeanda.ajaxproxy.model.config.HttpHeader;
-import com.thedeanda.ajaxproxy.model.config.ProxyConfigRequest;
 
 public class ProxyRequestHandler implements RequestHandler {
 	private static final Logger log = LoggerFactory.getLogger(ProxyRequestHandler.class);
@@ -60,7 +61,7 @@ public class ProxyRequestHandler implements RequestHandler {
 		@SuppressWarnings("unchecked")
 		Enumeration<String> hnames = request.getHeaderNames();
 
-		String hostHeaderString = proxyConfig.getHost(); // default header
+		String hostHeaderString = proxyConfig.getHost().getValue(); // default header
 		if (!StringUtils.isBlank(proxyConfig.getHostHeader())) {
 			hostHeaderString = proxyConfig.getHostHeader();
 		}
@@ -82,8 +83,9 @@ public class ProxyRequestHandler implements RequestHandler {
 		log.trace("headers: {}", inputHeaders);
 
 		StringBuilder proxyUrl = new StringBuilder();
-		proxyUrl.append("http://" + proxyConfig.getHost());
-		if (proxyConfig.getPort() != 80) {
+		proxyUrl.append(proxyConfig.getProtocol() + "://" + proxyConfig.getHost().getValue());
+		if (("http".equalsIgnoreCase(proxyConfig.getProtocol()) && proxyConfig.getPort() != 80)
+				|| ("https".equalsIgnoreCase(proxyConfig.getProtocol()) && proxyConfig.getPort() != 443)) {
 			proxyUrl.append(":" + proxyConfig.getPort());
 		}
 		proxyUrl.append(uri);
@@ -113,7 +115,7 @@ public class ProxyRequestHandler implements RequestHandler {
 			}
 		} else {
 			// send cached response
-			sendCachedResponse(request, inputHeaders.toString(), cachedResponse, response, requestListener);
+			sendCachedResponse(request, inputHeaders, cachedResponse, response, requestListener);
 		}
 
 		return true;
@@ -123,6 +125,10 @@ public class ProxyRequestHandler implements RequestHandler {
 		Set<String> blacklist = new HashSet<>();
 		blacklist.add("host");
 		blacklist.add("content-length");
+		blacklist.add("connection");
+		blacklist.add("transfer-encoding");
+		blacklist.add("keep-alive");
+		blacklist.add("trailer");
 		return blacklist.contains(headerName.toLowerCase());
 	}
 
@@ -183,7 +189,7 @@ public class ProxyRequestHandler implements RequestHandler {
 		return cachedResponse;
 	}
 
-	private void sendCachedResponse(HttpServletRequest request, String headers, CachedResponse cachedResponse,
+	private void sendCachedResponse(HttpServletRequest request, List<HttpHeader> inputHeaders, CachedResponse cachedResponse,
 			final HttpServletResponse response, final RequestListener listener) throws IOException {
 		log.debug("Using cached response: {}", cachedResponse.getUrl());
 		ServletOutputStream os = response.getOutputStream();
@@ -195,11 +201,9 @@ public class ProxyRequestHandler implements RequestHandler {
 		// now just notify listener so ui can function properly
 
 		Map<String, String> hds = new HashMap<>();
-		if (!StringUtils.isBlank(headers)) {
-			String[] lines = StringUtils.split(headers, "\n");
-			for (String line : lines) {
-				String[] parts = StringUtils.split(line, ":", 2);
-				hds.put(parts[0], parts[1]);
+		if (CollectionUtils.isNotEmpty(inputHeaders)) {
+			for (HttpHeader header : inputHeaders) {
+				hds.put(header.getName(), header.getValue());
 			}
 		}
 		Header[] requestHeaders = null;

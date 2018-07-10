@@ -7,6 +7,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+import javax.swing.DropMode;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -18,9 +19,10 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
-import com.thedeanda.ajaxproxy.model.config.ProxyConfig;
+import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfig;
 import com.thedeanda.ajaxproxy.ui.SettingsChangedListener;
 import com.thedeanda.ajaxproxy.ui.border.BottomBorder;
+import com.thedeanda.ajaxproxy.ui.util.TableRowTransferHandler;
 
 /**
  * top level proxy panel with list of configured proxy settings
@@ -43,10 +45,9 @@ public class ProxyPanel extends JPanel {
 		layout = new SpringLayout();
 		setLayout(layout);
 		this.proxyModel = proxyModel;
-		
+
 		topPanel = initTopPanel();
 		add(topPanel);
-
 
 		bottomPanel = initBottomPanel();
 		add(bottomPanel);
@@ -61,7 +62,7 @@ public class ProxyPanel extends JPanel {
 
 		initLayout();
 	}
-	
+
 	private JPanel initTopPanel() {
 		JPanel panel = new JPanel();
 		SpringLayout layout = new SpringLayout();
@@ -76,7 +77,7 @@ public class ProxyPanel extends JPanel {
 				startAdd();
 			}
 		});
-		
+
 		this.editProxyButton = new JButton("Edit");
 		panel.add(editProxyButton);
 		editProxyButton.addActionListener(new ActionListener() {
@@ -85,8 +86,7 @@ public class ProxyPanel extends JPanel {
 				startEdit();
 			}
 		});
-		
-		
+
 		layout.putConstraint(SpringLayout.NORTH, addProxyButton, 20, SpringLayout.NORTH, panel);
 		layout.putConstraint(SpringLayout.WEST, addProxyButton, 10, SpringLayout.WEST, panel);
 
@@ -95,10 +95,13 @@ public class ProxyPanel extends JPanel {
 
 		return panel;
 	}
-	
+
 	private JPanel initBottomPanel() {
 
 		proxyTable = new JTable(proxyModel);
+		proxyTable.setDragEnabled(true);
+		proxyTable.setDropMode(DropMode.INSERT_ROWS);
+		proxyTable.setTransferHandler(new TableRowTransferHandler(proxyTable));
 		proxyTable.setColumnModel(new ProxyColumnModel());
 		proxyTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		proxyTable.addKeyListener(new KeyAdapter() {
@@ -118,13 +121,15 @@ public class ProxyPanel extends JPanel {
 				}
 			}
 		});
-		proxyTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
-	        public void valueChanged(ListSelectionEvent event) {
-	        		if (event.getValueIsAdjusting()) return;
-	        }
-	    });		
+		proxyTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent event) {
+				if (event.getValueIsAdjusting())
+					return;
+			}
+		});
 		scroll = new JScrollPane(proxyTable);
-		
+
 		JPanel panel = new JPanel();
 		SpringLayout layout = new SpringLayout();
 		panel.setLayout(layout);
@@ -133,7 +138,7 @@ public class ProxyPanel extends JPanel {
 		layout.putConstraint(SpringLayout.SOUTH, scroll, -10, SpringLayout.SOUTH, panel);
 		layout.putConstraint(SpringLayout.WEST, scroll, 10, SpringLayout.WEST, panel);
 		layout.putConstraint(SpringLayout.EAST, scroll, -10, SpringLayout.EAST, panel);
-		
+
 		return panel;
 	}
 
@@ -149,29 +154,30 @@ public class ProxyPanel extends JPanel {
 			proxyTable.changeSelection(row, 0, false, true);
 		}
 	}
-	
+
 	private void startAdd() {
-		ProxyConfig updatedValue = ProxyEditorDialog.showEditDialog(null, scroll);
+		ProxyConfig updatedValue = ProxyEditorDialog.showAddDialog(null, scroll);
 		if (updatedValue != null) {
 			int row = proxyModel.addValue(updatedValue);
-			proxyTable.changeSelection(row-1, 0, false, true);
+			proxyTable.changeSelection(row - 1, 0, false, true);
 		}
 	}
 
 	private void initLayout() {
 		/*
-		layout.putConstraint(SpringLayout.SOUTH, editor, -10, SpringLayout.SOUTH, this);
-		layout.putConstraint(SpringLayout.EAST, editor, -10, SpringLayout.EAST, this);
-		layout.putConstraint(SpringLayout.WEST, editor, 10, SpringLayout.WEST, this);
+		 * layout.putConstraint(SpringLayout.SOUTH, editor, -10, SpringLayout.SOUTH,
+		 * this); layout.putConstraint(SpringLayout.EAST, editor, -10,
+		 * SpringLayout.EAST, this); layout.putConstraint(SpringLayout.WEST, editor, 10,
+		 * SpringLayout.WEST, this);
+		 * 
+		 * // table layout.putConstraint(SpringLayout.NORTH, scroll, 10,
+		 * SpringLayout.NORTH, this); layout.putConstraint(SpringLayout.EAST, scroll,
+		 * -10, SpringLayout.EAST, this); layout.putConstraint(SpringLayout.WEST,
+		 * scroll, 10, SpringLayout.WEST, this);
+		 * layout.putConstraint(SpringLayout.SOUTH, scroll, -10, SpringLayout.NORTH,
+		 * editor); //
+		 */
 
-		// table
-		layout.putConstraint(SpringLayout.NORTH, scroll, 10, SpringLayout.NORTH, this);
-		layout.putConstraint(SpringLayout.EAST, scroll, -10, SpringLayout.EAST, this);
-		layout.putConstraint(SpringLayout.WEST, scroll, 10, SpringLayout.WEST, this);
-		layout.putConstraint(SpringLayout.SOUTH, scroll, -10, SpringLayout.NORTH, editor);
-		//*/
-
-		
 		layout.putConstraint(SpringLayout.NORTH, topPanel, 0, SpringLayout.NORTH, this);
 		layout.putConstraint(SpringLayout.SOUTH, topPanel, 60, SpringLayout.NORTH, this);
 		layout.putConstraint(SpringLayout.WEST, topPanel, 0, SpringLayout.WEST, this);

@@ -1,23 +1,69 @@
 {
   "merge":[],
   "options":{
-    "cacheTime":2,
+    "cacheTime":1,
     "forcedLatency":0,
     "maxBitrate":0
   },
   "port":8080,
   "proxy":[
     {
-      "cache":false,
-      "cacheDuration":30,
+      "cache":true,
+      "cacheDuration":10,
+      "host":"jsonplaceholder.typicode.com",
+      "hostHeader":"",
+      "path":"/albums/.*",
+      "port":80,
+      "protocol":"http"
+    },
+    {
+      "cache":true,
+      "cacheDuration":10,
+      "host":"jsonplaceholder.typicode.com",
+      "hostHeader":"",
+      "path":"/comments/.*",
+      "port":80,
+      "protocol":"http"
+    },
+    {
+      "cache":true,
+      "cacheDuration":10,
+      "host":"jsonplaceholder.typicode.com",
+      "hostHeader":"",
+      "path":"/photos/.*",
+      "port":80,
+      "protocol":"http"
+    },
+    {
+      "cache":true,
+      "cacheDuration":10,
+      "host":"jsonplaceholder.typicode.com",
+      "hostHeader":"",
+      "path":"/posts/.*",
+      "port":80,
+      "protocol":"http"
+    },
+    {
+      "cache":true,
+      "cacheDuration":10,
+      "host":"jsonplaceholder.typicode.com",
+      "hostHeader":"",
+      "path":"/todos/.*",
+      "port":80,
+      "protocol":"http"
+    },
+    {
+      "cache":true,
+      "cacheDuration":10,
       "host":"jsonplaceholder.typicode.com",
       "hostHeader":"",
       "path":"/users/.*",
-      "port":80
+      "port":80,
+      "protocol":"http"
     }
   ],
   "resource":{},
-  "resourceBase":".",
+  "resourceBase":"./src/test/resources/web",
   "showIndex":true,
   "tamper":{
     "items":[]

@@ -9,22 +9,24 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfig;
+import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigFile;
+import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigRequest;
 import com.thedeanda.ajaxproxy.model.config.Convertor;
-import com.thedeanda.ajaxproxy.model.config.ProxyConfig;
-import com.thedeanda.ajaxproxy.model.config.ProxyConfigFile;
-import com.thedeanda.ajaxproxy.model.config.ProxyConfigRequest;
+import com.thedeanda.ajaxproxy.ui.util.Reorderable;
 import com.thedeanda.javajson.JsonArray;
 import com.thedeanda.javajson.JsonValue;
 
-public class ProxyTableModel extends AbstractTableModel {
+public class ProxyTableModel extends AbstractTableModel implements Reorderable {
 	private static final Logger log = LoggerFactory.getLogger(ProxyTableModel.class);
 	private static final long serialVersionUID = 1L;
 	private List<ProxyConfig> data;
+	private final static String PROTOCOL = "protocol";
 	private final static String DOMAIN = "domain";
 	private final static String PORT = "port";
 	private final static String PATH = "path";
 	// private final static String NEW_PROXY = "newProxy";
-	private final static String[] COLS = { DOMAIN, PORT, PATH };
+	private final static String[] COLS = { PROTOCOL, DOMAIN, PORT, PATH };
 
 	public ProxyTableModel() {
 		log.debug("new table model");
@@ -44,7 +46,7 @@ public class ProxyTableModel extends AbstractTableModel {
 	}
 
 	public JsonArray getConfig(final int cacheTime) {
-		//normalizeData();
+		// normalizeData();
 		JsonArray arr = new JsonArray();
 		Convertor converter = Convertor.get();
 		for (ProxyConfig config : data) {
@@ -93,14 +95,14 @@ public class ProxyTableModel extends AbstractTableModel {
 
 		switch (col) {
 		case 0:
-			return config.getHost();
+			return config.getProtocol();
 		case 1:
-			return config.getPort();
+			return config.getHost();
 		case 2:
-			return config.getPath();
-		// case 3:
-		// return config.isNewProxy();
+			return config.getPort();
 		case 3:
+			return config.getPath();
+		case 4:
 			return config.isEnableCache();
 		}
 		return null;
@@ -149,15 +151,15 @@ public class ProxyTableModel extends AbstractTableModel {
 				ProxyConfigRequest config = (ProxyConfigRequest) proxyConfig;
 				if (config.getPort() <= 0)
 					keep = false;
-				if (StringUtils.isBlank(config.getHost()))
+				if (StringUtils.isBlank(config.getHost().getOriginalValue()))
 					keep = false;
-				if (StringUtils.isBlank(config.getPath()))
+				if (StringUtils.isBlank(config.getPath().getOriginalValue()))
 					keep = false;
 			} else {
 				ProxyConfigFile fileConfig = (ProxyConfigFile) proxyConfig;
-				if (StringUtils.isBlank(fileConfig.getPath()))
+				if (StringUtils.isBlank(fileConfig.getPath().getOriginalValue()))
 					keep = false;
-				if (StringUtils.isBlank(fileConfig.getBasePath()))
+				if (StringUtils.isBlank(fileConfig.getBasePath().getOriginalValue()))
 					keep = false;
 			}
 
@@ -187,5 +189,20 @@ public class ProxyTableModel extends AbstractTableModel {
 		}
 		this.fireTableDataChanged();
 		this.normalizeData();
+	}
+
+	@Override
+	public void reorder(int fromIndex, int toIndex) {
+		if (fromIndex < 0 || fromIndex >= data.size() || toIndex < 0)
+			return;
+		if (toIndex > data.size()) {
+			toIndex = data.size();
+		}
+
+		ProxyConfig item = data.remove(fromIndex);
+		if (fromIndex < toIndex) {
+			toIndex--;
+		}
+		data.add(toIndex, item);
 	}
 }

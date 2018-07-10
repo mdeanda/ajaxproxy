@@ -1,0 +1,70 @@
+<!DOCTYPE HTML>
+
+<html>
+<head>
+	<title>Ajax Proxy Sample Web</title>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+	<style>
+		body { max-width: 60em; margin: 1em auto 5em auto; }
+		h1 { border-bottom: 4px double black ; text-align: center; }
+		h2 { border-bottom: 1px solid black; }
+		code {
+			white-space: pre;
+			font-color: #444;
+			font-size: small;
+			display: block;
+			border: 1px solid #ddd;
+			padding: 1em;
+			background: #f0f0f0;
+		}
+		a {
+			color: #444;
+			font-weight: bold;
+		}
+	</style>
+</head>
+<body>
+
+<h1>Ajax Proxy</h1>
+<div id="toc_container"></div>
+
+<h2>Summary</h2>
+<p>Ajax Proxy was created to help simplify the development of ajax-based web applications. It provides a simple webserver that can be used by web and flash developers to allow them work without the burden of configuring and maintaining the real webserver that feeds them data.</p>
+
+<h2>Features</h2>
+<ul>
+	<li>Proxy requests from a given path to a different host at the same path</li>
+	<li>Proxy multiple paths to multiple different hosts</li>
+	<li>Use variable substitution for paths and host names</li>
+	<li>Merge javascript/css files to a single url</li>
+	<li>Compress merged javascript/css files</li>
+	<li>UI can add fake latency and simulate a bitrate</li>
+	<li>UI can log requests and filter by regular expression</li>
+</ul>
+
+<h2>Running</h2>
+<p>Ajax Proxy can be run as a swing application by running the following command:</p>
+<code>java -jar ajaxproxy-1234.jar</code>
+
+<p>To run as a build tool to merge files and exit, then use the following:</p>
+<code>java -jar ajaxproxy-1234.jar --c myconfigfile.json --m outputfolder</code>
+
+<p>To see a full list of command line options try the following:</p>
+<code>java -jar ajaxproxy-1234.jar --help</code>
+
+
+<h2>Proxied Rest APIs</h2>
+<ul>
+	<li><a href="/users/1">/users/1</a></li>
+</ul>
+
+<h2>Source</h2>
+<p>The <a href="https://github.com/mdeanda/ajaxproxy" title="ajaxproxy source code">source code</a> to ajaxproxy is available at <a href="http://github.com/" title="github, social coding">github</a>.</p>
+
+<h2>Download</h2>
+<ul>
+	<li><a href="https://github.com/mdeanda/ajaxproxy/releases" title="downloads area">downloads</a> - Run by double clicking or `java -jar ajaxproxy-${version}.jar`</li>
+</ul>
+
+</body>
+</html>

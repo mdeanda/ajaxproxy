@@ -1,4 +1,4 @@
-package com.thedeanda.ajaxproxy;
+package com.thedeanda.ajaxproxy.config.model;
 
 public enum MergeMode {
 	JS("text/javascript"), CSS("text/css"), HTML_JSON("text/plain"), PLAIN(

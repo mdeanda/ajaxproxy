@@ -148,23 +148,29 @@ public class MainFrame extends JFrame implements ProxyListener, WindowListListen
 
 		MouseListener mouseListener = new MouseListener() {
 
+			@Override
 			public void mouseClicked(MouseEvent e) {
 			}
 
+			@Override
 			public void mouseEntered(MouseEvent e) {
 			}
 
+			@Override
 			public void mouseExited(MouseEvent e) {
 			}
 
+			@Override
 			public void mousePressed(MouseEvent e) {
 			}
 
+			@Override
 			public void mouseReleased(MouseEvent e) {
 			}
 		};
 
 		ActionListener menuItemListener = new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (e.getSource() == startServerMenuItem_tray) {
 					startProxy();
@@ -213,6 +219,7 @@ public class MainFrame extends JFrame implements ProxyListener, WindowListListen
 			trayIcon = new TrayIcon(image, "AjaxProxy", popup);
 
 			ActionListener actionListener = new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					MainFrame self = MainFrame.this;
 					self.setVisible(!MainFrame.this.isVisible());
@@ -317,6 +324,7 @@ public class MainFrame extends JFrame implements ProxyListener, WindowListListen
 		menu.add(mi);
 
 		ActionListener menuItemListener = new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (e.getSource() == startServerMenuItem2)
 					startProxy();

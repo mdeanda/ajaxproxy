@@ -2,7 +2,7 @@ package com.thedeanda.ajaxproxy.ui.merge;
 
 import javax.swing.table.AbstractTableModel;
 
-import com.thedeanda.ajaxproxy.MergeMode;
+import com.thedeanda.ajaxproxy.config.model.MergeMode;
 import com.thedeanda.javajson.JsonArray;
 import com.thedeanda.javajson.JsonObject;
 import com.thedeanda.javajson.JsonValue;

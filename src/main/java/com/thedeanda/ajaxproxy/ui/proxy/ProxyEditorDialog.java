@@ -4,7 +4,7 @@ import java.awt.Component;
 
 import javax.swing.JOptionPane;
 
-import com.thedeanda.ajaxproxy.model.config.ProxyConfig;
+import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfig;
 
 public class ProxyEditorDialog {
 
@@ -14,7 +14,7 @@ public class ProxyEditorDialog {
 
 		String[] options = new String[] { "OK", "Cancel" };
 		int option = JOptionPane.showOptionDialog(null, panel, title, JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
-				null, options, options[1]);
+				null, options, options[0]);
 
 		ProxyConfig result = null;
 		if (option == 0) {
@@ -30,4 +30,9 @@ public class ProxyEditorDialog {
 		return result;
 	}
 
+	public static ProxyConfig showAddDialog(ProxyConfig config, Component parent) {
+		ProxyConfig result = showDialog(config, "Add Proxy", parent);
+
+		return result;
+	}
 }
