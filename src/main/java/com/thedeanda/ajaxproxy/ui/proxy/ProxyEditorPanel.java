@@ -139,7 +139,7 @@ public class ProxyEditorPanel extends JPanel {
 
 	public void setValue(ProxyConfig config) {
 		if (config == null) {
-			config = new ProxyConfigRequest();
+			config = ProxyConfigRequest.builder().build();
 		}
 
 		if (config instanceof ProxyConfigRequest) {

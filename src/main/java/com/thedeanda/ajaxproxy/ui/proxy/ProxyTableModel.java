@@ -97,11 +97,11 @@ public class ProxyTableModel extends AbstractTableModel implements Reorderable {
 		case 0:
 			return config.getProtocol();
 		case 1:
-			return config.getHost();
+			return config.getHost().getOriginalValue();
 		case 2:
 			return config.getPort();
 		case 3:
-			return config.getPath();
+			return config.getPath().getOriginalValue();
 		case 4:
 			return config.isEnableCache();
 		}
@@ -111,9 +111,9 @@ public class ProxyTableModel extends AbstractTableModel implements Reorderable {
 	public Object getValueForFile(ProxyConfigFile file, int col) {
 		switch (col) {
 		case 0:
-			return file.getBasePath();
+			return file.getBasePath().getOriginalValue();
 		case 2:
-			return file.getPath();
+			return file.getPath().getOriginalValue();
 		}
 		return null;
 	}

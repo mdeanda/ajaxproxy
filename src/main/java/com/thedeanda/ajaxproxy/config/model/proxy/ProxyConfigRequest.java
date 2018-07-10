@@ -17,10 +17,12 @@ import lombok.NoArgsConstructor;
 public class ProxyConfigRequest implements ProxyConfig {
 	@Builder.Default
 	private String protocol = "http";
-	private StringVariable host;
+	@Builder.Default
+	private StringVariable host = new StringVariable();
 	@Builder.Default
 	private int port = 80;
-	private StringVariable path;
+	@Builder.Default
+	private StringVariable path = new StringVariable();
 	private boolean enableCache;
 	/** cache duration in seconds */
 	@Builder.Default
