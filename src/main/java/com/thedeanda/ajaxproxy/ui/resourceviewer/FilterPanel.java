@@ -1,7 +1,6 @@
 package com.thedeanda.ajaxproxy.ui.resourceviewer;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -10,7 +9,6 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -39,8 +37,6 @@ public class FilterPanel extends JPanel {
 	private JTextField filter;
 	private CheckComboBox rtFilter;
 	private JButton clearBtn;
-	private JButton exportBtn;
-	private JCheckBox toggleBtn;
 
 	private Color filterOkColor;
 	private Color filterBadColor;
@@ -86,12 +82,8 @@ public class FilterPanel extends JPanel {
 		layout.putConstraint(SpringLayout.WEST, rtFilter, 10, SpringLayout.EAST, filter);
 		layout.putConstraint(SpringLayout.EAST, rtFilter, 100, SpringLayout.WEST, rtFilter);
 
-		layout.putConstraint(SpringLayout.NORTH, clearBtn, 20, SpringLayout.NORTH, this); //everything follows this
-		layout.putConstraint(SpringLayout.EAST, clearBtn, -10, SpringLayout.WEST, exportBtn);
-		layout.putConstraint(SpringLayout.BASELINE, exportBtn, 0, SpringLayout.BASELINE, lbl);
-		layout.putConstraint(SpringLayout.EAST, exportBtn, -10, SpringLayout.WEST, toggleBtn);
-		layout.putConstraint(SpringLayout.BASELINE, toggleBtn, 0, SpringLayout.BASELINE, lbl);
-		layout.putConstraint(SpringLayout.EAST, toggleBtn, -10, SpringLayout.EAST, this);
+		layout.putConstraint(SpringLayout.NORTH, clearBtn, 20, SpringLayout.NORTH, this); // everything follows this
+		layout.putConstraint(SpringLayout.EAST, clearBtn, -10, SpringLayout.EAST, this);
 
 	}
 
@@ -100,8 +92,7 @@ public class FilterPanel extends JPanel {
 		SwingUtils.prepJTextField(filter);
 		filter.setToolTipText("Filter path by java regex. Include items that match");
 		add(filter);
-		
-		
+
 		filterOut = new JTextField("");
 		SwingUtils.prepJTextField(filterOut);
 		filterOut.setToolTipText("Filter path by java regex. Exclude items that match.");
@@ -112,28 +103,34 @@ public class FilterPanel extends JPanel {
 		filterBadColor = new Color(250, 210, 200);
 
 		filter.getDocument().addDocumentListener(new DocumentListener() {
+			@Override
 			public void changedUpdate(DocumentEvent e) {
 				resetFilter();
 			}
 
+			@Override
 			public void removeUpdate(DocumentEvent e) {
 				resetFilter();
 			}
 
+			@Override
 			public void insertUpdate(DocumentEvent e) {
 				resetFilter();
 			}
 		});
 
 		filterOut.getDocument().addDocumentListener(new DocumentListener() {
+			@Override
 			public void changedUpdate(DocumentEvent e) {
 				resetFilter();
 			}
 
+			@Override
 			public void removeUpdate(DocumentEvent e) {
 				resetFilter();
 			}
 
+			@Override
 			public void insertUpdate(DocumentEvent e) {
 				resetFilter();
 			}
@@ -166,12 +163,6 @@ public class FilterPanel extends JPanel {
 
 		clearBtn = new JButton("Clear");
 
-		exportBtn = new JButton("Export");
-		exportBtn.setEnabled(false);
-
-		toggleBtn = new JCheckBox("Monitor Resources");
-		toggleBtn.setEnabled(false);
-
 		clearBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -180,22 +171,8 @@ public class FilterPanel extends JPanel {
 				}
 			}
 		});
-		exportBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// export();
-			}
-		});
-		toggleBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// handleMonitorCheckboxChanged();
-			}
-		});
 
 		add(clearBtn);
-		add(exportBtn);
-		add(toggleBtn);
 	}
 
 	private void resetFilter() {

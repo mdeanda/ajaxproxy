@@ -9,10 +9,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfig;
+import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigFile;
+import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigRequest;
 import com.thedeanda.ajaxproxy.model.config.Convertor;
-import com.thedeanda.ajaxproxy.model.config.ProxyConfig;
-import com.thedeanda.ajaxproxy.model.config.ProxyConfigFile;
-import com.thedeanda.ajaxproxy.model.config.ProxyConfigRequest;
 import com.thedeanda.ajaxproxy.ui.util.Reorderable;
 import com.thedeanda.javajson.JsonArray;
 import com.thedeanda.javajson.JsonValue;
@@ -151,15 +151,15 @@ public class ProxyTableModel extends AbstractTableModel implements Reorderable {
 				ProxyConfigRequest config = (ProxyConfigRequest) proxyConfig;
 				if (config.getPort() <= 0)
 					keep = false;
-				if (StringUtils.isBlank(config.getHost()))
+				if (StringUtils.isBlank(config.getHost().getOriginalValue()))
 					keep = false;
-				if (StringUtils.isBlank(config.getPath()))
+				if (StringUtils.isBlank(config.getPath().getOriginalValue()))
 					keep = false;
 			} else {
 				ProxyConfigFile fileConfig = (ProxyConfigFile) proxyConfig;
-				if (StringUtils.isBlank(fileConfig.getPath()))
+				if (StringUtils.isBlank(fileConfig.getPath().getOriginalValue()))
 					keep = false;
-				if (StringUtils.isBlank(fileConfig.getBasePath()))
+				if (StringUtils.isBlank(fileConfig.getBasePath().getOriginalValue()))
 					keep = false;
 			}
 

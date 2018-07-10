@@ -19,7 +19,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
-import com.thedeanda.ajaxproxy.model.config.ProxyConfig;
+import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfig;
 import com.thedeanda.ajaxproxy.ui.SettingsChangedListener;
 import com.thedeanda.ajaxproxy.ui.border.BottomBorder;
 import com.thedeanda.ajaxproxy.ui.util.TableRowTransferHandler;

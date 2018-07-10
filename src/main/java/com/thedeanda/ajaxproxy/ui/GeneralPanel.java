@@ -29,10 +29,23 @@ import com.thedeanda.ajaxproxy.filter.ThrottleFilter;
 import com.thedeanda.ajaxproxy.ui.options.OptionValue;
 import com.thedeanda.javajson.JsonObject;
 
-public class GeneralPanel extends JPanel implements ChangeListener,
-		ActionListener {
+public class GeneralPanel extends JPanel implements ChangeListener, ActionListener {
 	private static final long serialVersionUID = 1L;
+	private JLabel portLabel;
 	private JTextField port;
+
+	private JCheckBox enableSsl;
+	private JCheckBox saveSslPassword;
+	private JLabel sslPortLabel;
+	private JTextField sslPort;
+	private JLabel sslFileLabel;
+	private JTextField sslFile;
+	private JButton sslFileButton;
+	private JLabel sslKeystorePassLabel;
+	private JTextField sslKeystorePass;
+	private JLabel sslKeystorePass2Label;
+	private JTextField sslKeystorePass2;
+
 	private JTextField resourceBase;
 	private JCheckBox indexCheck;
 
@@ -40,22 +53,25 @@ public class GeneralPanel extends JPanel implements ChangeListener,
 	private JSlider forcedLatency;
 	private List<OptionValue> delayOptionValues;
 	private JButton folderButton;
+	final JFileChooser folderChooser;
 	final JFileChooser fileChooser;
 	private List<OptionValue> cacheOptionsValues;
 	private JSlider cacheSlider;
+	private JLabel baseLabel;
+	private JLabel forcedLabel;
+	private JLabel cacheLabel;
 
 	public GeneralPanel(final SettingsChangedListener listener) {
-		SpringLayout layout = new SpringLayout();
-		setLayout(layout);
-
 		// TODO: track changes to text fields
+		folderChooser = new JFileChooser();
+		folderChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		fileChooser = new JFileChooser();
-		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 
-		port = SwingUtils.newJTextField();
+		port = SwingUtils.newIntegerField();
 
-		JLabel portLabel = new JLabel("Local Port");
+		portLabel = new JLabel("HTTP Port");
 		portLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+
 		Dimension size = portLabel.getPreferredSize();
 		size.width = 150;
 		portLabel.setPreferredSize(size);
@@ -63,8 +79,41 @@ public class GeneralPanel extends JPanel implements ChangeListener,
 		add(portLabel);
 		add(port);
 
+		enableSsl = new JCheckBox("Enable SSL");
+		saveSslPassword = new JCheckBox("Save Passwords");
+		add(enableSsl);
+		add(saveSslPassword);
+
+		sslPort = SwingUtils.newIntegerField();
+		sslPortLabel = new JLabel("SSL Port");
+		sslPortLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+
+		sslFileLabel = new JLabel("Keystore");
+		sslFileLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+		sslFile = SwingUtils.newJTextField();
+		sslFileButton = new JButton("...");
+		sslFileButton.addActionListener(this);
+
+		add(sslPortLabel);
+		add(sslPort);
+		add(sslFileLabel);
+		add(sslFile);
+		add(sslFileButton);
+
+		sslKeystorePassLabel = new JLabel("Keystore Password");
+		sslKeystorePassLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+		sslKeystorePass = SwingUtils.newJPasswordField();
+		sslKeystorePass2Label = new JLabel("Key Password");
+		sslKeystorePass2Label.setHorizontalAlignment(SwingConstants.RIGHT);
+		sslKeystorePass2 = SwingUtils.newJPasswordField();
+
+		add(sslKeystorePassLabel);
+		add(sslKeystorePass);
+		add(sslKeystorePass2Label);
+		add(sslKeystorePass2);
+
 		resourceBase = SwingUtils.newJTextField();
-		JLabel baseLabel = new JLabel("Resource Base");
+		baseLabel = new JLabel("Resource Base");
 		folderButton = new JButton("...");
 		folderButton.addActionListener(this);
 
@@ -89,76 +138,144 @@ public class GeneralPanel extends JPanel implements ChangeListener,
 		forcedLatency
 				.setToolTipText("Every request will be blocked the specified amount of time to simulate slow servers");
 
-		JLabel forcedLabel = new JLabel("Request Delay");
+		forcedLabel = new JLabel("Request Delay");
 		forcedLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		add(forcedLabel);
 		add(forcedLatency);
 
 		cacheOptionsValues = initCacheOptionValues();
 		cacheSlider = createCustomSlider(cacheOptionsValues);
-		cacheSlider
-				.setToolTipText("Cacheded proxy entries will be cached for the amount of time specified here");
-		JLabel cacheLabel = new JLabel("Cache Time");
+		cacheSlider.setToolTipText("Cacheded proxy entries will be cached for the amount of time specified here");
+		cacheLabel = new JLabel("Cache Time");
 		add(cacheLabel);
 		add(cacheSlider);
 
-		layout.putConstraint(SpringLayout.WEST, portLabel, 10,
-				SpringLayout.WEST, this);
-		layout.putConstraint(SpringLayout.WEST, port, 5, SpringLayout.EAST,
-				portLabel);
-		layout.putConstraint(SpringLayout.NORTH, port, 60, SpringLayout.NORTH,
-				this);
-		layout.putConstraint(SpringLayout.EAST, port, -10, SpringLayout.EAST,
-				this);
-		layout.putConstraint(SpringLayout.VERTICAL_CENTER, portLabel, 0,
-				SpringLayout.VERTICAL_CENTER, port);
+		initListeners();
+		initLayout();
 
-		layout.putConstraint(SpringLayout.NORTH, folderButton, 20,
-				SpringLayout.SOUTH, port);
-		layout.putConstraint(SpringLayout.EAST, folderButton, 0,
-				SpringLayout.EAST, port);
+		sslToggled();
+	}
 
-		layout.putConstraint(SpringLayout.NORTH, resourceBase, 20,
-				SpringLayout.SOUTH, port);
-		layout.putConstraint(SpringLayout.WEST, resourceBase, 0,
-				SpringLayout.WEST, port);
-		layout.putConstraint(SpringLayout.EAST, resourceBase, 0,
-				SpringLayout.WEST, folderButton);
+	private void initLayout() {
+		final int V_PADDING_SECTION = 40;
+		final int V_PADDING = 10;
+		final int V_PADDING_SMALL = 5;
+		final int EDGE_PADDING = 20;
+		final int SMALL_FIELD_WIDTH = 70;
+		SpringLayout layout = new SpringLayout();
+		setLayout(layout);
+		setPreferredSize(new Dimension(700, 550));
 
-		layout.putConstraint(SpringLayout.VERTICAL_CENTER, baseLabel, 0,
-				SpringLayout.VERTICAL_CENTER, resourceBase);
-		layout.putConstraint(SpringLayout.EAST, baseLabel, 0,
-				SpringLayout.EAST, portLabel);
+		layout.putConstraint(SpringLayout.WEST, portLabel, EDGE_PADDING, SpringLayout.WEST, this);
+		layout.putConstraint(SpringLayout.WEST, port, 5, SpringLayout.EAST, portLabel);
+		layout.putConstraint(SpringLayout.NORTH, port, EDGE_PADDING * 2, SpringLayout.NORTH, this);
+		layout.putConstraint(SpringLayout.EAST, port, SMALL_FIELD_WIDTH, SpringLayout.WEST, port);
+		layout.putConstraint(SpringLayout.BASELINE, portLabel, 0, SpringLayout.BASELINE, port);
 
-		layout.putConstraint(SpringLayout.NORTH, indexCheck, 20,
-				SpringLayout.SOUTH, resourceBase);
-		layout.putConstraint(SpringLayout.WEST, indexCheck, 0,
-				SpringLayout.WEST, resourceBase);
+		/* next ssl row */
+		layout.putConstraint(SpringLayout.NORTH, enableSsl, V_PADDING_SECTION, SpringLayout.SOUTH, port);
+		layout.putConstraint(SpringLayout.WEST, enableSsl, 0, SpringLayout.WEST, port);
+		layout.putConstraint(SpringLayout.EAST, enableSsl, 150, SpringLayout.WEST, enableSsl);
 
-		layout.putConstraint(SpringLayout.NORTH, forcedLabel, 60,
-				SpringLayout.SOUTH, indexCheck);
-		layout.putConstraint(SpringLayout.EAST, forcedLabel, 0,
-				SpringLayout.EAST, baseLabel);
+		layout.putConstraint(SpringLayout.WEST, saveSslPassword, 0, SpringLayout.EAST, enableSsl);
+		layout.putConstraint(SpringLayout.BASELINE, saveSslPassword, 0, SpringLayout.BASELINE, enableSsl);
 
-		layout.putConstraint(SpringLayout.VERTICAL_CENTER, forcedLatency, 0,
-				SpringLayout.VERTICAL_CENTER, forcedLabel);
-		layout.putConstraint(SpringLayout.WEST, forcedLatency, 5,
-				SpringLayout.EAST, forcedLabel);
-		layout.putConstraint(SpringLayout.EAST, forcedLatency, -10,
-				SpringLayout.EAST, this);
+		/* next ssl row */
+		layout.putConstraint(SpringLayout.WEST, sslPortLabel, EDGE_PADDING, SpringLayout.WEST, this);
+		layout.putConstraint(SpringLayout.EAST, sslPortLabel, 0, SpringLayout.EAST, portLabel);
+		layout.putConstraint(SpringLayout.BASELINE, sslPortLabel, 0, SpringLayout.BASELINE, sslPort);
 
-		layout.putConstraint(SpringLayout.NORTH, cacheLabel, 40,
-				SpringLayout.SOUTH, forcedLatency);
-		layout.putConstraint(SpringLayout.EAST, cacheLabel, 0,
-				SpringLayout.EAST, baseLabel);
+		layout.putConstraint(SpringLayout.NORTH, sslPort, V_PADDING_SMALL, SpringLayout.SOUTH, enableSsl);
+		layout.putConstraint(SpringLayout.WEST, sslPort, 0, SpringLayout.WEST, port);
+		layout.putConstraint(SpringLayout.EAST, sslPort, SMALL_FIELD_WIDTH, SpringLayout.WEST, sslPort);
 
-		layout.putConstraint(SpringLayout.VERTICAL_CENTER, cacheSlider, 0,
-				SpringLayout.VERTICAL_CENTER, cacheLabel);
-		layout.putConstraint(SpringLayout.WEST, cacheSlider, 5,
-				SpringLayout.EAST, cacheLabel);
-		layout.putConstraint(SpringLayout.EAST, cacheSlider, -10,
-				SpringLayout.EAST, this);
+		/* next ssl row */
+		layout.putConstraint(SpringLayout.BASELINE, sslFileLabel, 0, SpringLayout.BASELINE, sslFile);
+		layout.putConstraint(SpringLayout.WEST, sslFileLabel, EDGE_PADDING, SpringLayout.WEST, this);
+		layout.putConstraint(SpringLayout.EAST, sslFileLabel, 0, SpringLayout.EAST, sslPortLabel);
 
+		layout.putConstraint(SpringLayout.NORTH, sslFile, V_PADDING, SpringLayout.SOUTH, sslPort);
+		layout.putConstraint(SpringLayout.WEST, sslFile, 0, SpringLayout.WEST, sslPort);
+		layout.putConstraint(SpringLayout.EAST, sslFile, 0, SpringLayout.WEST, sslFileButton);
+
+		layout.putConstraint(SpringLayout.BASELINE, sslFileButton, 0, SpringLayout.BASELINE, sslFile);
+		layout.putConstraint(SpringLayout.EAST, sslFileButton, -EDGE_PADDING, SpringLayout.EAST, this);
+
+		/* next ssl row */
+		layout.putConstraint(SpringLayout.BASELINE, sslKeystorePassLabel, 0, SpringLayout.BASELINE, sslKeystorePass);
+		layout.putConstraint(SpringLayout.WEST, sslKeystorePassLabel, EDGE_PADDING, SpringLayout.WEST, this);
+		layout.putConstraint(SpringLayout.EAST, sslKeystorePassLabel, 0, SpringLayout.EAST, portLabel);
+
+		layout.putConstraint(SpringLayout.NORTH, sslKeystorePass, V_PADDING, SpringLayout.SOUTH, sslFile);
+		layout.putConstraint(SpringLayout.WEST, sslKeystorePass, 0, SpringLayout.WEST, sslPort);
+		layout.putConstraint(SpringLayout.EAST, sslKeystorePass, 200, SpringLayout.WEST, sslKeystorePass);
+
+		layout.putConstraint(SpringLayout.BASELINE, sslKeystorePass2Label, 0, SpringLayout.BASELINE, sslKeystorePass);
+		layout.putConstraint(SpringLayout.WEST, sslKeystorePass2Label, 10, SpringLayout.EAST, sslKeystorePass);
+		layout.putConstraint(SpringLayout.EAST, sslKeystorePass2Label, 100, SpringLayout.WEST, sslKeystorePass2Label);
+
+		layout.putConstraint(SpringLayout.BASELINE, sslKeystorePass2, 0, SpringLayout.BASELINE, sslKeystorePass);
+		layout.putConstraint(SpringLayout.WEST, sslKeystorePass2, 10, SpringLayout.EAST, sslKeystorePass2Label);
+		layout.putConstraint(SpringLayout.EAST, sslKeystorePass2, 200, SpringLayout.WEST, sslKeystorePass2);
+
+		/* end ssl */
+
+		layout.putConstraint(SpringLayout.NORTH, folderButton, 40, SpringLayout.SOUTH, sslKeystorePass);
+		layout.putConstraint(SpringLayout.EAST, folderButton, -EDGE_PADDING, SpringLayout.EAST, this);
+
+		layout.putConstraint(SpringLayout.BASELINE, resourceBase, 0, SpringLayout.BASELINE, folderButton);
+		layout.putConstraint(SpringLayout.WEST, resourceBase, 0, SpringLayout.WEST, port);
+		layout.putConstraint(SpringLayout.EAST, resourceBase, 0, SpringLayout.WEST, folderButton);
+
+		layout.putConstraint(SpringLayout.BASELINE, baseLabel, 0, SpringLayout.BASELINE, resourceBase);
+		layout.putConstraint(SpringLayout.EAST, baseLabel, 0, SpringLayout.EAST, portLabel);
+
+		layout.putConstraint(SpringLayout.NORTH, indexCheck, V_PADDING_SMALL, SpringLayout.SOUTH, resourceBase);
+		layout.putConstraint(SpringLayout.WEST, indexCheck, 0, SpringLayout.WEST, resourceBase);
+
+		/* new row */
+
+		layout.putConstraint(SpringLayout.NORTH, forcedLabel, V_PADDING_SECTION * 2, SpringLayout.SOUTH, indexCheck);
+		layout.putConstraint(SpringLayout.EAST, forcedLabel, 0, SpringLayout.EAST, baseLabel);
+
+		layout.putConstraint(SpringLayout.BASELINE, forcedLatency, 0, SpringLayout.BASELINE, forcedLabel);
+		layout.putConstraint(SpringLayout.WEST, forcedLatency, 0, SpringLayout.WEST, port);
+		layout.putConstraint(SpringLayout.EAST, forcedLatency, -EDGE_PADDING, SpringLayout.EAST, this);
+
+		/* new row */
+
+		layout.putConstraint(SpringLayout.NORTH, cacheLabel, V_PADDING_SECTION, SpringLayout.SOUTH, forcedLatency);
+		layout.putConstraint(SpringLayout.EAST, cacheLabel, 0, SpringLayout.EAST, baseLabel);
+
+		layout.putConstraint(SpringLayout.BASELINE, cacheSlider, 0, SpringLayout.BASELINE, cacheLabel);
+		layout.putConstraint(SpringLayout.WEST, cacheSlider, 0, SpringLayout.WEST, port);
+		layout.putConstraint(SpringLayout.EAST, cacheSlider, -EDGE_PADDING, SpringLayout.EAST, this);
+
+	}
+
+	private void initListeners() {
+		enableSsl.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				sslToggled();
+			}
+		});
+	}
+
+	private void sslToggled() {
+		boolean enabled = enableSsl.isSelected();
+
+		saveSslPassword.setEnabled(enabled);
+		sslPort.setEnabled(enabled);
+		sslFile.setEnabled(enabled);
+		sslFileButton.setEnabled(enabled);
+		sslKeystorePass.setEnabled(enabled);
+		sslKeystorePass2.setEnabled(enabled);
+
+		sslPortLabel.setEnabled(enabled);
+		sslFileLabel.setEnabled(enabled);
+		sslKeystorePassLabel.setEnabled(enabled);
+		sslKeystorePass2Label.setEnabled(enabled);
 	}
 
 	private List<OptionValue> initDelayOptionValues() {
@@ -282,13 +399,39 @@ public class GeneralPanel extends JPanel implements ChangeListener,
 			forcedLatency.setValue(options.getInt("forcedLatency"));
 			cacheSlider.setValue(options.getInt("cacheTime"));
 		}
+
+		JsonObject ssl = config.getJsonObject("ssl");
+		if (ssl != null) {
+			enableSsl.setSelected(ssl.getBoolean("enable"));
+			saveSslPassword.setSelected(ssl.getBoolean("savePassword"));
+			sslPort.setText(ssl.getString("port"));
+			sslFile.setText(ssl.getString("keystore"));
+			if (saveSslPassword.isSelected()) {
+				sslKeystorePass.setText(ssl.getString("keystorePassword"));
+				sslKeystorePass2.setText(ssl.getString("sslKeyPassword"));
+			}
+		}
+
+		sslToggled();
 	}
 
 	/** update values from current ui state into config object */
 	public void updateConfig(JsonObject config) {
-		config.put("port", getPort());
-		config.put("resourceBase", getResourceBase());
+		config.put(AjaxProxy.PORT, getPort());
+		config.put(AjaxProxy.RESOURCE_BASE, getResourceBase());
 		config.put(AjaxProxy.SHOW_INDEX, isShowIndex());
+
+		JsonObject ssl = new JsonObject();
+		config.put("ssl", ssl);
+		ssl.put("enable", enableSsl.isSelected());
+		ssl.put("savePassword", saveSslPassword.isSelected());
+		ssl.put("port", sslPort.getText());
+		ssl.put("keystore", sslFile.getText());
+		if (saveSslPassword.isSelected()) {
+			// TODO: add simple encryption at least
+			ssl.put("keystorePassword", sslKeystorePass.getText());
+			ssl.put("sslKeyPassword", sslKeystorePass2.getText());
+		}
 
 		JsonObject options = config.getJsonObject("options");
 		if (options == null) {
@@ -298,7 +441,7 @@ public class GeneralPanel extends JPanel implements ChangeListener,
 		options.put("forcedLatency", forcedLatency.getValue());
 		options.put("cacheTime", cacheSlider.getValue());
 	}
-	
+
 	public int getCacheTime() {
 		return cacheOptionsValues.get(cacheSlider.getValue()).getRealValue();
 	}
@@ -308,6 +451,8 @@ public class GeneralPanel extends JPanel implements ChangeListener,
 		Object source = e.getSource();
 		if (source == folderButton) {
 			pickResourceBase();
+		} else if (source == sslFileButton) {
+			pickSslKeystore();
 		}
 	}
 
@@ -316,6 +461,22 @@ public class GeneralPanel extends JPanel implements ChangeListener,
 			// TODO: have a method to resolve relative path
 			File file = new File(resourceBase.getText());
 			if (file.exists()) {
+				folderChooser.setCurrentDirectory(file);
+			}
+		}
+		int retVal = folderChooser.showOpenDialog(this);
+		if (retVal == JFileChooser.APPROVE_OPTION) {
+			File file = folderChooser.getSelectedFile();
+			// TODO: convert to relative path when possible
+			resourceBase.setText(file.getAbsolutePath());
+		}
+	}
+
+	private void pickSslKeystore() {
+		if (!StringUtils.isBlank(sslFile.getText())) {
+			// TODO: have a method to resolve relative path
+			File file = new File(sslFile.getText());
+			if (file.exists()) {
 				fileChooser.setCurrentDirectory(file);
 			}
 		}
@@ -323,7 +484,7 @@ public class GeneralPanel extends JPanel implements ChangeListener,
 		if (retVal == JFileChooser.APPROVE_OPTION) {
 			File file = fileChooser.getSelectedFile();
 			// TODO: convert to relative path when possible
-			resourceBase.setText(file.getAbsolutePath());
+			sslFile.setText(file.getAbsolutePath());
 		}
 	}
 }

@@ -9,7 +9,7 @@ import javax.swing.table.AbstractTableModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.thedeanda.ajaxproxy.model.config.Variable;
+import com.thedeanda.ajaxproxy.ui.variable.model.Variable;
 import com.thedeanda.javajson.JsonObject;
 
 public class VariableTableModel extends AbstractTableModel {

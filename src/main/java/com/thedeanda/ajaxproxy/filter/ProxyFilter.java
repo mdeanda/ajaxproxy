@@ -21,16 +21,16 @@ import org.slf4j.LoggerFactory;
 import com.thedeanda.ajaxproxy.AjaxProxy;
 import com.thedeanda.ajaxproxy.cache.MemProxyCache;
 import com.thedeanda.ajaxproxy.cache.NoOpCache;
+import com.thedeanda.ajaxproxy.config.model.ServerConfig;
+import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfig;
+import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigFile;
+import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigLogger;
+import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigRequest;
 import com.thedeanda.ajaxproxy.filter.handler.FileRequestHandler;
 import com.thedeanda.ajaxproxy.filter.handler.ProxyRequestHandler;
 import com.thedeanda.ajaxproxy.filter.handler.logger.LoggerRequestHandler;
 import com.thedeanda.ajaxproxy.http.RequestListener;
 import com.thedeanda.ajaxproxy.model.ProxyContainer;
-import com.thedeanda.ajaxproxy.model.config.AjaxProxyConfig;
-import com.thedeanda.ajaxproxy.model.config.ProxyConfig;
-import com.thedeanda.ajaxproxy.model.config.ProxyConfigFile;
-import com.thedeanda.ajaxproxy.model.config.ProxyConfigLogger;
-import com.thedeanda.ajaxproxy.model.config.ProxyConfigRequest;
 
 /**
  * new method of proxying requests that does not use jetty's transparent proxy
@@ -48,8 +48,11 @@ public class ProxyFilter implements Filter {
 
 	private RequestListener listener;
 
-	public ProxyFilter(AjaxProxy ajaxProxy) {
+	private ServerConfig server;
+
+	public ProxyFilter(AjaxProxy ajaxProxy, ServerConfig server) {
 		this.ajaxProxy = ajaxProxy;
+		this.server = server;
 		this.listener = ajaxProxy.getRequestListener();
 	}
 
@@ -105,16 +108,15 @@ public class ProxyFilter implements Filter {
 	}
 
 	public void reset() {
-		AjaxProxyConfig config = ajaxProxy.getAjaxProxyConfig();
 		proxyContainers = new ArrayList<ProxyContainer>();
-		for (ProxyConfig proxyConfig : config.getProxyConfig()) {
+		for (ProxyConfig proxyConfig : server.getProxyConfig()) {
 			loadProxyConfigRequest(proxyConfig);
 		}
 	}
 
 	private void loadProxyConfigRequest(ProxyConfig proxyConfig) {
 		try {
-			Pattern pattern = Pattern.compile(proxyConfig.getPath());
+			Pattern pattern = Pattern.compile(proxyConfig.getPath().getValue());
 			ProxyContainer proxyContainer = new ProxyContainer();
 			proxyContainer.setPattern(pattern);
 			proxyContainer.setProxyConfig(proxyConfig);
