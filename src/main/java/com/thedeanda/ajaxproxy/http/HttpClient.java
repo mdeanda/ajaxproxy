@@ -17,7 +17,6 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -37,20 +36,21 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.thedeanda.ajaxproxy.config.model.proxy.HttpHeader;
 import com.thedeanda.ajaxproxy.ui.ConfigService;
 
-public class HttpClient {
-	private static final Logger log = LoggerFactory.getLogger(HttpClient.class);
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
+public class HttpClient {
 	private final CloseableHttpClient client;
+	private static final int DEFAULT_CONNECT_TIMEOUT = 5000;
+	private static final int DEFAULT_CONNECTION_REQUEST_TIMEOUT = 30000;
+	private static final int DEFAULT_SOCKET_TIMEOUT = 60000;
 
 	public enum RequestMethod {
-		GET(false), POST(true), PUT(true), DELETE(false), HEAD(false), PATCH(
-				true), OPTIONS(true), TRACE(true);
+		GET(false), POST(true), PUT(true), DELETE(false), HEAD(false), PATCH(true), OPTIONS(true), TRACE(true);
 
 		private boolean acceptsPayload;
 
@@ -64,9 +64,12 @@ public class HttpClient {
 	}
 
 	public HttpClient() {
-		final RequestConfig requestConfig = RequestConfig.custom()
-				.setConnectTimeout(5000).setConnectionRequestTimeout(60000)
-				.setSocketTimeout(60000).build();
+		this(DEFAULT_CONNECT_TIMEOUT, DEFAULT_CONNECTION_REQUEST_TIMEOUT, DEFAULT_SOCKET_TIMEOUT);
+	}
+
+	public HttpClient(int connectTimeout, int requestTimeout, int socketTimeout) {
+		final RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(connectTimeout)
+				.setConnectionRequestTimeout(requestTimeout).setSocketTimeout(socketTimeout).build();
 
 		HostnameVerifier verifier = new HostnameVerifier() {
 			@Override
@@ -77,20 +80,11 @@ public class HttpClient {
 		};
 		SSLContext ctx = getSslContext();
 		String version = ConfigService.get().getVersionString();
-		client = HttpClientBuilder
-				.create()
-				.disableAuthCaching()
-				.disableAutomaticRetries()
-				.disableConnectionState()
-				.disableContentCompression()
-				.disableCookieManagement()
-				.disableRedirectHandling()
-				.setSSLHostnameVerifier(verifier)
-				.setSslcontext(ctx)
-				.setConnectionReuseStrategy(
-						DefaultConnectionReuseStrategy.INSTANCE)
-				.setDefaultRequestConfig(requestConfig)
-				.setUserAgent("AjaxProxy/" + version).build();
+		client = HttpClientBuilder.create().disableAuthCaching().disableAutomaticRetries().disableConnectionState()
+				.disableContentCompression().disableCookieManagement().disableRedirectHandling()
+				.setSSLHostnameVerifier(verifier).setSslcontext(ctx)
+				.setConnectionReuseStrategy(DefaultConnectionReuseStrategy.INSTANCE)
+				.setDefaultRequestConfig(requestConfig).setUserAgent("AjaxProxy/" + version).build();
 
 	}
 
@@ -98,29 +92,26 @@ public class HttpClient {
 		SSLContext ctx = null;
 		try {
 			ctx = SSLContext.getInstance("TLS");
-			ctx.init(new KeyManager[0],
-					new TrustManager[] { new X509TrustManager() {
+			ctx.init(new KeyManager[0], new TrustManager[] { new X509TrustManager() {
 
-						@Override
-						public void checkClientTrusted(X509Certificate[] chain,
-								String authType) throws CertificateException {
-							// TODO Auto-generated method stub
+				@Override
+				public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+					// TODO Auto-generated method stub
 
-						}
+				}
 
-						@Override
-						public void checkServerTrusted(X509Certificate[] chain,
-								String authType) throws CertificateException {
-							// TODO Auto-generated method stub
+				@Override
+				public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+					// TODO Auto-generated method stub
 
-						}
+				}
 
-						@Override
-						public X509Certificate[] getAcceptedIssuers() {
-							// TODO Auto-generated method stub
-							return null;
-						}
-					} }, new SecureRandom());
+				@Override
+				public X509Certificate[] getAcceptedIssuers() {
+					// TODO Auto-generated method stub
+					return null;
+				}
+			} }, new SecureRandom());
 			SSLContext.setDefault(ctx);
 		} catch (Exception e) {
 			log.warn(e.getMessage(), e);
@@ -128,8 +119,7 @@ public class HttpClient {
 		return ctx;
 	}
 
-	private void fireNewRequest(UUID uuid, String url, String method,
-			RequestListener... listeners) {
+	private void fireNewRequest(UUID uuid, String url, String method, RequestListener... listeners) {
 		if (listeners != null) {
 			for (RequestListener listener : listeners) {
 				listener.newRequest(uuid, url, method);
@@ -137,8 +127,7 @@ public class HttpClient {
 		}
 	}
 
-	private void fireError(UUID id, String message, Exception e,
-			RequestListener... listeners) {
+	private void fireError(UUID id, String message, Exception e, RequestListener... listeners) {
 		if (listeners != null) {
 			for (RequestListener listener : listeners) {
 				listener.error(id, message, e);
@@ -146,8 +135,8 @@ public class HttpClient {
 		}
 	}
 
-	private void fireStartRequest(UUID id, URL url, Header[] requestHeaders,
-			byte[] data, RequestListener... listeners) {
+	private void fireStartRequest(UUID id, URL url, Header[] requestHeaders, byte[] data,
+			RequestListener... listeners) {
 		if (listeners != null) {
 			for (RequestListener listener : listeners) {
 				listener.startRequest(id, url, requestHeaders, data);
@@ -155,19 +144,17 @@ public class HttpClient {
 		}
 	}
 
-	private void fireRequestComplete(UUID id, int status, String reason,
-			long duation, Header[] responseHeaders, byte[] data,
-			RequestListener... listeners) {
+	private void fireRequestComplete(UUID id, int status, String reason, long duation, Header[] responseHeaders,
+			byte[] data, RequestListener... listeners) {
 		if (listeners != null) {
 			for (RequestListener listener : listeners) {
-				listener.requestComplete(id, status, reason, duation,
-						responseHeaders, data);
+				listener.requestComplete(id, status, reason, duation, responseHeaders, data);
 			}
 		}
 	}
 
-	public void makeRequest(RequestMethod method, String url, List<HttpHeader> headers,
-			byte[] input, RequestListener... listener) {
+	public void makeRequest(RequestMethod method, String url, List<HttpHeader> headers, byte[] input,
+			RequestListener... listener) {
 
 		UUID uuid = UUID.randomUUID();
 		URL urlobj = null;
@@ -179,7 +166,7 @@ public class HttpClient {
 		}
 
 		Map<String, String> hds = new HashMap<>();
-		if (headers !=null && !headers.isEmpty()) {
+		if (headers != null && !headers.isEmpty()) {
 			for (HttpHeader line : headers) {
 				hds.put(line.getName(), line.getValue());
 			}
@@ -197,30 +184,29 @@ public class HttpClient {
 		makeRequest(method, urlobj, requestHeaders, input, listener);
 	}
 
-	public void makeRequest(RequestMethod method, URL url, Header[] headers,
-			byte[] input, RequestListener... listener) {
+	public void makeRequest(RequestMethod method, URL url, Header[] headers, byte[] input,
+			RequestListener... listener) {
 
 		UUID uuid = UUID.randomUUID();
 		fireNewRequest(uuid, url.toString(), method.toString(), listener);
 		makeRequest_internal(uuid, method, url, headers, input, listener);
 	}
 
-	private void makeRequest_internal(UUID uuid, RequestMethod method, URL url,
-			Header[] headers, byte[] input, RequestListener... listener) {
+	private void makeRequest_internal(UUID uuid, RequestMethod method, URL url, Header[] headers, byte[] input,
+			RequestListener... listener) {
 
 		fireStartRequest(uuid, url, headers, input, listener);
 
 		makeRequestInternal(method, uuid, url, headers, input, listener);
 	}
 
-	private void makeRequestInternal(RequestMethod method, UUID id, URL url,
-			Header[] requestHeaders, byte[] data, RequestListener... listener) {
+	private void makeRequestInternal(RequestMethod method, UUID id, URL url, Header[] requestHeaders, byte[] data,
+			RequestListener... listener) {
 
 		HttpRequestBase request = null;
 		try {
 			String target = url.toString();
-			HttpEntity requestBody = new ByteArrayEntity(data,
-					ContentType.APPLICATION_OCTET_STREAM);
+			HttpEntity requestBody = new ByteArrayEntity(data, ContentType.APPLICATION_OCTET_STREAM);
 			switch (method) {
 			case GET:
 				request = new HttpGet(target);
@@ -264,8 +250,7 @@ public class HttpClient {
 				bytes = EntityUtils.toByteArray(response.getEntity());
 			}
 			Header[] headers = response.getAllHeaders();
-			fireRequestComplete(id, status.getStatusCode(),
-					status.getReasonPhrase(), (end - start), headers, bytes,
+			fireRequestComplete(id, status.getStatusCode(), status.getReasonPhrase(), (end - start), headers, bytes,
 					listener);
 
 		} catch (Exception e) {

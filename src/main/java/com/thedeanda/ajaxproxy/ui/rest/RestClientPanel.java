@@ -39,6 +39,10 @@ public class RestClientPanel extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 1L;
 	private static final Logger log = LoggerFactory.getLogger(RestClientPanel.class);
 
+	private static final int CONNECT_TIMEOUT = 5000;
+	private static final int CONNECTION_REQUEST_TIMEOUT = 5000;
+	private static final int SOCKET_TIMEOUT = 300000;
+
 	private JTextField urlField;
 	private JTextArea headersField;
 	private JTextArea inputField;
@@ -51,7 +55,7 @@ public class RestClientPanel extends JPanel implements ActionListener {
 	private HistoryListModel historyModel;
 
 	public RestClientPanel() {
-		httpClient = new HttpClient();
+		httpClient = new HttpClient(CONNECT_TIMEOUT, CONNECTION_REQUEST_TIMEOUT, SOCKET_TIMEOUT);
 		SpringLayout layout = new SpringLayout();
 		setLayout(layout);
 
