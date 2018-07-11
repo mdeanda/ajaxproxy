@@ -6,9 +6,8 @@ import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -25,13 +24,7 @@ import javax.swing.plaf.basic.BasicSplitPaneUI;
 import com.thedeanda.ajaxproxy.ui.util.CaretMovingKeyListener;
 
 public class SwingUtils {
-	// private static final Logger log =
-	// LoggerFactory.getLogger(SwingUtils.class);
-	private static final ThreadPoolExecutor executor = new ThreadPoolExecutor(1, 6, 3, TimeUnit.SECONDS,
-			new LinkedBlockingQueue<Runnable>());
-	static {
-		executor.allowCoreThreadTimeOut(true);
-	}
+	private static final ExecutorService executor = Executors.newFixedThreadPool(10);
 
 	public static JLabel newJLabel(String label) {
 		JLabel ret = new JLabel(label);
@@ -150,7 +143,5 @@ public class SwingUtils {
 
 	public static void executNonUi(Runnable runnable) {
 		executor.execute(runnable);
-
-		// new Thread(runnable).start();
 	}
 }
