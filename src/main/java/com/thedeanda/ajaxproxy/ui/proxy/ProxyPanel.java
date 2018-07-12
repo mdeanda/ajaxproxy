@@ -39,6 +39,7 @@ public class ProxyPanel extends JPanel {
 	private JPanel bottomPanel;
 	private ProxyTableModel proxyModel;
 	private JButton addProxyButton;
+	private JButton addFileButton;
 	private JButton editProxyButton;
 
 	public ProxyPanel(final SettingsChangedListener listener, final ProxyTableModel proxyModel) {
@@ -78,6 +79,15 @@ public class ProxyPanel extends JPanel {
 			}
 		});
 
+		this.addFileButton = new JButton("Add Path");
+		panel.add(addFileButton);
+		addFileButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				startAddFile();
+			}
+		});
+		
 		this.editProxyButton = new JButton("Edit");
 		panel.add(editProxyButton);
 		editProxyButton.addActionListener(new ActionListener() {
@@ -90,8 +100,11 @@ public class ProxyPanel extends JPanel {
 		layout.putConstraint(SpringLayout.NORTH, addProxyButton, 20, SpringLayout.NORTH, panel);
 		layout.putConstraint(SpringLayout.WEST, addProxyButton, 10, SpringLayout.WEST, panel);
 
-		layout.putConstraint(SpringLayout.BASELINE, editProxyButton, 0, SpringLayout.BASELINE, addProxyButton);
-		layout.putConstraint(SpringLayout.WEST, editProxyButton, 10, SpringLayout.EAST, addProxyButton);
+		layout.putConstraint(SpringLayout.BASELINE, addFileButton, 0, SpringLayout.BASELINE, addProxyButton);
+		layout.putConstraint(SpringLayout.WEST, addFileButton, 10, SpringLayout.EAST, addProxyButton);
+
+		layout.putConstraint(SpringLayout.BASELINE, editProxyButton, 0, SpringLayout.BASELINE, addFileButton);
+		layout.putConstraint(SpringLayout.WEST, editProxyButton, 10, SpringLayout.EAST, addFileButton);
 
 		return panel;
 	}
@@ -156,7 +169,15 @@ public class ProxyPanel extends JPanel {
 	}
 
 	private void startAdd() {
-		ProxyConfig updatedValue = ProxyEditorDialog.showAddDialog(null, scroll);
+		ProxyConfig updatedValue = ProxyEditorDialog.showAddProxyDialog(scroll);
+		if (updatedValue != null) {
+			int row = proxyModel.addValue(updatedValue);
+			proxyTable.changeSelection(row - 1, 0, false, true);
+		}
+	}
+	
+	private void startAddFile() {
+		ProxyConfig updatedValue = ProxyEditorDialog.showAddFileDialog(scroll);
 		if (updatedValue != null) {
 			int row = proxyModel.addValue(updatedValue);
 			proxyTable.changeSelection(row - 1, 0, false, true);

@@ -2,12 +2,20 @@ package com.thedeanda.ajaxproxy.config.model.proxy;
 
 import com.thedeanda.ajaxproxy.config.model.StringVariable;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class ProxyConfigFile implements ProxyConfig {
-	private StringVariable path;
-	private StringVariable basePath; // for files
+	@Builder.Default
+	private StringVariable path = new StringVariable();
+	@Builder.Default
+	private StringVariable basePath = new StringVariable(); // for files
 	private String filterPath; // start of request path that gets removed
 
 	@Override

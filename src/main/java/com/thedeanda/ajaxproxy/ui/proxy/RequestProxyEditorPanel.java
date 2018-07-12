@@ -16,7 +16,7 @@ import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfig;
 import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigRequest;
 import com.thedeanda.ajaxproxy.ui.SwingUtils;
 
-public class ProxyEditorPanel extends JPanel {
+public class RequestProxyEditorPanel extends JPanel implements EditorPanel<ProxyConfigRequest> {
 	private static final long serialVersionUID = 5379224168584631339L;
 	private static final String[] protocolList = { "http", "https" };
 
@@ -33,7 +33,7 @@ public class ProxyEditorPanel extends JPanel {
 	private JComboBox<String> protocols;
 	private JLabel protLabel;
 
-	public ProxyEditorPanel() {
+	public RequestProxyEditorPanel() {
 		layout = new SpringLayout();
 		setLayout(layout);
 
@@ -113,6 +113,7 @@ public class ProxyEditorPanel extends JPanel {
 
 	}
 
+	@Override
 	public ProxyConfigRequest getResult() {
 		String host = hostField.getText();
 		int port = 0;
@@ -137,7 +138,8 @@ public class ProxyEditorPanel extends JPanel {
 		return config;
 	}
 
-	public void setValue(ProxyConfig config) {
+	@Override
+	public void setValue(ProxyConfigRequest config) {
 		if (config == null) {
 			config = ProxyConfigRequest.builder().build();
 		}
