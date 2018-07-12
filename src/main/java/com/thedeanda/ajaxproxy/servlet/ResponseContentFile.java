@@ -25,7 +25,7 @@ public class ResponseContentFile implements ResponseContent {
 
 	@Override
 	public String getEtag() {
-		// TODO: make some kind of checksum out of this
+		// TODO: make some kind of checksum out of this as its not secure!
 		return file.getAbsolutePath();
 	}
 

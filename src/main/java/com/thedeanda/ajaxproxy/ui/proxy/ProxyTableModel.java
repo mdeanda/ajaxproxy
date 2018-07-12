@@ -111,8 +111,10 @@ public class ProxyTableModel extends AbstractTableModel implements Reorderable {
 	public Object getValueForFile(ProxyConfigFile file, int col) {
 		switch (col) {
 		case 0:
+			return "file";
+		case 1:
 			return file.getBasePath().getOriginalValue();
-		case 2:
+		case 3:
 			return file.getPath().getOriginalValue();
 		}
 		return null;

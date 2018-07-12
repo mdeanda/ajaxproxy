@@ -5,6 +5,8 @@ import java.awt.Component;
 import javax.swing.JOptionPane;
 
 import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfig;
+import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigFile;
+import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigRequest;
 
 public class ProxyEditorDialog {
 
@@ -23,9 +25,19 @@ public class ProxyEditorDialog {
 		return result;
 	}
 
-	public static ProxyConfig showEditDialog(ProxyConfig config, Component parent) {
+	public static ProxyConfig showEditDialog(ProxyConfigRequest config, Component parent) {
 		if (config != null) {
 			RequestProxyEditorPanel panel = new RequestProxyEditorPanel();
+			ProxyConfig result = showDialog(panel, config, "Edit Proxy", parent);
+
+			return result;
+		} else
+			return null;
+	}
+
+	public static ProxyConfig showEditDialog(ProxyConfigFile config, Component parent) {
+		if (config != null) {
+			FileProxyEditorPanel panel = new FileProxyEditorPanel();
 			ProxyConfig result = showDialog(panel, config, "Edit Proxy", parent);
 
 			return result;
@@ -39,7 +51,7 @@ public class ProxyEditorDialog {
 
 		return result;
 	}
-	
+
 	public static ProxyConfig showAddFileDialog(Component parent) {
 		FileProxyEditorPanel panel = new FileProxyEditorPanel();
 		ProxyConfig result = showDialog(panel, null, "Add Path", parent);

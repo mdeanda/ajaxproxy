@@ -60,6 +60,11 @@
       "path":"/users/.*",
       "port":80,
       "protocol":"http"
+    },
+    {
+      "basePath":"./src",
+      "filterPath":"/fp1",
+      "path":"/fp1/.*"
     }
   ],
   "resource":{},

@@ -20,6 +20,8 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
 import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfig;
+import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigFile;
+import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigRequest;
 import com.thedeanda.ajaxproxy.ui.SettingsChangedListener;
 import com.thedeanda.ajaxproxy.ui.border.BottomBorder;
 import com.thedeanda.ajaxproxy.ui.util.TableRowTransferHandler;
@@ -87,7 +89,7 @@ public class ProxyPanel extends JPanel {
 				startAddFile();
 			}
 		});
-		
+
 		this.editProxyButton = new JButton("Edit");
 		panel.add(editProxyButton);
 		editProxyButton.addActionListener(new ActionListener() {
@@ -161,7 +163,13 @@ public class ProxyPanel extends JPanel {
 			row = proxyModel.getRowCount() - 1;
 		}
 		ProxyConfig config = proxyModel.getProxyConfig(row);
-		ProxyConfig updatedValue = ProxyEditorDialog.showEditDialog(config, scroll);
+		ProxyConfig updatedValue = null;
+		if (config instanceof ProxyConfigRequest) {
+			updatedValue = ProxyEditorDialog.showEditDialog((ProxyConfigRequest) config, scroll);
+		} else if (config instanceof ProxyConfigFile) {
+			updatedValue = ProxyEditorDialog.showEditDialog((ProxyConfigFile) config, scroll);
+		}
+
 		if (updatedValue != null) {
 			proxyModel.setValue(row, updatedValue);
 			proxyTable.changeSelection(row, 0, false, true);
@@ -175,7 +183,7 @@ public class ProxyPanel extends JPanel {
 			proxyTable.changeSelection(row - 1, 0, false, true);
 		}
 	}
-	
+
 	private void startAddFile() {
 		ProxyConfig updatedValue = ProxyEditorDialog.showAddFileDialog(scroll);
 		if (updatedValue != null) {

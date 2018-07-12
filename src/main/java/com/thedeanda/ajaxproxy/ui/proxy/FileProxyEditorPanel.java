@@ -23,10 +23,10 @@ public class FileProxyEditorPanel extends JPanel implements EditorPanel<ProxyCon
 	private SpringLayout layout;
 	private JLabel pathLabel;
 	private JTextField pathField;
-	private JLabel hostHeaderLabel;
-	private JTextField hostHeaderField;
 	private JLabel filePathLabel;
 	private JTextField filePathField;
+	private JLabel filterPathLabel;
+	private JTextField filterPathField;
 
 	public FileProxyEditorPanel() {
 		layout = new SpringLayout();
@@ -37,20 +37,19 @@ public class FileProxyEditorPanel extends JPanel implements EditorPanel<ProxyCon
 		add(pathLabel);
 		add(pathField);
 
-		hostHeaderLabel = new JLabel("Host Header");
-		hostHeaderField = SwingUtils.newJTextField();
-		add(hostHeaderLabel);
-		add(hostHeaderField);
-
 		filePathLabel = new JLabel("File Path");
 		filePathField = SwingUtils.newJTextField();
 		add(filePathLabel);
 		add(filePathField);
 
+		filterPathLabel = new JLabel("Filter Path");
+		filterPathField = SwingUtils.newJTextField();
+		add(filterPathLabel);
+		add(filterPathField);
 
 		initLayout();
-		setPreferredSize(new Dimension(450, 240));
-		setMinimumSize(new Dimension(300, 120));
+		setPreferredSize(new Dimension(450, 220));
+		setMinimumSize(new Dimension(300, 140));
 	}
 
 	private void initLayout() {
@@ -61,33 +60,31 @@ public class FileProxyEditorPanel extends JPanel implements EditorPanel<ProxyCon
 		layout.putConstraint(SpringLayout.WEST, pathField, 10, SpringLayout.WEST, this);
 		layout.putConstraint(SpringLayout.EAST, pathField, -10, SpringLayout.EAST, this);
 
-		layout.putConstraint(SpringLayout.NORTH, hostHeaderLabel, 5, SpringLayout.SOUTH, pathField);
-		layout.putConstraint(SpringLayout.WEST, hostHeaderLabel, 10, SpringLayout.WEST, this);
-
-		layout.putConstraint(SpringLayout.NORTH, hostHeaderField, 5, SpringLayout.SOUTH, hostHeaderLabel);
-		layout.putConstraint(SpringLayout.WEST, hostHeaderField, 10, SpringLayout.WEST, this);
-		layout.putConstraint(SpringLayout.EAST, hostHeaderField, -10, SpringLayout.EAST, this);
-
-		layout.putConstraint(SpringLayout.NORTH, filePathLabel, 5, SpringLayout.SOUTH, hostHeaderField);
+		layout.putConstraint(SpringLayout.NORTH, filePathLabel, 5, SpringLayout.SOUTH, pathField);
 		layout.putConstraint(SpringLayout.WEST, filePathLabel, 10, SpringLayout.WEST, this);
 
 		layout.putConstraint(SpringLayout.NORTH, filePathField, 5, SpringLayout.SOUTH, filePathLabel);
 		layout.putConstraint(SpringLayout.WEST, filePathField, 10, SpringLayout.WEST, this);
 		layout.putConstraint(SpringLayout.EAST, filePathField, -10, SpringLayout.EAST, this);
 
+		layout.putConstraint(SpringLayout.NORTH, filterPathLabel, 5, SpringLayout.SOUTH, filePathField);
+		layout.putConstraint(SpringLayout.WEST, filterPathLabel, 10, SpringLayout.WEST, this);
+
+		layout.putConstraint(SpringLayout.NORTH, filterPathField, 5, SpringLayout.SOUTH, filterPathLabel);
+		layout.putConstraint(SpringLayout.WEST, filterPathField, 10, SpringLayout.WEST, this);
+		layout.putConstraint(SpringLayout.EAST, filterPathField, -10, SpringLayout.EAST, this);
+
 	}
 
 	@Override
 	public ProxyConfigFile getResult() {
 		String path = pathField.getText();
+		String basePath = filePathField.getText();
 
 		ProxyConfigFile config = new ProxyConfigFile();
-//		config.setHost(StringVariable.builder().originalValue(host).build());
-//		config.setPort(port);
 		config.setPath(StringVariable.builder().originalValue(path).build());
-//		config.setHostHeader(hostHeaderField.getText());
-//		config.setEnableCache(cacheCheckbox.isSelected());
-//		config.setProtocol(String.valueOf(protocols.getSelectedItem()));
+		config.setBasePath(StringVariable.builder().originalValue(basePath).build());
+		config.setFilterPath(filterPathField.getText());
 
 		return config;
 	}
@@ -99,6 +96,8 @@ public class FileProxyEditorPanel extends JPanel implements EditorPanel<ProxyCon
 		}
 
 		this.pathField.setText(config.getPath().getOriginalValue());
+		this.filePathField.setText(config.getBasePath().getOriginalValue());
+		this.filterPathField.setText(config.getFilterPath());
 
 	}
 }

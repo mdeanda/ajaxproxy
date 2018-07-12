@@ -27,7 +27,11 @@ public class SimpleFileServlet extends AbstractFileServlet {
 	public ResponseContent getFile(HttpServletRequest request) throws FileServletException {
 		log.warn(request.getRequestURI());
 		String requestPath = request.getRequestURI();
-
+		
+		if (!StringUtils.startsWith(requestPath, filterPath)) {
+			return null;
+		}
+		
 		File file = null;
 
 		if (!StringUtils.isBlank(filterPath) && requestPath.startsWith(filterPath)) {
@@ -36,7 +40,7 @@ public class SimpleFileServlet extends AbstractFileServlet {
 
 		// TODO: prevent ../../../ paths from going outside of basePath
 		file = new File(basePath, requestPath);
-		log.warn("get file: " + file.getAbsolutePath());
+		log.warn("get file: {}, exists? {}", file.getAbsolutePath(), file.exists());
 
 		return new ResponseContentFile(file);
 	}
