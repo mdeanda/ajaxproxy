@@ -3,12 +3,12 @@ package com.thedeanda.ajaxproxy.service;
 import java.io.File;
 import java.net.URL;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
@@ -17,15 +17,16 @@ import com.j256.ormlite.table.TableUtils;
 import com.thedeanda.ajaxproxy.cache.LruCache;
 import com.thedeanda.ajaxproxy.http.NetworkUtil;
 import com.thedeanda.ajaxproxy.http.RequestListener;
-import com.thedeanda.ajaxproxy.ui.model.Resource;
-import com.thedeanda.ajaxproxy.ui.rest.HistoryItem;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class ResourceService implements RequestListener {
-	private static Logger log = LoggerFactory.getLogger(ResourceService.class);
 	private final LruCache<String, StoredResource> cache;
 	private JdbcConnectionSource connectionSource;
 	private Dao<StoredResource, String> dao;
 	private File dbFile;
+	private List<RequestListener> listeners = new ArrayList<>();
 
 	public ResourceService(int cacheSize, File dbFile) {
 		cache = new LruCache<String, StoredResource>(cacheSize);
@@ -37,6 +38,10 @@ public class ResourceService implements RequestListener {
 			log.error(e.getMessage(), e);
 			dao = null;
 		}
+	}
+
+	public void addListener(RequestListener listener) {
+		listeners.add(listener);
 	}
 
 	private void initConnection() throws SQLException {
@@ -66,13 +71,13 @@ public class ResourceService implements RequestListener {
 			if (!saveImmediately(r)) {
 				throw new Exception("failed to save");
 			}
-			
+
 			dao.queryForId(id);
 			dao.deleteById(id);
 		} catch (Exception e) {
 			log.warn(e.getMessage(), e);
 			log.debug("recreating table");
-			
+
 			TableUtils.dropTable(connectionSource, StoredResource.class, true);
 			TableUtils.createTableIfNotExists(connectionSource, StoredResource.class);
 		}
@@ -135,6 +140,14 @@ public class ResourceService implements RequestListener {
 		sr.setMethod(method);
 		sr.setStartTime(System.currentTimeMillis());
 		save(sr);
+
+		listeners.forEach(l -> {
+			try {
+				l.newRequest(id, url, method);
+			} catch (Exception e) {
+				log.warn(e.getMessage(), e);
+			}
+		});
 	}
 
 	@Override
@@ -148,6 +161,14 @@ public class ResourceService implements RequestListener {
 			sr.setInput(data);
 			save(sr);
 		}
+
+		listeners.forEach(l -> {
+			try {
+				l.startRequest(id, url, requestHeaders, data);
+			} catch (Exception e) {
+				log.warn(e.getMessage(), e);
+			}
+		});
 	}
 
 	@Override
@@ -167,16 +188,34 @@ public class ResourceService implements RequestListener {
 			decompressIfNeeded(sr);
 			save(sr);
 		}
+
+		listeners.forEach(l -> {
+			try {
+				l.requestComplete(id, status, reason, duration, responseHeaders, data);
+			} catch (Exception e) {
+				log.warn(e.getMessage(), e);
+			}
+		});
+
 	}
 
 	@Override
-	public void error(UUID id, String message, Exception e) {
+	public void error(UUID id, String message, Exception ex) {
 		log.debug("request error: {} {}", id, message);
 		StoredResource sr = get(id.toString());
 		if (sr != null) {
 			sr.setErrorMessage(message);
 			save(sr);
 		}
+
+		listeners.forEach(l -> {
+			try {
+				l.error(id, message, ex);
+			} catch (Exception e) {
+				log.warn(e.getMessage(), e);
+			}
+		});
+
 	}
 
 	private String headersToString(Header[] headers) {

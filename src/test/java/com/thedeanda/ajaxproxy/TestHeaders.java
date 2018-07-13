@@ -13,6 +13,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.thedeanda.ajaxproxy.http.EmptyRequestListener;
 import com.thedeanda.ajaxproxy.http.HttpClient;
 import com.thedeanda.ajaxproxy.http.HttpClient.RequestMethod;
 import com.thedeanda.ajaxproxy.http.RequestListener;
@@ -52,7 +53,7 @@ public class TestHeaders {
 		proxyPath.put(AjaxProxy.PATH, ".*");
 		proxyPath.put(AjaxProxy.PORT, 80);
 
-		AjaxProxy proxy = new AjaxProxy(config, new File("."));
+		AjaxProxy proxy = new AjaxProxy(config, new File("."), new EmptyRequestListener());
 		new Thread(proxy).start();
 
 		Response realResponse = getResponse(REAL_URL);

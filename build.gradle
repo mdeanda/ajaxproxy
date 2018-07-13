@@ -45,11 +45,11 @@ dependencies {
 	compile 'commons-cli:commons-cli:1.4'
 	compile 'commons-io:commons-io:2.+'
 	compile 'org.apache.commons:commons-lang3:3.+'
-	compile 'dom4j:dom4j:1.+'
+	compile 'dom4j:dom4j:1.6.1'
 	compile 'org.slf4j:slf4j-api:1.+'
 	compile 'org.slf4j:slf4j-simple:1.+'
 	compile 'org.apache.httpcomponents:httpclient:4.+'
-	compile 'com.h2database:h2:1.4.191'
+	compile 'com.h2database:h2:1.4.197'
 	compile 'com.j256.ormlite:ormlite-core:4.48'
 	compile 'com.j256.ormlite:ormlite-jdbc:4.48'
 

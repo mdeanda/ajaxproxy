@@ -64,6 +64,7 @@ public class ResourceListPanel extends JPanel implements ActionListener, Request
 
 		this.model = model;
 		this.resourceService = resourceService;
+		resourceService.addListener(this);
 
 		final JPopupMenu popup = this.createListPopup();
 

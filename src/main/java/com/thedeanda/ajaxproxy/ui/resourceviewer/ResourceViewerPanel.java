@@ -94,13 +94,6 @@ public class ResourceViewerPanel extends JPanel implements ResourceListPanelList
 		resourcePanel.setResource(resource);
 	}
 
-	public void setProxy(AjaxProxy ajaxProxy) {
-		if (ajaxProxy != null) {
-			// ajaxProxy.addTracker(this);
-			ajaxProxy.addRequestListener(resourceListPanel);
-		}
-	}
-
 	/*
 	 * @Override public void trackFile(LoadedResource res) { boolean show =
 	 * toggleBtn.isSelected();

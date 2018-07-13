@@ -3,19 +3,16 @@ package com.thedeanda.ajaxproxy;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
-import java.util.UUID;
 import java.util.regex.Pattern;
 
 import javax.servlet.DispatcherType;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.Header;
 import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
@@ -40,6 +37,7 @@ import com.thedeanda.ajaxproxy.filter.ProxyFilter;
 import com.thedeanda.ajaxproxy.filter.ThrottleFilter;
 import com.thedeanda.ajaxproxy.filter.handler.logger.LoggerMessage;
 import com.thedeanda.ajaxproxy.filter.handler.logger.LoggerMessageListener;
+import com.thedeanda.ajaxproxy.http.EmptyRequestListener;
 import com.thedeanda.ajaxproxy.http.RequestListener;
 import com.thedeanda.ajaxproxy.model.ProxyPath;
 import com.thedeanda.javajson.JsonArray;
@@ -48,7 +46,7 @@ import com.thedeanda.javajson.JsonValue;
 
 public class AjaxProxy implements Runnable, LoggerMessageListener {
 	private static final Logger log = LoggerFactory.getLogger(AjaxProxy.class);
-	//TODO: move to config
+	// TODO: move to config
 	private String keystoreFile = "";
 	private String keystorePassword = "";
 
@@ -62,10 +60,8 @@ public class AjaxProxy implements Runnable, LoggerMessageListener {
 	private boolean mergeMode = false;
 	private List<MergeServlet> mergeServlets = new ArrayList<MergeServlet>();
 	private Collection<LoggerMessageListener> messageListeners = new HashSet<>();
-	private ArrayList<RequestListener> proxyListeners;
 	private RequestListener listener;
 
-//	private AjaxProxyConfig ajaxProxyConfig;
 	private Config configObject;
 
 	private enum ProxyEvent {
@@ -83,8 +79,8 @@ public class AjaxProxy implements Runnable, LoggerMessageListener {
 	private static final String MODE = "mode";
 	private static final String MINIFY = "minify";
 
-	public AjaxProxy(JsonObject config, File workingDir) throws Exception {
-		init(config, workingDir);
+	public AjaxProxy(JsonObject config, File workingDir, RequestListener listener) throws Exception {
+		init(config, workingDir, listener);
 	}
 
 	public AjaxProxy(String configFile) throws Exception {
@@ -98,21 +94,22 @@ public class AjaxProxy implements Runnable, LoggerMessageListener {
 		try (FileInputStream fis = new FileInputStream(cf)) {
 			config = JsonObject.parse(fis);
 		}
-		init(config, configDir);
+		init(config, configDir, new EmptyRequestListener());
 	}
 
-	private void init(JsonObject config, File workingDir) {
-		//TODO: perhaps pass in config object
+	private void init(JsonObject config, File workingDir, RequestListener listener) {
+		this.listener = listener;
+
+		// TODO: perhaps pass in config object
 		ConfigLoader cl = new ConfigLoader();
 		configObject = cl.loadConfig(config, workingDir);
-		
+
 		this.config = config;
 		this.workingDir = workingDir;
 
-		this.proxyListeners = new ArrayList<RequestListener>();
 		throttleFilter = new ThrottleFilter();
-		
-		//TODO: one filter per server?
+
+		// TODO: one filter per server?
 		ServerConfig firstServer = configObject.getServers().get(0);
 		proxyFilter = new ProxyFilter(this, firstServer);
 		getRequestListener();
@@ -293,8 +290,8 @@ public class AjaxProxy implements Runnable, LoggerMessageListener {
 		try {
 			fireEvent(ProxyEvent.START);
 			initRun();
-			
-			//TODO: for now assume just 1 server in config, later we'll loop through all
+
+			// TODO: for now assume just 1 server in config, later we'll loop through all
 			ServerConfig serverConfig = configObject.getServers().get(0);
 			boolean showIndex = serverConfig.isShowIndex();
 
@@ -405,62 +402,7 @@ public class AjaxProxy implements Runnable, LoggerMessageListener {
 		this.mergeMode = mergeMode;
 	}
 
-	public void addRequestListener(RequestListener listener) {
-		this.proxyListeners.add(listener);
-	}
-
 	public RequestListener getRequestListener() {
-		if (listener == null) {
-			// TODO: move this to its own class so its easier to read/maintain
-			listener = new RequestListener() {
-
-				@Override
-				public void newRequest(UUID id, String url, String method) {
-					for (RequestListener listener : proxyListeners) {
-						try {
-							listener.newRequest(id, url, method);
-						} catch (Exception e) {
-							log.warn(e.getMessage(), e);
-						}
-					}
-				}
-
-				@Override
-				public void startRequest(UUID id, URL url, Header[] requestHeaders, byte[] data) {
-					for (RequestListener listener : proxyListeners) {
-						try {
-							listener.startRequest(id, url, requestHeaders, data);
-						} catch (Exception e) {
-							log.warn(e.getMessage(), e);
-						}
-					}
-				}
-
-				@Override
-				public void requestComplete(UUID id, int status, String reason, long duration, Header[] responseHeaders,
-						byte[] data) {
-					for (RequestListener listener : proxyListeners) {
-						try {
-							listener.requestComplete(id, status, reason, duration, responseHeaders, data);
-						} catch (Exception e) {
-							log.warn(e.getMessage(), e);
-						}
-					}
-				}
-
-				@Override
-				public void error(UUID id, String message, Exception e) {
-					for (RequestListener listener : proxyListeners) {
-						try {
-							listener.error(id, message, e);
-						} catch (Exception ex) {
-							log.warn(ex.getMessage(), ex);
-						}
-					}
-				}
-
-			};
-		}
 		return listener;
 	}
 

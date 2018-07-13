@@ -206,13 +206,11 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 			File workingDir = configFile.getParentFile();
 			if (workingDir == null)
 				workingDir = new File(".");
-			proxy = new AjaxProxy(json, workingDir);
+			proxy = new AjaxProxy(json, workingDir, resourceService);
 			proxy.addProxyListener(this);
 			new Thread(proxy).start();
-			proxy.addRequestListener(resourceService);
 			generalPanel.setProxy(proxy);
 			loggerPanel.setProxy(proxy);
-			resourceViewerPanel.setProxy(proxy);
 			started = true;
 			navPanel.selectNavItem(NavItem.Start, 0);
 			fireProxyStarted();
@@ -243,7 +241,6 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 				proxy = null;
 				p.stop();
 				generalPanel.setProxy(null);
-				resourceViewerPanel.setProxy(null);
 			}
 		} finally {
 			proxy = null;
