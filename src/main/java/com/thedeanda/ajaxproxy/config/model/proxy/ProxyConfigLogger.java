@@ -7,7 +7,6 @@ import lombok.Data;
 
 @Data
 public class ProxyConfigLogger implements ProxyConfig {
-	@Builder.Default
 	private StringVariable path = new StringVariable("/logger", "/logger");
 
 	@Override

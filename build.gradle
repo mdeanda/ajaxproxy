@@ -19,7 +19,7 @@ apply plugin: "com.github.johnrengelman.shadow"
 apply plugin: 'com.jfrog.artifactory-upload'
 
 group = 'com.thedeanda'
-version = '2.4-SNAPSHOT'
+version = '2.3.1-SNAPSHOT'
 sourceCompatibility = "1.8"
 targetCompatibility = "1.8"
 
@@ -34,6 +34,7 @@ def jettyVersion = "9.4.10.v20180503"
 dependencies {
 	compileOnly "org.projectlombok:lombok:1.16.20"
 
+	// TODO: need to publish this to maven central!
 	compile 'com.thedeanda.javajson:javajson-parser:1.+'
 
 	compile "org.eclipse.jetty:jetty-server:$jettyVersion"
