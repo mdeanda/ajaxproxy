@@ -11,3 +11,4 @@
 /ajaxproxy.iml
 hs_err_*.log
 /out/
+/.nb-gradle/
