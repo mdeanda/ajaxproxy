@@ -1,30 +1,26 @@
 package com.thedeanda.ajaxproxy.ui.resourceviewer.list;
 
-import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.net.URL;
 import java.util.UUID;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JList;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
-import javax.swing.JTextField;
+import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpringLayout;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 
 import com.thedeanda.ajaxproxy.http.RequestListener;
@@ -34,13 +30,12 @@ import com.thedeanda.ajaxproxy.ui.SwingUtils;
 import com.thedeanda.ajaxproxy.ui.model.Resource;
 import com.thedeanda.ajaxproxy.ui.model.ResourceListModel;
 import com.thedeanda.ajaxproxy.ui.resourceviewer.ResourceFrame;
-import com.thedeanda.ajaxproxy.ui.resourceviewer.ResourceViewerPanel;
 import com.thedeanda.ajaxproxy.ui.rest.RestClientFrame;
 import com.thedeanda.ajaxproxy.ui.viewer.ResourceCellRenderer;
 
 /**
  * filterable list panel on left side if resource viewer panel
- * 
+ *
  * @author mdeanda
  *
  */
@@ -55,18 +50,26 @@ public class ResourceListPanel extends JPanel implements ActionListener, Request
 	private ResourceService resourceService;
 
 	private ResourceListPanelListener listener;
+	private JScrollPane scroll;
+	private JToolBar toolbar;
 
 	public ResourceListPanel(ResourceListModel model, ResourceService resourceService) {
 		SpringLayout layout = new SpringLayout();
-		JPanel panel = this;
-		panel.setLayout(layout);
-		panel.setBorder(BorderFactory.createEmptyBorder());
+		this.setLayout(layout);
+		this.setBorder(BorderFactory.createEmptyBorder());
 
 		this.model = model;
 		this.resourceService = resourceService;
 		resourceService.addListener(this);
 
+		addComponents();
+		initLayout(layout);
+	}
+
+	private void addComponents() {
 		final JPopupMenu popup = this.createListPopup();
+
+		initToolbar();
 
 		list = new JList<Resource>(model);
 		list.setCellRenderer(new ResourceCellRenderer());
@@ -98,9 +101,54 @@ public class ResourceListPanel extends JPanel implements ActionListener, Request
 		});
 		list.setBorder(BorderFactory.createEmptyBorder());
 		JScrollPane scroll = new JScrollPane(list);
-		panel.add(scroll);
+		this.scroll = scroll;
+		this.add(scroll);
 
-		layout.putConstraint(SpringLayout.NORTH, scroll, 10, SpringLayout.NORTH, panel);
+	}
+
+	private void initToolbar() {
+		toolbar = new JToolBar("Toolbar");
+		toolbar.setFloatable(false);
+		add(toolbar);
+
+		JButton button = null;
+
+		button = makeNavigationButton("textfield_delete.png", "EXCLUDE", "Back to previous something-or-other",
+				"Exclude");
+		toolbar.add(button);
+
+		button = makeNavigationButton("textfield_add.png", "INCLUDE", "Back to previous something-or-other", "Include");
+		toolbar.add(button);
+	}
+
+	protected JButton makeNavigationButton(String imageName, String actionCommand, String toolTipText, String altText) {
+		// Look for the image.
+		String imgLocation = "/images/" + imageName;
+		URL imageURL = getClass().getResource(imgLocation);
+
+		// Create and initialize the button.
+		JButton button = new JButton();
+		button.setActionCommand(actionCommand);
+		button.setToolTipText(toolTipText);
+		button.addActionListener(this);
+
+		if (imageURL != null) { // image found
+			button.setIcon(new ImageIcon(imageURL, altText));
+		} else { // no image found
+			button.setText(altText);
+			System.err.println("Resource not found: " + imgLocation);
+		}
+
+		return button;
+	}
+
+	private void initLayout(SpringLayout layout) {
+		JPanel panel = this;
+
+		layout.putConstraint(SpringLayout.NORTH, toolbar, 0, SpringLayout.NORTH, panel);
+		layout.putConstraint(SpringLayout.WEST, toolbar, 10, SpringLayout.WEST, panel);
+
+		layout.putConstraint(SpringLayout.NORTH, scroll, 0, SpringLayout.SOUTH, toolbar);
 		layout.putConstraint(SpringLayout.WEST, scroll, 10, SpringLayout.WEST, panel);
 		layout.putConstraint(SpringLayout.EAST, scroll, -10, SpringLayout.EAST, panel);
 		layout.putConstraint(SpringLayout.SOUTH, scroll, -10, SpringLayout.SOUTH, panel);
@@ -133,7 +181,7 @@ public class ResourceListPanel extends JPanel implements ActionListener, Request
 
 	private void listItemSelected(ListSelectionEvent evt) {
 		if (!evt.getValueIsAdjusting()) {
-			Resource resource = (Resource) list.getSelectedValue();
+			Resource resource = list.getSelectedValue();
 			if (resource != null) {
 				showResource(resource);
 			}

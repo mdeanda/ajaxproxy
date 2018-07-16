@@ -1,14 +1,5 @@
 package com.thedeanda.ajaxproxy.ui.resourceviewer;
 
-import javax.swing.BorderFactory;
-import javax.swing.JPanel;
-import javax.swing.JSplitPane;
-import javax.swing.SpringLayout;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.thedeanda.ajaxproxy.AjaxProxy;
 import com.thedeanda.ajaxproxy.service.ResourceService;
 import com.thedeanda.ajaxproxy.ui.SwingUtils;
 import com.thedeanda.ajaxproxy.ui.model.Resource;
@@ -16,8 +7,16 @@ import com.thedeanda.ajaxproxy.ui.model.ResourceListModel;
 import com.thedeanda.ajaxproxy.ui.resourceviewer.list.ResourceListPanel;
 import com.thedeanda.ajaxproxy.ui.resourceviewer.list.ResourceListPanelListener;
 import com.thedeanda.javajson.JsonObject;
+import javax.swing.BorderFactory;
+import javax.swing.JPanel;
+import javax.swing.JSplitPane;
+import javax.swing.SpringLayout;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-/** tracks files that get loaded */
+/**
+ * this is the main resource panel that gets added to the application
+ */
 public class ResourceViewerPanel extends JPanel implements ResourceListPanelListener {
 	private static final Logger log = LoggerFactory.getLogger(ResourceViewerPanel.class);
 	private static final long serialVersionUID = 1L;
@@ -97,7 +96,7 @@ public class ResourceViewerPanel extends JPanel implements ResourceListPanelList
 	/*
 	 * @Override public void trackFile(LoadedResource res) { boolean show =
 	 * toggleBtn.isSelected();
-	 * 
+	 *
 	 * if (show) { model.add(new Resource(res)); } }
 	 */
 
@@ -123,13 +122,13 @@ public class ResourceViewerPanel extends JPanel implements ResourceListPanelList
 		 * "response headers", headers); if (obj.getResponseHeaders() != null) {
 		 * for (Header hdr : obj.getResponseHeaders()) {
 		 * headers.put(hdr.getName(), hdr.getValue()); } }
-		 * 
+		 *
 		 * Writer writer = null; try { writer = new OutputStreamWriter(new
 		 * FileOutputStream( new File(path + File.separator + fn + ".txt")),
 		 * "UTF-8"); writer.write(json.toString(4)); } catch (Exception e) {
 		 * e.printStackTrace(); } finally { if (writer != null) { try {
 		 * writer.close(); } catch (IOException e) { e.printStackTrace(); } } }
-		 * 
+		 *
 		 * } } //
 		 */
 	}
