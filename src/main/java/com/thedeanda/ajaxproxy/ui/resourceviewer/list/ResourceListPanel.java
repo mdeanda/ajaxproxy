@@ -113,11 +113,13 @@ public class ResourceListPanel extends JPanel implements ActionListener, Request
 
 		JButton button = null;
 
-		button = makeNavigationButton("textfield_delete.png", "EXCLUDE", "Back to previous something-or-other",
-				"Exclude");
+		button = makeNavigationButton("textfield_delete.png", "EXCLUDE", "Filter - Exclude", "Exclude");
 		toolbar.add(button);
 
-		button = makeNavigationButton("textfield_add.png", "INCLUDE", "Back to previous something-or-other", "Include");
+		button = makeNavigationButton("textfield_add.png", "INCLUDE", "Filter - Include", "Include");
+		toolbar.add(button);
+
+		button = makeNavigationButton("application_view_list_delete.png", "CLEAR", "Clear List", "Clear");
 		toolbar.add(button);
 	}
 
