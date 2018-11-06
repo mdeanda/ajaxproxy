@@ -1,18 +1,15 @@
 package com.thedeanda.ajaxproxy.cache;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import com.thedeanda.ajaxproxy.cache.model.CachedResponse;
+import org.apache.commons.io.FileUtils;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.commons.io.FileUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
-import com.thedeanda.ajaxproxy.cache.model.CachedResponse;
+import static org.junit.Assert.*;
 
 public class DbCacheTest {
 	private static final String CACHE_PATH = "./src/test/resources/DB_CACHE";
@@ -22,21 +19,25 @@ public class DbCacheTest {
 	private static final int STATUS = 200;
 	private static final long TIMESTAMP = 3209l;
 
-	private final File cacheDir = new File(CACHE_PATH);
+	private static final File cacheBaseDir = new File(CACHE_PATH);
+	private File cacheDir;
 	private DbCache cache;
 
 	@Before
-	public void init() throws IOException {
-		done();
-		cache = new DbCache(new File(cacheDir, "test"), false);
+	public void init() throws Exception {
+		cacheBaseDir.mkdirs();
+		cacheDir = File.createTempFile("test", "", cacheBaseDir);
+		cacheDir.delete();
+		cache = new DbCache(cacheDir, false);
 	}
 
-	@After
-	public void done() throws IOException {
-		if (cache != null) {
-			cache.clearCache();
+	@AfterClass
+	public static void classDone() {
+		try {
+			FileUtils.deleteDirectory(cacheBaseDir);
+		} catch (IOException e) {
+
 		}
-		FileUtils.deleteDirectory(cacheDir);
 	}
 
 	@Test
