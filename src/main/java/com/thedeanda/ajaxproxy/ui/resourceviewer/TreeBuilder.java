@@ -1,17 +1,15 @@
 package com.thedeanda.ajaxproxy.ui.resourceviewer;
 
-import java.util.Iterator;
-
-import javax.swing.tree.DefaultMutableTreeNode;
-
+import com.thedeanda.javajson.JsonArray;
+import com.thedeanda.javajson.JsonObject;
+import com.thedeanda.javajson.JsonValue;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.Element;
 
-import com.thedeanda.javajson.JsonArray;
-import com.thedeanda.javajson.JsonObject;
-import com.thedeanda.javajson.JsonValue;
+import javax.swing.tree.DefaultMutableTreeNode;
+import java.util.Iterator;
 
 public class TreeBuilder {
 	private static final int MAX_WIDTH = 80;

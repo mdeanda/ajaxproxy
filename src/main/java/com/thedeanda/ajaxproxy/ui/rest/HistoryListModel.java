@@ -1,8 +1,7 @@
 package com.thedeanda.ajaxproxy.ui.rest;
 
+import javax.swing.*;
 import java.util.List;
-
-import javax.swing.AbstractListModel;
 
 public class HistoryListModel extends AbstractListModel<HistoryItem> {
 	private static final long serialVersionUID = 4328488269405279215L;

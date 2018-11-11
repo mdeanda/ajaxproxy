@@ -1,12 +1,9 @@
 package com.thedeanda.ajaxproxy.ui.logger;
 
-import java.awt.BorderLayout;
-
-import javax.swing.JPanel;
-import javax.swing.SpringLayout;
-
 import com.thedeanda.ajaxproxy.filter.handler.logger.LoggerMessage;
 import com.thedeanda.ajaxproxy.ui.resourceviewer.ContentViewer;
+
+import javax.swing.*;
 
 public class LoggerMessagePanel extends JPanel {
 	private ContentViewer cv;

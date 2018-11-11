@@ -1,8 +1,7 @@
 package com.thedeanda.ajaxproxy.ui.windows;
 
+import javax.swing.*;
 import java.lang.ref.WeakReference;
-
-import javax.swing.JFrame;
 
 public class WindowContainer {
 	private WeakReference<JFrame> frame;

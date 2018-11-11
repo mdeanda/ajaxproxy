@@ -1,11 +1,7 @@
 package com.thedeanda.ajaxproxy.ui.update;
 
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-
-import javax.swing.SwingWorker;
-
+import com.thedeanda.ajaxproxy.http.SimpleHttpClient;
+import com.thedeanda.ajaxproxy.ui.ConfigService;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -15,8 +11,10 @@ import org.dom4j.tree.DefaultElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.thedeanda.ajaxproxy.http.SimpleHttpClient;
-import com.thedeanda.ajaxproxy.ui.ConfigService;
+import javax.swing.*;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class UpdateCheckWorker extends SwingWorker<Boolean, Void> {
 	private static final Logger log = LoggerFactory.getLogger(UpdateCheckWorker.class);

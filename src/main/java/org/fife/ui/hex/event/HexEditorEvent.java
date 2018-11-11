@@ -1,8 +1,8 @@
 package org.fife.ui.hex.event;
 
-import java.util.EventObject;
-
 import org.fife.ui.hex.swing.HexEditor;
+
+import java.util.EventObject;
 
 
 /**

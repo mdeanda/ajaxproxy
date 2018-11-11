@@ -1,12 +1,9 @@
 package com.thedeanda.ajaxproxy.ui.tamper;
 
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.SpringLayout;
-
 import com.thedeanda.ajaxproxy.model.tamper.TamperItem;
 import com.thedeanda.ajaxproxy.model.tamper.TamperSelector;
+
+import javax.swing.*;
 
 public class TamperViewPanel extends JPanel {
 	private static final long serialVersionUID = -7865500250217198161L;

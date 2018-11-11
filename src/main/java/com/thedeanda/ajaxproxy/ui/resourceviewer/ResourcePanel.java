@@ -1,33 +1,22 @@
 package com.thedeanda.ajaxproxy.ui.resourceviewer;
 
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.net.URL;
-import java.util.Date;
-
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JEditorPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.SpringLayout;
-import javax.swing.SwingUtilities;
-import javax.swing.SwingWorker;
-import javax.swing.text.Document;
-import javax.swing.text.html.HTMLEditorKit;
-import javax.swing.text.html.StyleSheet;
-
+import com.thedeanda.ajaxproxy.service.ResourceService;
+import com.thedeanda.ajaxproxy.service.StoredResource;
+import com.thedeanda.ajaxproxy.ui.model.Resource;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.http.Header;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.thedeanda.ajaxproxy.service.ResourceService;
-import com.thedeanda.ajaxproxy.service.StoredResource;
-import com.thedeanda.ajaxproxy.ui.model.Resource;
+import javax.swing.*;
+import javax.swing.text.Document;
+import javax.swing.text.html.HTMLEditorKit;
+import javax.swing.text.html.StyleSheet;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.net.URL;
+import java.util.Date;
 
 /**
  * panel to view a single resource.

@@ -1,24 +1,16 @@
 package com.thedeanda.ajaxproxy.ui.model;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.UUID;
-import java.util.regex.Pattern;
-
-import javax.swing.AbstractListModel;
-
-import org.apache.http.Header;
-
 import com.thedeanda.ajaxproxy.service.ResourceService;
 import com.thedeanda.ajaxproxy.ui.resourceviewer.filter.RequestFilter;
 import com.thedeanda.ajaxproxy.ui.resourceviewer.filter.RequestType;
+import org.apache.http.Header;
+
+import javax.swing.*;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.net.URL;
+import java.util.*;
+import java.util.regex.Pattern;
 
 public class ResourceListModel extends AbstractListModel<Resource> {
 	private static final long serialVersionUID = -8347782415802894185L;

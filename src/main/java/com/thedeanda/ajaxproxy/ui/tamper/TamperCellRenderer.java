@@ -1,17 +1,10 @@
 package com.thedeanda.ajaxproxy.ui.tamper;
 
-import java.awt.Color;
-import java.awt.Component;
-
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.ListCellRenderer;
-
 import com.thedeanda.ajaxproxy.model.tamper.TamperItem;
 import com.thedeanda.ajaxproxy.model.tamper.TamperSelector;
+
+import javax.swing.*;
+import java.awt.*;
 
 public class TamperCellRenderer extends JPanel implements
 		ListCellRenderer<TamperItem> {

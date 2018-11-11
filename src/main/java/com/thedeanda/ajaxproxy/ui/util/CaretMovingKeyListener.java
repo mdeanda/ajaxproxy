@@ -1,15 +1,11 @@
 package com.thedeanda.ajaxproxy.ui.util;
 
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.swing.JTextField;
-
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 public class CaretMovingKeyListener implements KeyListener {
 	private static final Logger log = LoggerFactory.getLogger(CaretMovingKeyListener.class);

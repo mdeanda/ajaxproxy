@@ -1,14 +1,5 @@
 package com.thedeanda.ajaxproxy.ui.proxy;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.table.AbstractTableModel;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfig;
 import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigFile;
 import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigRequest;
@@ -16,6 +7,13 @@ import com.thedeanda.ajaxproxy.model.config.Convertor;
 import com.thedeanda.ajaxproxy.ui.util.Reorderable;
 import com.thedeanda.javajson.JsonArray;
 import com.thedeanda.javajson.JsonValue;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.table.AbstractTableModel;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ProxyTableModel extends AbstractTableModel implements Reorderable {
 	private static final Logger log = LoggerFactory.getLogger(ProxyTableModel.class);

@@ -1,19 +1,16 @@
 package com.thedeanda.ajaxproxy;
 
-import java.io.File;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.table.TableUtils;
-import com.thedeanda.ajaxproxy.cache.model.CachedResponse;
-import com.thedeanda.ajaxproxy.service.StoredResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
 
 public class Repo<T> {
 	private static final Logger log = LoggerFactory.getLogger(Repo.class);

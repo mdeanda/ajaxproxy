@@ -1,21 +1,19 @@
 package com.thedeanda.ajaxproxy.ui.logger;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.regex.Pattern;
-
-import javax.swing.table.AbstractTableModel;
-
+import com.thedeanda.ajaxproxy.filter.handler.logger.LoggerMessage;
+import com.thedeanda.ajaxproxy.filter.handler.logger.LoggerMessageListener;
+import com.thedeanda.javajson.JsonArray;
 import org.apache.commons.lang3.StringUtils;
 import org.japura.gui.model.ListCheckModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.thedeanda.ajaxproxy.filter.handler.logger.LoggerMessage;
-import com.thedeanda.ajaxproxy.filter.handler.logger.LoggerMessageListener;
-import com.thedeanda.javajson.JsonArray;
+import javax.swing.table.AbstractTableModel;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.regex.Pattern;
 
 public class LoggerTableModel extends AbstractTableModel implements LoggerMessageListener {
 	private static final long serialVersionUID = 4961880986671181480L;

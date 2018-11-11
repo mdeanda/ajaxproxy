@@ -1,15 +1,12 @@
 package com.thedeanda.ajaxproxy.ui.tamper;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.swing.AbstractListModel;
-
+import com.thedeanda.ajaxproxy.model.tamper.TamperItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.thedeanda.ajaxproxy.model.tamper.TamperItem;
+import javax.swing.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TamperListModel extends AbstractListModel<TamperItem> {
 	private static final Logger log = LoggerFactory

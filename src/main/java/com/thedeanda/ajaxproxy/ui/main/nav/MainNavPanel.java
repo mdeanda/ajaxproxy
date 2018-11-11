@@ -1,5 +1,10 @@
 package com.thedeanda.ajaxproxy.ui.main.nav;
 
+import com.thedeanda.ajaxproxy.config.ConfigService;
+import com.thedeanda.ajaxproxy.ui.border.BottomBorder;
+import lombok.extern.slf4j.Slf4j;
+
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -8,11 +13,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import javax.swing.*;
-
-import com.thedeanda.ajaxproxy.ui.border.BottomBorder;
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class MainNavPanel extends JPanel {
@@ -26,7 +26,7 @@ public class MainNavPanel extends JPanel {
 	private static final String START_LABEL = "Start";
 	private static final String STOP_LABEL = "Stop";
 
-	public MainNavPanel() {
+	public MainNavPanel(ConfigService configService) {
 		JPanel panel = this;
 
 		createNavButton(this, "Server", "Server", NavItem.Server, 0);

@@ -1,20 +1,12 @@
 package com.thedeanda.ajaxproxy.ui.proxy;
 
-import java.awt.Dimension;
-
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.SpringLayout;
-
-import org.apache.commons.lang3.StringUtils;
-
 import com.thedeanda.ajaxproxy.config.model.StringVariable;
-import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfig;
 import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigRequest;
 import com.thedeanda.ajaxproxy.ui.SwingUtils;
+import org.apache.commons.lang3.StringUtils;
+
+import javax.swing.*;
+import java.awt.*;
 
 public class RequestProxyEditorPanel extends JPanel implements EditorPanel<ProxyConfigRequest> {
 	private static final long serialVersionUID = 5379224168584631339L;

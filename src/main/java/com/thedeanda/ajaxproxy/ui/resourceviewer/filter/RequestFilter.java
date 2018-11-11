@@ -1,9 +1,9 @@
 package com.thedeanda.ajaxproxy.ui.resourceviewer.filter;
 
+import com.thedeanda.ajaxproxy.ui.model.Resource;
+
 import java.util.List;
 import java.util.regex.Pattern;
-
-import com.thedeanda.ajaxproxy.ui.model.Resource;
 
 public class RequestFilter {
 	private Pattern filterOutRegEx;

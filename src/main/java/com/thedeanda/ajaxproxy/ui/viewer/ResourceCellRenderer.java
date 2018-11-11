@@ -1,18 +1,10 @@
 package com.thedeanda.ajaxproxy.ui.viewer;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.net.URL;
-
-import javax.swing.BorderFactory;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.ListCellRenderer;
-import javax.swing.SpringLayout;
-
 import com.thedeanda.ajaxproxy.ui.model.Resource;
+
+import javax.swing.*;
+import java.awt.*;
+import java.net.URL;
 
 public class ResourceCellRenderer extends JPanel implements
 		ListCellRenderer<Resource> {

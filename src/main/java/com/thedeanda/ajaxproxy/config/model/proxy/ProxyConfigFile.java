@@ -1,7 +1,6 @@
 package com.thedeanda.ajaxproxy.config.model.proxy;
 
 import com.thedeanda.ajaxproxy.config.model.StringVariable;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

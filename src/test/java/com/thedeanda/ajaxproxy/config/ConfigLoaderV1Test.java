@@ -1,21 +1,16 @@
 package com.thedeanda.ajaxproxy.config;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import com.thedeanda.ajaxproxy.config.model.*;
+import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfig;
+import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigRequest;
+import com.thedeanda.javajson.JsonObject;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.File;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
-
-import com.thedeanda.ajaxproxy.config.model.Config;
-import com.thedeanda.ajaxproxy.config.model.MergeConfig;
-import com.thedeanda.ajaxproxy.config.model.MergeMode;
-import com.thedeanda.ajaxproxy.config.model.ServerConfig;
-import com.thedeanda.ajaxproxy.config.model.Variable;
-import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfig;
-import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigRequest;
-import com.thedeanda.javajson.JsonObject;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ConfigLoaderV1Test {
 

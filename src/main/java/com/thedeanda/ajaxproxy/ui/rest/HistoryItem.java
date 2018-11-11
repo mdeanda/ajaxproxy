@@ -1,10 +1,10 @@
 package com.thedeanda.ajaxproxy.ui.rest;
 
-import java.util.UUID;
-
 import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
+
+import java.util.UUID;
 
 @DatabaseTable(tableName = "rest_history")
 public class HistoryItem {

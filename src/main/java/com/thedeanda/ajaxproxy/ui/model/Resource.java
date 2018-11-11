@@ -1,13 +1,13 @@
 package com.thedeanda.ajaxproxy.ui.model;
 
+import org.apache.http.Header;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.UUID;
-
-import org.apache.http.Header;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class Resource implements Serializable, Comparable<Resource> {
 	private static final long serialVersionUID = -2666007600337135608L;

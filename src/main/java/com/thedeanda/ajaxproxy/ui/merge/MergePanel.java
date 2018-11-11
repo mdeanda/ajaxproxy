@@ -1,13 +1,10 @@
 package com.thedeanda.ajaxproxy.ui.merge;
 
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.SpringLayout;
+import com.thedeanda.ajaxproxy.ui.SettingsChangedListener;
+
+import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
-
-import com.thedeanda.ajaxproxy.ui.SettingsChangedListener;
 
 public class MergePanel extends JPanel {
 	private static final long serialVersionUID = 1L;

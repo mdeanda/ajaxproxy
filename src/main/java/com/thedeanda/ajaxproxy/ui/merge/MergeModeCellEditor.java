@@ -1,15 +1,11 @@
 package com.thedeanda.ajaxproxy.ui.merge;
 
-import java.awt.Component;
+import com.thedeanda.ajaxproxy.config.model.MergeMode;
 
-import javax.swing.AbstractCellEditor;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JComboBox;
-import javax.swing.JTable;
+import javax.swing.*;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
-
-import com.thedeanda.ajaxproxy.config.model.MergeMode;
+import java.awt.*;
 
 public class MergeModeCellEditor extends AbstractCellEditor implements
 		TableCellEditor, TableCellRenderer {

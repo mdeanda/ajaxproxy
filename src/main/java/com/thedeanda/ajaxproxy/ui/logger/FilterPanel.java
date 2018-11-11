@@ -1,21 +1,7 @@
 package com.thedeanda.ajaxproxy.ui.logger;
 
-import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
-
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.SpringLayout;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-
+import com.thedeanda.ajaxproxy.ui.SwingUtils;
+import com.thedeanda.ajaxproxy.ui.border.BottomBorder;
 import org.apache.commons.lang3.StringUtils;
 import org.japura.gui.CheckComboBox;
 import org.japura.gui.event.ListCheckListener;
@@ -24,8 +10,16 @@ import org.japura.gui.model.ListCheckModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.thedeanda.ajaxproxy.ui.SwingUtils;
-import com.thedeanda.ajaxproxy.ui.border.BottomBorder;
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 public class FilterPanel extends JPanel {
 	private static final Logger log = LoggerFactory.getLogger(FilterPanel.class);

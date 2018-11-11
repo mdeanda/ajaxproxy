@@ -1,32 +1,20 @@
 package com.thedeanda.ajaxproxy;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.StringReader;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.GnuParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
+import com.thedeanda.ajaxproxy.config.ConfigService;
+import com.thedeanda.ajaxproxy.ui.MainFrame;
+import com.thedeanda.ajaxproxy.ui.rest.RestClientFrame;
+import org.apache.commons.cli.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.thedeanda.ajaxproxy.ui.MainFrame;
-import com.thedeanda.ajaxproxy.ui.rest.RestClientFrame;
+import javax.swing.*;
+import java.io.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Main {
 	private static final Logger log = LoggerFactory.getLogger(Main.class);
@@ -65,7 +53,8 @@ public class Main {
 			} else if (config != null && merge != null) {
 				runMerge(config, merge, rm, ignore);
 			} else if (config != null && run) {
-				AjaxProxy ap = new AjaxProxy(config);
+				ConfigService configService = new ConfigService();
+				AjaxProxy ap = new AjaxProxy(config, configService);
 				ap.run();
 			} else if (merge != null && config == null) {
 				printHelp(options);
@@ -162,7 +151,8 @@ public class Main {
 			System.exit(1);
 		}
 
-		AjaxProxy proxy = new AjaxProxy(config);
+		ConfigService configService = new ConfigService();
+		AjaxProxy proxy = new AjaxProxy(config, configService);
 		proxy.setMergeMode(true);
 		proxy.run();
 		List<MergeServlet> servlets = proxy.getMergeServlets();

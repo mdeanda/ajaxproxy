@@ -1,11 +1,11 @@
 package com.thedeanda.ajaxproxy.ui.merge;
 
-import javax.swing.table.AbstractTableModel;
-
 import com.thedeanda.ajaxproxy.config.model.MergeMode;
 import com.thedeanda.javajson.JsonArray;
 import com.thedeanda.javajson.JsonObject;
 import com.thedeanda.javajson.JsonValue;
+
+import javax.swing.table.AbstractTableModel;
 
 public class MergeTableModel extends AbstractTableModel {
 	private static final long serialVersionUID = 1L;

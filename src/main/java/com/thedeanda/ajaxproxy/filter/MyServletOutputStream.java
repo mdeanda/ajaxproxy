@@ -1,10 +1,9 @@
 package com.thedeanda.ajaxproxy.filter;
 
-import java.io.IOException;
-import java.io.OutputStream;
-
 import javax.servlet.ServletOutputStream;
 import javax.servlet.WriteListener;
+import java.io.IOException;
+import java.io.OutputStream;
 
 public class MyServletOutputStream extends ServletOutputStream {
 	private OutputStream os;

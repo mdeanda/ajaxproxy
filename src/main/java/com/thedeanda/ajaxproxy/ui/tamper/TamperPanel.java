@@ -1,23 +1,5 @@
 package com.thedeanda.ajaxproxy.ui.tamper;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.ListSelectionModel;
-import javax.swing.SpringLayout;
-import javax.swing.SwingUtilities;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.thedeanda.ajaxproxy.model.tamper.TamperConvertor;
 import com.thedeanda.ajaxproxy.model.tamper.TamperItem;
 import com.thedeanda.ajaxproxy.model.tamper.TamperSelector;
@@ -26,6 +8,14 @@ import com.thedeanda.ajaxproxy.ui.border.BottomBorder;
 import com.thedeanda.javajson.JsonArray;
 import com.thedeanda.javajson.JsonObject;
 import com.thedeanda.javajson.JsonValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class TamperPanel extends JPanel implements ActionListener {
 	private static final String JSON_KEY = "items";

@@ -1,35 +1,7 @@
 package com.thedeanda.ajaxproxy;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.List;
-import java.util.regex.Pattern;
-
-import javax.servlet.DispatcherType;
-
-import org.apache.commons.lang3.StringUtils;
-import org.eclipse.jetty.http.HttpVersion;
-import org.eclipse.jetty.server.HttpConfiguration;
-import org.eclipse.jetty.server.HttpConnectionFactory;
-import org.eclipse.jetty.server.SecureRequestCustomizer;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.server.SslConnectionFactory;
-import org.eclipse.jetty.server.handler.AllowSymLinkAliasChecker;
-import org.eclipse.jetty.servlet.DefaultServlet;
-import org.eclipse.jetty.servlet.FilterHolder;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
-import org.eclipse.jetty.util.ssl.SslContextFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.thedeanda.ajaxproxy.config.ConfigLoader;
+import com.thedeanda.ajaxproxy.config.ConfigService;
 import com.thedeanda.ajaxproxy.config.model.Config;
 import com.thedeanda.ajaxproxy.config.model.MergeMode;
 import com.thedeanda.ajaxproxy.config.model.ServerConfig;
@@ -43,6 +15,24 @@ import com.thedeanda.ajaxproxy.model.ProxyPath;
 import com.thedeanda.javajson.JsonArray;
 import com.thedeanda.javajson.JsonObject;
 import com.thedeanda.javajson.JsonValue;
+import org.apache.commons.lang3.StringUtils;
+import org.eclipse.jetty.http.HttpVersion;
+import org.eclipse.jetty.server.*;
+import org.eclipse.jetty.server.handler.AllowSymLinkAliasChecker;
+import org.eclipse.jetty.servlet.DefaultServlet;
+import org.eclipse.jetty.servlet.FilterHolder;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.servlet.DispatcherType;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.*;
+import java.util.regex.Pattern;
 
 public class AjaxProxy implements Runnable, LoggerMessageListener {
 	private static final Logger log = LoggerFactory.getLogger(AjaxProxy.class);
@@ -64,6 +54,8 @@ public class AjaxProxy implements Runnable, LoggerMessageListener {
 
 	private Config configObject;
 
+	private final ConfigService configService;
+
 	private enum ProxyEvent {
 		START, STOP, FAIL
 	};
@@ -79,11 +71,13 @@ public class AjaxProxy implements Runnable, LoggerMessageListener {
 	private static final String MODE = "mode";
 	private static final String MINIFY = "minify";
 
-	public AjaxProxy(JsonObject config, File workingDir, RequestListener listener) throws Exception {
+	public AjaxProxy(JsonObject config, File workingDir, RequestListener listener, ConfigService configService) throws Exception {
+		this.configService = configService;
 		init(config, workingDir, listener);
 	}
 
-	public AjaxProxy(String configFile) throws Exception {
+	public AjaxProxy(String configFile, ConfigService configService) throws Exception {
+		this.configService = configService;
 		log.info("using config file: " + configFile);
 		File cf = new File(configFile);
 		if (!cf.exists())
@@ -101,8 +95,7 @@ public class AjaxProxy implements Runnable, LoggerMessageListener {
 		this.listener = listener;
 
 		// TODO: perhaps pass in config object
-		ConfigLoader cl = new ConfigLoader();
-		configObject = cl.loadConfig(config, workingDir);
+		configObject = configService.loadConfig(config, workingDir);
 
 		this.config = config;
 		this.workingDir = workingDir;

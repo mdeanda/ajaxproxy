@@ -1,18 +1,8 @@
 package com.thedeanda.ajaxproxy.ui.resourceviewer.util;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-
-import javax.imageio.ImageIO;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.DefaultStyledDocument;
-
+import com.thedeanda.ajaxproxy.ui.resourceviewer.TreeBuilder;
+import com.thedeanda.javajson.JsonArray;
+import com.thedeanda.javajson.JsonObject;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -23,9 +13,16 @@ import org.fife.ui.hex.swing.HexEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.thedeanda.ajaxproxy.ui.resourceviewer.TreeBuilder;
-import com.thedeanda.javajson.JsonArray;
-import com.thedeanda.javajson.JsonObject;
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultStyledDocument;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 
 public class DocumentParser {
 	private static final Logger log = LoggerFactory.getLogger(DocumentParser.class);

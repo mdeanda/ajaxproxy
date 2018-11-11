@@ -1,11 +1,11 @@
 package com.thedeanda.ajaxproxy.config;
 
+import com.thedeanda.ajaxproxy.config.model.Config;
+import com.thedeanda.javajson.JsonObject;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.thedeanda.ajaxproxy.config.model.Config;
-import com.thedeanda.javajson.JsonObject;
 
 public class ConfigLoader {
 	private List<Loader> loaders;

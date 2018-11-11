@@ -1,14 +1,13 @@
 package com.thedeanda.ajaxproxy.config;
 
-import static org.junit.Assert.assertEquals;
+import com.thedeanda.ajaxproxy.config.model.Variable;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
-
-import com.thedeanda.ajaxproxy.config.model.Variable;
+import static org.junit.Assert.assertEquals;
 
 public class VariableHandlerTest {
 

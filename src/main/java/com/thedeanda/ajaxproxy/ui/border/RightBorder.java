@@ -1,12 +1,8 @@
 package com.thedeanda.ajaxproxy.ui.border;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Graphics;
-import java.awt.Insets;
-
-import javax.swing.UIDefaults;
+import javax.swing.*;
 import javax.swing.border.Border;
+import java.awt.*;
 
 public class RightBorder implements Border {
 

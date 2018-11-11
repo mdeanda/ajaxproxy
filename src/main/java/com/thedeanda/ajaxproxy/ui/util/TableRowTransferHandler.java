@@ -1,15 +1,12 @@
 package com.thedeanda.ajaxproxy.ui.util;
 
-import java.awt.Cursor;
+import javax.activation.ActivationDataFlavor;
+import javax.activation.DataHandler;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.dnd.DragSource;
-
-import javax.activation.ActivationDataFlavor;
-import javax.activation.DataHandler;
-import javax.swing.JComponent;
-import javax.swing.JTable;
-import javax.swing.TransferHandler;
 
 // https://stackoverflow.com/a/4769575
 public class TableRowTransferHandler extends TransferHandler {

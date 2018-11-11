@@ -1,27 +1,5 @@
 package com.thedeanda.ajaxproxy.ui;
 
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.Desktop;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import javax.swing.BorderFactory;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.SpringLayout;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.thedeanda.ajaxproxy.AjaxProxy;
 import com.thedeanda.ajaxproxy.ProxyListener;
 import com.thedeanda.ajaxproxy.service.ResourceService;
@@ -40,11 +18,25 @@ import com.thedeanda.ajaxproxy.ui.update.UpdateCheckWorker;
 import com.thedeanda.ajaxproxy.ui.variable.VariablesPanel;
 import com.thedeanda.javajson.JsonException;
 import com.thedeanda.javajson.JsonObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import java.awt.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class MainPanel extends JPanel implements ProxyListener, SettingsChangedListener, NavListener {
 	private static final long serialVersionUID = 1L;
 	private static final Logger log = LoggerFactory.getLogger(MainPanel.class);
 	private static final int CACHE_SIZE = 50;
+	private final com.thedeanda.ajaxproxy.config.ConfigService configService;
 
 	private boolean started = false;
 	private AjaxProxy proxy = null;
@@ -72,7 +64,8 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 	private static final String CARD_RESOURCE_VIEWER = "card_resource_viewer";
 	private static final String CARD_LOGGER = "card_logger";
 
-	public MainPanel() {
+	public MainPanel(com.thedeanda.ajaxproxy.config.ConfigService configService) {
+		this.configService = configService;
 		SpringLayout layout = new SpringLayout();
 		setLayout(layout);
 
@@ -116,7 +109,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		// tabs.add("Logger", loggerPanel);
 		cardPanel.add(loggerPanel, CARD_LOGGER);
 
-		navPanel = new MainNavPanel();
+		navPanel = new MainNavPanel(configService);
 		JScrollPane navComponent = new JScrollPane(navPanel);
 		add(navComponent);
 		navComponent.setBorder(null);
@@ -206,7 +199,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 			File workingDir = configFile.getParentFile();
 			if (workingDir == null)
 				workingDir = new File(".");
-			proxy = new AjaxProxy(json, workingDir, resourceService);
+			proxy = new AjaxProxy(json, workingDir, resourceService, configService);
 			proxy.addProxyListener(this);
 			new Thread(proxy).start();
 			generalPanel.setProxy(proxy);

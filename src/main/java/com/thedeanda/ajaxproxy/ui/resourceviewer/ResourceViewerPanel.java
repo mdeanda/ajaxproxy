@@ -7,12 +7,10 @@ import com.thedeanda.ajaxproxy.ui.model.ResourceListModel;
 import com.thedeanda.ajaxproxy.ui.resourceviewer.list.ResourceListPanel;
 import com.thedeanda.ajaxproxy.ui.resourceviewer.list.ResourceListPanelListener;
 import com.thedeanda.javajson.JsonObject;
-import javax.swing.BorderFactory;
-import javax.swing.JPanel;
-import javax.swing.JSplitPane;
-import javax.swing.SpringLayout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
 
 /**
  * this is the main resource panel that gets added to the application

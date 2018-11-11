@@ -1,9 +1,15 @@
 package com.thedeanda.ajaxproxy.ui.json;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Image;
-import java.awt.Toolkit;
+import com.thedeanda.ajaxproxy.ui.windows.WindowContainer;
+import com.thedeanda.ajaxproxy.ui.windows.WindowListListener;
+import com.thedeanda.ajaxproxy.ui.windows.WindowMenuHelper;
+import com.thedeanda.ajaxproxy.ui.windows.Windows;
+import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -11,22 +17,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Collection;
-
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.KeyStroke;
-
-import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.thedeanda.ajaxproxy.ui.windows.WindowContainer;
-import com.thedeanda.ajaxproxy.ui.windows.WindowListListener;
-import com.thedeanda.ajaxproxy.ui.windows.WindowMenuHelper;
-import com.thedeanda.ajaxproxy.ui.windows.Windows;
 
 public class JsonViewerFrame extends JFrame implements WindowListListener {
 	private static final long serialVersionUID = 1L;

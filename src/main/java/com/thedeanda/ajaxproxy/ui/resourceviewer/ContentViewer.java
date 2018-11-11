@@ -1,26 +1,17 @@
 package com.thedeanda.ajaxproxy.ui.resourceviewer;
 
-import java.awt.CardLayout;
-import java.util.concurrent.ExecutionException;
-
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
-import javax.swing.JTree;
-import javax.swing.SwingWorker;
-import javax.swing.tree.DefaultTreeModel;
-
-import org.apache.commons.lang3.ArrayUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.thedeanda.ajaxproxy.ui.resourceviewer.util.DocumentContainer;
 import com.thedeanda.ajaxproxy.ui.resourceviewer.util.DocumentParser;
 import com.thedeanda.ajaxproxy.ui.viewer.ImageViewer;
 import com.thedeanda.javajson.JsonArray;
+import org.apache.commons.lang3.ArrayUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import javax.swing.tree.DefaultTreeModel;
+import java.awt.*;
+import java.util.concurrent.ExecutionException;
 
 /**
  * this is a content viewer used to show input/ouput content of http requests.

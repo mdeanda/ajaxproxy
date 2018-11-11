@@ -1,13 +1,9 @@
 package com.thedeanda.ajaxproxy.servlet;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.io.RandomAccessFile;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.*;
 
 public class ResponseContentFile implements ResponseContent {
 	private static final Logger log = LoggerFactory.getLogger(ResponseContentFile.class);

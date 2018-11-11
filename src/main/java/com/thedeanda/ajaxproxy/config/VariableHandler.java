@@ -1,13 +1,12 @@
 package com.thedeanda.ajaxproxy.config;
 
-import java.util.List;
-import java.util.regex.Pattern;
-
-import org.apache.commons.lang3.StringUtils;
-
 import com.thedeanda.ajaxproxy.config.model.IntVariable;
 import com.thedeanda.ajaxproxy.config.model.StringVariable;
 import com.thedeanda.ajaxproxy.config.model.Variable;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.List;
+import java.util.regex.Pattern;
 
 public class VariableHandler {
 	private List<Variable> variables;

@@ -1,9 +1,16 @@
 package com.thedeanda.ajaxproxy.ui.rest;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Image;
-import java.awt.Toolkit;
+import com.thedeanda.ajaxproxy.http.RequestListener;
+import com.thedeanda.ajaxproxy.service.StoredResource;
+import com.thedeanda.ajaxproxy.ui.busy.BusyNotification;
+import com.thedeanda.ajaxproxy.ui.windows.*;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.Header;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -12,27 +19,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.KeyStroke;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.http.Header;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.thedeanda.ajaxproxy.http.RequestListener;
-import com.thedeanda.ajaxproxy.service.StoredResource;
-import com.thedeanda.ajaxproxy.ui.busy.BusyNotification;
-import com.thedeanda.ajaxproxy.ui.model.Resource;
-import com.thedeanda.ajaxproxy.ui.windows.WindowContainer;
-import com.thedeanda.ajaxproxy.ui.windows.WindowListListener;
-import com.thedeanda.ajaxproxy.ui.windows.WindowListListenerCleanup;
-import com.thedeanda.ajaxproxy.ui.windows.WindowMenuHelper;
-import com.thedeanda.ajaxproxy.ui.windows.Windows;
 
 public class RestClientFrame extends JFrame implements RequestListener,
 		WindowListListener {

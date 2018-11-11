@@ -1,9 +1,9 @@
 package com.thedeanda.ajaxproxy.ui.update;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.commons.lang3.StringUtils;
 
 public class ReleaseVersion implements Comparable<ReleaseVersion> {
 	private int major;

@@ -1,12 +1,11 @@
 package com.thedeanda.ajaxproxy.ui.proxy;
 
-import java.awt.Component;
-
-import javax.swing.JOptionPane;
-
 import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfig;
 import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigFile;
 import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigRequest;
+
+import javax.swing.*;
+import java.awt.*;
 
 public class ProxyEditorDialog {
 

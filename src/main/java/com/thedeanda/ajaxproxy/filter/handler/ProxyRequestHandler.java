@@ -1,24 +1,12 @@
 package com.thedeanda.ajaxproxy.filter.handler;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-
-import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.thedeanda.ajaxproxy.cache.model.CachedResponse;
+import com.thedeanda.ajaxproxy.config.model.proxy.HttpHeader;
+import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigRequest;
+import com.thedeanda.ajaxproxy.http.HttpClient;
+import com.thedeanda.ajaxproxy.http.HttpClient.RequestMethod;
+import com.thedeanda.ajaxproxy.http.RequestListener;
+import com.thedeanda.ajaxproxy.model.ProxyContainer;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -27,13 +15,15 @@ import org.apache.http.message.BasicHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.thedeanda.ajaxproxy.cache.model.CachedResponse;
-import com.thedeanda.ajaxproxy.config.model.proxy.HttpHeader;
-import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigRequest;
-import com.thedeanda.ajaxproxy.http.HttpClient;
-import com.thedeanda.ajaxproxy.http.HttpClient.RequestMethod;
-import com.thedeanda.ajaxproxy.http.RequestListener;
-import com.thedeanda.ajaxproxy.model.ProxyContainer;
+import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.net.URL;
+import java.util.*;
 
 public class ProxyRequestHandler implements RequestHandler {
 	private static final Logger log = LoggerFactory.getLogger(ProxyRequestHandler.class);

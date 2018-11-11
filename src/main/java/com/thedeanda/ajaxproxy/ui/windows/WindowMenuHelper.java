@@ -1,24 +1,16 @@
 package com.thedeanda.ajaxproxy.ui.windows;
 
+import com.thedeanda.ajaxproxy.ui.MainFrame;
+import com.thedeanda.ajaxproxy.ui.json.JsonViewerFrame;
+import com.thedeanda.ajaxproxy.ui.rest.RestClientFrame;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.util.Collection;
-
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JSeparator;
-import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.thedeanda.ajaxproxy.ui.MainFrame;
-import com.thedeanda.ajaxproxy.ui.json.JsonViewerFrame;
-import com.thedeanda.ajaxproxy.ui.rest.RestClientFrame;
 
 public class WindowMenuHelper implements WindowListListener {
 	private static final Logger log = LoggerFactory.getLogger(WindowMenuHelper.class);

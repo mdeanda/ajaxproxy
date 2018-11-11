@@ -1,22 +1,17 @@
 package com.thedeanda.ajaxproxy.http;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Arrays;
-import java.util.zip.DataFormatException;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.Inflater;
-
+import lzma.sdk.lzma.Decoder;
+import lzma.streams.LzmaInputStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import lzma.sdk.lzma.Decoder;
-import lzma.streams.LzmaInputStream;
+import java.io.*;
+import java.util.Arrays;
+import java.util.zip.DataFormatException;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.Inflater;
 
 public class NetworkUtil {
 	private static final Logger log = LoggerFactory.getLogger(NetworkUtil.class);

@@ -1,24 +1,24 @@
 package com.thedeanda.ajaxproxy;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-import java.io.File;
-import java.net.URL;
-import java.util.UUID;
-import java.util.concurrent.locks.ReentrantLock;
-
-import org.apache.http.Header;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-
+import com.thedeanda.ajaxproxy.config.ConfigService;
 import com.thedeanda.ajaxproxy.http.EmptyRequestListener;
 import com.thedeanda.ajaxproxy.http.HttpClient;
 import com.thedeanda.ajaxproxy.http.HttpClient.RequestMethod;
 import com.thedeanda.ajaxproxy.http.RequestListener;
 import com.thedeanda.javajson.JsonArray;
 import com.thedeanda.javajson.JsonObject;
+import org.apache.http.Header;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+
+import java.io.File;
+import java.net.URL;
+import java.util.UUID;
+import java.util.concurrent.locks.ReentrantLock;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * launches ajax proxy and confirms that headers match when making request
@@ -53,7 +53,8 @@ public class TestHeaders {
 		proxyPath.put(AjaxProxy.PATH, ".*");
 		proxyPath.put(AjaxProxy.PORT, 80);
 
-		AjaxProxy proxy = new AjaxProxy(config, new File("."), new EmptyRequestListener());
+		ConfigService configService = new ConfigService();
+		AjaxProxy proxy = new AjaxProxy(config, new File("."), new EmptyRequestListener(), configService);
 		new Thread(proxy).start();
 
 		Response realResponse = getResponse(REAL_URL);

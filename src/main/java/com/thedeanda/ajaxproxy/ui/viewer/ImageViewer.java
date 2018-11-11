@@ -1,11 +1,8 @@
 package com.thedeanda.ajaxproxy.ui.viewer;
 
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.image.BufferedImage;
-
-import javax.swing.JPanel;
 
 public class ImageViewer extends JPanel {
 	private static final long serialVersionUID = 1L;

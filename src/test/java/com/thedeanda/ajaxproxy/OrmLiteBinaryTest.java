@@ -1,12 +1,5 @@
 package com.thedeanda.ajaxproxy;
 
-import static org.junit.Assert.assertEquals;
-
-import java.sql.SQLException;
-
-import org.junit.Ignore;
-import org.junit.Test;
-
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.field.DataType;
@@ -15,6 +8,12 @@ import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.DatabaseTable;
 import com.j256.ormlite.table.TableUtils;
+import org.junit.Ignore;
+import org.junit.Test;
+
+import java.sql.SQLException;
+
+import static org.junit.Assert.assertEquals;
 
 public class OrmLiteBinaryTest {
 

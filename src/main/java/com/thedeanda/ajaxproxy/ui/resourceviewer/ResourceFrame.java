@@ -1,12 +1,10 @@
 package com.thedeanda.ajaxproxy.ui.resourceviewer;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-
-import javax.swing.JFrame;
-
 import com.thedeanda.ajaxproxy.service.ResourceService;
 import com.thedeanda.ajaxproxy.ui.model.Resource;
+
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * simple frame to view resources in a separate window

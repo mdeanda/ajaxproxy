@@ -1,15 +1,7 @@
 package com.thedeanda.ajaxproxy.ui.viewer;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.StringWriter;
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.imageio.ImageIO;
-
+import com.thedeanda.javajson.JsonArray;
+import com.thedeanda.javajson.JsonObject;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
@@ -18,8 +10,14 @@ import org.dom4j.DocumentHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.thedeanda.javajson.JsonArray;
-import com.thedeanda.javajson.JsonObject;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.StringWriter;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * convenience methods and data structure to load and hold parsed data

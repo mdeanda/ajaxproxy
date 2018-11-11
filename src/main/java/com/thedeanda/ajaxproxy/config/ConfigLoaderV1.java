@@ -1,17 +1,6 @@
 package com.thedeanda.ajaxproxy.config;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import com.thedeanda.ajaxproxy.config.model.Config;
-import com.thedeanda.ajaxproxy.config.model.IntVariable;
-import com.thedeanda.ajaxproxy.config.model.MergeConfig;
-import com.thedeanda.ajaxproxy.config.model.MergeMode;
-import com.thedeanda.ajaxproxy.config.model.ServerConfig;
-import com.thedeanda.ajaxproxy.config.model.StringVariable;
-import com.thedeanda.ajaxproxy.config.model.Variable;
+import com.thedeanda.ajaxproxy.config.model.*;
 import com.thedeanda.ajaxproxy.config.model.proxy.HttpHeader;
 import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfig;
 import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigFile;
@@ -19,8 +8,12 @@ import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigRequest;
 import com.thedeanda.javajson.JsonArray;
 import com.thedeanda.javajson.JsonObject;
 import com.thedeanda.javajson.JsonValue;
-
 import lombok.extern.slf4j.Slf4j;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @Slf4j
 public class ConfigLoaderV1 implements Loader {
