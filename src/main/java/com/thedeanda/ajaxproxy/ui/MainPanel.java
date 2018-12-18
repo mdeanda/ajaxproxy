@@ -2,6 +2,9 @@ package com.thedeanda.ajaxproxy.ui;
 
 import com.thedeanda.ajaxproxy.AjaxProxy;
 import com.thedeanda.ajaxproxy.ProxyListener;
+import com.thedeanda.ajaxproxy.config.ConfigService;
+import com.thedeanda.ajaxproxy.config.model.Config;
+import com.thedeanda.ajaxproxy.config.model.ConfigChangedListener;
 import com.thedeanda.ajaxproxy.service.ResourceService;
 import com.thedeanda.ajaxproxy.ui.border.RightBorder;
 import com.thedeanda.ajaxproxy.ui.logger.LoggerPanel;
@@ -32,11 +35,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class MainPanel extends JPanel implements ProxyListener, SettingsChangedListener, NavListener {
+public class MainPanel extends JPanel implements ProxyListener, SettingsChangedListener, NavListener, ConfigChangedListener {
 	private static final long serialVersionUID = 1L;
 	private static final Logger log = LoggerFactory.getLogger(MainPanel.class);
 	private static final int CACHE_SIZE = 50;
-	private final com.thedeanda.ajaxproxy.config.ConfigService configService;
+	private final ConfigService configService;
 
 	private boolean started = false;
 	private AjaxProxy proxy = null;
@@ -64,12 +67,13 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 	private static final String CARD_RESOURCE_VIEWER = "card_resource_viewer";
 	private static final String CARD_LOGGER = "card_logger";
 
-	public MainPanel(com.thedeanda.ajaxproxy.config.ConfigService configService) {
+	public MainPanel(ConfigService configService) {
 		this.configService = configService;
+		configService.addListener(this);
 		SpringLayout layout = new SpringLayout();
 		setLayout(layout);
 
-		File dbFile = ConfigService.get().getResourceHistoryDb();
+		File dbFile = SettingsConfigService.get().getResourceHistoryDb();
 		resourceService = new ResourceService(CACHE_SIZE, dbFile);
 
 		cardPanel = new JPanel();
@@ -213,7 +217,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		}
 	}
 
-	public void clearAll() {
+	private void clearAll() {
 		stop();
 		configFile = new File("");
 		config = new JsonObject();
@@ -350,5 +354,10 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 			start();
 			break;
 		}
+	}
+
+	@Override
+	public void configChanged(Config config) {
+		clearAll();
 	}
 }

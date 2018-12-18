@@ -1,7 +1,7 @@
 package com.thedeanda.ajaxproxy.ui.update;
 
 import com.thedeanda.ajaxproxy.http.SimpleHttpClient;
-import com.thedeanda.ajaxproxy.ui.ConfigService;
+import com.thedeanda.ajaxproxy.ui.SettingsConfigService;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -30,7 +30,7 @@ public class UpdateCheckWorker extends SwingWorker<Boolean, Void> {
 	@Override
 	protected Boolean doInBackground() throws Exception {
 		boolean retVal = false;
-		String version = ConfigService.get().getVersionString();
+		String version = SettingsConfigService.get().getVersionString();
 		if (StringUtils.isBlank(version)) {
 			return false;
 		}

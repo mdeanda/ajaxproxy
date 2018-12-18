@@ -1,7 +1,7 @@
 package com.thedeanda.ajaxproxy.http;
 
 import com.thedeanda.ajaxproxy.config.model.proxy.HttpHeader;
-import com.thedeanda.ajaxproxy.ui.ConfigService;
+import com.thedeanda.ajaxproxy.ui.SettingsConfigService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -65,7 +65,7 @@ public class HttpClient {
 			}
 		};
 		SSLContext ctx = getSslContext();
-		String version = ConfigService.get().getVersionString();
+		String version = SettingsConfigService.get().getVersionString();
 		client = HttpClientBuilder.create().disableAuthCaching().disableAutomaticRetries().disableConnectionState()
 				.disableContentCompression().disableCookieManagement().disableRedirectHandling()
 				.setSSLHostnameVerifier(verifier).setSslcontext(ctx)

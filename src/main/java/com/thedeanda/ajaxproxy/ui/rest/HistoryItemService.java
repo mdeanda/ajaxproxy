@@ -5,7 +5,7 @@ import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
-import com.thedeanda.ajaxproxy.ui.ConfigService;
+import com.thedeanda.ajaxproxy.ui.SettingsConfigService;
 
 import java.io.File;
 import java.sql.SQLException;
@@ -26,7 +26,7 @@ public class HistoryItemService {
 	}
 
 	private void initConnection() throws SQLException {
-		File dbFile = ConfigService.get().getRestHistoryDb();
+		File dbFile = SettingsConfigService.get().getRestHistoryDb();
 
 		try {
 			String databaseUrl = "jdbc:h2:file:" + dbFile.getAbsolutePath();

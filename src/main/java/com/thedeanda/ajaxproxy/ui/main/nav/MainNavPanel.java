@@ -1,6 +1,8 @@
 package com.thedeanda.ajaxproxy.ui.main.nav;
 
 import com.thedeanda.ajaxproxy.config.ConfigService;
+import com.thedeanda.ajaxproxy.config.model.Config;
+import com.thedeanda.ajaxproxy.config.model.ConfigChangedListener;
 import com.thedeanda.ajaxproxy.ui.border.BottomBorder;
 import lombok.extern.slf4j.Slf4j;
 
@@ -15,8 +17,9 @@ import java.util.List;
 import java.util.Set;
 
 @Slf4j
-public class MainNavPanel extends JPanel {
+public class MainNavPanel extends JPanel implements ConfigChangedListener {
 	private static final long serialVersionUID = -844239892839389886L;
+	private final ConfigService configService;
 	private List<JComponent> buttons = new ArrayList<>();
 
 	private Set<NavListener> listeners = new HashSet<>();
@@ -28,6 +31,8 @@ public class MainNavPanel extends JPanel {
 
 	public MainNavPanel(ConfigService configService) {
 		JPanel panel = this;
+		configService.addListener(this);
+		this.configService = configService;
 
 		createNavButton(this, "Server", "Server", NavItem.Server, 0);
 		createNavButton(this, "Requests", "Request Viewer", NavItem.RequestViewer, 0);
@@ -224,5 +229,10 @@ public class MainNavPanel extends JPanel {
 
 		// TODO: calculate this based on total number of buttons
 		setPreferredSize(new Dimension(1, 200));
+	}
+
+	@Override
+	public void configChanged(Config config) {
+		log.warn("config changed: {}", config);
 	}
 }

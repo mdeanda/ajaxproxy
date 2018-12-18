@@ -1,6 +1,7 @@
 package com.thedeanda.ajaxproxy.ui;
 
 import com.thedeanda.ajaxproxy.ProxyListener;
+import com.thedeanda.ajaxproxy.config.ConfigService;
 import com.thedeanda.ajaxproxy.ui.json.JsonViewerFrame;
 import com.thedeanda.ajaxproxy.ui.rest.RestClientFrame;
 import com.thedeanda.ajaxproxy.ui.windows.*;
@@ -22,7 +23,7 @@ import java.util.List;
 public class MainFrame extends JFrame implements ProxyListener, WindowListListener {
 	private static final long serialVersionUID = 1L;
 	private static final Logger log = LoggerFactory.getLogger(MainFrame.class);
-    private final com.thedeanda.ajaxproxy.config.ConfigService configService;
+    private final ConfigService configService;
     private boolean USE_TRAY = false; // got slightly buggy, disable for now
 	private MainPanel panel;
 	final JFileChooser fc = new JFileChooser();
@@ -30,7 +31,7 @@ public class MainFrame extends JFrame implements ProxyListener, WindowListListen
 	private List<File> recentFiles;
 	private JMenu recentMenu;
 	private Image image;
-	private File file = null;
+	private File file = null; //TODO: manage this via config service
 	private boolean ignoreSaveSettings = false;
 	private MenuItem stopServerMenuItem_tray;
 	private JMenuItem stopServerMenuItem2;
@@ -44,7 +45,7 @@ public class MainFrame extends JFrame implements ProxyListener, WindowListListen
 	private String windowId;
 
 	public MainFrame() {
-	    configService = new com.thedeanda.ajaxproxy.config.ConfigService();
+	    configService = new ConfigService();
         this.panel = new MainPanel(configService);
 		updateTitle();
 		recentFiles = new ArrayList<File>();
@@ -83,7 +84,7 @@ public class MainFrame extends JFrame implements ProxyListener, WindowListListen
 		if (file != null) {
 			title += " - " + file.getAbsolutePath();
 		}
-		title = ConfigService.get().generateWindowTitle(title);
+		title = SettingsConfigService.get().generateWindowTitle(title);
 
 		setTitle(title);
 		Windows.get().notifyOfChange();
@@ -329,7 +330,7 @@ public class MainFrame extends JFrame implements ProxyListener, WindowListListen
 	private void handleNew() {
 		// TODO: prompt for unsaved changes
 		handleStop();
-		panel.clearAll();
+		configService.newConfig();
 		file = null;
 		updateTitle();
 	}
@@ -406,7 +407,7 @@ public class MainFrame extends JFrame implements ProxyListener, WindowListListen
 
 	private JsonObject loadSettings() {
 		JsonObject ret = null;
-		File f = ConfigService.get().getConfigFile();
+		File f = SettingsConfigService.get().getConfigFile();
 		if (f.exists()) {
 			InputStream is = null;
 			try {
@@ -479,7 +480,7 @@ public class MainFrame extends JFrame implements ProxyListener, WindowListListen
 			return;
 		log.info("saving recents");
 
-		File f = ConfigService.get().getConfigFile();
+		File f = SettingsConfigService.get().getConfigFile();
 		JsonObject json = new JsonObject();
 		Set<String> repeats = new HashSet<String>();
 		for (File recent : recentFiles) {

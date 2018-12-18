@@ -14,13 +14,13 @@ import java.util.Properties;
 /**
  * this service is misnamed as its really for settings and not a "proxy config" file
  */
-public class ConfigService {
-	private static final Logger log = LoggerFactory.getLogger(ConfigService.class);
-	private static ConfigService instance = new ConfigService();
+public class SettingsConfigService {
+	private static final Logger log = LoggerFactory.getLogger(SettingsConfigService.class);
+	private static SettingsConfigService instance = new SettingsConfigService();
 	private File configDir;
 	private String version = null;
 
-	private ConfigService() {
+	private SettingsConfigService() {
 		configDir = new File(System.getProperty("user.home") + File.separator + ".ajaxproxy");
 		try {
 			migrateV1toV2();
@@ -31,7 +31,7 @@ public class ConfigService {
 		loadVersionString();
 	}
 
-	public static ConfigService get() {
+	public static SettingsConfigService get() {
 		return instance;
 	}
 
