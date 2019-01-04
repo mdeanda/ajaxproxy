@@ -254,7 +254,7 @@ public class HttpClient {
 					listener);
 
 		} catch (Exception e) {
-			log.warn(e.getMessage(), e);
+			log.debug(e.getMessage(), e);
 			fireError(id, e.getMessage(), e, listener);
 		} finally {
 			if (request != null) {
