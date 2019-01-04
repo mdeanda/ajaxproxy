@@ -5,6 +5,7 @@ import com.thedeanda.ajaxproxy.config.model.StringVariable;
 import lombok.Builder;
 import lombok.Data;
 
+@Builder
 @Data
 public class ProxyConfigLogger implements ProxyConfig {
 	@Builder.Default
