@@ -1,18 +1,9 @@
 package com.thedeanda.ajaxproxy.filter.handler;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -110,7 +101,8 @@ public class ProxyRequestHandler implements RequestHandler {
 					requestListener);
 			cachedResponse.setRequestPath(requestPath);
 			cachedResponse.setQueryString(queryString);
-			if (cachedResponse.getStatus() > 0 && "GET".equals(request.getMethod())) {
+			if (cachedResponse.getStatus() > 0 && cachedResponse.getStatus() < 300
+					&& "GET".equals(request.getMethod())) {
 				proxy.getCache().cache(cachedResponse);
 			}
 		} else {
@@ -171,22 +163,55 @@ public class ProxyRequestHandler implements RequestHandler {
 							}
 							IOUtils.copy(new ByteArrayInputStream(data), os);
 						} catch (Exception e) {
-
+							log.warn(e.getMessage(), e);
 						}
 
 						listener.requestComplete(id, status, reason, duration, responseHeaders, data);
 					}
 
 					@Override
-					public void error(UUID id, String message, Exception e) {
+					public void error(UUID id, String message, Exception ex) {
 						// chain.doFilter(request, response);
-						log.debug("error: id/message/ex - {}, {}, {}", id, message, e);
-						listener.error(id, message, e);
+						log.debug("error: id/message/ex - {}, {}, {}", id, message, ex);
+
+						//add generic 502 error content
+						cachedResponse.setStatus(502);
+						send502(response);
+						listener.error(id, message, ex);
 					}
 
 				});
 
 		return cachedResponse;
+	}
+
+	private void send502(HttpServletResponse response) {
+		// TODO: read Server name/version string from common place. current method is tied to ui code
+		String appVersion = "AjaxProxy";
+		Date dt = new Date();
+		SimpleDateFormat sdf = new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss z");
+		sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+
+		response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
+		response.setHeader("Server", appVersion);
+		response.setHeader("Date", sdf.format(dt));
+		response.setHeader("Content-Type", "text/html");
+
+
+		try {
+			ServletOutputStream os = response.getOutputStream();
+			StringBuilder sb = new StringBuilder();
+			sb.append("<html>\n");
+			sb.append("<head><title>502 Bad Gateway</title></head>\n");
+			sb.append("<body bgcolor=\"white\">\n");
+			sb.append("<center><h1>502 Bad Gateway</h1></center>\n");
+			sb.append("<hr><center>" + appVersion + "</center>\n");
+			sb.append("</body>\n");
+			sb.append("</html>\n");
+			IOUtils.copy(new StringReader(sb.toString()), os, "UTF-8");
+		} catch (Exception e) {
+			log.warn(e.getMessage(), e);
+		}
 	}
 
 	private void sendCachedResponse(HttpServletRequest request, List<HttpHeader> inputHeaders, CachedResponse cachedResponse,
