@@ -8,16 +8,12 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.BorderFactory;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.SpringLayout;
+import javax.swing.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +41,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 	private static final long serialVersionUID = 1L;
 	private static final Logger log = LoggerFactory.getLogger(MainPanel.class);
 	private static final int CACHE_SIZE = 50;
+	private final JToolBar toolBar;
 
 	private boolean started = false;
 	private AjaxProxy proxy = null;
@@ -78,6 +75,9 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 
 		File dbFile = ConfigService.get().getResourceHistoryDb();
 		resourceService = new ResourceService(CACHE_SIZE, dbFile);
+
+		toolBar = initToolbar();
+		add(toolBar);
 
 		cardPanel = new JPanel();
 		cardLayout = new CardLayout();
@@ -123,17 +123,70 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		navPanel.addNavListener(this);
 		navPanel.setBorder(new RightBorder());
 
-		layout.putConstraint(SpringLayout.NORTH, navComponent, 0, SpringLayout.NORTH, this);
+		layout.putConstraint(SpringLayout.NORTH, toolBar, 0, SpringLayout.NORTH, this);
+		layout.putConstraint(SpringLayout.WEST, toolBar, 0, SpringLayout.WEST, this);
+		layout.putConstraint(SpringLayout.EAST, toolBar, 0, SpringLayout.EAST, this);
+
+
+		layout.putConstraint(SpringLayout.NORTH, navComponent, 0, SpringLayout.SOUTH, toolBar);
 		layout.putConstraint(SpringLayout.SOUTH, navComponent, 0, SpringLayout.SOUTH, this);
 		layout.putConstraint(SpringLayout.WEST, navComponent, 0, SpringLayout.WEST, this);
 		layout.putConstraint(SpringLayout.EAST, navComponent, 125, SpringLayout.WEST, navComponent);
 
-		layout.putConstraint(SpringLayout.NORTH, cardPanel, 0, SpringLayout.NORTH, this);
+		layout.putConstraint(SpringLayout.NORTH, cardPanel, 0, SpringLayout.SOUTH, toolBar);
 		layout.putConstraint(SpringLayout.WEST, cardPanel, 0, SpringLayout.EAST, navComponent);
 		layout.putConstraint(SpringLayout.EAST, cardPanel, 0, SpringLayout.EAST, this);
 		layout.putConstraint(SpringLayout.SOUTH, cardPanel, 0, SpringLayout.SOUTH, this);
 
 		clearAll();
+	}
+
+	private JToolBar initToolbar() {
+		JToolBar toolBar = new JToolBar("Still draggable");
+		toolBar.setFloatable(false);
+		toolBar.setRollover(true);
+
+		JComponent button = null;
+
+		//first button
+		button = makeNavigationButton("Back24", "PREVIOUS",
+				"Back to previous something-or-other",
+				"Previous");
+		toolBar.add(button);
+
+		//second button
+		button = makeNavigationButton("Up24", "UP",
+				"Up to something-or-other",
+				"Up");
+		toolBar.add(button);
+
+		return toolBar;
+	}
+
+	protected JComponent makeNavigationButton(String imageName,
+										   String actionCommand,
+										   String toolTipText,
+										   String altText) {
+		//Look for the image.
+		String imgLocation = "images/"
+				+ imageName
+				+ ".gif";
+		URL imageURL = MainPanel.class.getResource(imgLocation);
+
+		//Create and initialize the button.
+		JButton button = new JButton();
+		button.setActionCommand(actionCommand);
+		button.setToolTipText(toolTipText);
+		//button.addActionListener(this);
+
+		if (imageURL != null) {                      //image found
+			button.setIcon(new ImageIcon(imageURL, altText));
+		} else {                                     //no image found
+			button.setText(altText);
+			log.warn("Resource not found: " + imgLocation);
+		}
+
+		return button;
 	}
 
 	public void addProxyListener(ProxyListener listener) {
