@@ -3,6 +3,10 @@ package com.thedeanda.ajaxproxy.ui;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Desktop;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -37,11 +41,13 @@ import com.thedeanda.ajaxproxy.ui.variable.VariablesPanel;
 import com.thedeanda.javajson.JsonException;
 import com.thedeanda.javajson.JsonObject;
 
-public class MainPanel extends JPanel implements ProxyListener, SettingsChangedListener, NavListener {
-	private static final long serialVersionUID = 1L;
+public class MainPanel extends JPanel implements ProxyListener, SettingsChangedListener, NavListener, ActionListener {
 	private static final Logger log = LoggerFactory.getLogger(MainPanel.class);
 	private static final int CACHE_SIZE = 50;
 	private final JToolBar toolBar;
+	private static final String COMMAND_SERVER = "server";
+	private static final String COMMAND_RESOURCE = "resource";
+	private static final String COMMAND_LOGGER = "logger";
 
 	private boolean started = false;
 	private AjaxProxy proxy = null;
@@ -142,28 +148,46 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 	}
 
 	private JToolBar initToolbar() {
-		JToolBar toolBar = new JToolBar("Still draggable");
+		JToolBar toolBar = new JToolBar();
 		toolBar.setFloatable(false);
 		toolBar.setRollover(true);
 
-		JComponent button = null;
+		JButton button = null;
 
-		//first button
-		button = makeNavigationButton("Back24", "PREVIOUS",
-				"Back to previous something-or-other",
-				"Previous");
+		button = makeNavigationButton("Back24", COMMAND_SERVER,
+				"Configure server and proxy paths",
+				"Server Config");
+		toolBar.add(button);
+		//prepPopup(button);
+
+		button = makeNavigationButton("Up24", COMMAND_RESOURCE,
+				"View requested handled by Ajax Proxy",
+				"Request Viewer");
 		toolBar.add(button);
 
-		//second button
-		button = makeNavigationButton("Up24", "UP",
-				"Up to something-or-other",
-				"Up");
+		button = makeNavigationButton("Up24", COMMAND_LOGGER,
+				"View log messages posted by a remote application",
+				"Logger");
 		toolBar.add(button);
 
 		return toolBar;
 	}
 
-	protected JComponent makeNavigationButton(String imageName,
+	private void prepPopup(JComponent btn) {
+		JPopupMenu pop = new JPopupMenu("test");
+		JMenuItem cutMenuItem = new JMenuItem("Cut");
+		cutMenuItem.setActionCommand("Cut");
+		pop.add(cutMenuItem);
+
+		btn.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
+				pop.show(MainPanel.this, 5, btn.getHeight()+2);
+			}
+		});
+
+	}
+
+	protected JButton makeNavigationButton(String imageName,
 										   String actionCommand,
 										   String toolTipText,
 										   String altText) {
@@ -177,7 +201,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		JButton button = new JButton();
 		button.setActionCommand(actionCommand);
 		button.setToolTipText(toolTipText);
-		//button.addActionListener(this);
+		button.addActionListener(this);
 
 		if (imageURL != null) {                      //image found
 			button.setIcon(new ImageIcon(imageURL, altText));
@@ -409,6 +433,26 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		case Start:
 			start();
 			break;
+		}
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+
+		switch (e.getActionCommand()) {
+			case COMMAND_SERVER:
+				cardLayout.show(cardPanel, CARD_SERVER);
+
+				break;
+			case COMMAND_RESOURCE:
+				cardLayout.show(cardPanel, CARD_RESOURCE_VIEWER);
+
+				break;
+			case COMMAND_LOGGER:
+				cardLayout.show(cardPanel, CARD_LOGGER);
+
+				break;
+			default:
 		}
 	}
 }
