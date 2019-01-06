@@ -74,6 +74,9 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 	private static final String CARD_SERVER = "card_server";
 	private static final String CARD_RESOURCE_VIEWER = "card_resource_viewer";
 	private static final String CARD_LOGGER = "card_logger";
+	private JToggleButton serverToolbarButton;
+	private JToggleButton requestToolbarButton;
+	private JToggleButton loggerToolbarButton;
 
 	public MainPanel() {
 		SpringLayout layout = new SpringLayout();
@@ -152,23 +155,26 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		toolBar.setFloatable(false);
 		toolBar.setRollover(true);
 
-		JButton button = null;
+		JToggleButton button = null;
 
-		button = makeNavigationButton("Back24", COMMAND_SERVER,
+		button = makeNavigationButton("a", COMMAND_SERVER,
 				"Configure server and proxy paths",
 				"Server Config");
 		toolBar.add(button);
 		//prepPopup(button);
+		serverToolbarButton = button;
 
-		button = makeNavigationButton("Up24", COMMAND_RESOURCE,
+		button = makeNavigationButton("b", COMMAND_RESOURCE,
 				"View requested handled by Ajax Proxy",
 				"Request Viewer");
 		toolBar.add(button);
+		requestToolbarButton = button;
 
-		button = makeNavigationButton("Up24", COMMAND_LOGGER,
+		button = makeNavigationButton("c", COMMAND_LOGGER,
 				"View log messages posted by a remote application",
 				"Logger");
 		toolBar.add(button);
+		loggerToolbarButton = button;
 
 		return toolBar;
 	}
@@ -187,7 +193,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 
 	}
 
-	protected JButton makeNavigationButton(String imageName,
+	protected JToggleButton makeNavigationButton(String imageName,
 										   String actionCommand,
 										   String toolTipText,
 										   String altText) {
@@ -198,7 +204,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		URL imageURL = MainPanel.class.getResource(imgLocation);
 
 		//Create and initialize the button.
-		JButton button = new JButton();
+		JToggleButton button = new JToggleButton();
 		button.setActionCommand(actionCommand);
 		button.setToolTipText(toolTipText);
 		button.addActionListener(this);
@@ -419,13 +425,13 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 	public void navEvent(NavItem navItem, int index) {
 		switch (navItem) {
 		case Logger:
-			cardLayout.show(cardPanel, CARD_LOGGER);
+			showCard(CARD_LOGGER);
 			break;
 		case RequestViewer:
-			cardLayout.show(cardPanel, CARD_RESOURCE_VIEWER);
+			showCard(CARD_RESOURCE_VIEWER);
 			break;
 		case Server:
-			cardLayout.show(cardPanel, CARD_SERVER);
+			showCard(CARD_SERVER);
 			break;
 		case Stop:
 			stop();
@@ -441,16 +447,37 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 
 		switch (e.getActionCommand()) {
 			case COMMAND_SERVER:
-				cardLayout.show(cardPanel, CARD_SERVER);
+				showCard(CARD_SERVER);
 
 				break;
 			case COMMAND_RESOURCE:
-				cardLayout.show(cardPanel, CARD_RESOURCE_VIEWER);
+				showCard(CARD_RESOURCE_VIEWER);
 
 				break;
 			case COMMAND_LOGGER:
-				cardLayout.show(cardPanel, CARD_LOGGER);
+				showCard(CARD_LOGGER);
 
+				break;
+			default:
+		}
+	}
+
+	private void showCard(String cardName) {
+		serverToolbarButton.setSelected(false);
+		requestToolbarButton.setSelected(false);
+		loggerToolbarButton.setSelected(false);
+
+		cardLayout.show(cardPanel, cardName);
+
+		switch(cardName) {
+			case CARD_SERVER:
+				serverToolbarButton.setSelected(true);
+				break;
+			case CARD_RESOURCE_VIEWER:
+				requestToolbarButton.setSelected(true);
+				break;
+			case CARD_LOGGER:
+				loggerToolbarButton.setSelected(true);
 				break;
 			default:
 		}
