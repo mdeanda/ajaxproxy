@@ -19,6 +19,7 @@ import java.util.Map;
 
 import javax.swing.*;
 
+import com.thedeanda.ajaxproxy.ui.border.TopBorder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,9 +46,6 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 	private static final Logger log = LoggerFactory.getLogger(MainPanel.class);
 	private static final int CACHE_SIZE = 50;
 	private final JToolBar toolBar;
-	private static final String COMMAND_SERVER = "server";
-	private static final String COMMAND_RESOURCE = "resource";
-	private static final String COMMAND_LOGGER = "logger";
 
 	private boolean started = false;
 	private AjaxProxy proxy = null;
@@ -80,19 +78,24 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 
 	public MainPanel() {
 		SpringLayout layout = new SpringLayout();
-		setLayout(layout);
+		setLayout(new BorderLayout());
 
 		File dbFile = ConfigService.get().getResourceHistoryDb();
 		resourceService = new ResourceService(CACHE_SIZE, dbFile);
 
 		toolBar = initToolbar();
-		add(toolBar);
+		add(toolBar, BorderLayout.NORTH);
+
+		JPanel contentPanel = new JPanel();
+		contentPanel.setLayout(layout);
+		contentPanel.setBorder(new TopBorder());
+		add(contentPanel, BorderLayout.CENTER);
 
 		cardPanel = new JPanel();
 		cardLayout = new CardLayout();
 		cardPanel.setLayout(cardLayout);
 
-		add(cardPanel);
+		contentPanel.add(cardPanel);
 
 		JTabbedPane tabs = new JTabbedPane();
 		JPanel tabsPanel = new JPanel();
@@ -127,25 +130,27 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 
 		navPanel = new MainNavPanel();
 		JScrollPane navComponent = new JScrollPane(navPanel);
-		add(navComponent);
+		contentPanel.add(navComponent);
 		navComponent.setBorder(null);
 		navPanel.addNavListener(this);
 		navPanel.setBorder(new RightBorder());
 
+		/*
 		layout.putConstraint(SpringLayout.NORTH, toolBar, 0, SpringLayout.NORTH, this);
 		layout.putConstraint(SpringLayout.WEST, toolBar, 0, SpringLayout.WEST, this);
 		layout.putConstraint(SpringLayout.EAST, toolBar, 0, SpringLayout.EAST, this);
+		*/
 
 
-		layout.putConstraint(SpringLayout.NORTH, navComponent, 0, SpringLayout.SOUTH, toolBar);
-		layout.putConstraint(SpringLayout.SOUTH, navComponent, 0, SpringLayout.SOUTH, this);
-		layout.putConstraint(SpringLayout.WEST, navComponent, 0, SpringLayout.WEST, this);
+		layout.putConstraint(SpringLayout.NORTH, navComponent, 2, SpringLayout.NORTH, contentPanel);
+		layout.putConstraint(SpringLayout.SOUTH, navComponent, 0, SpringLayout.SOUTH, contentPanel);
+		layout.putConstraint(SpringLayout.WEST, navComponent, 0, SpringLayout.WEST, contentPanel);
 		layout.putConstraint(SpringLayout.EAST, navComponent, 125, SpringLayout.WEST, navComponent);
 
-		layout.putConstraint(SpringLayout.NORTH, cardPanel, 0, SpringLayout.SOUTH, toolBar);
+		layout.putConstraint(SpringLayout.NORTH, cardPanel, 2, SpringLayout.NORTH, contentPanel);
 		layout.putConstraint(SpringLayout.WEST, cardPanel, 0, SpringLayout.EAST, navComponent);
-		layout.putConstraint(SpringLayout.EAST, cardPanel, 0, SpringLayout.EAST, this);
-		layout.putConstraint(SpringLayout.SOUTH, cardPanel, 0, SpringLayout.SOUTH, this);
+		layout.putConstraint(SpringLayout.EAST, cardPanel, 0, SpringLayout.EAST, contentPanel);
+		layout.putConstraint(SpringLayout.SOUTH, cardPanel, 0, SpringLayout.SOUTH, contentPanel);
 
 		clearAll();
 	}
@@ -157,20 +162,20 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 
 		JToggleButton button = null;
 
-		button = makeNavigationButton("a", COMMAND_SERVER,
+		button = makeNavigationButton("a", CARD_SERVER,
 				"Configure server and proxy paths",
 				"Server Config");
 		toolBar.add(button);
 		//prepPopup(button);
 		serverToolbarButton = button;
 
-		button = makeNavigationButton("b", COMMAND_RESOURCE,
+		button = makeNavigationButton("b", CARD_RESOURCE_VIEWER,
 				"View requested handled by Ajax Proxy",
 				"Request Viewer");
 		toolBar.add(button);
 		requestToolbarButton = button;
 
-		button = makeNavigationButton("c", COMMAND_LOGGER,
+		button = makeNavigationButton("c", CARD_LOGGER,
 				"View log messages posted by a remote application",
 				"Logger");
 		toolBar.add(button);
@@ -444,42 +449,33 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		showCard(e.getActionCommand());
+	}
 
-		switch (e.getActionCommand()) {
-			case COMMAND_SERVER:
-				showCard(CARD_SERVER);
+	private void showCard(String cardName) {
 
+		switch(cardName) {
+			case CARD_SERVER:
+				selectedCard(CARD_SERVER, serverToolbarButton);
 				break;
-			case COMMAND_RESOURCE:
-				showCard(CARD_RESOURCE_VIEWER);
-
+			case CARD_RESOURCE_VIEWER:
+				selectedCard(CARD_RESOURCE_VIEWER, requestToolbarButton);
 				break;
-			case COMMAND_LOGGER:
-				showCard(CARD_LOGGER);
-
+			case CARD_LOGGER:
+				selectedCard(CARD_LOGGER, loggerToolbarButton);
 				break;
 			default:
 		}
 	}
 
-	private void showCard(String cardName) {
+	private void selectedCard(String cardName, JToggleButton selectedToolbarButton) {
 		serverToolbarButton.setSelected(false);
 		requestToolbarButton.setSelected(false);
-		loggerToolbarButton.setSelected(false);
+		this.loggerToolbarButton.setSelected(false);
 
 		cardLayout.show(cardPanel, cardName);
 
-		switch(cardName) {
-			case CARD_SERVER:
-				serverToolbarButton.setSelected(true);
-				break;
-			case CARD_RESOURCE_VIEWER:
-				requestToolbarButton.setSelected(true);
-				break;
-			case CARD_LOGGER:
-				loggerToolbarButton.setSelected(true);
-				break;
-			default:
-		}
+		selectedToolbarButton.setSelected(true);
+
 	}
 }

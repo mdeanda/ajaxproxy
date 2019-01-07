@@ -103,7 +103,7 @@ public class Main {
 			final Map<String, String> vars) {
 		System.setProperty("apple.laf.useScreenMenuBar", "true");
 		System.setProperty("com.apple.mrj.application.apple.menu.about.name",
-				"Ajaxproxy");
+				"AjaxProxy");
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				try {
