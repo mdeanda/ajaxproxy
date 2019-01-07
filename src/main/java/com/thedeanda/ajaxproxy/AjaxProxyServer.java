@@ -44,8 +44,8 @@ import com.thedeanda.javajson.JsonArray;
 import com.thedeanda.javajson.JsonObject;
 import com.thedeanda.javajson.JsonValue;
 
-public class AjaxProxy implements Runnable, LoggerMessageListener {
-	private static final Logger log = LoggerFactory.getLogger(AjaxProxy.class);
+public class AjaxProxyServer implements Runnable, LoggerMessageListener {
+	private static final Logger log = LoggerFactory.getLogger(AjaxProxyServer.class);
 	// TODO: move to config
 	private String keystoreFile = "";
 	private String keystorePassword = "";
@@ -79,11 +79,11 @@ public class AjaxProxy implements Runnable, LoggerMessageListener {
 	private static final String MODE = "mode";
 	private static final String MINIFY = "minify";
 
-	public AjaxProxy(JsonObject config, File workingDir, RequestListener listener) throws Exception {
+	public AjaxProxyServer(JsonObject config, File workingDir, RequestListener listener) throws Exception {
 		init(config, workingDir, listener);
 	}
 
-	public AjaxProxy(String configFile) throws Exception {
+	public AjaxProxyServer(String configFile) throws Exception {
 		log.info("using config file: " + configFile);
 		File cf = new File(configFile);
 		if (!cf.exists())

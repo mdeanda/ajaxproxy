@@ -19,11 +19,11 @@ import java.util.Map;
 
 import javax.swing.*;
 
+import com.thedeanda.ajaxproxy.AjaxProxyServer;
 import com.thedeanda.ajaxproxy.ui.border.TopBorder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.thedeanda.ajaxproxy.AjaxProxy;
 import com.thedeanda.ajaxproxy.ProxyListener;
 import com.thedeanda.ajaxproxy.service.ResourceService;
 import com.thedeanda.ajaxproxy.ui.border.RightBorder;
@@ -48,7 +48,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 	private final JToolBar toolBar;
 
 	private boolean started = false;
-	private AjaxProxy proxy = null;
+	private AjaxProxyServer proxy = null;
 	private ProxyTableModel proxyModel;
 	private MergeTableModel mergeModel;
 	private File configFile;
@@ -134,13 +134,6 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		navComponent.setBorder(null);
 		navPanel.addNavListener(this);
 		navPanel.setBorder(new RightBorder());
-
-		/*
-		layout.putConstraint(SpringLayout.NORTH, toolBar, 0, SpringLayout.NORTH, this);
-		layout.putConstraint(SpringLayout.WEST, toolBar, 0, SpringLayout.WEST, this);
-		layout.putConstraint(SpringLayout.EAST, toolBar, 0, SpringLayout.EAST, this);
-		*/
-
 
 		layout.putConstraint(SpringLayout.NORTH, navComponent, 2, SpringLayout.NORTH, contentPanel);
 		layout.putConstraint(SpringLayout.SOUTH, navComponent, 0, SpringLayout.SOUTH, contentPanel);
@@ -294,7 +287,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 			File workingDir = configFile.getParentFile();
 			if (workingDir == null)
 				workingDir = new File(".");
-			proxy = new AjaxProxy(json, workingDir, resourceService);
+			proxy = new AjaxProxyServer(json, workingDir, resourceService);
 			proxy.addProxyListener(this);
 			new Thread(proxy).start();
 			generalPanel.setProxy(proxy);
@@ -325,7 +318,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		try {
 			if (proxy != null) {
 				log.info("stopping server");
-				AjaxProxy p = proxy;
+				AjaxProxyServer p = proxy;
 				proxy = null;
 				p.stop();
 				generalPanel.setProxy(null);

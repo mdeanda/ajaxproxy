@@ -12,7 +12,7 @@ import javax.swing.SpringLayout;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import com.thedeanda.ajaxproxy.AjaxProxy;
+import com.thedeanda.ajaxproxy.AjaxProxyServer;
 import com.thedeanda.ajaxproxy.filter.handler.logger.LoggerMessage;
 import com.thedeanda.ajaxproxy.ui.SwingUtils;
 import com.thedeanda.javajson.JsonObject;
@@ -104,7 +104,7 @@ public class LoggerPanel extends JPanel {
 
 	}
 
-	public void setProxy(AjaxProxy proxy) {
+	public void setProxy(AjaxProxyServer proxy) {
 		if (proxy != null) {
 			proxy.addLoggerMessageListener(loggerTableModel);
 		}

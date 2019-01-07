@@ -43,17 +43,17 @@ public class TestHeaders {
 	@Test
 	public void testHeadersNewProxy() throws Exception {
 		JsonObject config = new JsonObject();
-		config.put(AjaxProxy.RESOURCE_BASE, ".");
-		config.put(AjaxProxy.PORT, 8888);
+		config.put(AjaxProxyServer.RESOURCE_BASE, ".");
+		config.put(AjaxProxyServer.PORT, 8888);
 		JsonArray proxyArray = new JsonArray();
-		config.put(AjaxProxy.PROXY_ARRAY, proxyArray);
+		config.put(AjaxProxyServer.PROXY_ARRAY, proxyArray);
 		JsonObject proxyPath = new JsonObject();
 		proxyArray.add(proxyPath);
-		proxyPath.put(AjaxProxy.DOMAIN, REAL_HOST);
-		proxyPath.put(AjaxProxy.PATH, ".*");
-		proxyPath.put(AjaxProxy.PORT, 80);
+		proxyPath.put(AjaxProxyServer.DOMAIN, REAL_HOST);
+		proxyPath.put(AjaxProxyServer.PATH, ".*");
+		proxyPath.put(AjaxProxyServer.PORT, 80);
 
-		AjaxProxy proxy = new AjaxProxy(config, new File("."), new EmptyRequestListener());
+		AjaxProxyServer proxy = new AjaxProxyServer(config, new File("."), new EmptyRequestListener());
 		new Thread(proxy).start();
 
 		Response realResponse = getResponse(REAL_URL);

@@ -24,7 +24,7 @@ import javax.swing.event.ChangeListener;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.thedeanda.ajaxproxy.AjaxProxy;
+import com.thedeanda.ajaxproxy.AjaxProxyServer;
 import com.thedeanda.ajaxproxy.filter.ThrottleFilter;
 import com.thedeanda.ajaxproxy.ui.options.OptionValue;
 import com.thedeanda.javajson.JsonObject;
@@ -36,7 +36,7 @@ public class GeneralPanel extends JPanel implements ChangeListener,
 	private JTextField resourceBase;
 	private JCheckBox indexCheck;
 
-	private AjaxProxy proxy;
+	private AjaxProxyServer proxy;
 	private JSlider forcedLatency;
 	private List<OptionValue> delayOptionValues;
 	private JButton folderButton;
@@ -238,7 +238,7 @@ public class GeneralPanel extends JPanel implements ChangeListener,
 		return indexCheck.isSelected();
 	}
 
-	public void setProxy(AjaxProxy proxy) {
+	public void setProxy(AjaxProxyServer proxy) {
 		this.proxy = proxy;
 		this.applyOptions();
 	}
@@ -275,7 +275,7 @@ public class GeneralPanel extends JPanel implements ChangeListener,
 
 		setPort(config.getInt("port"));
 		setResourceBase(config.getString("resourceBase"));
-		setShowIndex(config.getBoolean(AjaxProxy.SHOW_INDEX));
+		setShowIndex(config.getBoolean(AjaxProxyServer.SHOW_INDEX));
 
 		JsonObject options = config.getJsonObject("options");
 		if (options != null) {
@@ -288,7 +288,7 @@ public class GeneralPanel extends JPanel implements ChangeListener,
 	public void updateConfig(JsonObject config) {
 		config.put("port", getPort());
 		config.put("resourceBase", getResourceBase());
-		config.put(AjaxProxy.SHOW_INDEX, isShowIndex());
+		config.put(AjaxProxyServer.SHOW_INDEX, isShowIndex());
 
 		JsonObject options = config.getJsonObject("options");
 		if (options == null) {

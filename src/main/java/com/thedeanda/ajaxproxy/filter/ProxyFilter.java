@@ -15,10 +15,10 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.thedeanda.ajaxproxy.AjaxProxyServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.thedeanda.ajaxproxy.AjaxProxy;
 import com.thedeanda.ajaxproxy.cache.MemProxyCache;
 import com.thedeanda.ajaxproxy.cache.NoOpCache;
 import com.thedeanda.ajaxproxy.config.model.ServerConfig;
@@ -42,7 +42,7 @@ import com.thedeanda.ajaxproxy.model.ProxyContainer;
 public class ProxyFilter implements Filter {
 	private static final Logger log = LoggerFactory.getLogger(ProxyFilter.class);
 
-	private AjaxProxy ajaxProxy;
+	private AjaxProxyServer ajaxProxyServer;
 
 	private List<ProxyContainer> proxyContainers;
 
@@ -50,10 +50,10 @@ public class ProxyFilter implements Filter {
 
 	private ServerConfig server;
 
-	public ProxyFilter(AjaxProxy ajaxProxy, ServerConfig server) {
-		this.ajaxProxy = ajaxProxy;
+	public ProxyFilter(AjaxProxyServer ajaxProxyServer, ServerConfig server) {
+		this.ajaxProxyServer = ajaxProxyServer;
 		this.server = server;
-		this.listener = ajaxProxy.getRequestListener();
+		this.listener = ajaxProxyServer.getRequestListener();
 	}
 
 	@Override
@@ -126,7 +126,7 @@ public class ProxyFilter implements Filter {
 			if (proxyConfig instanceof ProxyConfigFile) {
 				proxyContainer.setRequestHandler(new FileRequestHandler((ProxyConfigFile) proxyConfig));
 			} else if (proxyConfig instanceof ProxyConfigLogger) {
-				proxyContainer.setRequestHandler(new LoggerRequestHandler(ajaxProxy));
+				proxyContainer.setRequestHandler(new LoggerRequestHandler(ajaxProxyServer));
 			} else if (proxyConfig instanceof ProxyConfigRequest) {
 				proxyContainer.setRequestHandler(new ProxyRequestHandler((ProxyConfigRequest) proxyConfig));
 			}

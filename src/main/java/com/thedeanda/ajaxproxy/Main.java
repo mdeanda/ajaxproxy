@@ -65,7 +65,7 @@ public class Main {
 			} else if (config != null && merge != null) {
 				runMerge(config, merge, rm, ignore);
 			} else if (config != null && run) {
-				AjaxProxy ap = new AjaxProxy(config);
+				AjaxProxyServer ap = new AjaxProxyServer(config);
 				ap.run();
 			} else if (merge != null && config == null) {
 				printHelp(options);
@@ -162,7 +162,7 @@ public class Main {
 			System.exit(1);
 		}
 
-		AjaxProxy proxy = new AjaxProxy(config);
+		AjaxProxyServer proxy = new AjaxProxyServer(config);
 		proxy.setMergeMode(true);
 		proxy.run();
 		List<MergeServlet> servlets = proxy.getMergeServlets();
