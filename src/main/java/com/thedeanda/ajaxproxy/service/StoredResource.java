@@ -46,7 +46,7 @@ public class StoredResource {
 	private String reason;
 
 	@Setter
-	@DatabaseField()
+	@DatabaseField(index = true)
 	private long startTime;
 
 	@Setter
