@@ -20,6 +20,7 @@
         <h2db.version>1.4.197</h2db.version>
         <lombok.version>1.18.4</lombok.version>
         <slf4j.version>1.7.25</slf4j.version>
+        <flexmark.version>0.40.0</flexmark.version>
     </properties>
 
     <dependencyManagement>
@@ -124,17 +125,19 @@
         <dependency>
             <groupId>com.vladsch.flexmark</groupId>
             <artifactId>flexmark</artifactId>
-            <version>0.40.0</version>
+            <version>${flexmark.version}</version>
         </dependency>
+        <!--s
         <dependency>
             <groupId>com.vladsch.flexmark</groupId>
             <artifactId>flexmark-java</artifactId>
-            <version>0.40.0</version>
+            <version>${flexmark.version}</version>
         </dependency>
+        -->
         <dependency>
             <groupId>com.vladsch.flexmark</groupId>
             <artifactId>flexmark-util</artifactId>
-            <version>0.40.0</version>
+            <version>${flexmark.version}</version>
         </dependency>
 
         <dependency>
