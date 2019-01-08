@@ -65,9 +65,10 @@ public class ResourceService implements RequestListener {
 		// table
 		String id = UUID.randomUUID().toString();
 		try {
-			StoredResource r = new StoredResource();
-			r.setId(id);
-			r.setContentEncoding("test");
+			StoredResource r = StoredResource.builder()
+					.contentEncoding("test")
+					.id(id)
+					.build();
 			if (!saveImmediately(r)) {
 				throw new Exception("failed to save");
 			}
@@ -95,7 +96,7 @@ public class ResourceService implements RequestListener {
 			return false;
 
 		try {
-			if (StringUtils.isBlank(resource.getId())) {
+			if (resource.isNotSaved()) {
 				dao.create(resource);
 			} else {
 				dao.update(resource);
@@ -134,11 +135,12 @@ public class ResourceService implements RequestListener {
 	@Override
 	public void newRequest(UUID id, String url, String method) {
 		log.debug("new request: {} {} {}", id, url, method);
-		StoredResource sr = new StoredResource();
-		sr.setId(id.toString());
-		sr.setUrl(url);
-		sr.setMethod(method);
-		sr.setStartTime(System.currentTimeMillis());
+		StoredResource sr = StoredResource.builder()
+                .id(id.toString())
+                .url(url)
+                .method(method)
+                .startTime(System.currentTimeMillis())
+                .build();
 		save(sr);
 
 		listeners.forEach(l -> {
