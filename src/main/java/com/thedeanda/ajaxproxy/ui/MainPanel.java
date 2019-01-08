@@ -21,6 +21,7 @@ import javax.swing.*;
 
 import com.thedeanda.ajaxproxy.AjaxProxyServer;
 import com.thedeanda.ajaxproxy.ui.border.TopBorder;
+import com.thedeanda.ajaxproxy.ui.serverconfig.ServerConfigPanel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,16 +47,12 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 	private static final Logger log = LoggerFactory.getLogger(MainPanel.class);
 	private static final int CACHE_SIZE = 50;
 	private final JToolBar toolBar;
+	private final ServerConfigPanel tabsPanel;
 
 	private boolean started = false;
 	private AjaxProxyServer proxy = null;
-	private ProxyTableModel proxyModel;
-	private MergeTableModel mergeModel;
 	private File configFile;
 	private JsonObject config;
-	// private JTabbedPane tabs;
-	private GeneralPanel generalPanel;
-	private TamperPanel tamperPanel;
 
 	private static final String START = "Start";
 	private static final String STOP = "Stop";
@@ -63,7 +60,6 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 	private List<ProxyListener> listeners = new ArrayList<ProxyListener>();
 	private ResourceViewerPanel resourceViewerPanel;
 	private ResourceService resourceService;
-	private VariablesPanel variablePanel;
 	private LoggerPanel loggerPanel;
 
 	private JPanel cardPanel;
@@ -97,35 +93,14 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 
 		contentPanel.add(cardPanel);
 
-		JTabbedPane tabs = new JTabbedPane();
-		JPanel tabsPanel = new JPanel();
-		tabsPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-		tabsPanel.setLayout(new BorderLayout());
-		tabsPanel.add(tabs, BorderLayout.CENTER);
+		//TODO: rename later
+		tabsPanel = new ServerConfigPanel(this);
 		cardPanel.add(tabsPanel, CARD_SERVER);
 
-		generalPanel = new GeneralPanel(this);
-		tabs.add("General", generalPanel);
-
-		proxyModel = new ProxyTableModel();
-		tabs.add("Proxy", new ProxyPanel(this, proxyModel));
-
-		mergeModel = new MergeTableModel();
-		tabs.add("Merge", new MergePanel(this, mergeModel));
-
-		// TODO: move proxy to its own panel so code is easier to maintain
-		variablePanel = new VariablesPanel(this);
-		tabs.add("Variables", variablePanel);
-
-		tamperPanel = new TamperPanel();
-		// tabs.add("Tamper", tamperPanel);
-
 		resourceViewerPanel = new ResourceViewerPanel(resourceService);
-		// tabs.add("Resource Viewer", resourceViewerPanel);
 		cardPanel.add(resourceViewerPanel, CARD_RESOURCE_VIEWER);
 
 		loggerPanel = new LoggerPanel();
-		// tabs.add("Logger", loggerPanel);
 		cardPanel.add(loggerPanel, CARD_LOGGER);
 
 		navPanel = new MainNavPanel();
@@ -245,13 +220,9 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 	 */
 	public JsonObject getConfig() {
 		JsonObject json = config;
-		json.put("proxy", proxyModel.getConfig(generalPanel.getCacheTime()));
-		json.put("merge", mergeModel.getConfig());
-		json.put("variables", variablePanel.getConfig());
 		json.put("resource", resourceViewerPanel.getConfig());
-		json.put("tamper", tamperPanel.getConfig());
 
-		generalPanel.updateConfig(json);
+		tabsPanel.updateConfig(json);
 		loggerPanel.updateConfig(json);
 
 		log.trace(json.toString(2));
@@ -290,7 +261,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 			proxy = new AjaxProxyServer(json, workingDir, resourceService);
 			proxy.addProxyListener(this);
 			new Thread(proxy).start();
-			generalPanel.setProxy(proxy);
+			tabsPanel.setProxy(proxy);
 			loggerPanel.setProxy(proxy);
 			started = true;
 			navPanel.selectNavItem(NavItem.Start, 0);
@@ -306,12 +277,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		configFile = new File("");
 		config = new JsonObject();
 
-		generalPanel.setPort(0);
-		generalPanel.setResourceBase("");
-		generalPanel.setShowIndex(false);
-		proxyModel.clear();
-		mergeModel.clear();
-		variablePanel.clear();
+		tabsPanel.clearAll();
 	}
 
 	public void stop() {
@@ -321,7 +287,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 				AjaxProxyServer p = proxy;
 				proxy = null;
 				p.stop();
-				generalPanel.setProxy(null);
+				tabsPanel.setProxy(null);
 			}
 		} finally {
 			proxy = null;
@@ -362,12 +328,8 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 
 	public void setConfig(JsonObject json) {
 		this.config = json;
-		proxyModel.setConfig(config.getJsonArray("proxy"));
-		mergeModel.setConfig(config.getJsonArray("merge"));
-		variablePanel.setConfig(config.getJsonObject("variables"));
-		generalPanel.setConfig(config);
+		tabsPanel.setConfig(json);
 		resourceViewerPanel.setConfig(json.getJsonObject("resource"));
-		tamperPanel.setConfig(json.getJsonObject("tamper"));
 	}
 
 	@Override
@@ -399,8 +361,12 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		log.debug("settings changed, possibly track to warn of unsaved changes during close");
 	}
 
+	/**
+	 * adds variables from command line
+	 * @param vars
+	 */
 	public void addVariables(Map<String, String> vars) {
-		variablePanel.setVariables(vars);
+		tabsPanel.addVariables(vars);
 	}
 
 	private void openReleasesPage() {

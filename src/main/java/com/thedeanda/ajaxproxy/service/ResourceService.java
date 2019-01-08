@@ -72,7 +72,7 @@ public class ResourceService implements RequestListener {
 				throw new Exception("failed to save");
 			}
 
-			dao.queryForId(id);
+			StoredResource obj = dao.queryForId(id);
 			dao.deleteById(id);
 		} catch (Exception e) {
 			log.warn(e.getMessage(), e);
