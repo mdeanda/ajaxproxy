@@ -13,6 +13,7 @@ import javax.swing.JTree;
 import javax.swing.SwingWorker;
 import javax.swing.tree.DefaultTreeModel;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,9 +30,9 @@ import com.thedeanda.javajson.JsonArray;
  * @author mdeanda
  * 
  */
+@Slf4j
 public class ContentViewer extends JPanel {
 	private static final long serialVersionUID = 1L;
-	private static final Logger log = LoggerFactory.getLogger(ContentViewer.class);
 	private JTabbedPane tabs;
 	private CardLayout cardLayout;
 
@@ -97,7 +98,7 @@ public class ContentViewer extends JPanel {
 
 		@Override
 		protected DocumentContainer doInBackground() throws Exception {
-			log.info("start parsing");
+			log.debug("start parsing");
 
 			DocumentParser parser = new DocumentParser();
 			DocumentContainer document;
@@ -107,14 +108,14 @@ public class ContentViewer extends JPanel {
 				document = parser.parse(message);
 			}
 
-			log.info("done parsing");
+			log.debug("done parsing");
 
 			return document;
 		}
 
 		@Override
 		protected void done() {
-			log.info("start of done");
+			log.debug("start of done");
 			DocumentContainer data;
 			try {
 				data = get();
@@ -124,15 +125,15 @@ public class ContentViewer extends JPanel {
 			}
 
 			if (data.image != null) {
-				log.info("setting image");
+				log.debug("setting image");
 				tabs.add("Image", new ImageViewer(data.image));
 			} else {
 				if (data.formattedText != null) {
-					log.info("setting formatted");
+					log.debug("setting formatted");
 					tabs.add("Formatted", data.formattedTextArea);
 				}
 				if (data.treeNode != null) {
-					log.info("setting tree");
+					log.debug("setting tree");
 					JTree tree = new JTree(new DefaultTreeModel(data.treeNode));
 					tree.setBorder(BorderFactory.createEmptyBorder());
 					tree.setShowsRootHandles(true);
@@ -141,16 +142,16 @@ public class ContentViewer extends JPanel {
 					tabs.add("Tree View", scroll);
 				}
 				if (data.rawText != null && data.rawText.length() < DocumentParser.MAX_TEXT_SIZE) {
-					log.info("setting raw: " + data.rawText.length());
+					log.debug("setting raw: " + data.rawText.length());
 					tabs.add("Raw Text", data.rawTextArea);
 				}
 			}
 			if (data.hex != null) {
-				log.info("setting hex");
+				log.debug("setting hex");
 				tabs.add("Hex", data.hex);
 			}
 
-			log.info("end of done");
+			log.debug("end of done");
 			cardLayout.show(ContentViewer.this, NORMAL_CARD);
 		}
 

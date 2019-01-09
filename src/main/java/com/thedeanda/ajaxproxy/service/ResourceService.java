@@ -69,7 +69,7 @@ public class ResourceService implements RequestListener {
 					.contentEncoding("test")
 					.id(id)
 					.build();
-			if (!saveImmediately(r)) {
+			if (!saveImmediately(r, true)) {
 				throw new Exception("failed to save");
 			}
 
@@ -84,19 +84,25 @@ public class ResourceService implements RequestListener {
 		}
 	}
 
-	public void save(StoredResource resource) {
+	public void saveNew(StoredResource resource) {
 		log.debug("saving resource: {}", resource);
-		// TODO: save to db in the background
-		saveImmediately(resource);
+		saveImmediately(resource, true);
 		cache.put(resource.getId(), resource);
 	}
 
-	private boolean saveImmediately(StoredResource resource) {
+	public void save(StoredResource resource) {
+		log.debug("saving resource: {}", resource);
+		// TODO: save to db in the background
+		saveImmediately(resource, false);
+		cache.put(resource.getId(), resource);
+	}
+
+	private boolean saveImmediately(StoredResource resource, boolean isNew) {
 		if (dao == null)
 			return false;
 
 		try {
-			if (resource.isNotSaved()) {
+			if (isNew) {
 				dao.create(resource);
 			} else {
 				dao.update(resource);
@@ -141,7 +147,7 @@ public class ResourceService implements RequestListener {
                 .method(method)
                 .startTime(System.currentTimeMillis())
                 .build();
-		save(sr);
+		saveNew(sr);
 
 		listeners.forEach(l -> {
 			try {
