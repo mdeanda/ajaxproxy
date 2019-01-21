@@ -29,15 +29,12 @@ import com.thedeanda.ajaxproxy.ProxyListener;
 import com.thedeanda.ajaxproxy.service.ResourceService;
 import com.thedeanda.ajaxproxy.ui.border.RightBorder;
 import com.thedeanda.ajaxproxy.ui.logger.LoggerPanel;
-import com.thedeanda.ajaxproxy.ui.main.nav.MainNavPanel;
-import com.thedeanda.ajaxproxy.ui.main.nav.NavItem;
-import com.thedeanda.ajaxproxy.ui.main.nav.NavListener;
 import com.thedeanda.ajaxproxy.ui.resourceviewer.ResourceViewerPanel;
 import com.thedeanda.ajaxproxy.ui.update.UpdateCheckWorker;
 import com.thedeanda.javajson.JsonException;
 import com.thedeanda.javajson.JsonObject;
 
-public class MainPanel extends JPanel implements ProxyListener, SettingsChangedListener, NavListener, ActionListener {
+public class MainPanel extends JPanel implements ProxyListener, SettingsChangedListener, ActionListener {
 	private static final Logger log = LoggerFactory.getLogger(MainPanel.class);
 	private static final int CACHE_SIZE = 50;
 	private final JToolBar toolBar;
@@ -58,7 +55,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 
 	private JPanel cardPanel;
 	private CardLayout cardLayout;
-	private MainNavPanel navPanel;
+//	private MainNavPanel navPanel;
 	private static final String CARD_SERVER = "card_server";
 	private static final String CARD_RESOURCE_VIEWER = "card_resource_viewer";
 	private static final String CARD_LOGGER = "card_logger";
@@ -97,20 +94,15 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		loggerPanel = new LoggerPanel();
 		cardPanel.add(loggerPanel, CARD_LOGGER);
 
-		navPanel = new MainNavPanel();
-		JScrollPane navComponent = new JScrollPane(navPanel);
-		contentPanel.add(navComponent);
-		navComponent.setBorder(null);
-		navPanel.addNavListener(this);
-		navPanel.setBorder(new RightBorder());
-
+		/*
 		layout.putConstraint(SpringLayout.NORTH, navComponent, 2, SpringLayout.NORTH, contentPanel);
 		layout.putConstraint(SpringLayout.SOUTH, navComponent, 0, SpringLayout.SOUTH, contentPanel);
 		layout.putConstraint(SpringLayout.WEST, navComponent, 0, SpringLayout.WEST, contentPanel);
 		layout.putConstraint(SpringLayout.EAST, navComponent, 125, SpringLayout.WEST, navComponent);
+		//*/
 
 		layout.putConstraint(SpringLayout.NORTH, cardPanel, 2, SpringLayout.NORTH, contentPanel);
-		layout.putConstraint(SpringLayout.WEST, cardPanel, 0, SpringLayout.EAST, navComponent);
+		layout.putConstraint(SpringLayout.WEST, cardPanel, 0, SpringLayout.WEST, contentPanel);
 		layout.putConstraint(SpringLayout.EAST, cardPanel, 0, SpringLayout.EAST, contentPanel);
 		layout.putConstraint(SpringLayout.SOUTH, cardPanel, 0, SpringLayout.SOUTH, contentPanel);
 
@@ -258,7 +250,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 			serverConfigPanel.setProxy(proxy);
 			loggerPanel.setProxy(proxy);
 			started = true;
-			navPanel.selectNavItem(NavItem.Start, 0);
+//			navPanel.selectNavItem(NavItem.Start, 0);
 			fireProxyStarted();
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
@@ -286,7 +278,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		} finally {
 			proxy = null;
 			started = false;
-			navPanel.selectNavItem(NavItem.Stop, 0);
+//			navPanel.selectNavItem(NavItem.Stop, 0);
 			fireProxyStopped();
 		}
 	}
@@ -379,6 +371,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		}
 	}
 
+	/*
 	@Override
 	public void navEvent(NavItem navItem, int index) {
 		switch (navItem) {
@@ -399,7 +392,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 			break;
 		}
 	}
-
+//*/
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		showCard(e.getActionCommand());
