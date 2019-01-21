@@ -32,14 +32,8 @@ import com.thedeanda.ajaxproxy.ui.logger.LoggerPanel;
 import com.thedeanda.ajaxproxy.ui.main.nav.MainNavPanel;
 import com.thedeanda.ajaxproxy.ui.main.nav.NavItem;
 import com.thedeanda.ajaxproxy.ui.main.nav.NavListener;
-import com.thedeanda.ajaxproxy.ui.merge.MergePanel;
-import com.thedeanda.ajaxproxy.ui.merge.MergeTableModel;
-import com.thedeanda.ajaxproxy.ui.proxy.ProxyPanel;
-import com.thedeanda.ajaxproxy.ui.proxy.ProxyTableModel;
 import com.thedeanda.ajaxproxy.ui.resourceviewer.ResourceViewerPanel;
-import com.thedeanda.ajaxproxy.ui.tamper.TamperPanel;
 import com.thedeanda.ajaxproxy.ui.update.UpdateCheckWorker;
-import com.thedeanda.ajaxproxy.ui.variable.VariablesPanel;
 import com.thedeanda.javajson.JsonException;
 import com.thedeanda.javajson.JsonObject;
 
@@ -47,7 +41,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 	private static final Logger log = LoggerFactory.getLogger(MainPanel.class);
 	private static final int CACHE_SIZE = 50;
 	private final JToolBar toolBar;
-	private final ServerConfigPanel tabsPanel;
+	private final ServerConfigPanel serverConfigPanel;
 
 	private boolean started = false;
 	private AjaxProxyServer proxy = null;
@@ -94,8 +88,8 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		contentPanel.add(cardPanel);
 
 		//TODO: rename later
-		tabsPanel = new ServerConfigPanel(this);
-		cardPanel.add(tabsPanel, CARD_SERVER);
+		serverConfigPanel = new ServerConfigPanel(this);
+		cardPanel.add(serverConfigPanel, CARD_SERVER);
 
 		resourceViewerPanel = new ResourceViewerPanel(resourceService);
 		cardPanel.add(resourceViewerPanel, CARD_RESOURCE_VIEWER);
@@ -222,7 +216,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		JsonObject json = config;
 		json.put("resource", resourceViewerPanel.getConfig());
 
-		tabsPanel.updateConfig(json);
+		serverConfigPanel.updateConfig(json);
 		loggerPanel.updateConfig(json);
 
 		log.trace(json.toString(2));
@@ -261,7 +255,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 			proxy = new AjaxProxyServer(json, workingDir, resourceService);
 			proxy.addProxyListener(this);
 			new Thread(proxy).start();
-			tabsPanel.setProxy(proxy);
+			serverConfigPanel.setProxy(proxy);
 			loggerPanel.setProxy(proxy);
 			started = true;
 			navPanel.selectNavItem(NavItem.Start, 0);
@@ -277,7 +271,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		configFile = new File("");
 		config = new JsonObject();
 
-		tabsPanel.clearAll();
+		serverConfigPanel.clearAll();
 	}
 
 	public void stop() {
@@ -287,7 +281,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 				AjaxProxyServer p = proxy;
 				proxy = null;
 				p.stop();
-				tabsPanel.setProxy(null);
+				serverConfigPanel.setProxy(null);
 			}
 		} finally {
 			proxy = null;
@@ -328,7 +322,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 
 	public void setConfig(JsonObject json) {
 		this.config = json;
-		tabsPanel.setConfig(json);
+		serverConfigPanel.setConfig(json);
 		resourceViewerPanel.setConfig(json.getJsonObject("resource"));
 	}
 
@@ -366,7 +360,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 	 * @param vars
 	 */
 	public void addVariables(Map<String, String> vars) {
-		tabsPanel.addVariables(vars);
+		serverConfigPanel.addVariables(vars);
 	}
 
 	private void openReleasesPage() {
