@@ -28,8 +28,8 @@ import org.slf4j.LoggerFactory;
 import com.thedeanda.ajaxproxy.ui.MainFrame;
 import com.thedeanda.ajaxproxy.ui.rest.RestClientFrame;
 
-public class Main {
-	private static final Logger log = LoggerFactory.getLogger(Main.class);
+public class AjaxProxy {
+	private static final Logger log = LoggerFactory.getLogger(AjaxProxy.class);
 
 	public static void main(String[] args) throws Exception {
 		// create the parser
