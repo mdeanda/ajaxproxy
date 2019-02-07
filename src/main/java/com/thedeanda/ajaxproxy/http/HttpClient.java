@@ -47,7 +47,7 @@ public class HttpClient {
 	private final CloseableHttpClient client;
 	private static final int DEFAULT_CONNECT_TIMEOUT = 5000;
 	private static final int DEFAULT_CONNECTION_REQUEST_TIMEOUT = 30000;
-	private static final int DEFAULT_SOCKET_TIMEOUT = 60000;
+	private static final int DEFAULT_SOCKET_TIMEOUT = 300000;
 
 	public enum RequestMethod {
 		GET(false), POST(true), PUT(true), DELETE(false), HEAD(false), PATCH(true), OPTIONS(true), TRACE(true);
