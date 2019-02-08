@@ -1,4 +1,4 @@
-package com.thedeanda.ajaxproxy.ui.proxy;
+package com.thedeanda.ajaxproxy.ui.serverconfig.proxy;
 
 import java.awt.Component;
 

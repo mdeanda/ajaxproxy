@@ -1,4 +1,4 @@
-package com.thedeanda.ajaxproxy.ui;
+package com.thedeanda.ajaxproxy.ui.serverconfig;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -22,6 +22,8 @@ import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import com.thedeanda.ajaxproxy.ui.SettingsChangedListener;
+import com.thedeanda.ajaxproxy.ui.SwingUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.thedeanda.ajaxproxy.AjaxProxyServer;

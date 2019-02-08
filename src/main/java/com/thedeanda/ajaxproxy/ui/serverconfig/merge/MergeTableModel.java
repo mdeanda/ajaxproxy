@@ -1,4 +1,4 @@
-package com.thedeanda.ajaxproxy.ui.merge;
+package com.thedeanda.ajaxproxy.ui.serverconfig.merge;
 
 import javax.swing.table.AbstractTableModel;
 

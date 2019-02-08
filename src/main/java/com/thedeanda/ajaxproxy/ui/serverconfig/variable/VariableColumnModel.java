@@ -1,4 +1,4 @@
-package com.thedeanda.ajaxproxy.ui.variable;
+package com.thedeanda.ajaxproxy.ui.serverconfig.variable;
 
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.TableColumn;

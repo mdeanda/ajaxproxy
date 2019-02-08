@@ -1,8 +1,7 @@
-package com.thedeanda.ajaxproxy.ui.tamper;
+package com.thedeanda.ajaxproxy.ui.serverconfig.tamper;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
 
 import com.thedeanda.ajaxproxy.model.tamper.TamperItem;

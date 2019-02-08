@@ -1,4 +1,4 @@
-package com.thedeanda.ajaxproxy.ui.proxy;
+package com.thedeanda.ajaxproxy.ui.serverconfig.proxy;
 
 import java.awt.Dimension;
 
@@ -12,7 +12,6 @@ import javax.swing.SpringLayout;
 import org.apache.commons.lang3.StringUtils;
 
 import com.thedeanda.ajaxproxy.config.model.StringVariable;
-import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfig;
 import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigRequest;
 import com.thedeanda.ajaxproxy.ui.SwingUtils;
 

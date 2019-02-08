@@ -1,4 +1,4 @@
-package com.thedeanda.ajaxproxy.ui.tamper;
+package com.thedeanda.ajaxproxy.ui.serverconfig.tamper;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

@@ -1,4 +1,4 @@
-package com.thedeanda.ajaxproxy.ui.variable;
+package com.thedeanda.ajaxproxy.ui.serverconfig.variable;
 
 import java.util.Map;
 
@@ -14,7 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.thedeanda.ajaxproxy.ui.SettingsChangedListener;
-import com.thedeanda.ajaxproxy.ui.variable.model.Variable;
+import com.thedeanda.ajaxproxy.ui.serverconfig.variable.model.Variable;
 import com.thedeanda.javajson.JsonObject;
 
 public class VariablesPanel extends JPanel {

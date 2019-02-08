@@ -1,14 +1,13 @@
 package com.thedeanda.ajaxproxy.ui.serverconfig;
 
 import com.thedeanda.ajaxproxy.AjaxProxyServer;
-import com.thedeanda.ajaxproxy.ui.GeneralPanel;
 import com.thedeanda.ajaxproxy.ui.SettingsChangedListener;
-import com.thedeanda.ajaxproxy.ui.merge.MergePanel;
-import com.thedeanda.ajaxproxy.ui.merge.MergeTableModel;
-import com.thedeanda.ajaxproxy.ui.proxy.ProxyPanel;
-import com.thedeanda.ajaxproxy.ui.proxy.ProxyTableModel;
-import com.thedeanda.ajaxproxy.ui.tamper.TamperPanel;
-import com.thedeanda.ajaxproxy.ui.variable.VariablesPanel;
+import com.thedeanda.ajaxproxy.ui.serverconfig.merge.MergePanel;
+import com.thedeanda.ajaxproxy.ui.serverconfig.merge.MergeTableModel;
+import com.thedeanda.ajaxproxy.ui.serverconfig.proxy.ProxyPanel;
+import com.thedeanda.ajaxproxy.ui.serverconfig.proxy.ProxyTableModel;
+import com.thedeanda.ajaxproxy.ui.serverconfig.tamper.TamperPanel;
+import com.thedeanda.ajaxproxy.ui.serverconfig.variable.VariablesPanel;
 import com.thedeanda.javajson.JsonObject;
 
 import javax.swing.*;

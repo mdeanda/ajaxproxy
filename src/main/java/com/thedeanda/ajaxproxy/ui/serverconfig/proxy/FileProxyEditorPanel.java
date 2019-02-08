@@ -1,19 +1,14 @@
-package com.thedeanda.ajaxproxy.ui.proxy;
+package com.thedeanda.ajaxproxy.ui.serverconfig.proxy;
 
 import java.awt.Dimension;
 
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.thedeanda.ajaxproxy.config.model.StringVariable;
 import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigFile;
-import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigRequest;
 import com.thedeanda.ajaxproxy.ui.SwingUtils;
 
 public class FileProxyEditorPanel extends JPanel implements EditorPanel<ProxyConfigFile> {
