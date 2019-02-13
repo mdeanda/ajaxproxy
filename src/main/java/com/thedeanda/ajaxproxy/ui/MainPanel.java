@@ -84,8 +84,9 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 
 		contentPanel.add(cardPanel);
 
-		serverConfigPanel = new ServerConfigPanel(this);
+		serverConfigPanel = new ServerConfigPanel(this, this);
 		cardPanel.add(serverConfigPanel, CARD_SERVER);
+		addProxyListener(serverConfigPanel);
 
 		resourceViewerPanel = new ResourceViewerPanel(resourceService);
 		cardPanel.add(resourceViewerPanel, CARD_RESOURCE_VIEWER);

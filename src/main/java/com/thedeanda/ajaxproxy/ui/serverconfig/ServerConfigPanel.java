@@ -1,6 +1,8 @@
 package com.thedeanda.ajaxproxy.ui.serverconfig;
 
 import com.thedeanda.ajaxproxy.AjaxProxyServer;
+import com.thedeanda.ajaxproxy.ProxyListener;
+import com.thedeanda.ajaxproxy.ui.MainPanel;
 import com.thedeanda.ajaxproxy.ui.SettingsChangedListener;
 import com.thedeanda.ajaxproxy.ui.util.SwingUtils;
 import com.thedeanda.ajaxproxy.ui.serverconfig.merge.MergePanel;
@@ -15,15 +17,19 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.Map;
 
-public class ServerConfigPanel extends JPanel implements SettingsChangedListener {
+public class ServerConfigPanel extends JPanel implements SettingsChangedListener, ProxyListener {
     private final SettingsChangedListener settingsChangedListener;
+    private final MainPanel mainPanel;
     private ProxyTableModel proxyModel;
     private MergeTableModel mergeModel;
     private GeneralPanel generalPanel;
     private TamperPanel tamperPanel;
     private VariablesPanel variablePanel;
+    private JButton startButton;
+    private JButton stopButton;
 
-    public ServerConfigPanel(SettingsChangedListener settingsChangedListener) {
+    public ServerConfigPanel(SettingsChangedListener settingsChangedListener, MainPanel mainPanel) {
+        this.mainPanel = mainPanel;
         JPanel tabsPanel = this;
         JTabbedPane tabs = new JTabbedPane();
         this.settingsChangedListener = settingsChangedListener;
@@ -35,6 +41,7 @@ public class ServerConfigPanel extends JPanel implements SettingsChangedListener
 
         generalPanel = new GeneralPanel(this);
         tabs.add("General", generalPanel);
+
 
         proxyModel = new ProxyTableModel();
         tabs.add("Proxy", new ProxyPanel(this, proxyModel));
@@ -55,11 +62,17 @@ public class ServerConfigPanel extends JPanel implements SettingsChangedListener
         JPanel panel = new JPanel();
         panel.setLayout(new FlowLayout(FlowLayout.TRAILING));
 
-        JButton startButton = SwingUtils.newJButton("Start");
+        startButton = SwingUtils.newJButton("Start");
         panel.add(startButton);
+        startButton.addActionListener((a) -> {
+            mainPanel.start();
+        });
 
-        JButton stopButton = SwingUtils.newJButton("Stop");
+        stopButton = SwingUtils.newJButton("Stop");
         panel.add(stopButton);
+        stopButton.addActionListener((a) -> {
+            mainPanel.stop();
+        });
 
         return panel;
     }
@@ -109,5 +122,23 @@ public class ServerConfigPanel extends JPanel implements SettingsChangedListener
     @Override
     public void restartRequired() {
         settingsChangedListener.restartRequired();
+    }
+
+    @Override
+    public void started() {
+        stopButton.setEnabled(true);
+        startButton.setEnabled(false);
+    }
+
+    @Override
+    public void stopped() {
+        stopButton.setEnabled(false);
+        startButton.setEnabled(true);
+    }
+
+    @Override
+    public void failed() {
+        stopButton.setEnabled(false);
+        startButton.setEnabled(true);
     }
 }
