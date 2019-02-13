@@ -23,7 +23,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import com.thedeanda.ajaxproxy.ui.SettingsChangedListener;
-import com.thedeanda.ajaxproxy.ui.SwingUtils;
+import com.thedeanda.ajaxproxy.ui.util.SwingUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.thedeanda.ajaxproxy.AjaxProxyServer;

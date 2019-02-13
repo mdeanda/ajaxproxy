@@ -23,7 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.thedeanda.ajaxproxy.model.tamper.TamperSelector;
-import com.thedeanda.ajaxproxy.ui.SwingUtils;
+import com.thedeanda.ajaxproxy.ui.util.SwingUtils;
 
 public class TamperSelectorDialog extends JDialog implements ActionListener {
 	private static final Logger log = LoggerFactory

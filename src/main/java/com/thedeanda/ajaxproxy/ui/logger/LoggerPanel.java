@@ -14,7 +14,7 @@ import javax.swing.event.ListSelectionListener;
 
 import com.thedeanda.ajaxproxy.AjaxProxyServer;
 import com.thedeanda.ajaxproxy.filter.handler.logger.LoggerMessage;
-import com.thedeanda.ajaxproxy.ui.SwingUtils;
+import com.thedeanda.ajaxproxy.ui.util.SwingUtils;
 import com.thedeanda.javajson.JsonObject;
 
 public class LoggerPanel extends JPanel {

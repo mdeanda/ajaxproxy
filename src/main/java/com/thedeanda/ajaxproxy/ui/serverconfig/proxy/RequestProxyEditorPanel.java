@@ -13,7 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.thedeanda.ajaxproxy.config.model.StringVariable;
 import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigRequest;
-import com.thedeanda.ajaxproxy.ui.SwingUtils;
+import com.thedeanda.ajaxproxy.ui.util.SwingUtils;
 
 public class RequestProxyEditorPanel extends JPanel implements EditorPanel<ProxyConfigRequest> {
 	private static final long serialVersionUID = 5379224168584631339L;

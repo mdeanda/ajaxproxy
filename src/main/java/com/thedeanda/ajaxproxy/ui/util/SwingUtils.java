@@ -1,4 +1,4 @@
-package com.thedeanda.ajaxproxy.ui;
+package com.thedeanda.ajaxproxy.ui.util;
 
 import java.awt.Color;
 import java.awt.Dimension;

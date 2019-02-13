@@ -13,7 +13,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 
-import com.thedeanda.ajaxproxy.ui.SwingUtils;
+import com.thedeanda.ajaxproxy.ui.util.SwingUtils;
 import com.thedeanda.ajaxproxy.ui.serverconfig.variable.model.Variable;
 
 public class VariableEditor extends JPanel {

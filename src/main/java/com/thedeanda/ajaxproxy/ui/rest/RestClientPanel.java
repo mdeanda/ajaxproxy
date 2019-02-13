@@ -31,7 +31,7 @@ import com.thedeanda.ajaxproxy.config.model.proxy.HttpHeader;
 import com.thedeanda.ajaxproxy.http.HttpClient;
 import com.thedeanda.ajaxproxy.http.HttpClient.RequestMethod;
 import com.thedeanda.ajaxproxy.http.RequestListener;
-import com.thedeanda.ajaxproxy.ui.SwingUtils;
+import com.thedeanda.ajaxproxy.ui.util.SwingUtils;
 import com.thedeanda.ajaxproxy.ui.border.BottomBorder;
 import com.thedeanda.ajaxproxy.ui.viewer.RequestViewer;
 

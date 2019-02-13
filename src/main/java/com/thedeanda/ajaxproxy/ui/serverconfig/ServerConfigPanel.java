@@ -2,6 +2,7 @@ package com.thedeanda.ajaxproxy.ui.serverconfig;
 
 import com.thedeanda.ajaxproxy.AjaxProxyServer;
 import com.thedeanda.ajaxproxy.ui.SettingsChangedListener;
+import com.thedeanda.ajaxproxy.ui.util.SwingUtils;
 import com.thedeanda.ajaxproxy.ui.serverconfig.merge.MergePanel;
 import com.thedeanda.ajaxproxy.ui.serverconfig.merge.MergeTableModel;
 import com.thedeanda.ajaxproxy.ui.serverconfig.proxy.ProxyPanel;
@@ -30,6 +31,7 @@ public class ServerConfigPanel extends JPanel implements SettingsChangedListener
         tabsPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         tabsPanel.setLayout(new BorderLayout());
         tabsPanel.add(tabs, BorderLayout.CENTER);
+        tabsPanel.add(initTopBar(), BorderLayout.NORTH);
 
         generalPanel = new GeneralPanel(this);
         tabs.add("General", generalPanel);
@@ -47,6 +49,19 @@ public class ServerConfigPanel extends JPanel implements SettingsChangedListener
         tamperPanel = new TamperPanel();
         // tabs.add("Tamper", tamperPanel);
 
+    }
+
+    private JPanel initTopBar() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new FlowLayout(FlowLayout.TRAILING));
+
+        JButton startButton = SwingUtils.newJButton("Start");
+        panel.add(startButton);
+
+        JButton stopButton = SwingUtils.newJButton("Stop");
+        panel.add(stopButton);
+
+        return panel;
     }
 
     /**

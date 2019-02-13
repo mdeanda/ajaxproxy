@@ -5,7 +5,6 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -14,7 +13,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.SpringLayout;
 
-import com.thedeanda.ajaxproxy.ui.SwingUtils;
+import com.thedeanda.ajaxproxy.ui.util.SwingUtils;
 import com.thedeanda.ajaxproxy.ui.resourceviewer.ContentViewer;
 
 public class JsonViewer extends JPanel implements ActionListener {

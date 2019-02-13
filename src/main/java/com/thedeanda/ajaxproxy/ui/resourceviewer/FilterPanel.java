@@ -24,7 +24,7 @@ import org.japura.gui.model.ListCheckModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.thedeanda.ajaxproxy.ui.SwingUtils;
+import com.thedeanda.ajaxproxy.ui.util.SwingUtils;
 import com.thedeanda.ajaxproxy.ui.border.BottomBorder;
 import com.thedeanda.ajaxproxy.ui.model.ResourceListModel;
 import com.thedeanda.ajaxproxy.ui.resourceviewer.filter.RequestType;

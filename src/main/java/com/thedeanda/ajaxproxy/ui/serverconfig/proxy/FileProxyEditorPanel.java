@@ -9,7 +9,7 @@ import javax.swing.SpringLayout;
 
 import com.thedeanda.ajaxproxy.config.model.StringVariable;
 import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigFile;
-import com.thedeanda.ajaxproxy.ui.SwingUtils;
+import com.thedeanda.ajaxproxy.ui.util.SwingUtils;
 
 public class FileProxyEditorPanel extends JPanel implements EditorPanel<ProxyConfigFile> {
 	private static final long serialVersionUID = 5379224168584631339L;

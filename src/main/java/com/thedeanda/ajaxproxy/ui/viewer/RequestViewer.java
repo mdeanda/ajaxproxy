@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import com.thedeanda.ajaxproxy.http.NetworkUtil;
 import com.thedeanda.ajaxproxy.http.RequestListener;
-import com.thedeanda.ajaxproxy.ui.SwingUtils;
+import com.thedeanda.ajaxproxy.ui.util.SwingUtils;
 import com.thedeanda.ajaxproxy.ui.resourceviewer.ContentViewer;
 import com.thedeanda.javajson.JsonArray;
 import com.thedeanda.javajson.JsonObject;

@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 import com.thedeanda.ajaxproxy.model.tamper.TamperConvertor;
 import com.thedeanda.ajaxproxy.model.tamper.TamperItem;
 import com.thedeanda.ajaxproxy.model.tamper.TamperSelector;
-import com.thedeanda.ajaxproxy.ui.SwingUtils;
+import com.thedeanda.ajaxproxy.ui.util.SwingUtils;
 import com.thedeanda.ajaxproxy.ui.border.BottomBorder;
 import com.thedeanda.javajson.JsonArray;
 import com.thedeanda.javajson.JsonObject;

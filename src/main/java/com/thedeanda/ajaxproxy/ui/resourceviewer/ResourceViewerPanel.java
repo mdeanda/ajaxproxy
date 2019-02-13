@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.thedeanda.ajaxproxy.service.ResourceService;
-import com.thedeanda.ajaxproxy.ui.SwingUtils;
+import com.thedeanda.ajaxproxy.ui.util.SwingUtils;
 import com.thedeanda.ajaxproxy.ui.model.Resource;
 import com.thedeanda.ajaxproxy.ui.model.ResourceListModel;
 import com.thedeanda.ajaxproxy.ui.resourceviewer.list.ResourceListPanel;
