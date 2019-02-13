@@ -77,7 +77,7 @@ public class RequestProxyEditorPanel extends JPanel implements EditorPanel<Proxy
 
 		layout.putConstraint(SpringLayout.NORTH, protocols, 10, SpringLayout.SOUTH, protLabel);
 		layout.putConstraint(SpringLayout.WEST, protocols, 10, SpringLayout.WEST, this);
-		layout.putConstraint(SpringLayout.EAST, protocols, 75 + 10, SpringLayout.WEST, this);
+		layout.putConstraint(SpringLayout.EAST, protocols, 85 + 10, SpringLayout.WEST, this);
 
 		layout.putConstraint(SpringLayout.NORTH, domainLabel, 10, SpringLayout.NORTH, this);
 		layout.putConstraint(SpringLayout.WEST, domainLabel, 10, SpringLayout.EAST, protocols);
