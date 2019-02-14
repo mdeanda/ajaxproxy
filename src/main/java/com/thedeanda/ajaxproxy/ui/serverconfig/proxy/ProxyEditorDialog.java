@@ -2,7 +2,7 @@ package com.thedeanda.ajaxproxy.ui.serverconfig.proxy;
 
 import java.awt.Component;
 
-import javax.swing.JOptionPane;
+import javax.swing.*;
 
 import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfig;
 import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigFile;
@@ -14,7 +14,7 @@ public class ProxyEditorDialog {
 		panel.setValue(value);
 
 		String[] options = new String[] { "OK", "Cancel" };
-		int option = JOptionPane.showOptionDialog(null, panel, title, JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
+		int option = JOptionPane.showOptionDialog(SwingUtilities.getWindowAncestor(parent), panel, title, JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
 				null, options, options[0]);
 
 		ProxyConfig result = null;
