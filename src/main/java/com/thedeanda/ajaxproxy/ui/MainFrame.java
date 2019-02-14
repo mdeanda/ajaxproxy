@@ -369,11 +369,11 @@ public class MainFrame extends JFrame implements ProxyListener, WindowListListen
 			helpAbout.setLocationRelativeTo(MainFrame.this);
 			helpAbout.setVisible(true);
 		});
-		menu.add(mi);
+		//TODO: bring back "help about"
+		//menu.add(mi);
 
 		mi = new JMenuItem("Check for Updates...");
 		mi.setMnemonic(KeyEvent.VK_C);
-		mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1, ActionEvent.CTRL_MASK));
 		mi.addActionListener(al -> {
 			showHelpUpdates();
 		});
