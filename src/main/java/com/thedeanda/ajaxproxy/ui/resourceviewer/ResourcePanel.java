@@ -131,7 +131,7 @@ public class ResourcePanel extends JPanel implements ActionListener {
 			return;
 
 		new SwingWorker<StoredResource, StoredResource>() {
-			StoredResource storedResource;
+			StoredResource storedResource = null;
 
 			@Override
 			protected StoredResource doInBackground() throws Exception {
@@ -141,26 +141,29 @@ public class ResourcePanel extends JPanel implements ActionListener {
 
 			@Override
 			protected void done() {
-				if (storedResource == null) {
-					log.warn("couldn't load resource: {}", newResource.getId());
-					return;
-				}
+				byte[] inputData = null;
+				byte[] outputData = null;
 
-				byte[] data = storedResource.getInput();
-				if (!ArrayUtils.isEmpty(data)) {
-					inputCv.setContent(data);
-				}
+				inputData = storedResource.getInput();
+				outputData = storedResource.getOutputDecompressed();
 
-				data = storedResource.getOutputDecompressed();
-				if (!ArrayUtils.isEmpty(data)) {
-					outputCv.setContent(data);
-				}
+				inputCv.setContent(inputData);
+				outputCv.setContent(outputData);
+
 				showGeneralResourceProperties(storedResource, resource);
 			}
 		}.execute();
 	}
 
 	private void showGeneralResourceProperties(StoredResource storedResource, Resource resource) {
+		String output = "";
+		if (storedResource != null && resource != null) {
+			output = buildHeaders(storedResource, resource);
+		}
+		showHeaders(output);
+	}
+
+	private String buildHeaders(StoredResource storedResource, Resource resource) {
 		final StringBuilder output = new StringBuilder();
 
 		output.append("<html><body>");
@@ -209,8 +212,7 @@ public class ResourcePanel extends JPanel implements ActionListener {
 		 */
 
 		output.append("</body></html>");
-
-		showHeaders(output.toString());
+		return output.toString();
 	}
 
 	private void writeField(StringBuilder output, String name, String value) {

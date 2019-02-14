@@ -126,9 +126,7 @@ public class ResourceListPanel extends JPanel implements ActionListener, Request
 	private void listItemSelected(ListSelectionEvent evt) {
 		if (!evt.getValueIsAdjusting()) {
 			Resource resource = (Resource) list.getSelectedValue();
-			if (resource != null) {
-				showResource(resource);
-			}
+			showResource(resource);
 		}
 	}
 
