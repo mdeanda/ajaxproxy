@@ -1,8 +1,20 @@
 package com.thedeanda.ajaxproxy.ui;
 
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.Desktop;
+import com.thedeanda.ajaxproxy.AjaxProxyServer;
+import com.thedeanda.ajaxproxy.ProxyListener;
+import com.thedeanda.ajaxproxy.service.ResourceService;
+import com.thedeanda.ajaxproxy.ui.border.TopBorder;
+import com.thedeanda.ajaxproxy.ui.logger.LoggerPanel;
+import com.thedeanda.ajaxproxy.ui.resourceviewer.ResourceViewerPanel;
+import com.thedeanda.ajaxproxy.ui.serverconfig.ServerConfigPanel;
+import com.thedeanda.ajaxproxy.ui.update.UpdateCheckWorker;
+import com.thedeanda.javajson.JsonException;
+import com.thedeanda.javajson.JsonObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -16,23 +28,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import javax.swing.*;
-
-import com.thedeanda.ajaxproxy.AjaxProxyServer;
-import com.thedeanda.ajaxproxy.ui.border.TopBorder;
-import com.thedeanda.ajaxproxy.ui.serverconfig.ServerConfigPanel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.thedeanda.ajaxproxy.ProxyListener;
-import com.thedeanda.ajaxproxy.service.ResourceService;
-import com.thedeanda.ajaxproxy.ui.border.RightBorder;
-import com.thedeanda.ajaxproxy.ui.logger.LoggerPanel;
-import com.thedeanda.ajaxproxy.ui.resourceviewer.ResourceViewerPanel;
-import com.thedeanda.ajaxproxy.ui.update.UpdateCheckWorker;
-import com.thedeanda.javajson.JsonException;
-import com.thedeanda.javajson.JsonObject;
 
 public class MainPanel extends JPanel implements ProxyListener, SettingsChangedListener, ActionListener {
 	private static final Logger log = LoggerFactory.getLogger(MainPanel.class);

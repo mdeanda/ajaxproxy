@@ -6,6 +6,7 @@ import java.util.TreeSet;
 
 import javax.swing.SwingWorker;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -18,31 +19,23 @@ import org.slf4j.LoggerFactory;
 import com.thedeanda.ajaxproxy.http.SimpleHttpClient;
 import com.thedeanda.ajaxproxy.ui.ConfigService;
 
-public class UpdateCheckWorker extends SwingWorker<Boolean, Void> {
-	private static final Logger log = LoggerFactory.getLogger(UpdateCheckWorker.class);
+@Slf4j
+public class UpdateCheckWorker extends SwingWorker<ReleaseEntry, Void> {
 	public static String RELEASE_CHECK_URL = "https://github.com/mdeanda/ajaxproxy/releases.atom";
 	public static String RELEASE_URL = "https://github.com/mdeanda/ajaxproxy/releases";
-
-	private static final long MIN_DELAY = 5000;
-	private static final long RANDOM_DELAY = 25000;
 
 	private String message = null;
 	private Set<ReleaseEntry> entries = new TreeSet<>();
 
 	@Override
-	protected Boolean doInBackground() throws Exception {
-		boolean retVal = false;
-		String version = ConfigService.get().getVersionString();
-		if (StringUtils.isBlank(version)) {
-			return false;
-		}
+	protected ReleaseEntry doInBackground() throws Exception {
+		ReleaseEntry retVal = null;
+		//String version = ConfigService.get().getVersionString();
 		try {
-			long delay = (System.currentTimeMillis() % RANDOM_DELAY) + MIN_DELAY;
-			Thread.sleep(delay);
 			loadAtomFeed();
 			ReleaseEntry entry = getEntry();
-			retVal = verifyUpdateAvailable(entry, version);
 			log.warn("latest: {}", entry);
+			retVal = entry;
 		} catch (Throwable e) {
 			log.warn(e.getMessage(), e);
 		}
@@ -55,8 +48,8 @@ public class UpdateCheckWorker extends SwingWorker<Boolean, Void> {
 		if (entry != null) {
 			ReleaseVersion currentVersion = new ReleaseVersion(version);
 
-			if (currentVersion.compareTo(entry.version) < 0) {
-				message = String.format("Version %s is available for download.", entry.version);
+			if (currentVersion.compareTo(entry.getVersion()) < 0) {
+				message = String.format("Version %s is available for download.", entry.getVersion());
 				retVal = true;
 			}
 		}
@@ -102,19 +95,19 @@ public class UpdateCheckWorker extends SwingWorker<Boolean, Void> {
 		el = element.element("id");
 		if (el == null)
 			return null;
-		entry.id = StringUtils.trimToEmpty(el.getText());
+		entry.setId(StringUtils.trimToEmpty(el.getText()));
 
 		el = element.element("link");
 		if (el == null)
 			return null;
-		entry.link = StringUtils.trimToEmpty(el.attributeValue("href"));
+		entry.setLink(StringUtils.trimToEmpty(el.attributeValue("href")));
 
-		int trimStart = StringUtils.lastIndexOf(entry.link, '/') + 1;
-		String version = entry.link.substring(trimStart);
+		int trimStart = StringUtils.lastIndexOf(entry.getLink(), '/') + 1;
+		String version = entry.getLink().substring(trimStart);
 		if (StringUtils.isBlank(version)) {
 			return null;
 		}
-		entry.version = new ReleaseVersion(version);
+		entry.setVersion(new ReleaseVersion(version));
 		return entry;
 	}
 
@@ -122,15 +115,4 @@ public class UpdateCheckWorker extends SwingWorker<Boolean, Void> {
 		return message;
 	}
 
-	private class ReleaseEntry implements Comparable<ReleaseEntry> {
-		public String id;
-		public String link;
-		public ReleaseVersion version;
-
-		@Override
-		public int compareTo(ReleaseEntry o) {
-			// we flip the compare here to get newest first
-			return o.version.compareTo(version);
-		}
-	}
 }

@@ -81,7 +81,6 @@ public class MainFrame extends JFrame implements ProxyListener, WindowListListen
 	private String windowId;
 
 	HelpAbout helpAbout = null;
-	HelpUpdates helpUpdates = null;
 
 
 	public MainFrame() {
@@ -375,9 +374,7 @@ public class MainFrame extends JFrame implements ProxyListener, WindowListListen
 		mi = new JMenuItem("Check for Updates...");
 		mi.setMnemonic(KeyEvent.VK_C);
 		mi.addActionListener(al -> {
-			if (helpUpdates == null) {
-				helpUpdates = new HelpUpdates(MainFrame.this);
-			}
+			HelpUpdates helpUpdates = new HelpUpdates(MainFrame.this);
 			helpUpdates.pack();
 			helpUpdates.setLocationRelativeTo(MainFrame.this);
 			helpUpdates.setVisible(true);
