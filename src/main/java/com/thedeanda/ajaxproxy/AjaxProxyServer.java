@@ -372,8 +372,8 @@ public class AjaxProxyServer implements Runnable, LoggerMessageListener {
 				});
 			}
 		} catch (Exception e) {
-			fireEvent(ProxyEvent.FAIL);
 			log.error(e.getMessage(), e);
+			fireEvent(ProxyEvent.FAIL);
 		}
 	}
 
