@@ -1,7 +1,7 @@
 package com.thedeanda.ajaxproxy.ui.help;
 
-import com.thedeanda.ajaxproxy.ui.update.ReleaseEntry;
-import com.thedeanda.ajaxproxy.ui.update.UpdateCheckWorker;
+import com.thedeanda.ajaxproxy.ui.help.update.ReleaseEntry;
+import com.thedeanda.ajaxproxy.ui.help.update.UpdateCheckWorker;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.swing.*;

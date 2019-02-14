@@ -373,13 +373,18 @@ public class MainFrame extends JFrame implements ProxyListener, WindowListListen
 
 		mi = new JMenuItem("Check for Updates...");
 		mi.setMnemonic(KeyEvent.VK_C);
+		mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1, ActionEvent.CTRL_MASK));
 		mi.addActionListener(al -> {
-			HelpUpdates helpUpdates = new HelpUpdates(MainFrame.this);
-			helpUpdates.pack();
-			helpUpdates.setLocationRelativeTo(MainFrame.this);
-			helpUpdates.setVisible(true);
+			showHelpUpdates();
 		});
 		menu.add(mi);
+	}
+
+	private void showHelpUpdates() {
+		HelpUpdates helpUpdates = new HelpUpdates(MainFrame.this);
+		helpUpdates.pack();
+		helpUpdates.setLocationRelativeTo(MainFrame.this);
+		helpUpdates.setVisible(true);
 	}
 
 	private void handleRest() {

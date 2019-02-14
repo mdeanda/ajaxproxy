@@ -7,7 +7,7 @@ import com.thedeanda.ajaxproxy.ui.border.TopBorder;
 import com.thedeanda.ajaxproxy.ui.logger.LoggerPanel;
 import com.thedeanda.ajaxproxy.ui.resourceviewer.ResourceViewerPanel;
 import com.thedeanda.ajaxproxy.ui.serverconfig.ServerConfigPanel;
-import com.thedeanda.ajaxproxy.ui.update.UpdateCheckWorker;
+import com.thedeanda.ajaxproxy.ui.help.update.UpdateCheckWorker;
 import com.thedeanda.javajson.JsonException;
 import com.thedeanda.javajson.JsonObject;
 import org.slf4j.Logger;

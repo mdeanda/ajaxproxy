@@ -1,4 +1,4 @@
-package com.thedeanda.ajaxproxy.ui.update;
+package com.thedeanda.ajaxproxy.ui.help.update;
 
 import java.util.List;
 import java.util.Set;
@@ -13,11 +13,8 @@ import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.tree.DefaultElement;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.thedeanda.ajaxproxy.http.SimpleHttpClient;
-import com.thedeanda.ajaxproxy.ui.ConfigService;
 
 @Slf4j
 public class UpdateCheckWorker extends SwingWorker<ReleaseEntry, Void> {
