@@ -2,6 +2,7 @@ package com.thedeanda.ajaxproxy.ui.help;
 
 import com.thedeanda.ajaxproxy.ui.ConfigService;
 import com.thedeanda.ajaxproxy.ui.help.update.ReleaseEntry;
+import com.thedeanda.ajaxproxy.ui.help.update.ReleaseVersion;
 import com.thedeanda.ajaxproxy.ui.help.update.UpdateCheckWorker;
 import com.thedeanda.ajaxproxy.ui.util.SwingUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -46,6 +47,13 @@ public class HelpUpdates extends JDialog {
                     progressBar.setValue(1);
 
                     lblLatestValue.setText(entry.getVersion().toString());
+
+                    String vs = ConfigService.get().getVersionString();
+                    ReleaseVersion version = new ReleaseVersion(vs);
+                    if (version.compareTo(entry.getVersion()) < 0) {
+                        lblLatestValue.setForeground(new Color(52, 164, 52));
+                    }
+
                 } catch (InterruptedException  | ExecutionException e) {
                     log.warn(e.getMessage(), e);
                 }

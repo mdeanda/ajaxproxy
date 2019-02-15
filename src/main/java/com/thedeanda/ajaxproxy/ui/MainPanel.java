@@ -7,7 +7,6 @@ import com.thedeanda.ajaxproxy.ui.border.TopBorder;
 import com.thedeanda.ajaxproxy.ui.logger.LoggerPanel;
 import com.thedeanda.ajaxproxy.ui.resourceviewer.ResourceViewerPanel;
 import com.thedeanda.ajaxproxy.ui.serverconfig.ServerConfigPanel;
-import com.thedeanda.ajaxproxy.ui.help.update.UpdateCheckWorker;
 import com.thedeanda.javajson.JsonException;
 import com.thedeanda.javajson.JsonObject;
 import org.slf4j.Logger;
@@ -23,7 +22,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,9 +38,6 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 	private File configFile;
 	private JsonObject config;
 
-	private static final String START = "Start";
-	private static final String STOP = "Stop";
-
 	private List<ProxyListener> listeners = new ArrayList<ProxyListener>();
 	private ResourceViewerPanel resourceViewerPanel;
 	private ResourceService resourceService;
@@ -50,7 +45,6 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 
 	private JPanel cardPanel;
 	private CardLayout cardLayout;
-//	private MainNavPanel navPanel;
 	private static final String CARD_SERVER = "card_server";
 	private static final String CARD_RESOURCE_VIEWER = "card_resource_viewer";
 	private static final String CARD_LOGGER = "card_logger";
@@ -238,7 +232,6 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 			serverConfigPanel.setProxy(proxy);
 			loggerPanel.setProxy(proxy);
 			started = true;
-//			navPanel.selectNavItem(NavItem.Start, 0);
 			fireProxyStarted();
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
@@ -266,7 +259,6 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		} finally {
 			proxy = null;
 			started = false;
-//			navPanel.selectNavItem(NavItem.Stop, 0);
 			fireProxyStopped();
 		}
 	}
@@ -343,44 +335,6 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		serverConfigPanel.addVariables(vars);
 	}
 
-	private void openReleasesPage() {
-		try {
-			URI url = new URI(UpdateCheckWorker.RELEASE_URL);
-			Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
-			if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
-				try {
-					desktop.browse(url);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		} catch (Exception e) {
-			log.warn(e.getMessage(), e);
-		}
-	}
-
-	/*
-	@Override
-	public void navEvent(NavItem navItem, int index) {
-		switch (navItem) {
-		case Logger:
-			showCard(CARD_LOGGER);
-			break;
-		case RequestViewer:
-			showCard(CARD_RESOURCE_VIEWER);
-			break;
-		case Server:
-			showCard(CARD_SERVER);
-			break;
-		case Stop:
-			stop();
-			break;
-		case Start:
-			start();
-			break;
-		}
-	}
-//*/
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		showCard(e.getActionCommand());
