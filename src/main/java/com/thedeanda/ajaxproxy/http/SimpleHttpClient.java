@@ -33,8 +33,8 @@ public class SimpleHttpClient {
 
 	public byte[] getBytes(String url) {
 		final Container<byte[]> container = new Container<byte[]>();
-
-		client.makeRequest(RequestMethod.GET, url, null, null,
+		byte[] nodata = new byte[]{};
+		client.makeRequest(RequestMethod.GET, url, null, nodata,
 				new RequestListener() {
 					@Override
 					public void newRequest(UUID id, String url, String method) {
@@ -55,6 +55,7 @@ public class SimpleHttpClient {
 					@Override
 					public void error(UUID id, String message, Exception e) {
 						// TODO: throw exception
+						log.warn("failed: {}", message, e);
 					}
 
 				});

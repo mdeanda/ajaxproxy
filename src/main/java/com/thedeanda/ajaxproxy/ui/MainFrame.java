@@ -39,6 +39,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
+import com.thedeanda.ajaxproxy.ui.help.HelpAbout;
+import com.thedeanda.ajaxproxy.ui.help.HelpUpdates;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,6 +80,9 @@ public class MainFrame extends JFrame implements ProxyListener, WindowListListen
 	private MenuItem newJsonViewerMenuItem_tray;
 	private String windowId;
 
+	HelpAbout helpAbout = null;
+
+
 	public MainFrame() {
 		this.panel = new MainPanel();
 		updateTitle();
@@ -96,7 +101,7 @@ public class MainFrame extends JFrame implements ProxyListener, WindowListListen
 		this.windowId = Windows.get().addListener(this).add(this);
 		this.addWindowListener(new WindowListListenerCleanup(this));
 		new WindowMenuHelper(windowId, getJMenuBar());
-
+		addHelpMenu(getJMenuBar());
 	}
 
 	private void initSettings() {
@@ -348,6 +353,38 @@ public class MainFrame extends JFrame implements ProxyListener, WindowListListen
 		mi.addActionListener(menuItemListener);
 		menu.add(mi);
 
+	}
+	private void addHelpMenu(JMenuBar mb) {
+		JMenuItem mi;
+		JMenu menu = new JMenu("Help");
+		menu.setMnemonic(KeyEvent.VK_F);
+		mb.add(menu);
+
+		mi = new JMenuItem("About");
+		mi.addActionListener(al -> {
+			if (helpAbout == null) {
+				helpAbout = new HelpAbout(MainFrame.this);
+			}
+			helpAbout.pack();
+			helpAbout.setLocationRelativeTo(MainFrame.this);
+			helpAbout.setVisible(true);
+		});
+		//TODO: bring back "help about"
+		//menu.add(mi);
+
+		mi = new JMenuItem("Check for Updates...");
+		mi.setMnemonic(KeyEvent.VK_C);
+		mi.addActionListener(al -> {
+			showHelpUpdates();
+		});
+		menu.add(mi);
+	}
+
+	private void showHelpUpdates() {
+		HelpUpdates helpUpdates = new HelpUpdates(MainFrame.this);
+		helpUpdates.pack();
+		helpUpdates.setLocationRelativeTo(MainFrame.this);
+		helpUpdates.setVisible(true);
 	}
 
 	private void handleRest() {

@@ -87,9 +87,9 @@ public class ResourcePanel extends JPanel implements ActionListener {
 	private void initGeneralPanel() {
 		HTMLEditorKit kit = new HTMLEditorKit();
 		StyleSheet styleSheet = kit.getStyleSheet();
-		styleSheet.addRule("body {color:#000000; margin: 4px; font-size: 10px; font-family: sans-serif; }");
+		styleSheet.addRule("body {color:#000000; margin: 4px; font-size: 9px; font-family: sans-serif; }");
 		styleSheet.addRule("h1 { margin: 4px 0; font-size: 12px; }");
-		styleSheet.addRule("div.items { margin-left: 10px;}");
+		styleSheet.addRule("div.items { margin-left: 9px;}");
 		styleSheet.addRule("p { margin: 0; font-family: monospace;}");
 		styleSheet.addRule("b { font-family: sans-serif; color: #444444;}");
 

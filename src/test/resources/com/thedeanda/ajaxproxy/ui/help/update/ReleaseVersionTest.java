@@ -1,4 +1,4 @@
-package com.thedeanda.ajaxproxy.ui.update;
+package com.thedeanda.ajaxproxy.ui.help.update;
 
 import static org.junit.Assert.*;
 
