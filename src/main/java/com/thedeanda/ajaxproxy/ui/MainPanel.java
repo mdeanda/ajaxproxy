@@ -89,13 +89,6 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		loggerPanel = new LoggerPanel();
 		cardPanel.add(loggerPanel, CARD_LOGGER);
 
-		/*
-		layout.putConstraint(SpringLayout.NORTH, navComponent, 2, SpringLayout.NORTH, contentPanel);
-		layout.putConstraint(SpringLayout.SOUTH, navComponent, 0, SpringLayout.SOUTH, contentPanel);
-		layout.putConstraint(SpringLayout.WEST, navComponent, 0, SpringLayout.WEST, contentPanel);
-		layout.putConstraint(SpringLayout.EAST, navComponent, 125, SpringLayout.WEST, navComponent);
-		//*/
-
 		layout.putConstraint(SpringLayout.NORTH, cardPanel, 2, SpringLayout.NORTH, contentPanel);
 		layout.putConstraint(SpringLayout.WEST, cardPanel, 0, SpringLayout.WEST, contentPanel);
 		layout.putConstraint(SpringLayout.EAST, cardPanel, 0, SpringLayout.EAST, contentPanel);
