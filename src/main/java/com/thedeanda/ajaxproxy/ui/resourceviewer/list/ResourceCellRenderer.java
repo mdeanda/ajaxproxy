@@ -1,9 +1,12 @@
-package com.thedeanda.ajaxproxy.ui.viewer;
+package com.thedeanda.ajaxproxy.ui.resourceviewer.list;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
+import java.awt.*;
 import java.net.URL;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -13,7 +16,11 @@ import javax.swing.ListCellRenderer;
 import javax.swing.SpringLayout;
 
 import com.thedeanda.ajaxproxy.ui.model.Resource;
+import com.thedeanda.ajaxproxy.ui.util.FontUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 
+@Slf4j
 public class ResourceCellRenderer extends JPanel implements
 		ListCellRenderer<Resource> {
 	private static final long serialVersionUID = -3020786707630237791L;
@@ -40,6 +47,15 @@ public class ResourceCellRenderer extends JPanel implements
 		status = new JLabel("status");
 		method = new JLabel("method");
 		dur = new JLabel("dur");
+
+		Font pathFont = FontUtils.getFont(path.getFont(), "Verdana", 10.0f);
+		Font detailsFont = FontUtils.getFont(path.getFont(), "Verdana", 9.0f);
+
+		path.setFont(pathFont);
+		status.setFont(detailsFont);
+		method.setFont(detailsFont);
+		dur.setFont(detailsFont);
+
 
 		add(path);
 		add(status);

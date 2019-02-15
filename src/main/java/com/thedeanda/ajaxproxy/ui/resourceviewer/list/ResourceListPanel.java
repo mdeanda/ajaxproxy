@@ -28,7 +28,6 @@ import com.thedeanda.ajaxproxy.ui.model.Resource;
 import com.thedeanda.ajaxproxy.ui.model.ResourceListModel;
 import com.thedeanda.ajaxproxy.ui.resourceviewer.ResourceFrame;
 import com.thedeanda.ajaxproxy.ui.rest.RestClientFrame;
-import com.thedeanda.ajaxproxy.ui.viewer.ResourceCellRenderer;
 
 /**
  * filterable list panel on left side if resource viewer panel
