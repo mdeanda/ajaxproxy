@@ -7,6 +7,7 @@ import com.thedeanda.ajaxproxy.ui.border.TopBorder;
 import com.thedeanda.ajaxproxy.ui.logger.LoggerPanel;
 import com.thedeanda.ajaxproxy.ui.resourceviewer.ResourceViewerPanel;
 import com.thedeanda.ajaxproxy.ui.serverconfig.ServerConfigPanel;
+import com.thedeanda.ajaxproxy.ui.variable.VariablesPanel;
 import com.thedeanda.javajson.JsonException;
 import com.thedeanda.javajson.JsonObject;
 import org.slf4j.Logger;
@@ -42,15 +43,18 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 	private ResourceViewerPanel resourceViewerPanel;
 	private ResourceService resourceService;
 	private LoggerPanel loggerPanel;
+	private VariablesPanel variablePanel;
 
 	private JPanel cardPanel;
 	private CardLayout cardLayout;
 	private static final String CARD_SERVER = "card_server";
 	private static final String CARD_RESOURCE_VIEWER = "card_resource_viewer";
+	private static final String CARD_VARIABLES = "card_variables";
 	private static final String CARD_LOGGER = "card_logger";
 	private JToggleButton serverToolbarButton;
 	private JToggleButton requestToolbarButton;
 	private JToggleButton loggerToolbarButton;
+	private JToggleButton variablesToolbarButton;
 
 	public MainPanel() {
 		SpringLayout layout = new SpringLayout();
@@ -79,6 +83,9 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 
 		resourceViewerPanel = new ResourceViewerPanel(resourceService);
 		cardPanel.add(resourceViewerPanel, CARD_RESOURCE_VIEWER);
+
+		variablePanel = new VariablesPanel(this);
+		cardPanel.add(variablePanel, CARD_VARIABLES);
 
 		loggerPanel = new LoggerPanel();
 		cardPanel.add(loggerPanel, CARD_LOGGER);
@@ -110,6 +117,13 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 				"Request Viewer");
 		toolBar.add(button);
 		requestToolbarButton = button;
+
+
+		button = makeNavigationButton("b", CARD_VARIABLES,
+				"View variables",
+				"Variables");
+		toolBar.add(button);
+		variablesToolbarButton = button;
 
 		button = makeNavigationButton("c", CARD_LOGGER,
 				"View log messages posted by a remote application",
@@ -352,6 +366,9 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 			case CARD_LOGGER:
 				selectedCard(CARD_LOGGER, loggerToolbarButton);
 				break;
+			case CARD_VARIABLES:
+				selectedCard(CARD_VARIABLES, variablesToolbarButton);
+				break;
 			default:
 		}
 	}
@@ -359,7 +376,8 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 	private void selectedCard(String cardName, JToggleButton selectedToolbarButton) {
 		serverToolbarButton.setSelected(false);
 		requestToolbarButton.setSelected(false);
-		this.loggerToolbarButton.setSelected(false);
+		loggerToolbarButton.setSelected(false);
+		variablesToolbarButton.setSelected(false);
 
 		cardLayout.show(cardPanel, cardName);
 
