@@ -10,7 +10,7 @@ import com.thedeanda.ajaxproxy.ui.serverconfig.merge.MergeTableModel;
 import com.thedeanda.ajaxproxy.ui.serverconfig.proxy.ProxyPanel;
 import com.thedeanda.ajaxproxy.ui.serverconfig.proxy.ProxyTableModel;
 import com.thedeanda.ajaxproxy.ui.serverconfig.tamper.TamperPanel;
-import com.thedeanda.ajaxproxy.ui.serverconfig.variable.VariablesPanel;
+import com.thedeanda.ajaxproxy.ui.variable.VariablesPanel;
 import com.thedeanda.javajson.JsonObject;
 
 import javax.swing.*;

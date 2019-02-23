@@ -1,4 +1,4 @@
-package com.thedeanda.ajaxproxy.ui.serverconfig.variable;
+package com.thedeanda.ajaxproxy.ui.variable;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -9,7 +9,7 @@ import javax.swing.table.AbstractTableModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.thedeanda.ajaxproxy.ui.serverconfig.variable.model.Variable;
+import com.thedeanda.ajaxproxy.ui.variable.model.Variable;
 import com.thedeanda.javajson.JsonObject;
 
 public class VariableTableModel extends AbstractTableModel {

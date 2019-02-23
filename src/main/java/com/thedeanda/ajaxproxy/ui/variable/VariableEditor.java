@@ -1,4 +1,4 @@
-package com.thedeanda.ajaxproxy.ui.serverconfig.variable;
+package com.thedeanda.ajaxproxy.ui.variable;
 
 import java.awt.Component;
 import java.awt.Insets;
@@ -14,7 +14,7 @@ import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 
 import com.thedeanda.ajaxproxy.ui.util.SwingUtils;
-import com.thedeanda.ajaxproxy.ui.serverconfig.variable.model.Variable;
+import com.thedeanda.ajaxproxy.ui.variable.model.Variable;
 
 public class VariableEditor extends JPanel {
 	private SpringLayout layout;
