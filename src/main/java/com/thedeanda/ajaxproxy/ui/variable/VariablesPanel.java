@@ -10,6 +10,7 @@ import javax.swing.SpringLayout;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import com.thedeanda.ajaxproxy.ui.variable.controller.VariableController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,8 +26,8 @@ public class VariablesPanel extends JPanel {
 	private SettingsChangedListener listener;
 	private JTable variableTable;
 
-	public VariablesPanel(final SettingsChangedListener listener) {
-		variableModel = new VariableTableModel();
+	public VariablesPanel(VariableController variableController) {
+		variableModel = new VariableTableModel(variableController);
 
 		SpringLayout layout = new SpringLayout();
 		setLayout(layout);

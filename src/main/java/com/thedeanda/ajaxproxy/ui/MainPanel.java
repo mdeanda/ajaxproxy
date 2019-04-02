@@ -7,6 +7,7 @@ import com.thedeanda.ajaxproxy.ui.border.TopBorder;
 import com.thedeanda.ajaxproxy.ui.logger.LoggerPanel;
 import com.thedeanda.ajaxproxy.ui.resourceviewer.ResourceViewerPanel;
 import com.thedeanda.ajaxproxy.ui.serverconfig.ServerConfigPanel;
+import com.thedeanda.ajaxproxy.ui.variable.controller.VariableController;
 import com.thedeanda.ajaxproxy.ui.variable.VariablesPanel;
 import com.thedeanda.javajson.JsonException;
 import com.thedeanda.javajson.JsonObject;
@@ -44,6 +45,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 	private ResourceService resourceService;
 	private LoggerPanel loggerPanel;
 	private VariablesPanel variablePanel;
+	private VariableController variableController;
 
 	private JPanel cardPanel;
 	private CardLayout cardLayout;
@@ -84,7 +86,9 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		resourceViewerPanel = new ResourceViewerPanel(resourceService);
 		cardPanel.add(resourceViewerPanel, CARD_RESOURCE_VIEWER);
 
-		variablePanel = new VariablesPanel(this);
+        variableController = new VariableController();
+        variableController.addListener(this);
+		variablePanel = new VariablesPanel(variableController);
 		cardPanel.add(variablePanel, CARD_VARIABLES);
 
 		loggerPanel = new LoggerPanel();
@@ -309,6 +313,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 	public void setConfig(JsonObject json) {
 		this.config = json;
 		serverConfigPanel.setConfig(json);
+        variableController.setConfig(json);
 		resourceViewerPanel.setConfig(json.getJsonObject("resource"));
 	}
 

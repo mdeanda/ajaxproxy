@@ -24,7 +24,6 @@ public class ServerConfigPanel extends JPanel implements SettingsChangedListener
     private MergeTableModel mergeModel;
     private GeneralPanel generalPanel;
     private TamperPanel tamperPanel;
-    private VariablesPanel variablePanel;
     private JButton startButton;
     private JButton stopButton;
 
@@ -48,10 +47,6 @@ public class ServerConfigPanel extends JPanel implements SettingsChangedListener
 
         mergeModel = new MergeTableModel();
         tabs.add("Merge", new MergePanel(this, mergeModel));
-
-        // TODO: move proxy to its own panel so code is easier to maintain
-        variablePanel = new VariablesPanel(this);
-        tabs.add("Variables", variablePanel);
 
         tamperPanel = new TamperPanel();
         // tabs.add("Tamper", tamperPanel);
@@ -82,13 +77,12 @@ public class ServerConfigPanel extends JPanel implements SettingsChangedListener
      * @param vars
      */
     public void addVariables(Map<String, String> vars) {
-        variablePanel.setVariables(vars);
+//        variablePanel.setVariables(vars);
     }
 
     public void setConfig(JsonObject config) {
         proxyModel.setConfig(config.getJsonArray("proxy"));
         mergeModel.setConfig(config.getJsonArray("merge"));
-        variablePanel.setConfig(config.getJsonObject("variables"));
         generalPanel.setConfig(config);
         tamperPanel.setConfig(config.getJsonObject("tamper"));
     }
@@ -96,7 +90,6 @@ public class ServerConfigPanel extends JPanel implements SettingsChangedListener
     public void updateConfig(JsonObject config) {
         config.put("proxy", proxyModel.getConfig(generalPanel.getCacheTime()));
         config.put("merge", mergeModel.getConfig());
-        config.put("variables", variablePanel.getConfig());
         config.put("tamper", tamperPanel.getConfig());
         generalPanel.updateConfig(config);
     }
@@ -111,7 +104,6 @@ public class ServerConfigPanel extends JPanel implements SettingsChangedListener
         generalPanel.setShowIndex(false);
         proxyModel.clear();
         mergeModel.clear();
-        variablePanel.clear();
     }
 
     @Override

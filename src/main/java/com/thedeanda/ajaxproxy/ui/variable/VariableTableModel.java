@@ -6,6 +6,7 @@ import java.util.TreeMap;
 
 import javax.swing.table.AbstractTableModel;
 
+import com.thedeanda.ajaxproxy.ui.variable.controller.VariableController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,9 +17,11 @@ public class VariableTableModel extends AbstractTableModel {
 	private static final Logger log = LoggerFactory.getLogger(VariableTableModel.class);
 	private static final long serialVersionUID = 1L;
 	private final static String[] COLS = { "key", "value" };
+	private final VariableController variableController;
 	private Map<String, String> dataset = new TreeMap<>();
 
-	public VariableTableModel() {
+	public VariableTableModel(VariableController variableController) {
+		this.variableController = variableController;
 	}
 
 	public void clear() {
@@ -52,8 +55,7 @@ public class VariableTableModel extends AbstractTableModel {
 
 	@Override
 	public int getRowCount() {
-		log.debug("rows: {}", dataset.size());
-		return dataset.size() + 1;
+		return variableController.getSize();
 	}
 
 	@Override
@@ -104,9 +106,10 @@ public class VariableTableModel extends AbstractTableModel {
 	public Variable getValue(int row) {
 		Variable var = null;
 		if (row >= 0 && row < dataset.size()) {
-			var = new Variable();
-			var.setKey((String) getValueAt(row, 0));
-			var.setValue((String) getValueAt(row, 1));
+			var = Variable.builder()
+					.key((String) getValueAt(row, 0))
+					.value((String) getValueAt(row, 1))
+					.build();
 		}
 		return var;
 	}
