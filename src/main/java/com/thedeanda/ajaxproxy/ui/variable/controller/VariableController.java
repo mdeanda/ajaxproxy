@@ -6,12 +6,9 @@ import com.thedeanda.ajaxproxy.ui.variable.model.VariableModel;
 import com.thedeanda.javajson.JsonObject;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
-public class VariableController implements SettingsChangedListener {
+public class VariableController {
     private JsonObject config;
     private Collection<SettingsChangedListener> listeners = new HashSet<>();
     private Collection<VariableChangeListener> variableChangeListeners = new HashSet<>();
@@ -21,7 +18,6 @@ public class VariableController implements SettingsChangedListener {
 
     public VariableController() {
         this.variableModel = VariableModel.builder().build();
-
     }
 
     private void fireSettingsChanged() {
@@ -57,23 +53,16 @@ public class VariableController implements SettingsChangedListener {
         return ret;
     }
 
-    @Override
-    public void settingsChanged() {
-
-    }
-
-    @Override
-    public void restartRequired() {
-
-    }
-
     public int getSize() {
         return variableModel==null ? 0 : variableModel.getVariables().size();
     }
 
-    public Variable get(int index) {
-        return (variableModel == null || variableModel.getVariables().size()<index)
-                ? null : variableModel.getVariables().get(index);
+    public Optional<Variable> get(int index) {
+        Variable var = null;
+        if (index >= 0 && index < variableModel.getVariables().size())
+            var = variableModel.getVariables().get(index);
+
+        return Optional.ofNullable(var);
     }
 
     public void remove(String key) {
@@ -82,10 +71,13 @@ public class VariableController implements SettingsChangedListener {
     }
 
     public void set(String key, String value) {
-        variableModel.getVariables().add(Variable.builder()
+        List<Variable> vars = variableModel.getVariables();
+        vars.removeIf(var -> StringUtils.equals(key, var.getKey()));
+        vars.add(Variable.builder()
                 .key(key)
                 .value(value)
                 .build());
+        Collections.sort(vars);
         fireSettingsChanged();
     }
 }

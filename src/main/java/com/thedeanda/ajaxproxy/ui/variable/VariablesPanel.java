@@ -65,10 +65,7 @@ public class VariablesPanel extends JPanel {
 	private void startEdit() {
 		int row = variableTable.getSelectedRow();
 		log.trace("start edit {}", row);
-		Variable value = variableModel.getValue(row);
-		if (value == null) {
-			value = new Variable();
-		}
+		Variable value = variableController.get(row).orElse(new Variable());
 		variableEditor.startEdit(value);
 	}
 

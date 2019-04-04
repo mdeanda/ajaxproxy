@@ -2,6 +2,7 @@ package com.thedeanda.ajaxproxy.ui.variable;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
 
 import javax.swing.table.AbstractTableModel;
@@ -49,14 +50,12 @@ public class VariableTableModel extends AbstractTableModel implements SettingsCh
 
 	@Override
 	public Object getValueAt(int row, int col) {
-		String value = null;
-		if (row >= 0 && row < variableController.getSize()) {
-			Variable var = variableController.get(row);
-			if (col == 0)
-				value = var.getKey();
-			else
-				value = var.getValue();
-		}
+		String value = variableController.get(row).map(var -> {
+				if (col == 0)
+					return var.getKey();
+				else
+					return var.getValue();
+			}).orElse(null);
 		log.debug("get: {}/{} -> {}", row, col, value);
 		return value;
 		// return data.getJsonObject(row).getString(COLS[col]);
@@ -65,10 +64,6 @@ public class VariableTableModel extends AbstractTableModel implements SettingsCh
 	@Override
 	public void setValueAt(Object value, int rowIndex, int columnIndex) {
 		return;
-	}
-
-	public Variable getValue(int row) {
-		return variableController.get(row);
 	}
 
 	public void updateValue(String oldKey, String newKey, String newValue) {
