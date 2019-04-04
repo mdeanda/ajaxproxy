@@ -21,12 +21,13 @@ import com.thedeanda.javajson.JsonObject;
 public class VariablesPanel extends JPanel {
 	private static final Logger log = LoggerFactory.getLogger(VariablesPanel.class);
 	private static final long serialVersionUID = 1L;
+	private final VariableController variableController;
 	private VariableEditor variableEditor;
 	private VariableTableModel variableModel;
-	private SettingsChangedListener listener;
 	private JTable variableTable;
 
 	public VariablesPanel(VariableController variableController) {
+		this.variableController = variableController;
 		variableModel = new VariableTableModel(variableController);
 
 		SpringLayout layout = new SpringLayout();
@@ -39,8 +40,6 @@ public class VariablesPanel extends JPanel {
 
 		variableEditor = new VariableEditor(this);
 		add(variableEditor);
-
-		this.listener = listener;
 
 		final ListSelectionModel cellSelectionModel = variableTable.getSelectionModel();
 		cellSelectionModel.addListSelectionListener(new ListSelectionListener() {
@@ -75,24 +74,6 @@ public class VariablesPanel extends JPanel {
 
 	public void changeValue(String oldKey, String newKey, String newValue) {
 		variableModel.updateValue(oldKey, newKey, newValue);
-		listener.settingsChanged();
-		listener.restartRequired();
-	}
-
-	public JsonObject getConfig() {
-		return variableModel.getConfig();
-	}
-
-	public void clear() {
-		variableModel.clear();
-	}
-
-	public void setConfig(JsonObject jsonObject) {
-		variableModel.setConfig(jsonObject);
-	}
-
-	public void setVariables(Map<String, String> vars) {
-		variableModel.setValues(vars);
 	}
 
 }

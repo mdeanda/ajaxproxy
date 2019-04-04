@@ -58,7 +58,8 @@ public class VariableEditor extends JPanel {
 	}
 
 	private void commitEdit() {
-		panel.changeValue(originalValue.getKey(), keyField.getText(), valueField.getText());
+		String origKey = originalValue==null ? null : originalValue.getKey();
+		panel.changeValue(origKey, keyField.getText(), valueField.getText());
 	}
 
 	private void initLayout() {
