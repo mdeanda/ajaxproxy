@@ -4,12 +4,12 @@ import com.thedeanda.ajaxproxy.ui.SettingsChangedListener;
 import com.thedeanda.ajaxproxy.ui.variable.model.Variable;
 import com.thedeanda.ajaxproxy.ui.variable.model.VariableModel;
 import com.thedeanda.javajson.JsonObject;
+import com.thedeanda.javajson.JsonValue;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 
 public class VariableController {
-    private JsonObject config;
     private Collection<SettingsChangedListener> listeners = new HashSet<>();
     private Collection<VariableChangeListener> variableChangeListeners = new HashSet<>();
     private Map<String, String> datanset = new TreeMap<>();
@@ -41,7 +41,12 @@ public class VariableController {
     }
 
     public void setConfig(JsonObject jsonObject) {
-        this.config = jsonObject;
+        clear();
+        if (jsonObject == null) return;
+
+        for (String key : jsonObject) {
+            set(key, jsonObject.getString(key));
+        }
     }
 
     public JsonObject getConfig() {

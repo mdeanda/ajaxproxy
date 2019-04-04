@@ -210,6 +210,8 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 
 		serverConfigPanel.updateConfig(json);
 		loggerPanel.updateConfig(json);
+		JsonObject vars = variableController.getConfig();
+		json.put("variables", vars);
 
 		log.trace(json.toString(2));
 		return json;
@@ -315,6 +317,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		serverConfigPanel.setConfig(json);
         variableController.setConfig(json);
 		resourceViewerPanel.setConfig(json.getJsonObject("resource"));
+		variableController.setConfig(json.getJsonObject("variables"));
 	}
 
 	@Override
