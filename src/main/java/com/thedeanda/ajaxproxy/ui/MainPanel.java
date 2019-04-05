@@ -265,6 +265,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		config = new JsonObject();
 
 		serverConfigPanel.clearAll();
+		variableController.clear();
 	}
 
 	public void stop() {

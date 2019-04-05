@@ -71,6 +71,10 @@ public class VariablesPanel extends JPanel {
 
 	public void changeValue(String oldKey, String newKey, String newValue) {
 		variableModel.updateValue(oldKey, newKey, newValue);
+		int index = variableController.getKeyIndex(newKey);
+		if (index >= 0) {
+			variableTable.setRowSelectionInterval(index, index);
+		}
 	}
 
 }

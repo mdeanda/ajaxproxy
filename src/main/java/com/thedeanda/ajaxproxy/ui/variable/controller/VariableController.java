@@ -70,6 +70,17 @@ public class VariableController {
         return Optional.ofNullable(var);
     }
 
+    public int getKeyIndex(String key) {
+        int i = 0;
+        for (Variable v : variableModel.getVariables()) {
+            if (StringUtils.equals(key, v.getKey())) {
+                return i;
+            }
+            i++;
+        }
+        return -1;
+    }
+
     public void remove(String key) {
         variableModel.getVariables().removeIf(var -> StringUtils.equals(key, var.getKey()));
         fireSettingsChanged();

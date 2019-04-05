@@ -45,7 +45,7 @@ public class VariableTableModel extends AbstractTableModel implements SettingsCh
 
 	@Override
 	public int getRowCount() {
-		return variableController.getSize();
+		return variableController.getSize() + 1;
 	}
 
 	@Override
