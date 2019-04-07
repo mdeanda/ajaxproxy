@@ -62,29 +62,29 @@ public class ResourceCellRenderer extends JPanel implements
 		add(method);
 		add(dur);
 
-		layout.putConstraint(SpringLayout.NORTH, path, 5, SpringLayout.NORTH,
+		layout.putConstraint(SpringLayout.NORTH, path, 1, SpringLayout.NORTH,
 				this);
 		layout.putConstraint(SpringLayout.WEST, path, 4, SpringLayout.WEST,
 				this);
 		layout.putConstraint(SpringLayout.EAST, path, -4, SpringLayout.EAST,
 				this);
 
-		layout.putConstraint(SpringLayout.NORTH, method, 2, SpringLayout.SOUTH,
+		layout.putConstraint(SpringLayout.NORTH, method, 1, SpringLayout.SOUTH,
 				path);
 		layout.putConstraint(SpringLayout.WEST, method, 4, SpringLayout.WEST,
 				this);
 
-		layout.putConstraint(SpringLayout.NORTH, status, 2, SpringLayout.SOUTH,
+		layout.putConstraint(SpringLayout.NORTH, status, 1, SpringLayout.SOUTH,
 				path);
 		layout.putConstraint(SpringLayout.WEST, status, 4, SpringLayout.EAST,
 				method);
 
-		layout.putConstraint(SpringLayout.NORTH, dur, 2, SpringLayout.SOUTH,
+		layout.putConstraint(SpringLayout.NORTH, dur, 1, SpringLayout.SOUTH,
 				path);
 		layout.putConstraint(SpringLayout.EAST, dur, -4, SpringLayout.EAST,
 				this);
 
-		this.setPreferredSize(new Dimension(50, 40));
+		this.setPreferredSize(new Dimension(50, 30));
 	}
 
 	@Override
