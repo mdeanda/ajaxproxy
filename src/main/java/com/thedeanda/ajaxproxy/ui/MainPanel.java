@@ -383,14 +383,18 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 	}
 
 	private void selectedCard(String cardName, JToggleButton selectedToolbarButton) {
-		serverToolbarButton.setSelected(false);
-		requestToolbarButton.setSelected(false);
-		loggerToolbarButton.setSelected(false);
-		variablesToolbarButton.setSelected(false);
+		if (selectedToolbarButton != serverToolbarButton)
+			serverToolbarButton.setSelected(false);
+		if (selectedToolbarButton != requestToolbarButton)
+			requestToolbarButton.setSelected(false);
+		if (selectedToolbarButton != loggerToolbarButton)
+			loggerToolbarButton.setSelected(false);
+		if (selectedToolbarButton != variablesToolbarButton)
+			variablesToolbarButton.setSelected(false);
 
 		cardLayout.show(cardPanel, cardName);
 
-		selectedToolbarButton.setSelected(true);
+		// selectedToolbarButton.setSelected(true);
 
 	}
 }
