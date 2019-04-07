@@ -10,7 +10,7 @@
     {
       "cache":true,
       "cacheDuration":10,
-      "host":"jsonplaceholder.typicode.com",
+      "host":"${jsonhost}",
       "hostHeader":"",
       "path":"/albums/.*",
       "port":80,
@@ -19,7 +19,7 @@
     {
       "cache":true,
       "cacheDuration":10,
-      "host":"jsonplaceholder.typicode.com",
+      "host":"${jsonhost}",
       "hostHeader":"",
       "path":"/comments/.*",
       "port":80,
@@ -28,7 +28,7 @@
     {
       "cache":true,
       "cacheDuration":10,
-      "host":"jsonplaceholder.typicode.com",
+      "host":"${jsonhost}",
       "hostHeader":"",
       "path":"/photos/.*",
       "port":80,
@@ -37,7 +37,7 @@
     {
       "cache":true,
       "cacheDuration":10,
-      "host":"jsonplaceholder.typicode.com",
+      "host":"${jsonhost}",
       "hostHeader":"",
       "path":"/posts/.*",
       "port":80,
@@ -46,7 +46,7 @@
     {
       "cache":true,
       "cacheDuration":10,
-      "host":"jsonplaceholder.typicode.com",
+      "host":"${jsonhost}",
       "hostHeader":"",
       "path":"/todos/.*",
       "port":80,
@@ -55,7 +55,7 @@
     {
       "cache":true,
       "cacheDuration":10,
-      "host":"jsonplaceholder.typicode.com",
+      "host":"${jsonhost}",
       "hostHeader":"",
       "path":"/users/.*",
       "port":80,
@@ -77,7 +77,9 @@
     "track":false
   },
   "variables":{
-    "a":"AAaaa",
-    "b":"bb"
+    "ab":"abbb",
+    "aye":"AAaaa",
+    "b":"bbeee",
+    "jsonhost":"jsonplaceholder.typicode.com"
   }
 }
