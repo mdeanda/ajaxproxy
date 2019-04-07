@@ -1,10 +1,9 @@
 package com.thedeanda.ajaxproxy.ui.variable.controller;
 
+import com.thedeanda.ajaxproxy.config.model.Variable;
 import com.thedeanda.ajaxproxy.ui.SettingsChangedListener;
-import com.thedeanda.ajaxproxy.ui.variable.model.Variable;
 import com.thedeanda.ajaxproxy.ui.variable.model.VariableModel;
 import com.thedeanda.javajson.JsonObject;
-import com.thedeanda.javajson.JsonValue;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;

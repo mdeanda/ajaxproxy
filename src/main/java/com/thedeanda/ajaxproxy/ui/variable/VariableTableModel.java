@@ -1,19 +1,11 @@
 package com.thedeanda.ajaxproxy.ui.variable;
 
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Optional;
-import java.util.TreeMap;
-
-import javax.swing.table.AbstractTableModel;
-
 import com.thedeanda.ajaxproxy.ui.SettingsChangedListener;
 import com.thedeanda.ajaxproxy.ui.variable.controller.VariableController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.thedeanda.ajaxproxy.ui.variable.model.Variable;
-import com.thedeanda.javajson.JsonObject;
+import javax.swing.table.AbstractTableModel;
 
 public class VariableTableModel extends AbstractTableModel implements SettingsChangedListener {
 	private static final Logger log = LoggerFactory.getLogger(VariableTableModel.class);

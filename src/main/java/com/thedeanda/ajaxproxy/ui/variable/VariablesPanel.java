@@ -1,22 +1,13 @@
 package com.thedeanda.ajaxproxy.ui.variable;
 
-import java.util.Map;
-
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
-import javax.swing.SpringLayout;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-
+import com.thedeanda.ajaxproxy.config.model.Variable;
 import com.thedeanda.ajaxproxy.ui.variable.controller.VariableController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.thedeanda.ajaxproxy.ui.SettingsChangedListener;
-import com.thedeanda.ajaxproxy.ui.variable.model.Variable;
-import com.thedeanda.javajson.JsonObject;
+import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 public class VariablesPanel extends JPanel {
 	private static final Logger log = LoggerFactory.getLogger(VariablesPanel.class);
@@ -65,7 +56,7 @@ public class VariablesPanel extends JPanel {
 	private void startEdit() {
 		int row = variableTable.getSelectedRow();
 		log.trace("start edit {}", row);
-		Variable value = variableController.get(row).orElse(new Variable());
+		Variable value = variableController.get(row).orElse(Variable.builder().build());
 		variableEditor.startEdit(value);
 	}
 
