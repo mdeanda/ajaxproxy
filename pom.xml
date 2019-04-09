@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.thedeanda</groupId>
     <artifactId>ajaxproxy</artifactId>
-    <version>2.3.1-SNAPSHOT</version>
+    <version>2.4</version>
     <name>Archetype - ajaxproxy</name>
     <url>http://maven.apache.org</url>
     <description>ajaxproxy</description>
