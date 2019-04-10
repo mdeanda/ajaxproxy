@@ -1,6 +1,7 @@
 package com.thedeanda.ajaxproxy.ui.rest;
 
 import java.io.File;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +48,7 @@ public class HistoryItemService {
 	private void closeConnection() {
 		try {
 			connectionSource.close();
-		} catch (SQLException e) {
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

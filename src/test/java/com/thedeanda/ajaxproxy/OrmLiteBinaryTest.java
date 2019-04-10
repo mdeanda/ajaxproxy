@@ -2,6 +2,7 @@ package com.thedeanda.ajaxproxy;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.IOException;
 import java.sql.SQLException;
 
 import org.junit.Ignore;
@@ -35,18 +36,18 @@ public class OrmLiteBinaryTest {
 
 	@Test
 	@Ignore
-	public void testHsqldb() throws SQLException {
+	public void testHsqldb() throws SQLException, IOException {
 		String databaseUrl = "jdbc:hsqldb:mem:account";
 		testBinary(databaseUrl);
 	}
 
 	@Test
-	public void testH2() throws SQLException {
+	public void testH2() throws SQLException, IOException {
 		String databaseUrl = "jdbc:h2:mem:account";
 		testBinary(databaseUrl);
 	}
 
-	private void testBinary(String databaseUrl) throws SQLException {
+	private void testBinary(String databaseUrl) throws SQLException, IOException {
 		ConnectionSource connectionSource = new JdbcConnectionSource(
 				databaseUrl);
 		Dao<Account, String> accountDao = DaoManager.createDao(

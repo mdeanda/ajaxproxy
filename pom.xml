@@ -15,12 +15,12 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jetty.version>9.4.10.v20180503</jetty.version>
-        <ormlite.version>4.48</ormlite.version>
-        <h2db.version>1.4.197</h2db.version>
-        <lombok.version>1.18.4</lombok.version>
-        <slf4j.version>1.7.25</slf4j.version>
-        <flexmark.version>0.40.0</flexmark.version>
+        <jetty.version>9.4.15.v20190215</jetty.version>
+        <ormlite.version>5.1</ormlite.version>
+        <h2db.version>1.4.199</h2db.version>
+        <lombok.version>1.18.6</lombok.version>
+        <slf4j.version>1.7.26</slf4j.version>
+        <flexmark.version>0.40.34</flexmark.version>
     </properties>
 
     <dependencyManagement>

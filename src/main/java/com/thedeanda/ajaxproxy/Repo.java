@@ -1,6 +1,7 @@
 package com.thedeanda.ajaxproxy;
 
 import java.io.File;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
@@ -68,7 +69,7 @@ public class Repo<T> {
 		try {
 			if (connectionSource != null)
 				connectionSource.close();
-		} catch (SQLException e) {
+		} catch (IOException e) {
 			log.warn(e.getMessage(), e);
 		}
 	}
