@@ -8,6 +8,8 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -18,10 +20,13 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.UIDefaults;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 
 import com.thedeanda.ajaxproxy.ui.util.CaretMovingKeyListener;
+import org.apache.commons.lang3.StringUtils;
 
 public class SwingUtils {
 	private static final ExecutorService executor = Executors.newFixedThreadPool(10);
@@ -44,6 +49,48 @@ public class SwingUtils {
 		combo.setBorder(BorderFactory.createEmptyBorder());
 
 		return combo;
+	}
+
+	/** adds regular expression support */
+	public static JTextField newJTextReField(ReFieldChangeListener listener) {
+		final JTextField tf = newJTextField();
+
+		final Color filterOkColor = tf.getBackground();
+		final Color filterBadColor = new Color(250, 210, 200);
+
+		tf.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                resetFilter();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                resetFilter();
+            }
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                resetFilter();
+            }
+
+            private void resetFilter() {
+                String txt = tf.getText();
+                if (!StringUtils.isBlank(txt)) {
+                    Pattern regEx;
+                    try {
+                        regEx = Pattern.compile(txt);
+                        tf.setBackground(filterOkColor);
+                    } catch (PatternSyntaxException ex) {
+                        regEx = null;
+                        tf.setBackground(filterBadColor);
+                    }
+                    listener.fieldChanged(regEx);
+                }
+            }
+        });
+
+		return tf;
 	}
 
 	public static JTextField newJTextField() {

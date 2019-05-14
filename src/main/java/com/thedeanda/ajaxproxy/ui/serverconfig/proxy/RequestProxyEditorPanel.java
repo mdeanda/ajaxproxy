@@ -36,23 +36,25 @@ public class RequestProxyEditorPanel extends JPanel implements EditorPanel<Proxy
 		layout = new SpringLayout();
 		setLayout(layout);
 
-		domainLabel = new JLabel("Host");
+		domainLabel = new JLabel("Host*");
 		hostField = SwingUtils.newJTextField();
 		add(domainLabel);
 		add(hostField);
 
-		portLabel = new JLabel("Port");
+		portLabel = new JLabel("Port*");
 		portField = SwingUtils.newJTextField();
 		add(portLabel);
 		add(portField);
 
-		pathLabel = new JLabel("Path");
-		pathField = SwingUtils.newJTextField();
+		pathLabel = new JLabel("Path*");
+		pathField = SwingUtils.newJTextReField(pattern -> {});
+		pathField.setToolTipText("Regular Expression");
 		add(pathLabel);
 		add(pathField);
 
 		hostHeaderLabel = new JLabel("Host Header");
 		hostHeaderField = SwingUtils.newJTextField();
+		hostHeaderField.setToolTipText("Adds a 'Host' Header to help downstream proxy servers route requests");
 		add(hostHeaderLabel);
 		add(hostHeaderField);
 
@@ -60,7 +62,7 @@ public class RequestProxyEditorPanel extends JPanel implements EditorPanel<Proxy
 		cacheCheckbox.setToolTipText("Any non-GET request clears the cache for this proxy mapping");
 		add(cacheCheckbox);
 
-		protLabel = new JLabel("Protocol");
+		protLabel = new JLabel("Protocol*");
 		add(protLabel);
 
 		protocols = new JComboBox<String>(protocolList);
