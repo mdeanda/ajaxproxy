@@ -14,7 +14,7 @@ public class FontUtils {
         wanted.add(fontName);
         GraphicsEnvironment e = GraphicsEnvironment.getLocalGraphicsEnvironment();
         Font detailsFont = Stream.of(e.getAllFonts())
-                .peek(f -> log.warn(f.getName()))
+                .peek(f -> log.debug(f.getName()))
                 .filter(f -> wanted.contains(f.getName()))
                 .findFirst()
                 .map(f -> f.deriveFont(size))

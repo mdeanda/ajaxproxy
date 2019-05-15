@@ -184,6 +184,12 @@ public class ResourceListModel extends AbstractListModel<Resource> {
 			resource.setDuration(duration);
 			resource.setResponseHeaders(responseHeaders);
 			notifyUpdated(id);
+
+			if (!requestFilter.accept(resource) && items.contains(resource)) {
+				int index = items.indexOf(resource);
+				items.remove(resource);
+				fireIntervalRemoved(this, index, index);
+			}
 		}
 	}
 

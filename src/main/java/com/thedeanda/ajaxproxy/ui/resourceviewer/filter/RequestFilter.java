@@ -31,6 +31,9 @@ public class RequestFilter {
 					if (rt.name().equalsIgnoreCase(item.getMethod())) {
 						accept = true;
 					}
+				} else if (rt.isStatusCode() && item.getStatus() == 0) {
+					//for now accept request being loaded still
+					accept = true;
 				} else if (rt.isStatusCode()) {
 					if (rt.isStatusInRange(item.getStatus())) {
 						accept = true;
