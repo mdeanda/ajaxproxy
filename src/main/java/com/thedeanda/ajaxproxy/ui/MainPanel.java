@@ -100,6 +100,8 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		layout.putConstraint(SpringLayout.SOUTH, cardPanel, 0, SpringLayout.SOUTH, contentPanel);
 
 		clearAll();
+		selectedCard(CARD_SERVER);
+        serverToolbarButton.setSelected(true);
 	}
 
 	private JToolBar initToolbar() {
@@ -107,11 +109,13 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		toolBar.setFloatable(false);
 		toolBar.setRollover(true);
 
+		ButtonGroup buttonGroup = new ButtonGroup();
 		JToggleButton button = null;
 
 		button = makeNavigationButton("a", CARD_SERVER,
 				"Configure server and proxy paths",
 				"Server Config");
+		buttonGroup.add(button);
 		toolBar.add(button);
 		//prepPopup(button);
 		serverToolbarButton = button;
@@ -119,6 +123,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		button = makeNavigationButton("b", CARD_RESOURCE_VIEWER,
 				"View requested handled by Ajax Proxy",
 				"Request Viewer");
+		buttonGroup.add(button);
 		toolBar.add(button);
 		requestToolbarButton = button;
 
@@ -126,12 +131,14 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		button = makeNavigationButton("b", CARD_VARIABLES,
 				"View variables",
 				"Variables");
+		buttonGroup.add(button);
 		toolBar.add(button);
 		variablesToolbarButton = button;
 
 		button = makeNavigationButton("c", CARD_LOGGER,
 				"View log messages posted by a remote application",
 				"Logger");
+		buttonGroup.add(button);
 		toolBar.add(button);
 		loggerToolbarButton = button;
 
@@ -367,34 +374,22 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 
 		switch(cardName) {
 			case CARD_SERVER:
-				selectedCard(CARD_SERVER, serverToolbarButton);
+				selectedCard(CARD_SERVER);
 				break;
 			case CARD_RESOURCE_VIEWER:
-				selectedCard(CARD_RESOURCE_VIEWER, requestToolbarButton);
+				selectedCard(CARD_RESOURCE_VIEWER);
 				break;
 			case CARD_LOGGER:
-				selectedCard(CARD_LOGGER, loggerToolbarButton);
+				selectedCard(CARD_LOGGER);
 				break;
 			case CARD_VARIABLES:
-				selectedCard(CARD_VARIABLES, variablesToolbarButton);
+				selectedCard(CARD_VARIABLES);
 				break;
 			default:
 		}
 	}
 
-	private void selectedCard(String cardName, JToggleButton selectedToolbarButton) {
-		if (selectedToolbarButton != serverToolbarButton)
-			serverToolbarButton.setSelected(false);
-		if (selectedToolbarButton != requestToolbarButton)
-			requestToolbarButton.setSelected(false);
-		if (selectedToolbarButton != loggerToolbarButton)
-			loggerToolbarButton.setSelected(false);
-		if (selectedToolbarButton != variablesToolbarButton)
-			variablesToolbarButton.setSelected(false);
-
+	private void selectedCard(String cardName) {
 		cardLayout.show(cardPanel, cardName);
-
-		// selectedToolbarButton.setSelected(true);
-
 	}
 }
