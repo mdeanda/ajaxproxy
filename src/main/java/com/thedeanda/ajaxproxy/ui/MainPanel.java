@@ -191,9 +191,6 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		button.setToolTipText(toolTipText);
 		button.addActionListener(this);
 		button.setText(altText);
-		button.addChangeListener(l -> {
-			log.info("button: " + l.getSource());
-		});
 
 		return button;
 	}
