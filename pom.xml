@@ -15,7 +15,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jetty.version>9.4.15.v20190215</jetty.version>
+        <jetty.version>9.4.19.v20190610</jetty.version>
         <ormlite.version>5.1</ormlite.version>
         <h2db.version>1.4.199</h2db.version>
         <lombok.version>1.18.6</lombok.version>
