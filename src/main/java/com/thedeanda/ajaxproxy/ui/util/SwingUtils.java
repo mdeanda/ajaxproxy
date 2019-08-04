@@ -9,15 +9,7 @@ import java.awt.event.FocusListener;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JSplitPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
-import javax.swing.UIDefaults;
+import javax.swing.*;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 
@@ -30,6 +22,12 @@ public class SwingUtils {
 		JLabel ret = new JLabel(label);
 		ret.setHorizontalAlignment(SwingConstants.RIGHT);
 		return ret;
+	}
+
+	public static JToggleButton newJToggleButton(String label) {
+		JToggleButton btn = new JToggleButton();
+		//btn.setMargin(new Insets(2, 10, 2, 10));
+		return btn;
 	}
 
 	public static JButton newJButton(String label) {

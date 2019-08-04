@@ -7,6 +7,7 @@ import com.thedeanda.ajaxproxy.ui.border.TopBorder;
 import com.thedeanda.ajaxproxy.ui.logger.LoggerPanel;
 import com.thedeanda.ajaxproxy.ui.resourceviewer.ResourceViewerPanel;
 import com.thedeanda.ajaxproxy.ui.serverconfig.ServerConfigPanel;
+import com.thedeanda.ajaxproxy.ui.util.SwingUtils;
 import com.thedeanda.ajaxproxy.ui.variable.controller.VariableController;
 import com.thedeanda.ajaxproxy.ui.variable.VariablesPanel;
 import com.thedeanda.javajson.JsonException;
@@ -32,7 +33,7 @@ import java.util.Map;
 public class MainPanel extends JPanel implements ProxyListener, SettingsChangedListener, ActionListener {
 	private static final Logger log = LoggerFactory.getLogger(MainPanel.class);
 	private static final int CACHE_SIZE = 50;
-	private final JToolBar toolBar;
+	//private final JToolBar toolBar;
 	private final ServerConfigPanel serverConfigPanel;
 
 	private boolean started = false;
@@ -65,7 +66,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		File dbFile = ConfigService.get().getResourceHistoryDb();
 		resourceService = new ResourceService(CACHE_SIZE, dbFile);
 
-		toolBar = initToolbar();
+		JComponent toolBar = initToolbar();
 		add(toolBar, BorderLayout.NORTH);
 
 		JPanel contentPanel = new JPanel();
@@ -102,38 +103,66 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		clearAll();
 	}
 
-	private JToolBar initToolbar() {
+	private JComponent initToolbar() {
+		/*
 		JToolBar toolBar = new JToolBar();
 		toolBar.setFloatable(false);
 		toolBar.setRollover(true);
+		//*/
+
+		JPanel toolBar = new JPanel();
+		SpringLayout layout = new SpringLayout();
+		toolBar.setLayout(layout);
 
 		JToggleButton button = null;
 
-		button = makeNavigationButton("a", CARD_SERVER,
+		button = makeNavigationButton(CARD_SERVER,
 				"Configure server and proxy paths",
 				"Server Config");
 		toolBar.add(button);
 		//prepPopup(button);
 		serverToolbarButton = button;
 
-		button = makeNavigationButton("b", CARD_RESOURCE_VIEWER,
+		button = makeNavigationButton(CARD_RESOURCE_VIEWER,
 				"View requested handled by Ajax Proxy",
 				"Request Viewer");
 		toolBar.add(button);
 		requestToolbarButton = button;
 
 
-		button = makeNavigationButton("b", CARD_VARIABLES,
+		button = makeNavigationButton(CARD_VARIABLES,
 				"View variables",
 				"Variables");
 		toolBar.add(button);
 		variablesToolbarButton = button;
 
-		button = makeNavigationButton("c", CARD_LOGGER,
+		button = makeNavigationButton(CARD_LOGGER,
 				"View log messages posted by a remote application",
 				"Logger");
 		toolBar.add(button);
 		loggerToolbarButton = button;
+
+		Dimension dim = button.getPreferredSize();
+		dim.height += 4;
+		dim.width = 500;
+		toolBar.setPreferredSize(dim);
+
+		layout.putConstraint(SpringLayout.WEST, serverToolbarButton, 2, SpringLayout.WEST, toolBar);
+		layout.putConstraint(SpringLayout.NORTH, serverToolbarButton, 2, SpringLayout.NORTH, toolBar);
+		layout.putConstraint(SpringLayout.SOUTH, serverToolbarButton, -2, SpringLayout.SOUTH, toolBar);
+
+		layout.putConstraint(SpringLayout.WEST, requestToolbarButton, 2, SpringLayout.EAST, serverToolbarButton);
+		layout.putConstraint(SpringLayout.NORTH, requestToolbarButton, 0, SpringLayout.NORTH, serverToolbarButton);
+		layout.putConstraint(SpringLayout.SOUTH, requestToolbarButton, 0, SpringLayout.SOUTH, serverToolbarButton);
+
+		layout.putConstraint(SpringLayout.WEST, variablesToolbarButton, 2, SpringLayout.EAST, requestToolbarButton);
+		layout.putConstraint(SpringLayout.NORTH, variablesToolbarButton, 0, SpringLayout.NORTH, serverToolbarButton);
+		layout.putConstraint(SpringLayout.SOUTH, variablesToolbarButton, 0, SpringLayout.SOUTH, serverToolbarButton);
+
+		layout.putConstraint(SpringLayout.WEST, loggerToolbarButton, 2, SpringLayout.EAST, variablesToolbarButton);
+		layout.putConstraint(SpringLayout.NORTH, loggerToolbarButton, 0, SpringLayout.NORTH, serverToolbarButton);
+		layout.putConstraint(SpringLayout.SOUTH, loggerToolbarButton, 0, SpringLayout.SOUTH, serverToolbarButton);
+
 
 		return toolBar;
 	}
@@ -152,28 +181,19 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 
 	}
 
-	protected JToggleButton makeNavigationButton(String imageName,
-										   String actionCommand,
+	protected JToggleButton makeNavigationButton(String actionCommand,
 										   String toolTipText,
 										   String altText) {
-		//Look for the image.
-		String imgLocation = "images/"
-				+ imageName
-				+ ".gif";
-		URL imageURL = MainPanel.class.getResource(imgLocation);
 
 		//Create and initialize the button.
-		JToggleButton button = new JToggleButton();
+		JToggleButton button = SwingUtils.newJToggleButton(altText);
 		button.setActionCommand(actionCommand);
 		button.setToolTipText(toolTipText);
 		button.addActionListener(this);
-
-		if (imageURL != null) {                      //image found
-			button.setIcon(new ImageIcon(imageURL, altText));
-		} else {                                     //no image found
-			button.setText(altText);
-			log.warn("Resource not found: " + imgLocation);
-		}
+		button.setText(altText);
+		button.addChangeListener(l -> {
+			log.info("button: " + l.getSource());
+		});
 
 		return button;
 	}
@@ -394,7 +414,6 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 
 		cardLayout.show(cardPanel, cardName);
 
-		// selectedToolbarButton.setSelected(true);
-
+		selectedToolbarButton.setSelected(true);
 	}
 }

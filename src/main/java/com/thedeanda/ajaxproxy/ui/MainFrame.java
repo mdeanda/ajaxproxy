@@ -142,6 +142,7 @@ public class MainFrame extends JFrame implements ProxyListener, WindowListListen
 		this.image = Toolkit.getDefaultToolkit().getImage(imgUrl);
 		this.setIconImage(image);
 		setPreferredSize(new Dimension(1150, 700));
+		setMinimumSize(new Dimension(700, 550));
 	}
 
 	private void initTray() {
