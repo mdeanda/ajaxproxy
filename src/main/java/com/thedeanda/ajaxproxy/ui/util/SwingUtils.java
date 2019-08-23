@@ -1,9 +1,6 @@
 package com.thedeanda.ajaxproxy.ui.util;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Insets;
+import java.awt.*;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.util.concurrent.ExecutorService;

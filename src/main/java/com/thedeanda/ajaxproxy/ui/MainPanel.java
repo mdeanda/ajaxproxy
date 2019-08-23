@@ -142,24 +142,30 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		toolBar.add(button);
 		loggerToolbarButton = button;
 
+		//*
 		Dimension dim = button.getPreferredSize();
-		dim.height += 4;
-		dim.width = 500;
+		dim.height += 10;
+		dim.width = 600;
 		toolBar.setPreferredSize(dim);
+		 //*/
 
 		layout.putConstraint(SpringLayout.WEST, serverToolbarButton, 2, SpringLayout.WEST, toolBar);
+		layout.putConstraint(SpringLayout.EAST, serverToolbarButton, 140, SpringLayout.WEST, serverToolbarButton);
 		layout.putConstraint(SpringLayout.NORTH, serverToolbarButton, 2, SpringLayout.NORTH, toolBar);
 		layout.putConstraint(SpringLayout.SOUTH, serverToolbarButton, -2, SpringLayout.SOUTH, toolBar);
 
 		layout.putConstraint(SpringLayout.WEST, requestToolbarButton, 2, SpringLayout.EAST, serverToolbarButton);
+		layout.putConstraint(SpringLayout.EAST, requestToolbarButton, 150, SpringLayout.WEST, requestToolbarButton);
 		layout.putConstraint(SpringLayout.NORTH, requestToolbarButton, 0, SpringLayout.NORTH, serverToolbarButton);
 		layout.putConstraint(SpringLayout.SOUTH, requestToolbarButton, 0, SpringLayout.SOUTH, serverToolbarButton);
 
 		layout.putConstraint(SpringLayout.WEST, variablesToolbarButton, 2, SpringLayout.EAST, requestToolbarButton);
+		layout.putConstraint(SpringLayout.EAST, variablesToolbarButton, 110, SpringLayout.WEST, variablesToolbarButton);
 		layout.putConstraint(SpringLayout.NORTH, variablesToolbarButton, 0, SpringLayout.NORTH, serverToolbarButton);
 		layout.putConstraint(SpringLayout.SOUTH, variablesToolbarButton, 0, SpringLayout.SOUTH, serverToolbarButton);
 
 		layout.putConstraint(SpringLayout.WEST, loggerToolbarButton, 2, SpringLayout.EAST, variablesToolbarButton);
+		layout.putConstraint(SpringLayout.EAST, loggerToolbarButton, 90, SpringLayout.WEST, loggerToolbarButton);
 		layout.putConstraint(SpringLayout.NORTH, loggerToolbarButton, 0, SpringLayout.NORTH, serverToolbarButton);
 		layout.putConstraint(SpringLayout.SOUTH, loggerToolbarButton, 0, SpringLayout.SOUTH, serverToolbarButton);
 
