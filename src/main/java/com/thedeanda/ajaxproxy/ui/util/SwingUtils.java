@@ -1,9 +1,6 @@
 package com.thedeanda.ajaxproxy.ui.util;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Insets;
+import java.awt.*;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.util.concurrent.ExecutorService;
@@ -11,15 +8,8 @@ import java.util.concurrent.Executors;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JSplitPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
-import javax.swing.UIDefaults;
+
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
@@ -35,6 +25,12 @@ public class SwingUtils {
 		JLabel ret = new JLabel(label);
 		ret.setHorizontalAlignment(SwingConstants.RIGHT);
 		return ret;
+	}
+
+	public static JToggleButton newJToggleButton(String label) {
+		JToggleButton btn = new JToggleButton();
+		//btn.setMargin(new Insets(2, 10, 2, 10));
+		return btn;
 	}
 
 	public static JButton newJButton(String label) {
