@@ -157,11 +157,13 @@ public class ProxyRequestHandler implements RequestHandler {
 							// along too!
 							log.debug("response headers:\n{}", (Object[]) responseHeaders);
 
-							ServletOutputStream os = response.getOutputStream();
 							for (Header h : responseHeaders) {
 								response.addHeader(h.getName(), h.getValue());
 							}
-							IOUtils.copy(new ByteArrayInputStream(data), os);
+							if (data != null) {
+								ServletOutputStream os = response.getOutputStream();
+								IOUtils.copy(new ByteArrayInputStream(data), os);
+							}
 						} catch (Exception e) {
 							log.warn(e.getMessage(), e);
 						}
