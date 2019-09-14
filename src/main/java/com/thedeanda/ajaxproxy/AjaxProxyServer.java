@@ -52,10 +52,10 @@ public class AjaxProxyServer implements Runnable, LoggerMessageListener {
 
 	private String resourceBase = "";
 	private JsonObject config;
-	private Server jettyServer;
+	private List<Server> jettyServers = new ArrayList<>();
 	private File workingDir;
 	private List<ProxyListener> listeners = new ArrayList<ProxyListener>();
-	private ProxyFilter proxyFilter;
+	//private ProxyFilter proxyFilter;
 	private ThrottleFilter throttleFilter;
 	private boolean mergeMode = false;
 	private List<MergeServlet> mergeServlets = new ArrayList<MergeServlet>();
@@ -109,9 +109,6 @@ public class AjaxProxyServer implements Runnable, LoggerMessageListener {
 
 		throttleFilter = new ThrottleFilter();
 
-		// TODO: one filter per server?
-		ServerConfig firstServer = configObject.getServers().get(0);
-		proxyFilter = new ProxyFilter(this, firstServer);
 		getRequestListener();
 	}
 
@@ -295,7 +292,8 @@ public class AjaxProxyServer implements Runnable, LoggerMessageListener {
 			ServerConfig serverConfig = configObject.getServers().get(0);
 			boolean showIndex = serverConfig.isShowIndex();
 
-			jettyServer = new Server();
+			Server jettyServer = new Server();
+			jettyServers.add(jettyServer);
 			initConnectors(jettyServer, serverConfig);
 
 			ServletContextHandler root = new ServletContextHandler(ServletContextHandler.SESSIONS);
@@ -309,6 +307,7 @@ public class AjaxProxyServer implements Runnable, LoggerMessageListener {
 			EnumSet<DispatcherType> dispatches = EnumSet.allOf(DispatcherType.class);
 			root.addFilter(throttleFilterHolder, "/*", dispatches);
 
+			ProxyFilter proxyFilter = new ProxyFilter(this, serverConfig);
 			FilterHolder proxyFilterHolder = new FilterHolder(proxyFilter);
 			root.addFilter(proxyFilterHolder, "/*", dispatches);
 			proxyFilter.reset();
@@ -380,14 +379,17 @@ public class AjaxProxyServer implements Runnable, LoggerMessageListener {
 	// TODO: needs to reset or add a reset to clear all listener lists to avoid
 	// memory leak from ui
 	public void stop() {
-		try {
-			if (jettyServer != null) {
-				jettyServer.stop();
-				fireEvent(ProxyEvent.STOP);
+		for (Server jettyServer : jettyServers) {
+			try {
+				if (jettyServer != null) {
+					jettyServer.stop();
+					fireEvent(ProxyEvent.STOP);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
+		jettyServers.clear();
 	}
 
 	public JsonObject getConfig() {
