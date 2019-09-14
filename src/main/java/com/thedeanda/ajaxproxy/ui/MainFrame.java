@@ -1,83 +1,38 @@
 package com.thedeanda.ajaxproxy.ui;
 
-import java.awt.AWTException;
-import java.awt.Dimension;
-import java.awt.Image;
-import java.awt.MenuItem;
-import java.awt.PopupMenu;
-import java.awt.SystemTray;
-import java.awt.Toolkit;
-import java.awt.TrayIcon;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.io.Writer;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.KeyStroke;
-
+import com.thedeanda.ajaxproxy.ProxyListener;
 import com.thedeanda.ajaxproxy.ui.help.HelpAbout;
 import com.thedeanda.ajaxproxy.ui.help.HelpUpdates;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.thedeanda.ajaxproxy.ProxyListener;
-import com.thedeanda.ajaxproxy.ui.json.JsonViewerFrame;
-import com.thedeanda.ajaxproxy.ui.rest.RestClientFrame;
-import com.thedeanda.ajaxproxy.ui.windows.WindowContainer;
-import com.thedeanda.ajaxproxy.ui.windows.WindowListListener;
-import com.thedeanda.ajaxproxy.ui.windows.WindowListListenerCleanup;
-import com.thedeanda.ajaxproxy.ui.windows.WindowMenuHelper;
-import com.thedeanda.ajaxproxy.ui.windows.Windows;
+import com.thedeanda.ajaxproxy.ui.windows.*;
 import com.thedeanda.javajson.JsonArray;
 import com.thedeanda.javajson.JsonException;
 import com.thedeanda.javajson.JsonObject;
 import com.thedeanda.javajson.JsonValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.io.*;
+import java.net.URL;
+import java.util.List;
+import java.util.*;
 
 public class MainFrame extends JFrame implements ProxyListener, WindowListListener {
 	private static final long serialVersionUID = 1L;
 	private static final Logger log = LoggerFactory.getLogger(MainFrame.class);
-	private boolean USE_TRAY = false; // got slightly buggy, disable for now
 	private MainPanel panel;
 	final JFileChooser fc = new JFileChooser();
-	private TrayIcon trayIcon;
 	private List<File> recentFiles;
 	private JMenu recentMenu;
 	private Image image;
 	private File file = null;
 	private boolean ignoreSaveSettings = false;
-	private MenuItem stopServerMenuItem_tray;
 	private JMenuItem stopServerMenuItem2;
-	private MenuItem startServerMenuItem_tray;
 	private JMenuItem startServerMenuItem2;
-	private JMenuItem saveAsMenuItem;
-	private JMenuItem saveMenuItem;
-	private MenuItem showFrameMenuItem_tray;
-	private MenuItem newRestClientMenuItem_tray;
-	private MenuItem newJsonViewerMenuItem_tray;
 	private String windowId;
 
 	HelpAbout helpAbout = null;
@@ -89,7 +44,6 @@ public class MainFrame extends JFrame implements ProxyListener, WindowListListen
 		recentFiles = new ArrayList<File>();
 		this.initWindow();
 		this.initMenuBar();
-		this.initTray();
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
 		initSettings();
@@ -142,108 +96,7 @@ public class MainFrame extends JFrame implements ProxyListener, WindowListListen
 		this.image = Toolkit.getDefaultToolkit().getImage(imgUrl);
 		this.setIconImage(image);
 		setPreferredSize(new Dimension(1150, 700));
-	}
-
-	private void initTray() {
-		if (!SystemTray.isSupported() || !USE_TRAY) {
-			log.info("System tray disabled.");
-			USE_TRAY = false;
-			return;
-		}
-
-		MouseListener mouseListener = new MouseListener() {
-
-			@Override
-			public void mouseClicked(MouseEvent e) {
-			}
-
-			@Override
-			public void mouseEntered(MouseEvent e) {
-			}
-
-			@Override
-			public void mouseExited(MouseEvent e) {
-			}
-
-			@Override
-			public void mousePressed(MouseEvent e) {
-			}
-
-			@Override
-			public void mouseReleased(MouseEvent e) {
-			}
-		};
-
-		ActionListener menuItemListener = new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (e.getSource() == startServerMenuItem_tray) {
-					startProxy();
-				} else if (e.getSource() == stopServerMenuItem_tray) {
-					handleStop();
-				} else if (e.getSource() == showFrameMenuItem_tray) {
-					handleShowWindow();
-				} else if (e.getSource() == newRestClientMenuItem_tray) {
-					handleRest();
-				} else if (e.getSource() == newJsonViewerMenuItem_tray) {
-					handleJson();
-				} else
-					handleExit();
-			}
-
-		};
-
-		PopupMenu popup = new PopupMenu();
-		this.startServerMenuItem_tray = new MenuItem("Start Server");
-		startServerMenuItem_tray.addActionListener(menuItemListener);
-		popup.add(startServerMenuItem_tray);
-
-		this.stopServerMenuItem_tray = new MenuItem("Stop Server");
-		stopServerMenuItem_tray.addActionListener(menuItemListener);
-		popup.add(stopServerMenuItem_tray);
-
-		this.showFrameMenuItem_tray = new MenuItem("Show Window");
-		showFrameMenuItem_tray.addActionListener(menuItemListener);
-		popup.add(showFrameMenuItem_tray);
-
-		this.newRestClientMenuItem_tray = new MenuItem("New Rest Client");
-		newRestClientMenuItem_tray.addActionListener(menuItemListener);
-		popup.add(newRestClientMenuItem_tray);
-
-		this.newJsonViewerMenuItem_tray = new MenuItem("New Json Viewer");
-		newJsonViewerMenuItem_tray.addActionListener(menuItemListener);
-		popup.add(newJsonViewerMenuItem_tray);
-
-		popup.addSeparator();
-
-		MenuItem defaultItem = new MenuItem("Exit");
-		defaultItem.addActionListener(menuItemListener);
-		popup.add(defaultItem);
-
-		try {
-			trayIcon = new TrayIcon(image, "AjaxProxy", popup);
-
-			ActionListener actionListener = new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					MainFrame self = MainFrame.this;
-					self.setVisible(!MainFrame.this.isVisible());
-					if (self.isVisible()) {
-						self.requestFocus();
-					}
-				}
-			};
-
-			trayIcon.setImageAutoSize(true);
-			trayIcon.addActionListener(actionListener);
-			trayIcon.addMouseListener(mouseListener);
-
-			SystemTray tray = SystemTray.getSystemTray();
-			tray.add(trayIcon);
-		} catch (UnsupportedOperationException | AWTException e) {
-			log.error("System tray icon could not be added.", e);
-			USE_TRAY = false;
-		}
+		setMinimumSize(new Dimension(700, 550));
 	}
 
 	private void initMenuBar() {
@@ -297,7 +150,6 @@ public class MainFrame extends JFrame implements ProxyListener, WindowListListen
 		mi = new JMenuItem("Save");
 		mi.setMnemonic(KeyEvent.VK_S);
 		mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
-		saveMenuItem = mi;
 		mi.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent ae) {
@@ -307,7 +159,6 @@ public class MainFrame extends JFrame implements ProxyListener, WindowListListen
 		menu.add(mi);
 
 		mi = new JMenuItem("Save As");
-		saveAsMenuItem = mi;
 		mi.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent ae) {
@@ -385,16 +236,6 @@ public class MainFrame extends JFrame implements ProxyListener, WindowListListen
 		helpUpdates.pack();
 		helpUpdates.setLocationRelativeTo(MainFrame.this);
 		helpUpdates.setVisible(true);
-	}
-
-	private void handleRest() {
-		RestClientFrame frame = new RestClientFrame();
-		frame.setVisible(true);
-	}
-
-	private void handleJson() {
-		JsonViewerFrame frame = new JsonViewerFrame();
-		frame.setVisible(true);
 	}
 
 	private void handleNew() {
@@ -589,22 +430,12 @@ public class MainFrame extends JFrame implements ProxyListener, WindowListListen
 
 	@Override
 	public void started() {
-		if (startServerMenuItem_tray != null)
-			startServerMenuItem_tray.setEnabled(false);
-		if (stopServerMenuItem_tray != null)
-			stopServerMenuItem_tray.setEnabled(true);
-
 		startServerMenuItem2.setEnabled(false);
 		stopServerMenuItem2.setEnabled(true);
 	}
 
 	@Override
 	public void stopped() {
-		if (startServerMenuItem_tray != null)
-			startServerMenuItem_tray.setEnabled(true);
-		if (stopServerMenuItem_tray != null)
-			stopServerMenuItem_tray.setEnabled(false);
-
 		startServerMenuItem2.setEnabled(true);
 		stopServerMenuItem2.setEnabled(false);
 	}
@@ -616,10 +447,6 @@ public class MainFrame extends JFrame implements ProxyListener, WindowListListen
 
 	public void addVariables(Map<String, String> vars) {
 		panel.addVariables(vars);
-	}
-
-	private void handleShowWindow() {
-		this.setVisible(true);
 	}
 
 	@Override

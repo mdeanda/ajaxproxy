@@ -283,6 +283,17 @@ public class AjaxProxyServer implements Runnable, LoggerMessageListener {
 	}
 
 	public void run() {
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+			public void run() {
+				try {
+					log.info("Shutting down jetty");
+					AjaxProxyServer.this.stop();
+				} catch (Exception e) {
+					log.error(e.getMessage(), e);
+				}
+			}
+		});
+
 		log.info("starting jetty server");
 		try {
 			fireEvent(ProxyEvent.START);
@@ -359,16 +370,6 @@ public class AjaxProxyServer implements Runnable, LoggerMessageListener {
 					throw e;
 				}
 
-				Runtime.getRuntime().addShutdownHook(new Thread() {
-					public void run() {
-						try {
-							log.info("Shutting down jetty");
-							jettyServer.stop();
-						} catch (Exception e) {
-							log.error(e.getMessage(), e);
-						}
-					}
-				});
 			}
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
@@ -390,10 +391,6 @@ public class AjaxProxyServer implements Runnable, LoggerMessageListener {
 			}
 		}
 		jettyServers.clear();
-	}
-
-	public JsonObject getConfig() {
-		return config;
 	}
 
 	public List<MergeServlet> getMergeServlets() {
