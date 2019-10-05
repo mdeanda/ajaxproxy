@@ -3,6 +3,7 @@ package com.thedeanda.ajaxproxy.ui.serverconfig.merge;
 import javax.swing.table.AbstractTableModel;
 
 import com.thedeanda.ajaxproxy.config.model.MergeMode;
+import com.thedeanda.ajaxproxy.config.model.ServerConfig;
 import com.thedeanda.javajson.JsonArray;
 import com.thedeanda.javajson.JsonObject;
 import com.thedeanda.javajson.JsonValue;
@@ -130,7 +131,8 @@ public class MergeTableModel extends AbstractTableModel {
 		fireTableRowsInserted(data.size(), data.size());
 	}
 
-	public void setConfig(JsonArray data) {
+	public void setConfig(JsonArray data, ServerConfig serverConfig) {
+		//TODO: revisit to work with server config data instead
 		if (data == null)
 			data = new JsonArray();
 		this.data = data;

@@ -133,20 +133,6 @@ public class ResourceViewerPanel extends JPanel implements ResourceListPanelList
 		 */
 	}
 
-	public JsonObject getConfig() {
-		JsonObject data = new JsonObject();
-		// data.put("track", toggleBtn.isSelected());
-		return data;
-	}
-
-	public void setConfig(JsonObject config) {
-		if (config == null)
-			return;
-		// f toggleBtn.setSelected(config.getBoolean("track"));
-
-		handleMonitorCheckboxChanged();
-	}
-
 	class DataHolder {
 		public String headers;
 	}

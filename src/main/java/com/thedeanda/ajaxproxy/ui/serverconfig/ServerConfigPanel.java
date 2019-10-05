@@ -2,6 +2,8 @@ package com.thedeanda.ajaxproxy.ui.serverconfig;
 
 import com.thedeanda.ajaxproxy.AjaxProxyServer;
 import com.thedeanda.ajaxproxy.ProxyListener;
+import com.thedeanda.ajaxproxy.config.model.Config;
+import com.thedeanda.ajaxproxy.config.model.ServerConfig;
 import com.thedeanda.ajaxproxy.ui.MainPanel;
 import com.thedeanda.ajaxproxy.ui.SettingsChangedListener;
 import com.thedeanda.ajaxproxy.ui.util.SwingUtils;
@@ -80,17 +82,22 @@ public class ServerConfigPanel extends JPanel implements SettingsChangedListener
 //        variablePanel.setVariables(vars);
     }
 
-    public void setConfig(JsonObject config) {
-        proxyModel.setConfig(config.getJsonArray("proxy"));
-        mergeModel.setConfig(config.getJsonArray("merge"));
-        generalPanel.setConfig(config);
-        tamperPanel.setConfig(config.getJsonObject("tamper"));
+    public void setConfig(JsonObject json, Config config) {
+        //only show first server for now
+        ServerConfig serverConfig = config.getServers().stream().findFirst().get();
+
+        //TODO: add drop down or something to change which server config is being viewed/editted
+
+        proxyModel.setConfig(json.getJsonArray("proxy"), serverConfig);
+        mergeModel.setConfig(json.getJsonArray("merge"), serverConfig);
+        generalPanel.setConfig(json);
+        //tamperPanel.setConfig(json.getJsonObject("tamper"));
     }
 
     public void updateConfig(JsonObject config) {
         config.put("proxy", proxyModel.getConfig(generalPanel.getCacheTime()));
         config.put("merge", mergeModel.getConfig());
-        config.put("tamper", tamperPanel.getConfig());
+        //config.put("tamper", tamperPanel.getConfig());
         generalPanel.updateConfig(config);
     }
 

@@ -39,12 +39,12 @@ public class VariableController {
         fireSettingsChanged();
     }
 
-    public void setConfig(JsonObject jsonObject) {
+    public void setConfig(List<Variable> variables) {
         clear();
-        if (jsonObject == null) return;
+        if (variables == null || variables.isEmpty()) return;
 
-        for (String key : jsonObject) {
-            set(key, jsonObject.getString(key));
+        for (Variable var : variables) {
+            set(var.getKey(), var.getValue());
         }
     }
 

@@ -194,6 +194,7 @@ public class TamperPanel extends JPanel implements ActionListener {
 		}
 	}
 
+	/*
 	public JsonObject getConfig() {
 		JsonObject json = new JsonObject();
 		JsonArray array = new JsonArray();
@@ -226,6 +227,7 @@ public class TamperPanel extends JPanel implements ActionListener {
 			}
 		}
 	}
+	//*/
 
 	public void showAddDialog() {
 		TamperSelector selector = TamperSelectorDialog.showDialog(this);

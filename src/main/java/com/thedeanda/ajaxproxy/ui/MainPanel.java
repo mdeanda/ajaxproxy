@@ -2,6 +2,9 @@ package com.thedeanda.ajaxproxy.ui;
 
 import com.thedeanda.ajaxproxy.AjaxProxyServer;
 import com.thedeanda.ajaxproxy.ProxyListener;
+import com.thedeanda.ajaxproxy.config.ConfigLoader;
+import com.thedeanda.ajaxproxy.config.model.Config;
+import com.thedeanda.ajaxproxy.config.model.Variable;
 import com.thedeanda.ajaxproxy.service.ResourceService;
 import com.thedeanda.ajaxproxy.ui.border.TopBorder;
 import com.thedeanda.ajaxproxy.ui.logger.LoggerPanel;
@@ -231,7 +234,6 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 	 */
 	public JsonObject getConfig() {
 		JsonObject json = config;
-		json.put("resource", resourceViewerPanel.getConfig());
 
 		serverConfigPanel.updateConfig(json);
 		loggerPanel.updateConfig(json);
@@ -318,7 +320,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		InputStream is = null;
 		try {
 			is = new FileInputStream(configFile);
-			setConfig(JsonObject.parse(is));
+			setConfig(JsonObject.parse(is), configFile.getParentFile());
 		} catch (IOException e) {
 			log.error(e.getMessage(), e);
 			JOptionPane.showMessageDialog(MainPanel.this, "Error reading file");
@@ -338,12 +340,15 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		}
 	}
 
-	public void setConfig(JsonObject json) {
+	public void setConfig(JsonObject json, File configDir) {
+		//TODO: keep as Config object
+		ConfigLoader cl = new ConfigLoader();
+		Config co = cl.loadConfig(json, configDir);
+
+		List<Variable> variables = co.getVariables();
 		this.config = json;
-		serverConfigPanel.setConfig(json);
-        variableController.setConfig(json);
-		resourceViewerPanel.setConfig(json.getJsonObject("resource"));
-		variableController.setConfig(json.getJsonObject("variables"));
+		serverConfigPanel.setConfig(json, co);
+        variableController.setConfig(variables);
 	}
 
 	@Override

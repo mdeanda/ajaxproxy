@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
+import com.thedeanda.ajaxproxy.config.model.ServerConfig;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -177,11 +178,14 @@ public class ProxyTableModel extends AbstractTableModel implements Reorderable {
 		}
 	}
 
-	public void setConfig(JsonArray data) {
+	public void setConfig(JsonArray data, ServerConfig serverConfig) {
 		if (data == null)
 			data = new JsonArray();
 
 		this.data.clear();
+		this.data.addAll(serverConfig.getProxyConfig());
+
+		/*
 		Convertor converter = Convertor.get();
 		for (JsonValue v : data) {
 			ProxyConfig config = converter.readProxyConfig(v.getJsonObject());
@@ -189,6 +193,7 @@ public class ProxyTableModel extends AbstractTableModel implements Reorderable {
 				this.data.add(config);
 			}
 		}
+		//*/
 		this.fireTableDataChanged();
 		this.normalizeData();
 	}
