@@ -22,6 +22,7 @@ import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import com.thedeanda.ajaxproxy.config.model.ServerConfig;
 import com.thedeanda.ajaxproxy.ui.SettingsChangedListener;
 import com.thedeanda.ajaxproxy.ui.util.SwingUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -228,8 +229,8 @@ public class GeneralPanel extends JPanel implements ChangeListener,
 		resourceBase.setText(rb);
 	}
 
-	public void setPort(int port) {
-		this.port.setText(String.valueOf(port));
+	public void setPort(String port) {
+		this.port.setText(port);
 	}
 
 	public void setShowIndex(boolean showIndex) {
@@ -271,19 +272,17 @@ public class GeneralPanel extends JPanel implements ChangeListener,
 		// filter.setMaxBitrate(maxBitrate.getValue());
 	}
 
-	public void setConfig(JsonObject config) {
-		if (config == null)
+	public void setConfig(ServerConfig serverConfig) {
+		if (serverConfig == null)
 			return;
 
-		setPort(config.getInt("port"));
-		setResourceBase(config.getString("resourceBase"));
-		setShowIndex(config.getBoolean(AjaxProxyServer.SHOW_INDEX));
+		setPort(serverConfig.getPort().getOriginalValue());
+		setResourceBase(serverConfig.getResourceBase().getOriginalValue());
+		setShowIndex(serverConfig.isShowIndex());
 
-		JsonObject options = config.getJsonObject("options");
-		if (options != null) {
-			forcedLatency.setValue(options.getInt("forcedLatency"));
-			cacheSlider.setValue(options.getInt("cacheTime"));
-		}
+		//TODO: map to ui values instead
+		forcedLatency.setValue(serverConfig.getForcedLatencyMs());
+		cacheSlider.setValue(serverConfig.getCacheTimeSec());
 	}
 
 	/** update values from current ui state into config object */

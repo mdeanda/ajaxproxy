@@ -88,9 +88,9 @@ public class ServerConfigPanel extends JPanel implements SettingsChangedListener
 
         //TODO: add drop down or something to change which server config is being viewed/editted
 
-        proxyModel.setConfig(json.getJsonArray("proxy"), serverConfig);
+        proxyModel.setConfig(serverConfig);
         mergeModel.setConfig(json.getJsonArray("merge"), serverConfig);
-        generalPanel.setConfig(json);
+        generalPanel.setConfig(serverConfig);
         //tamperPanel.setConfig(json.getJsonObject("tamper"));
     }
 
@@ -106,7 +106,7 @@ public class ServerConfigPanel extends JPanel implements SettingsChangedListener
     }
 
     public void clearAll() {
-        generalPanel.setPort(0);
+        generalPanel.setPort("0");
         generalPanel.setResourceBase("");
         generalPanel.setShowIndex(false);
         proxyModel.clear();
