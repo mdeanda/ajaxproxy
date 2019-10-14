@@ -340,7 +340,8 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		}
 	}
 
-	public void setConfig(JsonObject json, File configDir) {
+	// NOTE: perhaps pass in original file instead and manage it all here
+	private void setConfig(JsonObject json, File configDir) {
 		//TODO: keep as Config object
 		ConfigLoader cl = new ConfigLoader();
 		Config co = cl.loadConfig(json, configDir);
