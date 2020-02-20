@@ -331,7 +331,8 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		}
 	}
 
-	public File getConfigFile() {
+	@Deprecated
+	private File getConfigFile() {
 		return configFile;
 	}
 
