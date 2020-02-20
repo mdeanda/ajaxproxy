@@ -7,6 +7,7 @@ import com.thedeanda.ajaxproxy.config.model.Config;
 import com.thedeanda.ajaxproxy.config.model.Variable;
 import com.thedeanda.ajaxproxy.service.ResourceService;
 import com.thedeanda.ajaxproxy.ui.border.TopBorder;
+import com.thedeanda.ajaxproxy.ui.json.JsonViewer;
 import com.thedeanda.ajaxproxy.ui.logger.LoggerPanel;
 import com.thedeanda.ajaxproxy.ui.resourceviewer.ResourceViewerPanel;
 import com.thedeanda.ajaxproxy.ui.serverconfig.ServerConfigPanel;
@@ -57,10 +58,13 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 	private static final String CARD_RESOURCE_VIEWER = "card_resource_viewer";
 	private static final String CARD_VARIABLES = "card_variables";
 	private static final String CARD_LOGGER = "card_logger";
+	private static final String CARD_JSON = "json_viewer";
+
 	private JToggleButton serverToolbarButton;
 	private JToggleButton requestToolbarButton;
 	private JToggleButton loggerToolbarButton;
 	private JToggleButton variablesToolbarButton;
+	private JToggleButton jsonToolbarButton;
 
 	public MainPanel() {
 		SpringLayout layout = new SpringLayout();
@@ -97,6 +101,9 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 
 		loggerPanel = new LoggerPanel();
 		cardPanel.add(loggerPanel, CARD_LOGGER);
+
+		JsonViewer jsonPanel = new JsonViewer();
+		cardPanel.add(jsonPanel, CARD_JSON);
 
 		layout.putConstraint(SpringLayout.NORTH, cardPanel, 2, SpringLayout.NORTH, contentPanel);
 		layout.putConstraint(SpringLayout.WEST, cardPanel, 0, SpringLayout.WEST, contentPanel);
@@ -147,6 +154,12 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		toolBar.add(button);
 		loggerToolbarButton = button;
 
+		button = makeNavigationButton(CARD_JSON,
+				"JSON Viewer",
+				"Json Viewer");
+		toolBar.add(button);
+		jsonToolbarButton = button;
+
 		//*
 		Dimension dim = button.getPreferredSize();
 		dim.height += 10;
@@ -173,6 +186,13 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		layout.putConstraint(SpringLayout.EAST, loggerToolbarButton, 90, SpringLayout.WEST, loggerToolbarButton);
 		layout.putConstraint(SpringLayout.NORTH, loggerToolbarButton, 0, SpringLayout.NORTH, serverToolbarButton);
 		layout.putConstraint(SpringLayout.SOUTH, loggerToolbarButton, 0, SpringLayout.SOUTH, serverToolbarButton);
+
+		layout.putConstraint(SpringLayout.WEST, jsonToolbarButton, 2, SpringLayout.EAST, loggerToolbarButton);
+		layout.putConstraint(SpringLayout.EAST, jsonToolbarButton, 120, SpringLayout.WEST, jsonToolbarButton);
+		layout.putConstraint(SpringLayout.NORTH, jsonToolbarButton, 0, SpringLayout.NORTH, serverToolbarButton);
+		layout.putConstraint(SpringLayout.SOUTH, jsonToolbarButton, 0, SpringLayout.SOUTH, serverToolbarButton);
+
+
 
 
 		return toolBar;
@@ -409,6 +429,9 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 			case CARD_VARIABLES:
 				selectedCard(CARD_VARIABLES, variablesToolbarButton);
 				break;
+			case CARD_JSON:
+				selectedCard(CARD_JSON, jsonToolbarButton);
+				break;
 			default:
 		}
 	}
@@ -422,6 +445,8 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 			loggerToolbarButton.setSelected(false);
 		if (selectedToolbarButton != variablesToolbarButton)
 			variablesToolbarButton.setSelected(false);
+		if (selectedToolbarButton != jsonToolbarButton)
+			jsonToolbarButton.setSelected(false);
 
 		cardLayout.show(cardPanel, cardName);
 
