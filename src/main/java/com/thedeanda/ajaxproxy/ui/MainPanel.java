@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
+import javax.swing.plaf.metal.MetalIconFactory;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -60,11 +61,11 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 	private static final String CARD_LOGGER = "card_logger";
 	private static final String CARD_JSON = "json_viewer";
 
-	private JToggleButton serverToolbarButton;
-	private JToggleButton requestToolbarButton;
-	private JToggleButton loggerToolbarButton;
-	private JToggleButton variablesToolbarButton;
-	private JToggleButton jsonToolbarButton;
+	private JButton serverToolbarButton;
+	private JButton requestToolbarButton;
+	private JButton loggerToolbarButton;
+	private JButton variablesToolbarButton;
+	private JButton jsonToolbarButton;
 
 	public MainPanel() {
 		SpringLayout layout = new SpringLayout();
@@ -78,7 +79,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 
 		JPanel contentPanel = new JPanel();
 		contentPanel.setLayout(layout);
-		contentPanel.setBorder(new TopBorder());
+		//contentPanel.setBorder(new TopBorder());
 		add(contentPanel, BorderLayout.CENTER);
 
 		cardPanel = new JPanel();
@@ -116,17 +117,17 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 	}
 
 	private JComponent initToolbar() {
-		/*
+		//*
 		JToolBar toolBar = new JToolBar();
 		toolBar.setFloatable(false);
-		toolBar.setRollover(true);
+		//toolBar.setRollover(true);
 		//*/
 
-		JPanel toolBar = new JPanel();
-		SpringLayout layout = new SpringLayout();
-		toolBar.setLayout(layout);
+		//JPanel toolBar = new JPanel();
+		//SpringLayout layout = new SpringLayout();
+		//toolBar.setLayout(layout);
 
-		JToggleButton button = null;
+		JButton button = null;
 
 		button = makeNavigationButton(CARD_SERVER,
 				"Configure server and proxy paths",
@@ -155,18 +156,19 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		loggerToolbarButton = button;
 
 		button = makeNavigationButton(CARD_JSON,
-				"JSON Viewer",
-				"Json Viewer");
+				"Json/Xml Formatter",
+				"Text Formatter");
 		toolBar.add(button);
 		jsonToolbarButton = button;
 
 		//*
 		Dimension dim = button.getPreferredSize();
 		dim.height += 10;
-		dim.width = 600;
+		dim.width = 100;
 		toolBar.setPreferredSize(dim);
 		 //*/
 
+		/*
 		layout.putConstraint(SpringLayout.WEST, serverToolbarButton, 2, SpringLayout.WEST, toolBar);
 		layout.putConstraint(SpringLayout.EAST, serverToolbarButton, 140, SpringLayout.WEST, serverToolbarButton);
 		layout.putConstraint(SpringLayout.NORTH, serverToolbarButton, 2, SpringLayout.NORTH, toolBar);
@@ -191,7 +193,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		layout.putConstraint(SpringLayout.EAST, jsonToolbarButton, 120, SpringLayout.WEST, jsonToolbarButton);
 		layout.putConstraint(SpringLayout.NORTH, jsonToolbarButton, 0, SpringLayout.NORTH, serverToolbarButton);
 		layout.putConstraint(SpringLayout.SOUTH, jsonToolbarButton, 0, SpringLayout.SOUTH, serverToolbarButton);
-
+		//*/
 
 
 
@@ -212,16 +214,22 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 
 	}
 
-	protected JToggleButton makeNavigationButton(String actionCommand,
+	protected JButton makeNavigationButton(String actionCommand,
 										   String toolTipText,
 										   String altText) {
 
 		//Create and initialize the button.
-		JToggleButton button = SwingUtils.newJToggleButton(altText);
+		Icon icon = MetalIconFactory.getFileChooserDetailViewIcon();
+		JButton button = new JButton(altText, icon);
 		button.setActionCommand(actionCommand);
 		button.setToolTipText(toolTipText);
 		button.addActionListener(this);
-		button.setText(altText);
+		button.setIcon(icon);
+		//button.setText(altText);
+		//Insets insets = new Insets(4, 0, 4, 14);
+		//button.setMargin(insets);
+		//button.getInsets(insets);
+		button.setMargin(new Insets(2, 0, 2, 10));
 
 		return button;
 	}
@@ -437,7 +445,8 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		}
 	}
 
-	private void selectedCard(String cardName, JToggleButton selectedToolbarButton) {
+	private void selectedCard(String cardName, JButton selectedToolbarButton) {
+		/*
 		if (selectedToolbarButton != serverToolbarButton)
 			serverToolbarButton.setSelected(false);
 		if (selectedToolbarButton != requestToolbarButton)
@@ -449,8 +458,10 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		if (selectedToolbarButton != jsonToolbarButton)
 			jsonToolbarButton.setSelected(false);
 
+		 */
+
 		cardLayout.show(cardPanel, cardName);
 
-		selectedToolbarButton.setSelected(true);
+		//selectedToolbarButton.setSelected(true);
 	}
 }
