@@ -21,6 +21,7 @@ public class HelpUpdates extends JDialog {
     private JLabel lblCurrentValue;
     private JLabel lblLatestValue;
     private JLabel lblIntroText;
+    private JTextField txtLink;
 
     public HelpUpdates(JFrame frame) {
         super(frame, true);
@@ -32,7 +33,7 @@ public class HelpUpdates extends JDialog {
 
         initComponents(panel);
         initLayout(layout, panel);
-        setMinimumSize(new Dimension(450, 300));
+        setMinimumSize(new Dimension(450, 305));
         setResizable(false);
 
         log.debug("checking for udpates");
@@ -87,6 +88,11 @@ public class HelpUpdates extends JDialog {
         layout.putConstraint(SpringLayout.BASELINE, lblLatestValue, 0, SpringLayout.BASELINE, lblLatest);
         layout.putConstraint(SpringLayout.WEST, lblLatestValue, 0, SpringLayout.WEST, lblCurrentValue);
 
+        layout.putConstraint(SpringLayout.NORTH, txtLink, 15, SpringLayout.SOUTH, lblLatest);
+        layout.putConstraint(SpringLayout.WEST, txtLink, 20, SpringLayout.WEST, panel);
+        layout.putConstraint(SpringLayout.EAST, txtLink, -20, SpringLayout.EAST, panel);
+
+
         layout.putConstraint(SpringLayout.SOUTH, viewReleasesButton, -20, SpringLayout.SOUTH, panel);
         layout.putConstraint(SpringLayout.HORIZONTAL_CENTER, viewReleasesButton, 0, SpringLayout.HORIZONTAL_CENTER, panel);
 
@@ -116,6 +122,10 @@ public class HelpUpdates extends JDialog {
         panel.add(viewReleasesButton);
         viewReleasesButton.addActionListener(el -> this.openReleasesPage());
 
+        txtLink = SwingUtils.newJTextField();
+        txtLink.setText(UpdateCheckWorker.RELEASE_URL);
+        txtLink.setEditable(false);
+        panel.add(txtLink);
 
         //*/
 
@@ -126,14 +136,9 @@ public class HelpUpdates extends JDialog {
             URI url = new URI(UpdateCheckWorker.RELEASE_URL);
             Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
             if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
-                try {
-                    desktop.browse(url);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                desktop.browse(url);
+                this.setVisible(false);
             }
-
-            this.setVisible(false);
         } catch (Exception e) {
             log.warn(e.getMessage(), e);
         }

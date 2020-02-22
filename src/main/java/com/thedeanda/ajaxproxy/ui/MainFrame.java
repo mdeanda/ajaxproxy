@@ -36,6 +36,7 @@ public class MainFrame extends JFrame implements ProxyListener, WindowListListen
 	private String windowId;
 
 	HelpAbout helpAbout = null;
+	HelpUpdates helpUpdates = null;
 
 
 	public MainFrame() {
@@ -232,8 +233,10 @@ public class MainFrame extends JFrame implements ProxyListener, WindowListListen
 	}
 
 	private void showHelpUpdates() {
-		HelpUpdates helpUpdates = new HelpUpdates(MainFrame.this);
-		helpUpdates.pack();
+		if (helpUpdates == null) {
+			helpUpdates = new HelpUpdates(MainFrame.this);
+			helpUpdates.pack();
+		}
 		helpUpdates.setLocationRelativeTo(MainFrame.this);
 		helpUpdates.setVisible(true);
 	}
