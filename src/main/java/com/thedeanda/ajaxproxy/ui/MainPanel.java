@@ -2,6 +2,7 @@ package com.thedeanda.ajaxproxy.ui;
 
 import com.thedeanda.ajaxproxy.AjaxProxyServer;
 import com.thedeanda.ajaxproxy.ProxyListener;
+import com.thedeanda.ajaxproxy.config.ConfigFileService;
 import com.thedeanda.ajaxproxy.config.ConfigLoader;
 import com.thedeanda.ajaxproxy.config.model.Config;
 import com.thedeanda.ajaxproxy.config.model.Variable;
@@ -61,6 +62,8 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 	private static final String CARD_LOGGER = "card_logger";
 	private static final String CARD_JSON = "json_viewer";
 
+	private final ConfigFileService configFileService;
+
 	private JButton serverToolbarButton;
 	private JButton requestToolbarButton;
 	private JButton loggerToolbarButton;
@@ -70,6 +73,8 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 	public MainPanel() {
 		SpringLayout layout = new SpringLayout();
 		setLayout(new BorderLayout());
+
+		configFileService = new ConfigFileService();
 
 		File dbFile = ConfigService.get().getResourceHistoryDb();
 		resourceService = new ResourceService(CACHE_SIZE, dbFile);
@@ -95,7 +100,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		resourceViewerPanel = new ResourceViewerPanel(resourceService);
 		cardPanel.add(resourceViewerPanel, CARD_RESOURCE_VIEWER);
 
-        variableController = new VariableController();
+        variableController = new VariableController(configFileService);
         variableController.addListener(this);
 		variablePanel = new VariablesPanel(variableController);
 		cardPanel.add(variablePanel, CARD_VARIABLES);
@@ -122,10 +127,6 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		toolBar.setFloatable(false);
 		//toolBar.setRollover(true);
 		//*/
-
-		//JPanel toolBar = new JPanel();
-		//SpringLayout layout = new SpringLayout();
-		//toolBar.setLayout(layout);
 
 		JButton button = null;
 
@@ -167,35 +168,6 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		dim.width = 100;
 		toolBar.setPreferredSize(dim);
 		 //*/
-
-		/*
-		layout.putConstraint(SpringLayout.WEST, serverToolbarButton, 2, SpringLayout.WEST, toolBar);
-		layout.putConstraint(SpringLayout.EAST, serverToolbarButton, 140, SpringLayout.WEST, serverToolbarButton);
-		layout.putConstraint(SpringLayout.NORTH, serverToolbarButton, 2, SpringLayout.NORTH, toolBar);
-		layout.putConstraint(SpringLayout.SOUTH, serverToolbarButton, -2, SpringLayout.SOUTH, toolBar);
-
-		layout.putConstraint(SpringLayout.WEST, requestToolbarButton, 2, SpringLayout.EAST, serverToolbarButton);
-		layout.putConstraint(SpringLayout.EAST, requestToolbarButton, 150, SpringLayout.WEST, requestToolbarButton);
-		layout.putConstraint(SpringLayout.NORTH, requestToolbarButton, 0, SpringLayout.NORTH, serverToolbarButton);
-		layout.putConstraint(SpringLayout.SOUTH, requestToolbarButton, 0, SpringLayout.SOUTH, serverToolbarButton);
-
-		layout.putConstraint(SpringLayout.WEST, variablesToolbarButton, 2, SpringLayout.EAST, requestToolbarButton);
-		layout.putConstraint(SpringLayout.EAST, variablesToolbarButton, 110, SpringLayout.WEST, variablesToolbarButton);
-		layout.putConstraint(SpringLayout.NORTH, variablesToolbarButton, 0, SpringLayout.NORTH, serverToolbarButton);
-		layout.putConstraint(SpringLayout.SOUTH, variablesToolbarButton, 0, SpringLayout.SOUTH, serverToolbarButton);
-
-		layout.putConstraint(SpringLayout.WEST, loggerToolbarButton, 2, SpringLayout.EAST, variablesToolbarButton);
-		layout.putConstraint(SpringLayout.EAST, loggerToolbarButton, 90, SpringLayout.WEST, loggerToolbarButton);
-		layout.putConstraint(SpringLayout.NORTH, loggerToolbarButton, 0, SpringLayout.NORTH, serverToolbarButton);
-		layout.putConstraint(SpringLayout.SOUTH, loggerToolbarButton, 0, SpringLayout.SOUTH, serverToolbarButton);
-
-		layout.putConstraint(SpringLayout.WEST, jsonToolbarButton, 2, SpringLayout.EAST, loggerToolbarButton);
-		layout.putConstraint(SpringLayout.EAST, jsonToolbarButton, 120, SpringLayout.WEST, jsonToolbarButton);
-		layout.putConstraint(SpringLayout.NORTH, jsonToolbarButton, 0, SpringLayout.NORTH, serverToolbarButton);
-		layout.putConstraint(SpringLayout.SOUTH, jsonToolbarButton, 0, SpringLayout.SOUTH, serverToolbarButton);
-		//*/
-
-
 
 		return toolBar;
 	}
@@ -348,6 +320,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		this.configFile = configFile;
 		InputStream is = null;
 		try {
+			configFileService.loadConfigFile(configFile);
 			is = new FileInputStream(configFile);
 			setConfig(JsonObject.parse(is), configFile.getParentFile());
 		} catch (IOException e) {
@@ -371,6 +344,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 
 	// NOTE: perhaps pass in original file instead and manage it all here
 	private void setConfig(JsonObject json, File configDir) {
+		//xxx
 		//TODO: keep as Config object
 		ConfigLoader cl = new ConfigLoader();
 		Config co = cl.loadConfig(json, configDir);
@@ -378,7 +352,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		List<Variable> variables = co.getVariables();
 		this.config = json;
 		serverConfigPanel.setConfig(json, co);
-        variableController.setConfig(variables);
+        //variableController.setConfig(variables);
 	}
 
 	@Override
