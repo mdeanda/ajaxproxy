@@ -316,6 +316,10 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		return configFile;
 	}
 
+	/**
+	 * entrypoint when loading a new file
+	 * @param configFile
+	 */
 	public void setConfigFile(final File configFile) {
 		this.configFile = configFile;
 		InputStream is = null;
