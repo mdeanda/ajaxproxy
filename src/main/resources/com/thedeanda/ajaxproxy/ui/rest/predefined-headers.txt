@@ -1,4 +1,7 @@
 Accept-Encoding: gzip, deflate
+Accept-Encoding: gzip, deflate, br
+Accept: application/json
+Accept: text/html
 Content-Type: application/json
 Content-Type: application/atom+xml
 Content-Type: application/x-www-form-urlencoded

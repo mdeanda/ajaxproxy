@@ -18,7 +18,10 @@ import com.thedeanda.ajaxproxy.ui.resourceviewer.ContentViewer;
 
 public class JsonViewer extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 1L;
+	private final String CMD_FORMAT = "FORMAT";
+	private final String CMD_CLEAR = "CLEAR";
 	private JTextArea inputField;
+	private JButton clearButton;
 	private JButton submitButton;
 	private JScrollPane inputScroll;
 	private ContentViewer contentViewer;
@@ -68,7 +71,13 @@ public class JsonViewer extends JPanel implements ActionListener {
 		panel.add(inputLabel);
 		panel.add(inputScroll);
 
+		clearButton = new JButton("Clear");
+		clearButton.setActionCommand(CMD_CLEAR);
+		clearButton.addActionListener(this);
+		panel.add(clearButton);
+
 		submitButton = new JButton("Format");
+		submitButton.setActionCommand(CMD_FORMAT);
 		submitButton.addActionListener(this);
 		panel.add(submitButton);
 
@@ -81,9 +90,15 @@ public class JsonViewer extends JPanel implements ActionListener {
 		layout.putConstraint(SpringLayout.WEST, inputScroll, 10, SpringLayout.WEST, panel);
 		layout.putConstraint(SpringLayout.SOUTH, inputScroll, -10, SpringLayout.SOUTH, panel);
 
+
+
 		// submit button
 		layout.putConstraint(SpringLayout.EAST, submitButton, -10, SpringLayout.EAST, panel);
-		layout.putConstraint(SpringLayout.NORTH, submitButton, 10, SpringLayout.NORTH, panel);
+		layout.putConstraint(SpringLayout.NORTH, submitButton, 20, SpringLayout.NORTH, panel);
+
+		// submit button
+		layout.putConstraint(SpringLayout.EAST, clearButton, -10, SpringLayout.WEST, submitButton);
+		layout.putConstraint(SpringLayout.NORTH, clearButton, 20, SpringLayout.NORTH, panel);
 
 		return panel;
 	}
@@ -94,8 +109,12 @@ public class JsonViewer extends JPanel implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if (e.getSource() == submitButton) {
+		String command = e.getActionCommand();
+		if (CMD_FORMAT.equals(command)) {
 			format();
+		} else if (CMD_CLEAR.equals(command)) {
+			inputField.setText("");
+			contentViewer.setContent((byte[]) null);
 		}
 	}
 

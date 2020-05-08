@@ -2,8 +2,13 @@ package com.thedeanda.ajaxproxy.ui;
 
 import com.thedeanda.ajaxproxy.AjaxProxyServer;
 import com.thedeanda.ajaxproxy.ProxyListener;
+import com.thedeanda.ajaxproxy.config.ConfigFileService;
+import com.thedeanda.ajaxproxy.config.ConfigLoader;
+import com.thedeanda.ajaxproxy.config.model.Config;
+import com.thedeanda.ajaxproxy.config.model.Variable;
 import com.thedeanda.ajaxproxy.service.ResourceService;
 import com.thedeanda.ajaxproxy.ui.border.TopBorder;
+import com.thedeanda.ajaxproxy.ui.json.JsonViewer;
 import com.thedeanda.ajaxproxy.ui.logger.LoggerPanel;
 import com.thedeanda.ajaxproxy.ui.resourceviewer.ResourceViewerPanel;
 import com.thedeanda.ajaxproxy.ui.serverconfig.ServerConfigPanel;
@@ -16,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
+import javax.swing.plaf.metal.MetalIconFactory;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -54,14 +60,21 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 	private static final String CARD_RESOURCE_VIEWER = "card_resource_viewer";
 	private static final String CARD_VARIABLES = "card_variables";
 	private static final String CARD_LOGGER = "card_logger";
-	private JToggleButton serverToolbarButton;
-	private JToggleButton requestToolbarButton;
-	private JToggleButton loggerToolbarButton;
-	private JToggleButton variablesToolbarButton;
+	private static final String CARD_JSON = "json_viewer";
+
+	private final ConfigFileService configFileService;
+
+	private JButton serverToolbarButton;
+	private JButton requestToolbarButton;
+	private JButton loggerToolbarButton;
+	private JButton variablesToolbarButton;
+	private JButton jsonToolbarButton;
 
 	public MainPanel() {
 		SpringLayout layout = new SpringLayout();
 		setLayout(new BorderLayout());
+
+		configFileService = new ConfigFileService();
 
 		File dbFile = ConfigService.get().getResourceHistoryDb();
 		resourceService = new ResourceService(CACHE_SIZE, dbFile);
@@ -71,7 +84,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 
 		JPanel contentPanel = new JPanel();
 		contentPanel.setLayout(layout);
-		contentPanel.setBorder(new TopBorder());
+		//contentPanel.setBorder(new TopBorder());
 		add(contentPanel, BorderLayout.CENTER);
 
 		cardPanel = new JPanel();
@@ -87,13 +100,16 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		resourceViewerPanel = new ResourceViewerPanel(resourceService);
 		cardPanel.add(resourceViewerPanel, CARD_RESOURCE_VIEWER);
 
-        variableController = new VariableController();
+        variableController = new VariableController(configFileService);
         variableController.addListener(this);
 		variablePanel = new VariablesPanel(variableController);
 		cardPanel.add(variablePanel, CARD_VARIABLES);
 
 		loggerPanel = new LoggerPanel();
 		cardPanel.add(loggerPanel, CARD_LOGGER);
+
+		JsonViewer jsonPanel = new JsonViewer();
+		cardPanel.add(jsonPanel, CARD_JSON);
 
 		layout.putConstraint(SpringLayout.NORTH, cardPanel, 2, SpringLayout.NORTH, contentPanel);
 		layout.putConstraint(SpringLayout.WEST, cardPanel, 0, SpringLayout.WEST, contentPanel);
@@ -106,17 +122,13 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 	}
 
 	private JComponent initToolbar() {
-		/*
+		//*
 		JToolBar toolBar = new JToolBar();
 		toolBar.setFloatable(false);
-		toolBar.setRollover(true);
+		//toolBar.setRollover(true);
 		//*/
 
-		JPanel toolBar = new JPanel();
-		SpringLayout layout = new SpringLayout();
-		toolBar.setLayout(layout);
-
-		JToggleButton button = null;
+		JButton button = null;
 
 		button = makeNavigationButton(CARD_SERVER,
 				"Configure server and proxy paths",
@@ -144,33 +156,18 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		toolBar.add(button);
 		loggerToolbarButton = button;
 
+		button = makeNavigationButton(CARD_JSON,
+				"Json/Xml Formatter",
+				"Text Formatter");
+		toolBar.add(button);
+		jsonToolbarButton = button;
+
 		//*
 		Dimension dim = button.getPreferredSize();
 		dim.height += 10;
-		dim.width = 600;
+		dim.width = 100;
 		toolBar.setPreferredSize(dim);
 		 //*/
-
-		layout.putConstraint(SpringLayout.WEST, serverToolbarButton, 2, SpringLayout.WEST, toolBar);
-		layout.putConstraint(SpringLayout.EAST, serverToolbarButton, 140, SpringLayout.WEST, serverToolbarButton);
-		layout.putConstraint(SpringLayout.NORTH, serverToolbarButton, 2, SpringLayout.NORTH, toolBar);
-		layout.putConstraint(SpringLayout.SOUTH, serverToolbarButton, -2, SpringLayout.SOUTH, toolBar);
-
-		layout.putConstraint(SpringLayout.WEST, requestToolbarButton, 2, SpringLayout.EAST, serverToolbarButton);
-		layout.putConstraint(SpringLayout.EAST, requestToolbarButton, 150, SpringLayout.WEST, requestToolbarButton);
-		layout.putConstraint(SpringLayout.NORTH, requestToolbarButton, 0, SpringLayout.NORTH, serverToolbarButton);
-		layout.putConstraint(SpringLayout.SOUTH, requestToolbarButton, 0, SpringLayout.SOUTH, serverToolbarButton);
-
-		layout.putConstraint(SpringLayout.WEST, variablesToolbarButton, 2, SpringLayout.EAST, requestToolbarButton);
-		layout.putConstraint(SpringLayout.EAST, variablesToolbarButton, 110, SpringLayout.WEST, variablesToolbarButton);
-		layout.putConstraint(SpringLayout.NORTH, variablesToolbarButton, 0, SpringLayout.NORTH, serverToolbarButton);
-		layout.putConstraint(SpringLayout.SOUTH, variablesToolbarButton, 0, SpringLayout.SOUTH, serverToolbarButton);
-
-		layout.putConstraint(SpringLayout.WEST, loggerToolbarButton, 2, SpringLayout.EAST, variablesToolbarButton);
-		layout.putConstraint(SpringLayout.EAST, loggerToolbarButton, 90, SpringLayout.WEST, loggerToolbarButton);
-		layout.putConstraint(SpringLayout.NORTH, loggerToolbarButton, 0, SpringLayout.NORTH, serverToolbarButton);
-		layout.putConstraint(SpringLayout.SOUTH, loggerToolbarButton, 0, SpringLayout.SOUTH, serverToolbarButton);
-
 
 		return toolBar;
 	}
@@ -189,16 +186,22 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 
 	}
 
-	protected JToggleButton makeNavigationButton(String actionCommand,
+	protected JButton makeNavigationButton(String actionCommand,
 										   String toolTipText,
 										   String altText) {
 
 		//Create and initialize the button.
-		JToggleButton button = SwingUtils.newJToggleButton(altText);
+		Icon icon = MetalIconFactory.getFileChooserDetailViewIcon();
+		JButton button = new JButton(altText, icon);
 		button.setActionCommand(actionCommand);
 		button.setToolTipText(toolTipText);
 		button.addActionListener(this);
-		button.setText(altText);
+		button.setIcon(icon);
+		//button.setText(altText);
+		//Insets insets = new Insets(4, 0, 4, 14);
+		//button.setMargin(insets);
+		//button.getInsets(insets);
+		button.setMargin(new Insets(2, 0, 2, 10));
 
 		return button;
 	}
@@ -231,7 +234,6 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 	 */
 	public JsonObject getConfig() {
 		JsonObject json = config;
-		json.put("resource", resourceViewerPanel.getConfig());
 
 		serverConfigPanel.updateConfig(json);
 		loggerPanel.updateConfig(json);
@@ -309,16 +311,22 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		}
 	}
 
-	public File getConfigFile() {
+	@Deprecated
+	private File getConfigFile() {
 		return configFile;
 	}
 
+	/**
+	 * entrypoint when loading a new file
+	 * @param configFile
+	 */
 	public void setConfigFile(final File configFile) {
 		this.configFile = configFile;
 		InputStream is = null;
 		try {
+			configFileService.loadConfigFile(configFile);
 			is = new FileInputStream(configFile);
-			setConfig(JsonObject.parse(is));
+			setConfig(JsonObject.parse(is), configFile.getParentFile());
 		} catch (IOException e) {
 			log.error(e.getMessage(), e);
 			JOptionPane.showMessageDialog(MainPanel.this, "Error reading file");
@@ -338,12 +346,17 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		}
 	}
 
-	public void setConfig(JsonObject json) {
+	// NOTE: perhaps pass in original file instead and manage it all here
+	private void setConfig(JsonObject json, File configDir) {
+		//xxx
+		//TODO: keep as Config object
+		ConfigLoader cl = new ConfigLoader();
+		Config co = cl.loadConfig(json, configDir);
+
+		List<Variable> variables = co.getVariables();
 		this.config = json;
-		serverConfigPanel.setConfig(json);
-        variableController.setConfig(json);
-		resourceViewerPanel.setConfig(json.getJsonObject("resource"));
-		variableController.setConfig(json.getJsonObject("variables"));
+		serverConfigPanel.setConfig(json, co);
+        //variableController.setConfig(variables);
 	}
 
 	@Override
@@ -403,11 +416,15 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 			case CARD_VARIABLES:
 				selectedCard(CARD_VARIABLES, variablesToolbarButton);
 				break;
+			case CARD_JSON:
+				selectedCard(CARD_JSON, jsonToolbarButton);
+				break;
 			default:
 		}
 	}
 
-	private void selectedCard(String cardName, JToggleButton selectedToolbarButton) {
+	private void selectedCard(String cardName, JButton selectedToolbarButton) {
+		/*
 		if (selectedToolbarButton != serverToolbarButton)
 			serverToolbarButton.setSelected(false);
 		if (selectedToolbarButton != requestToolbarButton)
@@ -416,9 +433,13 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 			loggerToolbarButton.setSelected(false);
 		if (selectedToolbarButton != variablesToolbarButton)
 			variablesToolbarButton.setSelected(false);
+		if (selectedToolbarButton != jsonToolbarButton)
+			jsonToolbarButton.setSelected(false);
+
+		 */
 
 		cardLayout.show(cardPanel, cardName);
 
-		selectedToolbarButton.setSelected(true);
+		//selectedToolbarButton.setSelected(true);
 	}
 }

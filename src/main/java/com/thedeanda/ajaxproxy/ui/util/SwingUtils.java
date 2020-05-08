@@ -28,7 +28,7 @@ public class SwingUtils {
 	}
 
 	public static JToggleButton newJToggleButton(String label) {
-		JToggleButton btn = new JToggleButton();
+		JToggleButton btn = new JToggleButton(label);
 		//btn.setMargin(new Insets(2, 10, 2, 10));
 		return btn;
 	}

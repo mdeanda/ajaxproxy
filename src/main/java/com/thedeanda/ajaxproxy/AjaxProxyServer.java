@@ -50,12 +50,11 @@ public class AjaxProxyServer implements Runnable, LoggerMessageListener {
 	private String keystoreFile = "";
 	private String keystorePassword = "";
 
-	private String resourceBase = "";
-	private JsonObject config;
-	private Server jettyServer;
+	//private String resourceBase = "";
+	private List<Server> jettyServers = new ArrayList<>();
 	private File workingDir;
 	private List<ProxyListener> listeners = new ArrayList<ProxyListener>();
-	private ProxyFilter proxyFilter;
+	//private ProxyFilter proxyFilter;
 	private ThrottleFilter throttleFilter;
 	private boolean mergeMode = false;
 	private List<MergeServlet> mergeServlets = new ArrayList<MergeServlet>();
@@ -80,7 +79,9 @@ public class AjaxProxyServer implements Runnable, LoggerMessageListener {
 	private static final String MINIFY = "minify";
 
 	public AjaxProxyServer(JsonObject config, File workingDir, RequestListener listener) throws Exception {
-		init(config, workingDir, listener);
+		ConfigLoader cl = new ConfigLoader();
+		Config co = cl.loadConfig(config, workingDir);
+		init(co, workingDir, listener);
 	}
 
 	public AjaxProxyServer(String configFile) throws Exception {
@@ -91,27 +92,23 @@ public class AjaxProxyServer implements Runnable, LoggerMessageListener {
 		File configDir = cf.getParentFile();
 		if (configDir == null)
 			configDir = new File(".");
+		JsonObject config;
 		try (FileInputStream fis = new FileInputStream(cf)) {
 			config = JsonObject.parse(fis);
 		}
-		init(config, configDir, new EmptyRequestListener());
-	}
-
-	private void init(JsonObject config, File workingDir, RequestListener listener) {
-		this.listener = listener;
-
 		// TODO: perhaps pass in config object
 		ConfigLoader cl = new ConfigLoader();
-		configObject = cl.loadConfig(config, workingDir);
+		Config co = cl.loadConfig(config, configDir);
+		init(co, configDir, new EmptyRequestListener());
+	}
 
-		this.config = config;
+	private void init(Config config, File workingDir, RequestListener listener) {
+		this.listener = listener;
+		this.configObject = config;
 		this.workingDir = workingDir;
 
 		throttleFilter = new ThrottleFilter();
 
-		// TODO: one filter per server?
-		ServerConfig firstServer = configObject.getServers().get(0);
-		proxyFilter = new ProxyFilter(this, firstServer);
 		getRequestListener();
 	}
 
@@ -124,49 +121,6 @@ public class AjaxProxyServer implements Runnable, LoggerMessageListener {
 	public void addLoggerMessageListener(LoggerMessageListener listener) {
 		synchronized (messageListeners) {
 			this.messageListeners.add(listener);
-		}
-	}
-
-	private void doVar(String variable, String value, JsonValue target) {
-		if (target.isJsonArray()) {
-			for (JsonValue next : target.getJsonArray()) {
-				doVar(variable, value, next);
-			}
-		} else if (target.isJsonObject()) {
-			JsonObject json = target.getJsonObject();
-			for (String key : json) {
-				doVar(variable, value, json.get(key));
-			}
-		} else if (target.isString()) {
-			String s = target.getString();
-			String v = "${" + variable + "}";
-			if (s != null && s.indexOf(v) >= 0) {
-				s = s.replaceAll(Pattern.quote(v), value);
-				target.setString(s);
-			}
-		}
-	}
-
-	private void doVars() {
-		JsonObject vars = config.getJsonObject("variables");
-		if (vars != null) {
-			JsonArray proxy = config.getJsonArray("proxy");
-			if (proxy != null)
-				doVars(vars, proxy);
-
-			JsonArray merge = config.getJsonArray("merge");
-			if (merge != null)
-				doVars(vars, merge);
-		}
-	}
-
-	private void doVars(JsonObject vars, JsonArray target) {
-		for (String val : vars) {
-			if (vars.isString(val) || vars.isInt(val)) {
-				for (JsonValue targetValue : target) {
-					doVar(val, vars.getString(val), targetValue);
-				}
-			}
 		}
 	}
 
@@ -191,8 +145,7 @@ public class AjaxProxyServer implements Runnable, LoggerMessageListener {
 	}
 
 	private void initRun() throws Exception {
-		doVars();
-
+		/*
 		if (config.isString(RESOURCE_BASE)) {
 			String rb = config.getString(RESOURCE_BASE);
 			resourceBase = workingDir.getPath() + File.separator + rb;
@@ -208,34 +161,8 @@ public class AjaxProxyServer implements Runnable, LoggerMessageListener {
 			throw new Exception("resourceBase not defined in config file");
 		}
 		log.info("using resource base: " + resourceBase);
-	}
 
-	/** returns the list of proxy paths (after resolving variables) */
-	public List<ProxyPath> getProxyPaths() {
-		List<ProxyPath> ret = new ArrayList<ProxyPath>();
-		if (config.isJsonArray(PROXY_ARRAY)) {
-			JsonArray pa = config.getJsonArray(PROXY_ARRAY);
-			for (JsonValue val : pa) {
-				int port = 80;
-				String domain = null;
-				String path = null;
-				JsonObject obj = val.getJsonObject();
-				if (obj.isString(DOMAIN))
-					domain = obj.getString(DOMAIN);
-				if (obj.isString(PATH))
-					path = obj.getString(PATH);
-				if (obj.isInt(PORT))
-					port = obj.getInt(PORT);
-				else if (obj.isString(PORT))
-					port = Integer.parseInt(obj.getString(PORT));
-
-				if (domain != null && path != null && port > 0) {
-					ProxyPath proxyPath = ProxyPath.builder().domain(domain).port(port).path(path).build();
-					ret.add(proxyPath);
-				}
-			}
-		}
-		return ret;
+		 */
 	}
 
 	private void initConnectors(Server jettyServer, ServerConfig serverConfig) {
@@ -306,7 +233,8 @@ public class AjaxProxyServer implements Runnable, LoggerMessageListener {
 			ServerConfig serverConfig = configObject.getServers().get(0);
 			boolean showIndex = serverConfig.isShowIndex();
 
-			jettyServer = new Server();
+			Server jettyServer = new Server();
+			jettyServers.add(jettyServer);
 			initConnectors(jettyServer, serverConfig);
 
 			ServletContextHandler root = new ServletContextHandler(ServletContextHandler.SESSIONS);
@@ -320,6 +248,7 @@ public class AjaxProxyServer implements Runnable, LoggerMessageListener {
 			EnumSet<DispatcherType> dispatches = EnumSet.allOf(DispatcherType.class);
 			root.addFilter(throttleFilterHolder, "/*", dispatches);
 
+			ProxyFilter proxyFilter = new ProxyFilter(this, serverConfig);
 			FilterHolder proxyFilterHolder = new FilterHolder(proxyFilter);
 			root.addFilter(proxyFilterHolder, "/*", dispatches);
 			proxyFilter.reset();
@@ -328,11 +257,13 @@ public class AjaxProxyServer implements Runnable, LoggerMessageListener {
 			DefaultServlet defaultServlet = new DefaultServlet();
 			servlet = new ServletHolder(defaultServlet);
 			servlet.setInitParameter("dirAllowed", String.valueOf(showIndex));
-			servlet.setInitParameter("resourceBase", resourceBase);
+			servlet.setInitParameter("resourceBase", serverConfig.getResourceBase().getValue());
 			servlet.setInitParameter("maxCacheSize", "0");
 			servlet.setName("default servlet");
 			root.addServlet(servlet, "/");
 
+			//TODO: implement merge stuffs again
+			/*
 			if (config.isJsonArray(MERGE_ARRAY)) {
 				JsonArray a = config.getJsonArray(MERGE_ARRAY);
 				for (JsonValue val : a) {
@@ -361,6 +292,7 @@ public class AjaxProxyServer implements Runnable, LoggerMessageListener {
 					}
 				}
 			}
+			*/
 
 			if (!mergeMode) {
 				try {
@@ -381,14 +313,17 @@ public class AjaxProxyServer implements Runnable, LoggerMessageListener {
 	// TODO: needs to reset or add a reset to clear all listener lists to avoid
 	// memory leak from ui
 	public void stop() {
-		try {
-			if (jettyServer != null) {
-				jettyServer.stop();
-				fireEvent(ProxyEvent.STOP);
+		for (Server jettyServer : jettyServers) {
+			try {
+				if (jettyServer != null) {
+					jettyServer.stop();
+					fireEvent(ProxyEvent.STOP);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
+		jettyServers.clear();
 	}
 
 	public List<MergeServlet> getMergeServlets() {

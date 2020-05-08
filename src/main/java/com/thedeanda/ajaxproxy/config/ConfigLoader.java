@@ -13,6 +13,7 @@ public class ConfigLoader {
 	public ConfigLoader() {
 		loaders = new ArrayList<>();
 		loaders.add(new ConfigLoaderV1());
+		loaders.add(new ConfigLoaderV2());
 	}
 
 	/**

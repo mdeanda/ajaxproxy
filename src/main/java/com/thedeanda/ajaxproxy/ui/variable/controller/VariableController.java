@@ -1,5 +1,6 @@
 package com.thedeanda.ajaxproxy.ui.variable.controller;
 
+import com.thedeanda.ajaxproxy.config.ConfigFileService;
 import com.thedeanda.ajaxproxy.config.model.Variable;
 import com.thedeanda.ajaxproxy.ui.SettingsChangedListener;
 import com.thedeanda.ajaxproxy.ui.variable.model.VariableModel;
@@ -9,14 +10,20 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.*;
 
 public class VariableController {
+    private final ConfigFileService configFileService;
     private Collection<SettingsChangedListener> listeners = new HashSet<>();
     private Collection<VariableChangeListener> variableChangeListeners = new HashSet<>();
     private Map<String, String> datanset = new TreeMap<>();
 
     private VariableModel variableModel;
 
-    public VariableController() {
+    public VariableController(ConfigFileService configFileService) {
+        this.configFileService = configFileService;
         this.variableModel = VariableModel.builder().build();
+
+        configFileService.addConfigChangeListener(c -> {
+            setConfig(c.getVariables());
+        });
     }
 
     private void fireSettingsChanged() {
@@ -39,12 +46,12 @@ public class VariableController {
         fireSettingsChanged();
     }
 
-    public void setConfig(JsonObject jsonObject) {
+    private void setConfig(List<Variable> variables) {
         clear();
-        if (jsonObject == null) return;
+        if (variables == null || variables.isEmpty()) return;
 
-        for (String key : jsonObject) {
-            set(key, jsonObject.getString(key));
+        for (Variable var : variables) {
+            set(var.getKey(), var.getValue());
         }
     }
 
