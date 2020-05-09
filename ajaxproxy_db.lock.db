@@ -1,6 +1,0 @@
-#FileLock
-#Fri May 08 17:50:06 PDT 2020
-server=127.0.1.1\:43501
-hostName=vmbox.local
-method=file
-id=171f6e9232c7fb8729c0e481b45fa7e4a6615d78f6b
