@@ -14,3 +14,5 @@ hs_err_*.log
 /.nb-gradle/
 /target/
 /ajaxproxy_db.trace.db
+/ajaxproxy_db.lock.db
+/ajaxproxy_db.mv.db
