@@ -1,0 +1,19 @@
+logging:
+  level: INFO
+  loggers:
+    com.thedeanda.ajaxproxy: DEBUG
+database:
+  driverClass: org.h2.Driver
+  user: pg-user
+  password: iAMs00perSecrEET
+  url: jdbc:h2:file:./ajaxproxy_db;AUTO_SERVER=TRUE
+  properties:
+    charSet: UTF-8
+  maxWaitForConnection: 10s
+  validationQuery: "/* MyService Health Check */ SELECT 1"
+  validationQueryTimeout: 3s
+  minSize: 1
+  maxSize: 16
+  checkConnectionWhileIdle: false
+  evictionInterval: 30s
+  minIdleTime: 1 minute

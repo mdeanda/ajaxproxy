@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.Header;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
@@ -19,6 +18,7 @@ import com.thedeanda.ajaxproxy.http.NetworkUtil;
 import com.thedeanda.ajaxproxy.http.RequestListener;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.Header;
 
 @Slf4j
 public class ResourceService implements RequestListener {

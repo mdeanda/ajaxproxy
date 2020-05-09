@@ -247,8 +247,6 @@ public class ConfigLoaderV1 implements Loader {
 	/**
 	 * TODO: remove this when the ui uses the new data structure
 	 * 
-	 * @param json
-	 * @return
 	 */
 	public ProxyConfig readProxyConfig(JsonObject json) {
 		if (json.hasKey(PROXY_BASE_PATH)) {
