@@ -4,6 +4,7 @@ import com.thedeanda.ajaxproxy.config.model.ServerConfig;
 import com.thedeanda.ajaxproxy.db.ServerConfigDao;
 import com.thedeanda.ajaxproxy.health.SampleHealthCheck;
 import com.thedeanda.ajaxproxy.resources.ServerResource;
+import com.thedeanda.ajaxproxy.service.ServerConfigService;
 import io.dropwizard.Application;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.hibernate.HibernateBundle;
@@ -38,7 +39,6 @@ public class AjaxProxyApplication extends Application<AjaxProxyConfiguration> {
 
     @Override
     public void initialize(final Bootstrap<AjaxProxyConfiguration> bootstrap) {
-        // TODO: application initialization
         bootstrap.addBundle(new MigrationsBundle<AjaxProxyConfiguration>() {
             @Override
             public DataSourceFactory getDataSourceFactory(AjaxProxyConfiguration configuration) {
@@ -54,26 +54,37 @@ public class AjaxProxyApplication extends Application<AjaxProxyConfiguration> {
 
         try {
             runLiquibase(config, environment);
-        } catch (LiquibaseException | SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
         final DBIFactory factory = new DBIFactory();
-        final DBI jdbi = factory.build(environment, config.getDataSourceFactory(), "postgresql");
-        final ServerResource resource = new ServerResource();
-        final SampleHealthCheck sampleHealthCheck = new SampleHealthCheck();
+        final DBI jdbi = factory.build(environment, config.getDataSourceFactory(), "datasource");
+        // jdbi.installPlugin(new SqlObjectPlugin());
 
+
+        //daos
         final ServerConfigDao serverConfigDao = jdbi.onDemand(ServerConfigDao.class);
 
-        environment.healthChecks().register("sample", sampleHealthCheck);
+        //services
+        final ServerConfigService serverConfigService = new ServerConfigService(serverConfigDao);
+
+        //resources
+        final ServerResource resource = new ServerResource(serverConfigService, serverConfigDao);
+
+
+
+        environment.healthChecks().register("sample", new SampleHealthCheck());
         environment.jersey().register(resource);
     }
 
-    private void runLiquibase(final AjaxProxyConfiguration config, final Environment environment) throws LiquibaseException, SQLException {
+    private void runLiquibase(final AjaxProxyConfiguration config, final Environment environment) throws Exception {
         DataSource dataSource = config.getDataSourceFactory().build(environment.metrics(), "mydatasource");
 
         Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(dataSource.getConnection()));
         Liquibase liquibase = new liquibase.Liquibase("migrations.xml", new ClassLoaderResourceAccessor(), database);
         liquibase.update(new Contexts(), new LabelExpression());
+        liquibase.close();
+
     }
 }
