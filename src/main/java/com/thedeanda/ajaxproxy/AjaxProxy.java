@@ -25,9 +25,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.thedeanda.ajaxproxy.ui.MainFrame;
-import com.thedeanda.ajaxproxy.ui.rest.RestClientFrame;
-
 public class AjaxProxy {
 	private static final Logger log = LoggerFactory.getLogger(AjaxProxy.class);
 
@@ -61,7 +58,7 @@ public class AjaxProxy {
 			}
 
 			if (runrest) {
-				runRest();
+				//runRest();
 			} else if (config != null && merge != null) {
 				runMerge(config, merge, rm, ignore);
 			} else if (config != null && run) {
@@ -70,7 +67,7 @@ public class AjaxProxy {
 			} else if (merge != null && config == null) {
 				printHelp(options);
 			} else {
-				showUi(config, runui, vars);
+				//showUi(config, runui, vars);
 			}
 
 		} catch (ParseException exp) {
@@ -99,51 +96,11 @@ public class AjaxProxy {
 		return map;
 	}
 
-	private static void showUi(final String config, final boolean runui,
-			final Map<String, String> vars) {
-		System.setProperty("apple.laf.useScreenMenuBar", "true");
-		System.setProperty("com.apple.mrj.application.apple.menu.about.name",
-				"AjaxProxy");
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					// Set System L&F
-
-					UIManager.setLookAndFeel(UIManager
-							.getSystemLookAndFeelClassName());
-
-				} catch (Exception ex) {
-
-				}
-
-				MainFrame frame = new MainFrame();
-				frame.setLocationByPlatform(true);
-				frame.setVisible(true);
-
-				if (!StringUtils.isBlank(config)) {
-					File file = new File(config);
-					frame.loadFile(file);
-				}
-
-				frame.addVariables(vars);
-
-				if (runui) {
-					frame.startProxy();
-				}
-			}
-		});
-	}
-
 	private static void printHelp(Options options) {
 		HelpFormatter formatter = new HelpFormatter();
 		formatter.printHelp(" ", options);
 	}
 
-	private static void runRest() {
-		RestClientFrame restFrame = new RestClientFrame();
-		restFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		restFrame.setVisible(true);
-	}
 
 	private static void runMerge(String config, String output, boolean rm,
 			boolean ignore) throws Exception {

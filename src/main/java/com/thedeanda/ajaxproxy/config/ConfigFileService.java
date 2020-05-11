@@ -16,6 +16,14 @@ public class ConfigFileService {
     private List<ConfigChangeListener> listeners = new ArrayList<>();
     private Config config;
 
+    public ConfigFileService() {
+
+    }
+
+    public ConfigFileService(File configFile) throws IOException, JsonException {
+        loadConfigFile(configFile);
+    }
+
     public void addConfigChangeListener(ConfigChangeListener listener) {
         listeners.add(listener);
     }
@@ -30,7 +38,7 @@ public class ConfigFileService {
             JsonObject json = JsonObject.parse(is);
 
             ConfigLoader cl = new ConfigLoader();
-            co = cl.loadConfig(json, configFile.getParentFile());
+            co = cl.loadConfig(json, configFile.getAbsoluteFile().getParentFile());
         }
 
         this.config = co;

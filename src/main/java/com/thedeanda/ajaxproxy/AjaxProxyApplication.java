@@ -1,28 +1,19 @@
 package com.thedeanda.ajaxproxy;
 
-import com.thedeanda.ajaxproxy.config.model.ServerConfig;
-import com.thedeanda.ajaxproxy.db.ServerConfigDao;
+import com.j256.ormlite.dao.DaoManager;
+import com.thedeanda.ajaxproxy.config.ConfigFileService;
 import com.thedeanda.ajaxproxy.health.SampleHealthCheck;
 import com.thedeanda.ajaxproxy.resources.ServerResource;
 import com.thedeanda.ajaxproxy.service.ServerConfigService;
+import com.thedeanda.javajson.JsonException;
 import io.dropwizard.Application;
 import io.dropwizard.db.DataSourceFactory;
-import io.dropwizard.hibernate.HibernateBundle;
-import io.dropwizard.jdbi.DBIFactory;
-import io.dropwizard.migrations.MigrationsBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
-import liquibase.Contexts;
-import liquibase.LabelExpression;
-import liquibase.Liquibase;
-import liquibase.database.Database;
-import liquibase.database.DatabaseFactory;
-import liquibase.database.jvm.JdbcConnection;
-import liquibase.exception.LiquibaseException;
-import liquibase.resource.ClassLoaderResourceAccessor;
-import org.skife.jdbi.v2.DBI;
 
 import javax.sql.DataSource;
+import java.io.File;
+import java.io.IOException;
 import java.sql.SQLException;
 
 public class AjaxProxyApplication extends Application<AjaxProxyConfiguration> {
@@ -39,12 +30,8 @@ public class AjaxProxyApplication extends Application<AjaxProxyConfiguration> {
 
     @Override
     public void initialize(final Bootstrap<AjaxProxyConfiguration> bootstrap) {
-        bootstrap.addBundle(new MigrationsBundle<AjaxProxyConfiguration>() {
-            @Override
-            public DataSourceFactory getDataSourceFactory(AjaxProxyConfiguration configuration) {
-                return configuration.getDataSourceFactory();
-            }
-        });
+
+
     }
 
     @Override
@@ -52,25 +39,31 @@ public class AjaxProxyApplication extends Application<AjaxProxyConfiguration> {
                     final Environment environment) {
         // TODO: implement application
 
+        /*
         try {
             runLiquibase(config, environment);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        //*/
 
-        final DBIFactory factory = new DBIFactory();
-        final DBI jdbi = factory.build(environment, config.getDataSourceFactory(), "datasource");
+        //final DBIFactory factory = new DBIFactory();
+        //final DBI jdbi = factory.build(environment, config.getDataSourceFactory(), "datasource");
         // jdbi.installPlugin(new SqlObjectPlugin());
 
 
-        //daos
-        final ServerConfigDao serverConfigDao = jdbi.onDemand(ServerConfigDao.class);
+        ConfigFileService configFileService = null;
+        try {
+            configFileService = new ConfigFileService(new File("sample_config.json"));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
 
         //services
-        final ServerConfigService serverConfigService = new ServerConfigService(serverConfigDao);
+        final ServerConfigService serverConfigService = new ServerConfigService();
 
         //resources
-        final ServerResource resource = new ServerResource(serverConfigService, serverConfigDao);
+        final ServerResource resource = new ServerResource(serverConfigService);
 
 
 
@@ -78,6 +71,7 @@ public class AjaxProxyApplication extends Application<AjaxProxyConfiguration> {
         environment.jersey().register(resource);
     }
 
+    /*
     private void runLiquibase(final AjaxProxyConfiguration config, final Environment environment) throws Exception {
         DataSource dataSource = config.getDataSourceFactory().build(environment.metrics(), "mydatasource");
 
@@ -86,5 +80,5 @@ public class AjaxProxyApplication extends Application<AjaxProxyConfiguration> {
         liquibase.update(new Contexts(), new LabelExpression());
         liquibase.close();
 
-    }
+    }//*/
 }

@@ -47,6 +47,7 @@
             <groupId>io.dropwizard</groupId>
             <artifactId>dropwizard-db</artifactId>
         </dependency>
+        <!--
         <dependency>
             <groupId>io.dropwizard.modules</groupId>
             <artifactId>dropwizard-jdbi</artifactId>
@@ -60,6 +61,7 @@
             <groupId>io.dropwizard</groupId>
             <artifactId>dropwizard-hibernate</artifactId>
         </dependency>
+        -->
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
@@ -73,6 +75,7 @@
             <scope>provided</scope>
         </dependency>
         -->
+        <!--
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
@@ -81,10 +84,13 @@
             <groupId>jakarta.validation</groupId>
             <artifactId>jakarta.validation-api</artifactId>
         </dependency>
+        -->
+        <!--
         <dependency>
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
         </dependency>
+        -->
 
         <dependency>
             <groupId>com.thedeanda</groupId>
@@ -92,11 +98,13 @@
             <version>1.0.4</version>
         </dependency>
 
+        <!--
         <dependency>
             <groupId>com.sun.activation</groupId>
             <artifactId>javax.activation</artifactId>
             <version>1.2.0</version>
         </dependency>
+        -->
 
         <!--
         <dependency>
@@ -182,6 +190,7 @@
             <version>1.4</version>
         </dependency>
 
+        <!--
         <dependency>
             <groupId>org.japura</groupId>
             <artifactId>japura-gui</artifactId>
@@ -193,6 +202,7 @@
             <artifactId>flexmark</artifactId>
             <version>${flexmark.version}</version>
         </dependency>
+        -->
         <!--s
         <dependency>
             <groupId>com.vladsch.flexmark</groupId>

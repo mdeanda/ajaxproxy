@@ -11,6 +11,7 @@ import javax.validation.constraints.*;
 public class AjaxProxyConfiguration extends Configuration {
     // TODO: implement service configuration
 
+    //*
     @Valid
     @NotNull
     private DataSourceFactory database = new DataSourceFactory();
@@ -24,4 +25,5 @@ public class AjaxProxyConfiguration extends Configuration {
     public DataSourceFactory getDataSourceFactory() {
         return database;
     }
+    //*/
 }
