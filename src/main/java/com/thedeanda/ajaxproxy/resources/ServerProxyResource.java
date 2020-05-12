@@ -1,6 +1,6 @@
 package com.thedeanda.ajaxproxy.resources;
 
-import com.thedeanda.ajaxproxy.api.ServerConfigDto;
+import com.thedeanda.ajaxproxy.api.ProxyConfigDto;
 import com.thedeanda.ajaxproxy.service.ServerConfigService;
 import lombok.extern.slf4j.Slf4j;
 
@@ -21,8 +21,14 @@ public class ServerProxyResource {
 
     @GET
     @Path("/{id}/proxy")
-    public List<ServerConfigDto> list() {
-        return serverConfigService.list();
+    public List<ProxyConfigDto> listProxies(@PathParam("id") int id) {
+        return serverConfigService.listProxies(id);
+    }
+
+    @GET
+    @Path("/{id}/proxy/{pid}")
+    public ProxyConfigDto getProxy(@PathParam("id") int id, @PathParam("pid") int proxyId) {
+        return serverConfigService.getProxy(id, proxyId);
     }
 
     /*

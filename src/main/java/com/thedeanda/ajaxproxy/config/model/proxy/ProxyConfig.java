@@ -1,11 +1,19 @@
 package com.thedeanda.ajaxproxy.config.model.proxy;
 
 import com.thedeanda.ajaxproxy.config.model.StringVariable;
+import lombok.Getter;
+import lombok.Setter;
 
-public interface ProxyConfig {
-	public StringVariable getPath();
+public abstract class ProxyConfig {
 
-	public boolean isEnableCache();
+	@Getter
+	@Setter
+	private int id;
 
-	public int getCacheDuration();
+
+	abstract public StringVariable getPath();
+
+	abstract public boolean isEnableCache();
+
+	abstract public int getCacheDuration();
 }

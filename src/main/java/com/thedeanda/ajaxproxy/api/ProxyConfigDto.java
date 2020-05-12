@@ -12,6 +12,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 public class ProxyConfigDto {
 
+	private int id;
 	private StringVariableDto path;
 	private boolean enableCache;
 	private int cacheDuration;

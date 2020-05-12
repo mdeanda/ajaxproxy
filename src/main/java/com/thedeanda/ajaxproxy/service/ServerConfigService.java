@@ -5,10 +5,13 @@ import com.thedeanda.ajaxproxy.api.ServerConfigDto;
 import com.thedeanda.ajaxproxy.config.ConfigFileService;
 import com.thedeanda.ajaxproxy.config.model.Config;
 import com.thedeanda.ajaxproxy.config.model.ServerConfig;
+import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfig;
+import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigFile;
+import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigLogger;
+import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigRequest;
 import com.thedeanda.ajaxproxy.mapper.ServerConfigMapper;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ServerConfigService {
@@ -44,10 +47,44 @@ public class ServerConfigService {
     }
 
     public List<ProxyConfigDto> listProxies(int serverId) {
-        getServer(serverId)
-                .map(ServerConfig::getProxyConfig);
+        List<ProxyConfig> proxies = getServer(serverId).map(ServerConfig::getProxyConfig).orElse(null);
+
+        if (proxies != null) {
+            return proxies.stream()
+                    .map(this::map)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+        }
+        return Collections.EMPTY_LIST;
+    }
+
+    public ProxyConfigDto getProxy(int serverId, int proxyId) {
+        List<ProxyConfig> proxies = getServer(serverId)
+                .map(ServerConfig::getProxyConfig)
+                .orElse(null);
+        if (proxies != null) {
+            return proxies.stream()
+                    .filter(p -> p.getId() == proxyId)
+                    .map(this::map)
+                    .findFirst()
+                    .orElse(null);
+        }
+        return null;
+    }
+
+    private ProxyConfigDto map(ProxyConfig proxyConfig) {
+
+        if (proxyConfig instanceof ProxyConfigFile) {
+            return serverConfigMapper.toDto((ProxyConfigFile) proxyConfig);
+        } else if (proxyConfig instanceof ProxyConfigRequest) {
+            return serverConfigMapper.toDto((ProxyConfigRequest) proxyConfig);
+        } else if (proxyConfig instanceof ProxyConfigLogger) {
+            return serverConfigMapper.toDto((ProxyConfigLogger) proxyConfig);
+        }
 
         return null;
     }
+
+
 
 }

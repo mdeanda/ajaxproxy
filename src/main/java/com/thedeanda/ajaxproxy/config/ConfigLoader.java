@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.thedeanda.ajaxproxy.config.model.Config;
 import com.thedeanda.ajaxproxy.config.model.ServerConfig;
+import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfig;
 import com.thedeanda.javajson.JsonObject;
 
 public class ConfigLoader {
@@ -36,9 +37,15 @@ public class ConfigLoader {
 
 		//migrate here
 		int serverId = 0;
+		int proxyId = 0;
+
 		for (ServerConfig sc : config.getServers()) {
 			sc.setId(serverId++);
+			for (ProxyConfig pc : sc.getProxyConfig()) {
+				pc.setId(proxyId++);
+			}
 		}
+
 
 
 		return config;
