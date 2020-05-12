@@ -1,22 +1,18 @@
 package com.thedeanda.ajaxproxy;
 
-import com.j256.ormlite.dao.DaoManager;
 import com.thedeanda.ajaxproxy.config.ConfigFileService;
-import com.thedeanda.ajaxproxy.config.model.ServerConfig;
 import com.thedeanda.ajaxproxy.health.SampleHealthCheck;
 import com.thedeanda.ajaxproxy.mapper.ServerConfigMapper;
+import com.thedeanda.ajaxproxy.resources.ServerProxyResource;
 import com.thedeanda.ajaxproxy.resources.ServerResource;
 import com.thedeanda.ajaxproxy.service.ServerConfigService;
-import com.thedeanda.javajson.JsonException;
 import io.dropwizard.Application;
-import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 
-import javax.sql.DataSource;
 import java.io.File;
-import java.io.IOException;
-import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AjaxProxyApplication extends Application<AjaxProxyConfiguration> {
     private final String configFile;
@@ -74,12 +70,16 @@ public class AjaxProxyApplication extends Application<AjaxProxyConfiguration> {
 
 
         //resources
-        final ServerResource resource = new ServerResource(serverConfigService);
-
+        final List<Object> resources = new ArrayList<>();
+        resources.add(new ServerResource(serverConfigService));
+        resources.add(new ServerProxyResource(serverConfigService));
 
 
         environment.healthChecks().register("sample", new SampleHealthCheck());
-        environment.jersey().register(resource);
+        resources.forEach(service ->
+                environment.jersey().register(service)
+        );
+
     }
 
     /*
