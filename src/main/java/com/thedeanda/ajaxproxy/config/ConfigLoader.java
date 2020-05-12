@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.thedeanda.ajaxproxy.config.model.Config;
+import com.thedeanda.ajaxproxy.config.model.ServerConfig;
 import com.thedeanda.javajson.JsonObject;
 
 public class ConfigLoader {
@@ -16,20 +17,31 @@ public class ConfigLoader {
 		loaders.add(new ConfigLoaderV2());
 	}
 
-	/**
-	 * TODO: change this so instead of returning the same object, it migrates from
-	 * v1, to v2 so more version can be added later without having to modify old
-	 * implementations.
-	 */
 	public Config loadConfig(JsonObject jsonConfig, File workingDir) {
 		Config config = null;
 		for (Loader loader : loaders) {
 			config = loader.loadConfig(jsonConfig, workingDir);
 			if (config != null) {
-				return config;
+				break;
 			}
 		}
-		return null;
+
+		config = migrate(config);
+
+		return config;
+	}
+
+	public Config migrate(Config config) {
+		if (config == null) return config;
+
+		//migrate here
+		int serverId = 0;
+		for (ServerConfig sc : config.getServers()) {
+			sc.setId(serverId++);
+		}
+
+
+		return config;
 	}
 
 }

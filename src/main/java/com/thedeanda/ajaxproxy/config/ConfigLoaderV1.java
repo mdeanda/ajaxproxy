@@ -24,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class ConfigLoaderV1 implements Loader {
+	private static final int VERSION = 1;
 	private static final String VAR_KEY = "variables";
 	private static final String MODE = "mode";
 
@@ -60,8 +61,12 @@ public class ConfigLoaderV1 implements Loader {
 
 		ServerConfig server = loadServer(variables, config);
 
-		return Config.builder().variables(variables).workingDir(workingDir.getAbsolutePath())
-				.servers(Arrays.asList(server)).build();
+		return Config.builder()
+				.variables(variables)
+				.workingDir(workingDir.getAbsolutePath())
+				.servers(Arrays.asList(server))
+				.version(VERSION)
+				.build();
 	}
 
 	private ServerConfig loadServer(List<Variable> variables, JsonObject config) {

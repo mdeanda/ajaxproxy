@@ -17,6 +17,7 @@ import java.util.List;
 
 @Slf4j
 public class ConfigLoaderV2 implements Loader {
+	private static final int VERSION = 1;
 	private static final String VAR_KEY = "variables";
 	private static final String MODE = "mode";
 
@@ -53,8 +54,12 @@ public class ConfigLoaderV2 implements Loader {
 
 		List<ServerConfig> servers = loadServers(variables, config);
 
-		return Config.builder().variables(variables).workingDir(workingDir.getAbsolutePath())
-				.servers(servers).build();
+		return Config.builder()
+				.variables(variables)
+				.workingDir(workingDir.getAbsolutePath())
+				.servers(servers)
+				.version(VERSION)
+				.build();
 	}
 
 	private List<ServerConfig> loadServers(List<Variable> variables, JsonObject jsonConfig) {

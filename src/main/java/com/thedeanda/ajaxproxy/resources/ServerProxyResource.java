@@ -12,18 +12,20 @@ import java.util.List;
 @Path("/api/server")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class ServerResource {
+public class ServerProxyResource {
     private final ServerConfigService serverConfigService;
 
-    public ServerResource(ServerConfigService serverConfigService) {
+    public ServerProxyResource(ServerConfigService serverConfigService) {
         this.serverConfigService = serverConfigService;
     }
 
     @GET
+    @Path("/{id}/proxy")
     public List<ServerConfigDto> list() {
         return serverConfigService.list();
     }
 
+    /*
     @GET
     @Path("/{id}")
     public ServerConfigDto get(@PathParam("id") int id) {
@@ -38,4 +40,5 @@ public class ServerResource {
 
         log.info("config: {}", config);
     }
+    */
 }

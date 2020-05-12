@@ -11,6 +11,8 @@ import lombok.Data;
 @Data
 @Builder
 public class ServerConfig {
+	private int id;
+
 	@Builder.Default
 	private IntVariable port = new IntVariable(8080);
 	

@@ -2,7 +2,9 @@ package com.thedeanda.ajaxproxy;
 
 import com.j256.ormlite.dao.DaoManager;
 import com.thedeanda.ajaxproxy.config.ConfigFileService;
+import com.thedeanda.ajaxproxy.config.model.ServerConfig;
 import com.thedeanda.ajaxproxy.health.SampleHealthCheck;
+import com.thedeanda.ajaxproxy.mapper.ServerConfigMapper;
 import com.thedeanda.ajaxproxy.resources.ServerResource;
 import com.thedeanda.ajaxproxy.service.ServerConfigService;
 import com.thedeanda.javajson.JsonException;
@@ -17,10 +19,16 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 public class AjaxProxyApplication extends Application<AjaxProxyConfiguration> {
+    private final String configFile;
 
     public static void main(String[] args) throws Exception {
         args = new String[]{"server", "config.yml"};
-        new AjaxProxyApplication().run(args);
+        new AjaxProxyApplication("sample_config.json").run(args);
+    }
+
+    public AjaxProxyApplication(String configFile) {
+        super();
+        this.configFile = configFile;
     }
 
     @Override
@@ -52,15 +60,18 @@ public class AjaxProxyApplication extends Application<AjaxProxyConfiguration> {
         // jdbi.installPlugin(new SqlObjectPlugin());
 
 
-        ConfigFileService configFileService = null;
+        ConfigFileService configFileService;
         try {
-            configFileService = new ConfigFileService(new File("sample_config.json"));
+            configFileService = new ConfigFileService(new File(configFile));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
+        ServerConfigMapper serverConfigMapper = ServerConfigMapper.INSTANCE;
+
         //services
-        final ServerConfigService serverConfigService = new ServerConfigService();
+        final ServerConfigService serverConfigService = new ServerConfigService(configFileService, serverConfigMapper);
+
 
         //resources
         final ServerResource resource = new ServerResource(serverConfigService);

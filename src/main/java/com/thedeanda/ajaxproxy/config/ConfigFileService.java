@@ -4,6 +4,7 @@ import com.thedeanda.ajaxproxy.config.model.Config;
 import com.thedeanda.ajaxproxy.config.model.ConfigChangeListener;
 import com.thedeanda.javajson.JsonException;
 import com.thedeanda.javajson.JsonObject;
+import lombok.Getter;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -14,6 +15,8 @@ import java.util.List;
  */
 public class ConfigFileService {
     private List<ConfigChangeListener> listeners = new ArrayList<>();
+
+    @Getter
     private Config config;
 
     public ConfigFileService() {

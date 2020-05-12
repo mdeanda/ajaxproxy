@@ -9,10 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ServerConfigDto {
-    private int id;
-    private IntVariableDto port;
-    private StringVariableDto resourceBase;
-    private boolean showIndex;
-
+public class IntVariableDto {
+    private String originalValue;
+    private int value;
 }
