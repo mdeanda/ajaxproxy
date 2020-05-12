@@ -7,6 +7,7 @@ import com.thedeanda.ajaxproxy.resources.ServerProxyResource;
 import com.thedeanda.ajaxproxy.resources.ServerResource;
 import com.thedeanda.ajaxproxy.service.ServerConfigService;
 import io.dropwizard.Application;
+import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 
@@ -34,7 +35,7 @@ public class AjaxProxyApplication extends Application<AjaxProxyConfiguration> {
 
     @Override
     public void initialize(final Bootstrap<AjaxProxyConfiguration> bootstrap) {
-
+        bootstrap.addBundle(new AssetsBundle("/assets/", "/", "index.html"));
 
     }
 
@@ -74,6 +75,7 @@ public class AjaxProxyApplication extends Application<AjaxProxyConfiguration> {
         resources.add(new ServerResource(serverConfigService));
         resources.add(new ServerProxyResource(serverConfigService));
 
+        environment.jersey().setUrlPattern("/api/*");
 
         environment.healthChecks().register("sample", new SampleHealthCheck());
         resources.forEach(service ->
