@@ -20,7 +20,7 @@ public interface ServerConfigMapper {
 
     public ServerConfigDto toDto(ServerConfig input);
 
-    public ProxyConfigDto toDto(ProxyConfig config);
+    //public ProxyConfigDto toDto(ProxyConfig config);
 
     public ProxyConfigRequestDto toDto(ProxyConfigRequest config);
 
