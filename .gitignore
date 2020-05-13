@@ -16,3 +16,4 @@ hs_err_*.log
 /ajaxproxy_db.trace.db
 /ajaxproxy_db.lock.db
 /ajaxproxy_db.mv.db
+/node_modules/
