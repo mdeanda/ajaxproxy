@@ -13,8 +13,6 @@ import org.mapstruct.factory.Mappers;
 //@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 @Mapper
 public interface ServerConfigMapper {
-    ServerConfigMapper INSTANCE = Mappers.getMapper( ServerConfigMapper.class );
-
 
     public ServerConfigDto toDto(ServerConfig input);
 

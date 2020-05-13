@@ -10,6 +10,7 @@ import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import org.mapstruct.factory.Mappers;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -64,7 +65,7 @@ public class AjaxProxyApplication extends Application<AjaxProxyConfiguration> {
             throw new RuntimeException(e);
         }
 
-        ServerConfigMapper serverConfigMapper = ServerConfigMapper.INSTANCE;
+        final ServerConfigMapper serverConfigMapper = Mappers.getMapper(ServerConfigMapper.class);
 
         //services
         final ServerConfigService serverConfigService = new ServerConfigService(configFileService, serverConfigMapper);
