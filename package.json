@@ -1,0 +1,43 @@
+{
+  "name": "ajaxproxy-web",
+  "version": "0.1.0",
+  "description": "AjaxProxy Web",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:mdeanda/ajaxproxy.git"
+  },
+  "keywords": [
+    "rest",
+    "hateoas",
+    "spring",
+    "data",
+    "react"
+  ],
+  "author": "Miguel De Anda",
+  "license": "BSD 3-Clause",
+  "bugs": {
+    "url": "https://github.com/mdeanda/ajaxproxy/issues"
+  },
+  "homepage": "https://github.com/mdeanda/ajaxproxy",
+  "dependencies": {
+    "react": "^16.8.4",
+    "react-dom": "^16.8.4",
+    "react-paginate": "^6.3.2",
+    "react-router-dom": "^5.1.2",
+    "react-scripts": "2.1.5",
+    "rest": "^1.3.1"
+  },
+  "scripts": {
+    "build": "webpack — mode production",
+    "start": "webpack-dev-server — mode development — hot — open — port 3100",
+    "watch": "webpack --watch -d"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.1.0",
+    "@babel/preset-env": "^7.1.0",
+    "@babel/preset-react": "^7.0.0",
+    "babel-loader": "^8.0.2",
+    "webpack": "^4.19.1",
+    "webpack-cli": "^3.1.0"
+  }
+}
