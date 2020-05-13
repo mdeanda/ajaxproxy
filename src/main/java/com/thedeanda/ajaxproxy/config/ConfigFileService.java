@@ -19,6 +19,9 @@ public class ConfigFileService {
     @Getter
     private Config config;
 
+    @Getter
+    private File workingDirectory;
+
     public ConfigFileService() {
 
     }
@@ -41,7 +44,9 @@ public class ConfigFileService {
             JsonObject json = JsonObject.parse(is);
 
             ConfigLoader cl = new ConfigLoader();
-            co = cl.loadConfig(json, configFile.getAbsoluteFile().getParentFile());
+            File wd = configFile.getAbsoluteFile().getParentFile();
+            co = cl.loadConfig(json, wd);
+            workingDirectory = wd;
         }
 
         this.config = co;

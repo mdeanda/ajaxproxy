@@ -3,8 +3,10 @@ package com.thedeanda.ajaxproxy;
 import com.thedeanda.ajaxproxy.config.ConfigFileService;
 import com.thedeanda.ajaxproxy.health.SampleHealthCheck;
 import com.thedeanda.ajaxproxy.mapper.ServerConfigMapper;
+import com.thedeanda.ajaxproxy.resources.AjaxProxyResource;
 import com.thedeanda.ajaxproxy.resources.ServerProxyResource;
 import com.thedeanda.ajaxproxy.resources.ServerResource;
+import com.thedeanda.ajaxproxy.service.AjaxProxyService;
 import com.thedeanda.ajaxproxy.service.ServerConfigService;
 import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
@@ -69,12 +71,14 @@ public class AjaxProxyApplication extends Application<AjaxProxyConfiguration> {
 
         //services
         final ServerConfigService serverConfigService = new ServerConfigService(configFileService, serverConfigMapper);
+        final AjaxProxyService ajaxProxyService = new AjaxProxyService(configFileService);
 
 
         //resources
         final List<Object> resources = new ArrayList<>();
         resources.add(new ServerResource(serverConfigService));
         resources.add(new ServerProxyResource(serverConfigService));
+        resources.add(new AjaxProxyResource(ajaxProxyService));
 
         environment.jersey().setUrlPattern("/api/*");
 

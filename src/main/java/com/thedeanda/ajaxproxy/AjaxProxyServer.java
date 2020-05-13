@@ -84,6 +84,10 @@ public class AjaxProxyServer implements Runnable, LoggerMessageListener {
 		init(co, workingDir, listener);
 	}
 
+	public AjaxProxyServer(Config config, File workingDir, RequestListener listener) throws Exception {
+		init(config, workingDir, listener);
+	}
+
 	public AjaxProxyServer(String configFile) throws Exception {
 		log.info("using config file: " + configFile);
 		File cf = new File(configFile);
