@@ -1,0 +1,40 @@
+{
+  "servers": [
+    {
+      "merge":[],
+      "options":{
+        "cacheTime":1,
+        "forcedLatency":0,
+        "maxBitrate":0
+      },
+      "port":8080,
+      "proxy":[
+        {
+          "cache":false,
+          "cacheDuration":10,
+          "host":"localhost",
+          "hostHeader":"",
+          "path":"/api/.*",
+          "port":8080,
+          "protocol":"http"
+        }
+      ],
+      "resourceBase":"./src/main/resources/assets",
+      "showIndex":true
+    }
+  ],
+  "resource":{},
+  "tamper":{
+    "items":[]
+  },
+  "tracker":{
+    "track":false
+  },
+  "variables":{
+    "ab":"abbb",
+    "aye":"AAaaa",
+    "b":"bbeee",
+    "jsonhost":"jsonplaceholder.typicode.com"
+  },
+  "version": 2
+}

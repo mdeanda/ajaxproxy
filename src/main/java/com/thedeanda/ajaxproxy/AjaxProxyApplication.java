@@ -23,7 +23,7 @@ public class AjaxProxyApplication extends Application<AjaxProxyConfiguration> {
 
     public static void main(String[] args) throws Exception {
         args = new String[]{"server", "config.yml"};
-        new AjaxProxyApplication("sample_config.json").run(args);
+        new AjaxProxyApplication("ui_config.json").run(args);
     }
 
     public AjaxProxyApplication(String configFile) {
