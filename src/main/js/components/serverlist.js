@@ -1,7 +1,9 @@
 const React = require('react');
 import PropTypes from 'prop-types';
 
-class Servers extends React.Component {
+import ServerItem from '../components/serveritem';
+
+class ServerList extends React.Component {
     constructor(props) {
         super(props);
         this.state = null;
@@ -13,7 +15,15 @@ class Servers extends React.Component {
         }
 
         return (
-            <p>this is a sss</p>
+            <div>
+                <p>this is a sss</p>
+
+                <ul>
+                {this.state.servers.map((server) => (
+                    <ServerItem server={server} key={server.id}/>
+                ))}
+                </ul>
+            </div>
         )
     }
 
@@ -26,11 +36,11 @@ class Servers extends React.Component {
         .then(res => res.json())
         .then((data) => {
             console.log("data", data);
-            //this.setState(data)
+            this.setState({servers:data})
         })
         .catch(console.log)
     }
 }
 
-export default Servers
+export default ServerList
 

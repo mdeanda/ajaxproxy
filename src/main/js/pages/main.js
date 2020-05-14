@@ -3,7 +3,7 @@ const ReactDOM = require('react-dom');
 
 import { Tabs, Tab, Panel } from '@bumaga/tabs'
 import Test from '../components/test';
-import Servers from '../components/servers';
+import ServerList from '../components/serverlist';
 
 class App extends React.Component {
 
@@ -27,7 +27,7 @@ class App extends React.Component {
                         <Tab><button>Logger</button></Tab>
                     </div>
 
-                    <Panel><Servers/></Panel>
+                    <Panel><ServerList /></Panel>
                     <Panel><p>Panel 2</p></Panel>
                     <Panel><Test /></Panel>
                     <Panel><p>logger</p></Panel>
