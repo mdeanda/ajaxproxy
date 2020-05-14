@@ -4,12 +4,16 @@ import PropTypes from 'prop-types';
 class Servers extends React.Component {
     constructor(props) {
         super(props);
-
+        this.state = null;
     }
 
     render() {
+        if (this.state == null) {
+            return '';
+        }
+
         return (
-        <p>this is a sss</p>
+            <p>this is a sss</p>
         )
     }
 
@@ -18,11 +22,11 @@ class Servers extends React.Component {
     }
 
     loadData() {
-        fetch('/api/servers')
+        fetch('/api/config/server')
         .then(res => res.json())
         .then((data) => {
             console.log("data", data);
-            this.setState(data)
+            //this.setState(data)
         })
         .catch(console.log)
     }
