@@ -3,7 +3,9 @@ const ReactDOM = require('react-dom');
 
 import { Tabs, Tab, Panel } from '@bumaga/tabs'
 import Test from '../components/test';
-import ServerList from '../components/serverlist';
+import ServerTab from '../components/servertab';
+import ApControl from '../components/apcontrol';
+
 
 class App extends React.Component {
 
@@ -16,18 +18,16 @@ class App extends React.Component {
             <div>
                 <h1>AjaxProxy</h1>
 
-                <Test />
-
-
                 <Tabs>
                     <div>
                         <Tab><button>Servers</button></Tab>
                         <Tab><button>Requests</button></Tab>
                         <Tab><button>Variables</button></Tab>
                         <Tab><button>Logger</button></Tab>
+                        <ApControl />
                     </div>
 
-                    <Panel><ServerList /></Panel>
+                    <Panel><ServerTab /></Panel>
                     <Panel><p>Panel 2</p></Panel>
                     <Panel><Test /></Panel>
                     <Panel><p>logger</p></Panel>
@@ -36,9 +36,6 @@ class App extends React.Component {
         )
     }
 
-    componentDidMount() {
-
-    }
 
 }
 

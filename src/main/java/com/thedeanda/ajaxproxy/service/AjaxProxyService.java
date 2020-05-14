@@ -1,6 +1,7 @@
 package com.thedeanda.ajaxproxy.service;
 
 import com.thedeanda.ajaxproxy.AjaxProxyServer;
+import com.thedeanda.ajaxproxy.api.AjaxProxyStatus;
 import com.thedeanda.ajaxproxy.config.ConfigFileService;
 import com.thedeanda.ajaxproxy.ui.ConfigService;
 
@@ -23,11 +24,18 @@ public class AjaxProxyService {
     }
 
     public void startServer() throws Exception {
-        ajaxProxyServer = new AjaxProxyServer(configFileService.getConfig(),
-                configFileService.getWorkingDirectory(),
-                resourceService);
-        apThread = new Thread(ajaxProxyServer);
-        apThread.start();
+        if (ajaxProxyServer == null) {
+            try {
+                ajaxProxyServer = new AjaxProxyServer(configFileService.getConfig(),
+                        configFileService.getWorkingDirectory(),
+                        resourceService);
+                apThread = new Thread(ajaxProxyServer);
+                apThread.start();
+            } catch (Exception e) {
+                stopServer();
+                throw e;
+            }
+        }
     }
 
     public void stopServer() {
@@ -35,6 +43,19 @@ public class AjaxProxyService {
             ajaxProxyServer.stop();
             apThread.interrupt();
             apThread = null;
+            ajaxProxyServer = null;
+        }
+    }
+
+    public AjaxProxyStatus getStatus() {
+        if (ajaxProxyServer != null) {
+            return AjaxProxyStatus.builder()
+                    .status(AjaxProxyStatus.Status.RUNNING)
+                    .build();
+        } else {
+            return AjaxProxyStatus.builder()
+                    .status(AjaxProxyStatus.Status.STOPPED)
+                    .build();
         }
     }
 }

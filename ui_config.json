@@ -21,6 +21,28 @@
       ],
       "resourceBase":"./src/main/resources/assets",
       "showIndex":true
+    },
+    {
+      "merge":[],
+      "options":{
+        "cacheTime":1,
+        "forcedLatency":0,
+        "maxBitrate":0
+      },
+      "port":8081,
+      "proxy":[
+        {
+          "cache":false,
+          "cacheDuration":10,
+          "host":"localhost",
+          "hostHeader":"",
+          "path":"/api/.*",
+          "port":8000,
+          "protocol":"http"
+        }
+      ],
+      "resourceBase":"./src/main/resources/assets",
+      "showIndex":true
     }
   ],
   "resource":{},

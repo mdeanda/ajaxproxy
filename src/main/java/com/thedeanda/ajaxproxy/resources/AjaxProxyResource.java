@@ -1,12 +1,10 @@
 package com.thedeanda.ajaxproxy.resources;
 
+import com.thedeanda.ajaxproxy.api.AjaxProxyStatus;
 import com.thedeanda.ajaxproxy.service.AjaxProxyService;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
 @Slf4j
@@ -30,6 +28,12 @@ public class AjaxProxyResource {
     @Path("/stop")
     public void stopProxy() {
         ajaxProxyService.stopServer();
+    }
+
+    @GET
+    @Path("/status")
+    public AjaxProxyStatus getStatus() {
+        return ajaxProxyService.getStatus();
     }
 
 

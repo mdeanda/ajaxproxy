@@ -2,6 +2,11 @@ const React = require('react');
 import PropTypes from 'prop-types';
 
 class ServerItem extends React.Component {
+    static propTypes = {
+        callback: PropTypes.func.isRequired,
+        server: PropTypes.object.isRequired
+    };
+
     constructor(props) {
         super(props);
         this.state = {
@@ -11,8 +16,12 @@ class ServerItem extends React.Component {
 
     render() {
         return (
-            <li>server {this.state.server.id}</li>
+            <li onClick={this.selected}>server {this.state.server.id}</li>
         )
+    }
+
+    selected = () => {
+        this.props.callback(this.state.server);
     }
 
 }
