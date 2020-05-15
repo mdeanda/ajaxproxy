@@ -42,7 +42,7 @@
         }
       ],
       "resourceBase":"./src/main/resources/assets",
-      "showIndex":true
+      "showIndex":false
     }
   ],
   "resource":{},
