@@ -19,6 +19,19 @@ class ServerEdit extends React.Component {
 
         return (
             <p>server edit {this.state.server.id}</p>
+
+            <form>
+                <label>local port</label>
+                <input type="number" />
+
+                <label>resource base</label>
+                <input type="text" />
+
+                <label>show directory index</label>
+                <input type="checkbox" />
+
+
+            </form>
         )
     }
 
