@@ -52,4 +52,8 @@ public class ConfigFileService {
         this.config = co;
         configChanged();
     }
+
+    public void save() {
+
+    }
 }

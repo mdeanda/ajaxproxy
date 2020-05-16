@@ -26,7 +26,7 @@ class ServerTab extends React.Component {
         console.log("item selected", item);
 
         const node = this.editRef.current;
-        node.setServer(item);
+        node.setServer(JSON.parse(JSON.stringify(item)));
     }
 
 }

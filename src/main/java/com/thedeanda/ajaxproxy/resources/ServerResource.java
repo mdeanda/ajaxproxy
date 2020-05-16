@@ -38,4 +38,16 @@ public class ServerResource {
 
         log.info("config: {}", config);
     }
+
+    @PUT
+    @Path("/{id}")
+    public ServerConfigDto update(@PathParam("id") int id, ServerConfigDto config) {
+        if (id == config.getId()) {
+            serverConfigService.update(id, config);
+        } else {
+            throw new IllegalArgumentException("Invalid ID: " + id);
+        }
+
+        return get(id);
+    }
 }

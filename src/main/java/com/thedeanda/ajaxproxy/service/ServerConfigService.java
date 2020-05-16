@@ -86,5 +86,14 @@ public class ServerConfigService {
     }
 
 
+    public void update(int id, ServerConfigDto config) {
+        ServerConfig server = getServer(id).orElseThrow(() -> new IllegalArgumentException("Invalid ID: " + id));
 
+        server.getPort().setOriginalValue(config.getPort().getOriginalValue());
+        server.getResourceBase().setOriginalValue(config.getResourceBase().getOriginalValue());
+        server.setShowIndex(config.isShowIndex());
+
+        //TODO: save
+        configFileService.save();
+    }
 }
