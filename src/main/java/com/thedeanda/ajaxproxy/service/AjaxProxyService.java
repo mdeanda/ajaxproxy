@@ -8,18 +8,14 @@ import com.thedeanda.ajaxproxy.ui.ConfigService;
 import java.io.File;
 
 public class AjaxProxyService {
-    private static final int CACHE_SIZE = 50;
     private final ConfigFileService configFileService;
     private final ResourceService resourceService;
     private AjaxProxyServer ajaxProxyServer;
     private Thread apThread;
 
-    public AjaxProxyService(ConfigFileService configFileService) {
+    public AjaxProxyService(ConfigFileService configFileService, ResourceService resourceService) {
         this.configFileService = configFileService;
-
-        //TODO: possibly move this
-        File dbFile = ConfigService.get().getResourceHistoryDb();
-        resourceService = new ResourceService(CACHE_SIZE, dbFile);
+        this.resourceService = resourceService;
 
     }
 

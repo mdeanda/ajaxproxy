@@ -6,20 +6,19 @@ import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfig;
 import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigFile;
 import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigLogger;
 import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigRequest;
+import com.thedeanda.ajaxproxy.service.StoredResource;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
-//@Service
-//@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 @Mapper
 public interface ServerConfigMapper {
 
-    public ServerConfigDto toDto(ServerConfig input);
+    public ServerConfigDto toDto(ServerConfig object);
 
-    public ProxyConfigLoggerDto toDto(ProxyConfigLogger config);
+    public ProxyConfigLoggerDto toDto(ProxyConfigLogger object);
 
-    public ProxyConfigRequestDto toDto(ProxyConfigRequest config);
+    public ProxyConfigRequestDto toDto(ProxyConfigRequest object);
 
-    public ProxyConfigFileDto toDto(ProxyConfigFile config);
+    public ProxyConfigFileDto toDto(ProxyConfigFile object);
 
 }

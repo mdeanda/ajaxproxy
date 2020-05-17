@@ -2,12 +2,17 @@ package com.thedeanda.ajaxproxy;
 
 import com.thedeanda.ajaxproxy.config.ConfigFileService;
 import com.thedeanda.ajaxproxy.health.SampleHealthCheck;
+import com.thedeanda.ajaxproxy.mapper.RequestMapper;
 import com.thedeanda.ajaxproxy.mapper.ServerConfigMapper;
 import com.thedeanda.ajaxproxy.resources.AjaxProxyResource;
+import com.thedeanda.ajaxproxy.resources.RequestResource;
 import com.thedeanda.ajaxproxy.resources.ServerProxyResource;
 import com.thedeanda.ajaxproxy.resources.ServerResource;
 import com.thedeanda.ajaxproxy.service.AjaxProxyService;
+import com.thedeanda.ajaxproxy.service.RequestService;
+import com.thedeanda.ajaxproxy.service.ResourceService;
 import com.thedeanda.ajaxproxy.service.ServerConfigService;
+import com.thedeanda.ajaxproxy.ui.ConfigService;
 import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.setup.Bootstrap;
@@ -19,6 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AjaxProxyApplication extends Application<AjaxProxyConfiguration> {
+    private static final int CACHE_SIZE = 50;
+
     private final String configFile;
 
     public static void main(String[] args) throws Exception {
@@ -68,10 +75,16 @@ public class AjaxProxyApplication extends Application<AjaxProxyConfiguration> {
         }
 
         final ServerConfigMapper serverConfigMapper = Mappers.getMapper(ServerConfigMapper.class);
+        final RequestMapper requestMapper = Mappers.getMapper(RequestMapper.class);
 
         //services
+        File dbFile = ConfigService.get().getResourceHistoryDb();
+        ResourceService resourceService = new ResourceService(CACHE_SIZE, dbFile);
+
+
         final ServerConfigService serverConfigService = new ServerConfigService(configFileService, serverConfigMapper);
-        final AjaxProxyService ajaxProxyService = new AjaxProxyService(configFileService);
+        final AjaxProxyService ajaxProxyService = new AjaxProxyService(configFileService, resourceService);
+        final RequestService requestService = new RequestService(resourceService, requestMapper);
 
 
         //resources
@@ -79,6 +92,7 @@ public class AjaxProxyApplication extends Application<AjaxProxyConfiguration> {
         resources.add(new ServerResource(serverConfigService));
         resources.add(new ServerProxyResource(serverConfigService));
         resources.add(new AjaxProxyResource(ajaxProxyService));
+        resources.add(new RequestResource(requestService));
 
         environment.jersey().setUrlPattern("/api/*");
 

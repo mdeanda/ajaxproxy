@@ -4,6 +4,7 @@ import java.io.File;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -238,4 +239,12 @@ public class ResourceService implements RequestListener {
 		return ret.toString();
 	}
 
+	public List<StoredResource> find() {
+		try {
+			return dao.queryForAll();
+		} catch (SQLException e) {
+			log.warn(e.getMessage(), e);
+			return Collections.emptyList();
+		}
+	}
 }

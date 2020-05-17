@@ -78,13 +78,17 @@ class ServerEdit extends React.Component {
         event.preventDefault();
 
         //TODO: edit vs add differences
-console.log("putting: ", this.state.server);
         const requestOptions = {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ content: this.state.server })
+            body: JSON.stringify(this.state.server)
         };
         fetch('/api/config/server/' + this.state.server.id, requestOptions)
+                .then(res => {
+                    if (res.ok)
+                        return res;
+                    else throw Error("Status error: " + res.status + ": " + res.statusText);
+                })
                 .then(res => res.json())
                 .then((data) => {
                     this.setState({server: data})

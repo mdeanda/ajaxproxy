@@ -41,9 +41,9 @@ public class ServerResource {
 
     @PUT
     @Path("/{id}")
-    public ServerConfigDto update(@PathParam("id") int id, ServerConfigDto config) {
+    public ServerConfigDto update(ServerConfigDto config, @PathParam("id") int id) {
         if (id == config.getId()) {
-            serverConfigService.update(id, config);
+            serverConfigService.update(config.getId(), config);
         } else {
             throw new IllegalArgumentException("Invalid ID: " + id);
         }
