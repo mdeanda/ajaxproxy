@@ -39,19 +39,19 @@ const entry = getFilesFromDir(PAGE_DIR, [".js"]).reduce( (obj, filePath) => {
 }, {});
 
 module.exports = (env, argv) => ({
-  entry: entry,
-  output: {
-    path: path.join(__dirname, "src", "main", "resources", "assets", "built"),
-    filename: "[name].js"
-  },
-  devtool: "sourcemaps", // argv.mode === 'production' ? false : 'eval-source-maps',
-  resolve:{
-		alias:{
-			src: path.resolve(__dirname, "src"),
-			components: path.resolve(__dirname, "src", "components")
-		}
-	},
-  module: {
+    entry: entry,
+    output: {
+        path: path.join(__dirname, "src", "main", "resources", "assets", "built"),
+        filename: "[name].js"
+    },
+    devtool: "sourcemaps", // argv.mode === 'production' ? false : 'eval-source-maps',
+    resolve:{
+        alias:{
+            src: path.resolve(__dirname, "src"),
+            components: path.resolve(__dirname, "src", "components")
+        }
+    },
+    module: {
 		rules: [
 			{
 				test: /\.js$/,
@@ -68,59 +68,71 @@ module.exports = (env, argv) => ({
                         ]
 					}
 				},
-      },
-      {
+            },
+            {
 				test: /\.css$/,
 				use: ["style-loader", {loader: "css-loader", options: {modules: true}}],
 				exclude: /node_modules/,
-      },
-      {
-        test: /\.(svg|jpg|gif|png)$/,
-        use: [
-          {
-            loader: 'file-loader',
-            options: {
-              name: '[name].[ext]',
-              outputPath: (url, resourcePath, context) => {
-                if(argv.mode === 'development') {
-                  const relativePath = path.relative(context, resourcePath);
-                  return `/${relativePath}`;
-                }
-                return `/assets/images/${path.basename(resourcePath)}`;
-              }
+            },
+            {
+                test: /\.s[ac]ss$/i,
+                use: [
+                    // Creates `style` nodes from JS strings
+                    'style-loader',
+                    // Translates CSS into CommonJS
+                    'css-loader',
+                    // Compiles Sass to CSS
+                    'sass-loader',
+                ]
+            },
+            {
+                test: /\.(svg|jpg|gif|png)$/,
+                use: [
+                    {
+                        loader: 'file-loader',
+                        options: {
+                            name: '[name].[ext]',
+                            outputPath: (url, resourcePath, context) => {
+                                if(argv.mode === 'development') {
+                                    const relativePath = path.relative(context, resourcePath);
+                                    return `/${relativePath}`;
+                                }
+                                return `/assets/images/${path.basename(resourcePath)}`;
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                test: /\.(woff|woff2|eot|ttf|otf)$/,
+                use: [
+                    {
+                        loader: 'file-loader',
+                        options: {
+                            outputPath: (url, resourcePath, context) => {
+                                if(argv.mode === 'development') {
+                                    const relativePath = path.relative(context, resourcePath);
+                                    return `/${relativePath}`;
+                                }
+                                return `/assets/fonts/${path.basename(resourcePath)}`;
+                            }
+                        }
+                    }
+                ]
             }
-          }
         ]
-      },
-      {
-        test: /\.(woff|woff2|eot|ttf|otf)$/,
-        use: [
-          {
-            loader: 'file-loader',
-            options: {
-              outputPath: (url, resourcePath, context) => {
-                if(argv.mode === 'development') {
-                  const relativePath = path.relative(context, resourcePath);
-                  return `/${relativePath}`;
-                }
-                return `/assets/fonts/${path.basename(resourcePath)}`;
-              }
-            }
-          }
-        ]
-      }]
     },
     optimization: {
-      minimize: false, // argv.mode === 'production' ? true : false,
-      splitChunks: {
-        cacheGroups: {
-          vendor: {
-            test: /node_modules/,
-            chunks: "initial",
-            name: "vendor",
-            enforce: true
-          }
+        minimize: false, // argv.mode === 'production' ? true : false,
+        splitChunks: {
+            cacheGroups: {
+                vendor: {
+                    test: /node_modules/,
+                    chunks: "initial",
+                    name: "vendor",
+                    enforce: true
+                }
+            }
         }
-      }
     }
 });
