@@ -15,4 +15,5 @@ public class ServerConfigDto {
     private StringVariableDto resourceBase;
     private boolean showIndex;
 
+    private String[] baseUrls;
 }

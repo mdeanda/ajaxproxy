@@ -17,9 +17,24 @@ class ServerEdit extends React.Component {
             return '';
         }
 
+        let urls;
+
+        if (this.state.server.baseUrls.length > 0) {
+            urls = <p>Base URL:
+                {this.state.server.baseUrls.map((url) => (
+                    <span>
+                        <a href={url} target='_blank'>{url}</a>
+                    </span>
+                ))}
+            </p>;
+        }
+
+
         return (
             <div>
                 <p>server edit {this.state.server.id}</p>
+
+                {urls}
 
                 <form onSubmit={this.handleSave}>
                     <label>local port</label>
