@@ -21,6 +21,8 @@
   "homepage": "https://github.com/mdeanda/ajaxproxy",
   "dependencies": {
     "@bumaga/tabs": "^0.2.0",
+    "css-loader": "^3.5.3",
+    "node-sass": "^4.14.1",
     "react": "^16.8.4",
     "react-dom": "^16.8.4",
     "react-paginate": "^6.3.2",

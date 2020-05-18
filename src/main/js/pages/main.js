@@ -1,12 +1,13 @@
 const React = require('react');
 const ReactDOM = require('react-dom');
 
+import styles from '../stylesheets/main.scss';
+
 import { Tabs, Tab, Panel } from '@bumaga/tabs'
 import Test from '../components/test';
 import ServerTab from '../components/servertab';
 import ApControl from '../components/apcontrol';
 import RequestTab from '../components/requesttab';
-
 
 class App extends React.Component {
 

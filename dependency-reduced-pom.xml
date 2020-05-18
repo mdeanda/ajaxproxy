@@ -174,18 +174,18 @@
     </dependencies>
   </dependencyManagement>
   <properties>
-    <ormlite.version>5.1</ormlite.version>
-    <dropwizard.version>2.0.9</dropwizard.version>
-    <org.mapstruct.version>1.3.1.Final</org.mapstruct.version>
-    <mainClass>com.thedeanda.ajaxproxy.AjaxProxy</mainClass>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <jetty.version>9.4.26.v20200117</jetty.version>
-    <flexmark.version>0.42.12</flexmark.version>
     <lombok.version>1.18.12</lombok.version>
-    <h2db.version>1.4.199</h2db.version>
-    <maven.compiler.target>1.8</maven.compiler.target>
+    <org.mapstruct.version>1.3.1.Final</org.mapstruct.version>
     <slf4j.version>1.7.28</slf4j.version>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <jetty.version>9.4.26.v20200117</jetty.version>
+    <mainClass>com.thedeanda.ajaxproxy.AjaxProxy</mainClass>
+    <dropwizard.version>2.0.9</dropwizard.version>
+    <maven.compiler.target>1.8</maven.compiler.target>
     <timestamp>${maven.build.timestamp}</timestamp>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <h2db.version>1.4.199</h2db.version>
+    <ormlite.version>5.1</ormlite.version>
+    <flexmark.version>0.42.12</flexmark.version>
+    <maven.compiler.source>1.8</maven.compiler.source>
   </properties>
 </project>
