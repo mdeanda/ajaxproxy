@@ -5,6 +5,7 @@ import { Tabs, Tab, Panel } from '@bumaga/tabs'
 import Test from '../components/test';
 import ServerTab from '../components/servertab';
 import ApControl from '../components/apcontrol';
+import RequestTab from '../components/requesttab';
 
 
 class App extends React.Component {
@@ -28,7 +29,7 @@ class App extends React.Component {
                     </div>
 
                     <Panel><ServerTab /></Panel>
-                    <Panel><p>Panel 2</p></Panel>
+                    <Panel><RequestTab /></Panel>
                     <Panel><Test /></Panel>
                     <Panel><p>logger</p></Panel>
                 </Tabs>

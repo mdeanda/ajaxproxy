@@ -30,6 +30,10 @@ public interface RequestMapper {
             if (i > 0)
                 url = url.substring(i+2);
 
+            i = url.indexOf("/");
+            if (i > 0)
+                url = url.substring(i);
+
             int q = url.indexOf('?');
             if (q > 0)
                 url = url.substring(0, q);
