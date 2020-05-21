@@ -1,6 +1,9 @@
 const React = require('react');
 import PropTypes from 'prop-types';
 
+import ProxyList from '../components/proxylist';
+
+
 class ServerEdit extends React.Component {
     static propTypes = {
     };
@@ -58,6 +61,8 @@ class ServerEdit extends React.Component {
 
                     <input type="submit"/>
                 </form>
+
+                <ProxyList serverId={this.state.server.id} />
             </div>
         )
     }
