@@ -28,10 +28,14 @@ class ProxyList extends React.Component {
                 {this.state.items.map((proxy) => (
                     <li>
                         <span class="id">{proxy.id}</span>
+                        --
                         <span class="protocol">{proxy.protocol}</span>
+                        ://
                         <span class="host">{proxy.host.originalValue}</span>
+                        :
                         <span class="port">{proxy.port}</span>
                         <span class="path">{proxy.path.originalValue}</span>
+                        
                         <span class="host-header">{proxy.hostHeader}</span>
 
                         <span class="enable-cache">{proxy.enableCache}</span>
