@@ -317,17 +317,19 @@ public class AjaxProxyServer implements Runnable, LoggerMessageListener {
 	// TODO: needs to reset or add a reset to clear all listener lists to avoid
 	// memory leak from ui
 	public void stop() {
-		for (Server jettyServer : jettyServers) {
-			try {
-				if (jettyServer != null) {
-					jettyServer.stop();
-					fireEvent(ProxyEvent.STOP);
+		synchronized (jettyServers) {
+			for (Server jettyServer : jettyServers) {
+				try {
+					if (jettyServer != null) {
+						jettyServer.stop();
+						fireEvent(ProxyEvent.STOP);
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
-			} catch (Exception e) {
-				e.printStackTrace();
 			}
+			jettyServers.clear();
 		}
-		jettyServers.clear();
 	}
 
 	public List<MergeServlet> getMergeServlets() {
