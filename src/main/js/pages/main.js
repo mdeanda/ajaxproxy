@@ -17,24 +17,24 @@ class App extends React.Component {
 
     render() {
         return (
-            <div>
-                <h1>AjaxProxy</h1>
+            <Tabs>
+                <div class="header">
+                    <h1>AjaxProxy</h1>
 
-                <Tabs>
-                    <div>
-                        <Tab><button>Servers</button></Tab>
-                        <Tab><button>Requests</button></Tab>
-                        <Tab><button>Variables</button></Tab>
-                        <Tab><button>Logger</button></Tab>
-                        <ApControl />
-                    </div>
+                    <Tab><button>Servers</button></Tab>
+                    <Tab><button>Requests</button></Tab>
+                    <Tab><button>Variables</button></Tab>
+                    <Tab><button>Logger</button></Tab>
+                    <ApControl />
+                </div>
 
+                <div class="tabs-container">
                     <Panel><ServerTab /></Panel>
                     <Panel><RequestTab /></Panel>
                     <Panel><Test /></Panel>
                     <Panel><p>logger</p></Panel>
-                </Tabs>
-            </div>
+                </div>
+            </Tabs>
         )
     }
 
