@@ -1,6 +1,9 @@
 const React = require('react');
 import PropTypes from 'prop-types';
 
+import styles from '../stylesheets/servertab.scss';
+
+
 import ServerList from '../components/serverlist';
 import ServerEdit from '../components/serveredit';
 
@@ -12,10 +15,13 @@ class ServerTab extends React.Component {
 
     render() {
         return (
-            <div>
-                <ServerList callback={this.itemSelected}/>
-
-                <ServerEdit ref={this.editRef}/>
+            <div class="server-tab">
+                <div class="list">
+                    <ServerList callback={this.itemSelected}/>
+                </div>
+                <div class="content">
+                    <ServerEdit ref={this.editRef}/>
+                </div>
             </div>
         )
     }
