@@ -18,7 +18,7 @@ class App extends React.Component {
     render() {
         return (
             <Tabs>
-                <div class="header">
+                <div className="header">
                     <h1>AjaxProxy</h1>
 
                     <Tab><button>Servers</button></Tab>
@@ -28,7 +28,7 @@ class App extends React.Component {
                     <ApControl />
                 </div>
 
-                <div class="tabs-container">
+                <div className="tabs-container">
                     <Panel><ServerTab /></Panel>
                     <Panel><RequestTab /></Panel>
                     <Panel><Test /></Panel>

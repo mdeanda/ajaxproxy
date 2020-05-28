@@ -25,7 +25,7 @@ class ServerEdit extends React.Component {
         if (this.state.server.baseUrls.length > 0) {
             urls = <p>Base URL:
                 {this.state.server.baseUrls.map((url) => (
-                    <span>
+                    <span key={url}>
                         <a href={url} target='_blank'>{url}</a>
                     </span>
                 ))}
@@ -35,7 +35,7 @@ class ServerEdit extends React.Component {
 
         return (
             <div>
-                <p>server edit {this.state.server.id}</p>
+                <h3>edit server ({this.state.server.id})</h3>
 
                 {urls}
 
@@ -68,6 +68,7 @@ class ServerEdit extends React.Component {
     }
 
     setServer = item => {
+        //TODO: maybe just use id instead and reload
         this.setState({server:item})
     }
 

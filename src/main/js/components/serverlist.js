@@ -12,6 +12,7 @@ class ServerList extends React.Component {
         super(props);
         this.state = {
             servers: null,
+            selected: null,
             callback: props.callback
         };
 
@@ -19,6 +20,7 @@ class ServerList extends React.Component {
     }
 
     render() {
+        console.log("render serverlist");
         if (this.state == null || this.state.servers == null) {
             return '';
         }
@@ -29,7 +31,10 @@ class ServerList extends React.Component {
 
                 <ul>
                 {this.state.servers.map((server) => (
-                    <ServerItem server={server} key={server.id} callback={this.itemSelected}/>
+                    <ServerItem server={server}
+                            key={server.id + '-' + this.state.selected}
+                            callback={this.itemSelected}
+                            selected={this.state.selected == server.id}/>
                 ))}
                 </ul>
             </div>
@@ -51,6 +56,7 @@ class ServerList extends React.Component {
     }
 
     itemSelected = item => {
+        this.setState({selected: item.id});
         console.log("item selected on serverlist", item);
         this.state.callback(item);
     }

@@ -22,24 +22,24 @@ class ProxyList extends React.Component {
         }
 
         return (
-            <div class="proxy-list">
-                proxy list
+            <div className="proxy-list">
+                <h3>proxy list</h3>
                 <ul>
                 {this.state.items.map((proxy) => (
-                    <li>
-                        <span class="id">{proxy.id}</span>
+                    <li key={proxy.id}>
+                        <span className="id">{proxy.id}</span>
                         --
-                        <span class="protocol">{proxy.protocol}</span>
+                        <span className="protocol">{proxy.protocol}</span>
                         ://
-                        <span class="host">{proxy.host.originalValue}</span>
+                        <span className="host">{proxy.host.originalValue}</span>
                         :
-                        <span class="port">{proxy.port}</span>
-                        <span class="path">{proxy.path.originalValue}</span>
+                        <span className="port">{proxy.port}</span>
+                        <span className="path">{proxy.path.originalValue}</span>
                         
-                        <span class="host-header">{proxy.hostHeader}</span>
+                        <span className="host-header">{proxy.hostHeader}</span>
 
-                        <span class="enable-cache">{proxy.enableCache}</span>
-                        <span class="cache-duration">{proxy.cacheDuration}</span>
+                        <span className="enable-cache">{proxy.enableCache}</span>
+                        <span className="cache-duration">{proxy.cacheDuration}</span>
                     </li>
                 ))}
                 </ul>

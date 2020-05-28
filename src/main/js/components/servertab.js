@@ -13,8 +13,6 @@ class ServerTab extends React.Component {
     render() {
         return (
             <div>
-                <p>tab starts here</p>
-
                 <ServerList callback={this.itemSelected}/>
 
                 <ServerEdit ref={this.editRef}/>
