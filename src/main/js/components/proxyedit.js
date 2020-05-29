@@ -1,73 +1,77 @@
 const React = require('react');
 import PropTypes from 'prop-types';
 
-import ProxyEdit from '../components/proxyedit';
-import ProxyList from '../components/proxylist';
 
-
-class ServerEdit extends React.Component {
+class ProxyRequestEdit extends React.Component {
     static propTypes = {
+        serverId: PropTypes.number.isRequired
+    };
+
+    state = {
+        serverId: this.props.serverId
     };
 
     constructor(props) {
         super(props);
-        this.state = {
-            server: props.server
-        };
-    }
+    };
 
     render() {
-        if (this.state.server == null) {
-            return '';
-        }
-
-        let urls;
-
-        if (this.state.server.baseUrls.length > 0) {
-            urls = <p>Base URL:
-                {this.state.server.baseUrls.map((url) => (
-                    <span key={url}>
-                        <a href={url} target='_blank'>{url}</a>
-                    </span>
-                ))}
-            </p>;
-        }
-
-
         return (
             <div>
-                <h3>Edit Server ({this.state.server.id})</h3>
-
-                {urls}
+                proxy request editor goes here
 
                 <form onSubmit={this.handleSave}>
                     <label>local port</label>
                     <input type="text"
                             name="port"
-                            value={this.state.server.port.originalValue}
+                            value={this.state.serverId}
                             onChange={this.handleInputChange} />
 
                     <label>resource base</label>
                     <input type="text"
                             name="resourceBase"
-                            value={this.state.server.resourceBase.originalValue}
+                            value={this.state.serverId}
                             onChange={this.handleInputChange} />
 
                     <label>show directory index</label>
                     <input type="checkbox"
                             name="showIndex"
-                            checked={this.state.server.showIndex}
+                            checked={this.state.serverId}
                             onChange={this.handleInputChange}
                             />
 
                     <input type="submit"/>
                 </form>
+            </div>
+        )
+    }
+}
 
-                <h3>Proxy List</h3>
+class ProxyEdit extends React.Component {
+    static propTypes = {
+        serverId: PropTypes.number.isRequired,
+        proxyType: PropTypes.string.isRequired,
+    };
 
-                <ProxyEdit serverId={this.state.server.id} proxyType='Proxy' />
+    state = {
+        serverId: this.props.serverId,
+        proxyType: this.props.proxyType
+    }
 
-                <ProxyList serverId={this.state.server.id} key={this.state.server.id} />
+    constructor(props) {
+        super(props);
+    }
+
+    render() {
+        if (this.state.proxyType.toUpperCase() == 'PROXY') {
+            return (
+                <ProxyRequestEdit serverId={this.state.serverId} />
+            )
+        }
+
+        return (
+            <div>
+                <h2>Editor not available yet</h2>
             </div>
         )
     }
@@ -124,5 +128,5 @@ class ServerEdit extends React.Component {
     }
 }
 
-export default ServerEdit
+export default ProxyEdit
 

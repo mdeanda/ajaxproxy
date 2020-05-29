@@ -39,6 +39,24 @@
           "path":"/api/.*",
           "port":8000,
           "protocol":"http"
+        },
+        {
+          "cache":false,
+          "cacheDuration":10,
+          "host":"localhost",
+          "hostHeader":"",
+          "path":"/monkey/.*",
+          "port":8000,
+          "protocol":"http"
+        },
+        {
+          "cache":false,
+          "cacheDuration":10,
+          "host":"localhost",
+          "hostHeader":"",
+          "path":"/donkey/.*",
+          "port":8000,
+          "protocol":"http"
         }
       ],
       "resourceBase":"./src/main/resources/assets",

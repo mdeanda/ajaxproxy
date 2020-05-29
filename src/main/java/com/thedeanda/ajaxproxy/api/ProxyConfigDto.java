@@ -11,9 +11,14 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 public class ProxyConfigDto {
 
+	public enum ProxyType {
+		Proxy, File, Logger
+	}
+
 	private int id;
 	private StringVariableDto path;
 	private boolean enableCache;
 	private int cacheDuration;
+	private ProxyType type;
 
 }

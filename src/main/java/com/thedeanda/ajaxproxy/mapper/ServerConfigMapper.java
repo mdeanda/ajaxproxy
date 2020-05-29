@@ -21,10 +21,13 @@ public interface ServerConfigMapper {
     @Mapping(source = "object", target = "baseUrls", qualifiedByName = "addBaseUrls")
     public ServerConfigDto toDto(ServerConfig object);
 
+    @Mapping(source = "object", target = "type", qualifiedByName = "addProxyType")
     public ProxyConfigLoggerDto toDto(ProxyConfigLogger object);
 
+    @Mapping(source = "object", target = "type", qualifiedByName = "addProxyType")
     public ProxyConfigRequestDto toDto(ProxyConfigRequest object);
 
+    @Mapping(source = "object", target = "type", qualifiedByName = "addProxyType")
     public ProxyConfigFileDto toDto(ProxyConfigFile object);
 
     @Named("addBaseUrls")
@@ -33,6 +36,17 @@ public interface ServerConfigMapper {
 
         //TODO: add more when we add https
         return new String[]{url};
+    }
+
+    @Named("addProxyType")
+    default ProxyConfigDto.ProxyType addProxyType(ProxyConfig config) {
+        if (config instanceof ProxyConfigFile) {
+            return ProxyConfigDto.ProxyType.File;
+        } else if (config instanceof ProxyConfigRequest) {
+            return ProxyConfigDto.ProxyType.Proxy;
+        } else {
+            return ProxyConfigDto.ProxyType.Logger;
+        }
     }
 
 }

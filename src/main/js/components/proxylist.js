@@ -5,15 +5,15 @@ import PropTypes from 'prop-types';
 
 class ProxyList extends React.Component {
     static propTypes = {
-            serverId: PropTypes.number.isRequired
+        serverId: PropTypes.number.isRequired
     };
+
+    state = {
+        serverId: this.props.serverId
+    }
 
     constructor(props) {
         super(props);
-        this.state = {
-            serverId: props.serverId
-        };
-
     }
 
     render() {
@@ -23,7 +23,6 @@ class ProxyList extends React.Component {
 
         return (
             <div className="proxy-list">
-                <h3>proxy list</h3>
                 <ul>
                 {this.state.items.map((proxy) => (
                     <li key={proxy.id}>
