@@ -24,14 +24,14 @@ class RequestList extends React.Component {
         }
 
         return (
-            <div class="request-list">
+            <div className="request-list">
                 <ul>
                 {this.state.requests.map((request) => (
-                    <li>
-                        <span class="path">{request.path}</span>
-                        <span class="method">{request.method}</span>
-                        <span class="status">{request.status}</span>
-                        <span class="duration">{request.duration}</span>
+                    <li key={request.id}>
+                        <span className="path">{request.path}</span>
+                        <span className="method">{request.method}</span>
+                        <span className="status">{request.status}</span>
+                        <span className="duration">{request.duration}</span>
                     </li>
                 ))}
                 </ul>

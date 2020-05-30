@@ -20,13 +20,12 @@
   },
   "homepage": "https://github.com/mdeanda/ajaxproxy",
   "dependencies": {
-    "@bumaga/tabs": "^0.2.0",
     "css-loader": "^3.5.3",
     "node-sass": "^4.14.1",
     "react": "^16.8.4",
     "react-dom": "^16.8.4",
     "react-paginate": "^6.3.2",
-    "react-router-dom": "^5.1.2",
+    "react-router-dom": "^5.2.0",
     "react-scripts": "2.1.5",
     "rest": "^1.3.1"
   },

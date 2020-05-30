@@ -17,11 +17,15 @@ class ApControl extends React.Component {
 
         if (this.state.status == RUNNING) {
             return (
-                <span onClick={this.stopServer}>stop server</span>
+                <div className="ap-control">
+                    <span onClick={this.stopServer}>stop server</span>
+                </div>
             )
         } else {
             return (
-                <span onClick={this.startServer}>start server</span>
+                <div className="ap-control">
+                    <span onClick={this.startServer}>start server</span>
+                </div>
             )
         }
     }

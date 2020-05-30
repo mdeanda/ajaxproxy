@@ -15,11 +15,11 @@ class ServerTab extends React.Component {
 
     render() {
         return (
-            <div class="server-tab">
-                <div class="list">
+            <div className="server-tab">
+                <div className="list">
                     <ServerList callback={this.itemSelected}/>
                 </div>
-                <div class="content">
+                <div className="content">
                     <ServerEdit ref={this.editRef}/>
                 </div>
             </div>

@@ -19,21 +19,59 @@ body {
 
 .header {
     flex: 0 0 auto;
-    background: ghostwhite;
-    padding: 20px 20px 0 20px;
+    background: floralwhite;
+    padding: 1em 1em 0 1em;
+    border-bottom: 1px solid #c0c0c0;
 
     h1 {
-        margin: 0 0 1em 0;
+        margin: 0 0 0.8em 0;
         padding: 0;
     }
 
+    .bottom-bar {
+        display: flex;
+        flex-direction: row;
+    }
+
+    nav {
+        flex: 0 0 auto;
+        margin-bottom: -1px;
+
+        .tab {
+            background: ghostwhite;
+            border: 1px solid #c0c0c0;
+            border-left: none;
+            padding: 0.4em 0.8em;
+            display: inline-block;
+
+            color: black;
+            text-decoration: none;
+        }
+        .tab:first-child {
+            border-left: 1px solid #c0c0c0;
+            border-top-left-radius: 0.5em;
+        }
+        .tab:last-child {
+            border-left: 1px solid #c0c0c0;
+            border-top-right-radius: 0.5em;
+        }
+        .tab.active {
+            border-top: 2px solid #c0c0c0;
+            border-bottom: 1px solid white;
+            background: white;
+        }
+
+    }
+    .ap-control {
+        flex: 1 1 auto;
+    }
 }
+
 
 .tabs-container {
     flex: 1 1 auto;
-    background: cornsilk;
+    background: white;
     overflow: auto;
-
 }
 
 li.selected { /*temporary*/

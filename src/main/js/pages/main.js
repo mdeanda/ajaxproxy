@@ -3,11 +3,13 @@ const ReactDOM = require('react-dom');
 
 import styles from '../stylesheets/main.scss';
 
-import { Tabs, Tab, Panel } from '@bumaga/tabs'
+import { HashRouter as Router, Route, Link, NavLink, Switch } from "react-router-dom";
+
 import Test from '../components/test';
 import ServerTab from '../components/servertab';
 import ApControl from '../components/apcontrol';
 import RequestTab from '../components/requesttab';
+
 
 class App extends React.Component {
 
@@ -17,24 +19,28 @@ class App extends React.Component {
 
     render() {
         return (
-            <Tabs>
+            <Router>
                 <div className="header">
                     <h1>AjaxProxy</h1>
 
-                    <Tab><button>Servers</button></Tab>
-                    <Tab><button>Requests</button></Tab>
-                    <Tab><button>Variables</button></Tab>
-                    <Tab><button>Logger</button></Tab>
-                    <ApControl />
+                    <div className="bottom-bar">
+                        <nav>
+                            <NavLink to='/servers' className='tab'>Servers</NavLink>
+                            <NavLink to='/requests' className='tab'>Requests</NavLink>
+                            <NavLink to='/variables' className='tab'>Variables</NavLink>
+                            <NavLink to='/logger' className='tab'>Logger</NavLink>
+                        </nav>
+                        <ApControl />
+                    </div>
                 </div>
 
                 <div className="tabs-container">
-                    <Panel><ServerTab /></Panel>
-                    <Panel><RequestTab /></Panel>
-                    <Panel><Test /></Panel>
-                    <Panel><p>logger</p></Panel>
+                    <Route path="/servers"><ServerTab /></Route>
+                    <Route path="/requests"><RequestTab /></Route>
+                    <Route path="/variables"><Test /></Route>
+                    <Route path="/logger"><p>logger</p></Route>
                 </div>
-            </Tabs>
+            </Router>
         )
     }
 
