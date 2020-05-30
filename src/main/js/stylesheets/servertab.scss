@@ -6,13 +6,14 @@
     .list {
         flex: 0 0 auto;
         overflow: auto;
-        background: limegreen;
+        xxbackground: limegreen;
         width: 15em;
+        border-right: 1px solid #c0c0c0;
     }
 
     .content {
         flex: 1 1 auto;
         overflow: auto;
-        background: lightblue;
+        xxbackground: lightblue;
     }
 }
