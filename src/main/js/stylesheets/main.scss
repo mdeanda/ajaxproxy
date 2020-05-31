@@ -1,3 +1,5 @@
+@import "variables";
+
 html {
     overflow: hidden;
     height: 100%;
@@ -21,7 +23,7 @@ body {
     flex: 0 0 auto;
     background: floralwhite;
     padding: 1em 1em 0 1em;
-    border-bottom: 1px solid #c0c0c0;
+    border-bottom: $border;
 
     h1 {
         margin: 0 0 0.8em 0;
@@ -39,7 +41,7 @@ body {
 
         .tab {
             background: ghostwhite;
-            border: 1px solid #c0c0c0;
+            border: $border;
             border-left: none;
             padding: 0.4em 0.8em;
             display: inline-block;
@@ -48,15 +50,16 @@ body {
             text-decoration: none;
         }
         .tab:first-child {
-            border-left: 1px solid #c0c0c0;
+            border-left: $border;
             border-top-left-radius: 0.5em;
         }
         .tab:last-child {
-            border-left: 1px solid #c0c0c0;
+            xxborder-left: $border;
             border-top-right-radius: 0.5em;
         }
         .tab.active {
-            border-top: 2px solid #c0c0c0;
+            border-top: $border;
+            border-top-width: 2px;
             border-bottom: 1px solid white;
             background: white;
         }

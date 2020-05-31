@@ -1,3 +1,5 @@
+@import "variables";
+
 .server-tab {
     display: flex;
     flex-direction: row;
@@ -8,7 +10,7 @@
         overflow: auto;
         xxbackground: limegreen;
         width: 15em;
-        border-right: 1px solid #c0c0c0;
+        border-right: $border;
 
         ul {
             list-style: none;
@@ -17,10 +19,10 @@
 
             li {
                 padding: .3em 1em;
-                border-bottom: 1px solid #c0c0c0;
+                border-bottom: $border;
             }
             li:first-child {
-                border-top: 1px solid #c0c0c0;
+                border-top: $border;
             }
             li.selected {
                 background: floralwhite;
@@ -31,6 +33,6 @@
     .content {
         flex: 1 1 auto;
         overflow: auto;
-        xxbackground: lightblue;
+        padding: 0 1em;
     }
 }

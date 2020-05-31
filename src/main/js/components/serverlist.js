@@ -50,7 +50,11 @@ class ServerList extends React.Component {
         .then(res => res.json())
         .then((data) => {
             console.log("data", data);
-            this.setState({servers:data})
+            this.setState({servers:data});
+
+            if (this.state.selected == null && data.length > 0) {
+                this.itemSelected(data[0]);
+            }
         })
         .catch(console.log)
     }

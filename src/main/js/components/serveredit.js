@@ -1,6 +1,9 @@
 const React = require('react');
 import PropTypes from 'prop-types';
 
+import styles from '../stylesheets/serveredit.scss';
+
+
 import ProxyEdit from '../components/proxyedit';
 import ProxyList from '../components/proxylist';
 
@@ -35,32 +38,55 @@ class ServerEdit extends React.Component {
 
 
         return (
-            <div>
-                <h3>Edit Server ({this.state.server.id})</h3>
+            <div className="server-edit">
+                <h3>Server {this.state.server.id}</h3>
 
                 {urls}
 
                 <form onSubmit={this.handleSave}>
-                    <label>local port</label>
-                    <input type="text"
-                            name="port"
-                            value={this.state.server.port.originalValue}
-                            onChange={this.handleInputChange} />
+                    <div className="row">
+                        <div class="col-25">
+                            <label for="port">Local Port</label>
+                        </div>
+                        <div class="col-75">
+                            <input type="text"
+                                    id="port"
+                                    name="port"
+                                    value={this.state.server.port.originalValue}
+                                    onChange={this.handleInputChange} />
+                        </div>
+                    </div>
 
-                    <label>resource base</label>
-                    <input type="text"
-                            name="resourceBase"
-                            value={this.state.server.resourceBase.originalValue}
-                            onChange={this.handleInputChange} />
+                    <div className="row">
+                        <div class="col-25">
+                            <label for="resourceBase">Resource Base</label>
+                        </div>
+                        <div class="col-75">
+                            <input type="text"
+                                    id="resourceBase"
+                                    name="resourceBase"
+                                    value={this.state.server.resourceBase.originalValue}
+                                    onChange={this.handleInputChange} />
+                        </div>
+                    </div>
 
-                    <label>show directory index</label>
-                    <input type="checkbox"
-                            name="showIndex"
-                            checked={this.state.server.showIndex}
-                            onChange={this.handleInputChange}
-                            />
+                    <div className="row">
+                        <div className="col-25 skip-25">
+                            <input type="checkbox"
+                                    id="showIndex"
+                                    name="showIndex"
+                                    checked={this.state.server.showIndex}
+                                    onChange={this.handleInputChange}
+                                    />
+                            <label for="showIndex">show directory index</label>
+                        </div>
+                    </div>
 
-                    <input type="submit"/>
+                    <div className="row submit-row">
+                        <div className="col-25 skip-25">
+                            <input type="submit"/>
+                        </div>
+                    </div>
                 </form>
 
                 <h3>Proxy List</h3>

@@ -28,7 +28,7 @@ class ServerItem extends React.Component {
         return (
             <li onClick={this.selected}
                     className={this.state.selected==true?'selected':'not-selected'}
-                    >server {this.state.server.id}</li>
+                    >Server {this.state.server.id}</li>
         )
     }
 
