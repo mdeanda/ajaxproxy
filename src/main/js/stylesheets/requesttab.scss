@@ -22,7 +22,7 @@
                 border-bottom: $border;
             }
             li:first-child {
-                border-top: $border;
+                xxborder-top: $border;
             }
             li.selected {
                 background: floralwhite;
@@ -34,5 +34,40 @@
         flex: 1 1 auto;
         overflow: auto;
         padding: 0 1em;
+    }
+}
+
+.request-list {
+    ul {
+        li {
+            p {
+                margin: 0;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                overflow: hidden;
+                font-size: small;
+                line-height: 1.2em;
+            }
+
+            .row-2 {
+                display: flex;
+                flex-direction: row;
+
+                .method {
+                    flex: 0 0 auto;
+                    padding-right: 0.2em;
+                }
+                .status {
+                    flex: 1 1 auto;
+                }
+                .duration {
+                    flex: 0 0 auto;
+                }
+            }
+        }
+
+        li.active {
+            background: $selected-color;
+        }
     }
 }
