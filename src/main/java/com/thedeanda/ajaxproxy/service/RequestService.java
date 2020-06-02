@@ -28,7 +28,8 @@ public class RequestService {
     public RequestDto get(String id) {
         StoredResource resource = resourceService.get(id);
         if (resource != null) {
-            return mapper.toDto(resource);
+            RequestDto output = mapper.toDto(resource);
+            return output;
         }
 
         return null;

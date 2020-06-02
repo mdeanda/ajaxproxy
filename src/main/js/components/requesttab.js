@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import styles from '../stylesheets/requesttab.scss';
 
 import RequestList from '../components/requestlist';
+import RequestView from '../components/requestview';
 
 class RequestTab extends React.Component {
     state = {
@@ -12,11 +13,10 @@ class RequestTab extends React.Component {
 
     constructor(props) {
         super(props);
-        this.editRef = React.createRef();
     }
 
     render() {
-        var selectedId = "x";
+        var selectedId = null;
         if (this.state.selectedItem != null) {
             selectedId = this.state.selectedItem.id;
         }
@@ -29,7 +29,7 @@ class RequestTab extends React.Component {
                     <RequestList callback={this.itemSelected}/>
                 </div>
                 <div className="content">
-                    <p key={selectedId}>content goes here: {selectedId}</p>
+                    <RequestView key={selectedId} itemId={selectedId} />
                 </div>
             </div>
         )

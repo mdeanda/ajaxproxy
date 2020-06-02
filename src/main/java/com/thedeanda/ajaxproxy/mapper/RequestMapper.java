@@ -11,6 +11,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
+import java.nio.charset.StandardCharsets;
+
 @Mapper
 public interface RequestMapper {
 
@@ -18,7 +20,10 @@ public interface RequestMapper {
     public RequestDtoListItem toListItem(StoredResource object);
 
     @Mapping(source = "url", target = "path", qualifiedByName = "extractPath")
+    @Mapping(source = "object", target = "input", qualifiedByName = "input")
+    @Mapping(source = "object", target = "inputText", qualifiedByName = "inputText")
     @Mapping(source = "object", target = "output", qualifiedByName = "output")
+    @Mapping(source = "object", target = "outputText", qualifiedByName = "outputText")
     public RequestDto toDto(StoredResource object);
 
     @Named("extractPath")
@@ -42,6 +47,21 @@ public interface RequestMapper {
         return url;
     }
 
+    @Named("input")
+    default byte[] getInput(StoredResource storedResource) {
+        return storedResource.getInput();
+    }
+
+    @Named("inputText")
+    default String getInputText(StoredResource storedResource) {
+        byte[] bytes = getInput(storedResource);
+
+        if (bytes == null) return "";
+
+        String output = new String(bytes, StandardCharsets.UTF_8);
+        return output;
+    }
+
     @Named("output")
     default byte[] getOutput(StoredResource storedResource) {
         if (storedResource.getOutputDecompressed() != null)
@@ -49,5 +69,13 @@ public interface RequestMapper {
         else
             return storedResource.getOutput();
     }
+    @Named("outputText")
+    default String getOutputText(StoredResource storedResource) {
+        byte[] bytes = getOutput(storedResource);
 
+        if (bytes == null) return "";
+
+        String output = new String(bytes, StandardCharsets.UTF_8);
+        return output;
+    }
 }
