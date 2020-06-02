@@ -86,18 +86,6 @@ class RequestList extends React.Component {
         this.state.callback(item);
     }
 
-    shouldComponentUpdate = (nextProps, nextState) => {
-
-        if (nextState.selectedItem == this.state.selectedItem && this.state.selectedItem != null) {
-            console.log("dont update");
-            return false;
-        }
-
-
-        console.log("request list should update", nextState);
-
-        return true;
-    }
 }
 
 export default RequestList
