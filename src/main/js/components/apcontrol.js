@@ -1,6 +1,10 @@
 const React = require('react');
 import PropTypes from 'prop-types';
 
+import { faPlay, faStop, faRedo } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
+
 const RUNNING = 'RUNNING';
 const STOPPED = 'STOPPED';
 
@@ -15,19 +19,27 @@ class ApControl extends React.Component {
     render() {
         if (this.state.status == null) return '';
 
+        var playCss = "play";
+        var stopCss = "stop";
+        var refreshCss = "refresh";
+
         if (this.state.status == RUNNING) {
-            return (
-                <div className="ap-control">
-                    <span onClick={this.stopServer}>stop server</span>
-                </div>
-            )
+            playCss += " active";
         } else {
-            return (
-                <div className="ap-control">
-                    <span onClick={this.startServer}>start server</span>
-                </div>
-            )
+            stopCss += " active";
         }
+
+        return (
+            <div className="ap-control">
+                <div className="buttons">
+                    <span onClick={this.startServer} className={playCss} title="Start Server"><FontAwesomeIcon icon={faPlay} /></span>
+                    <span onClick={this.stopServer} className={stopCss} title="Stop Server"><FontAwesomeIcon icon={faStop} /></span>
+                    <span onClick={this.restartServer} className={refreshCss} title="Restart Server"><FontAwesomeIcon icon={faRedo} /></span>
+                </div>
+                <div className="status">{this.state.status}</div>
+            </div>
+        )
+
     }
 
     componentDidMount() {

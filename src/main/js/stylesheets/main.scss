@@ -67,6 +67,37 @@ body {
     }
     .ap-control {
         flex: 1 1 auto;
+        padding: 0 0 0 10px;
+        display: flex;
+
+        .buttons {
+            font-size: 1.3em;
+            flex: 0 0 auto;
+            padding-top: 0.4em;
+
+            span {
+                padding-right: 0.3em;
+            }
+
+            .play {
+                color: green;
+            }
+            .stop {
+                color: red;
+            }
+            .refresh {
+                color: blue;
+            }
+            .active {
+                color: dimgrey;
+            }
+        }
+
+        .status {
+            flex: 0 0 auto;
+            font-size: 0.7em;
+            padding-top: 1em;
+        }
     }
 }
 
