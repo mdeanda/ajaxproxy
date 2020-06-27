@@ -12,11 +12,13 @@ class ServerEdit extends React.Component {
     static propTypes = {
     };
 
+    state = {
+        server: this.props.server,
+        selectedProxy: null
+    };
+
     constructor(props) {
         super(props);
-        this.state = {
-            server: props.server
-        };
     }
 
     render() {
@@ -25,6 +27,7 @@ class ServerEdit extends React.Component {
         }
 
         let urls;
+        let selectedProxyKey;
 
         if (this.state.server.baseUrls.length > 0) {
             urls = <p>Base URL:
@@ -36,6 +39,12 @@ class ServerEdit extends React.Component {
             </p>;
         }
 
+        if (this.state.selectedProxy != null) {
+            var proxy = this.state.selectedProxy;
+            selectedProxyKey = proxy.id + "x"; //TODO: make it change?
+        }
+
+
 
         return (
             <div className="server-edit">
@@ -45,27 +54,27 @@ class ServerEdit extends React.Component {
 
                 <form onSubmit={this.handleSave}>
                     <div className="row">
-                        <div class="col-25">
-                            <label for="port">Local Port</label>
+                        <div className="col-25">
+                            <label htmlFor="port">Local Port</label>
                         </div>
-                        <div class="col-75">
+                        <div className="col-75">
                             <input type="text"
                                     id="port"
                                     name="port"
-                                    value={this.state.server.port.originalValue}
+                                    defaultValue={this.state.server.port.originalValue}
                                     onChange={this.handleInputChange} />
                         </div>
                     </div>
 
                     <div className="row">
-                        <div class="col-25">
-                            <label for="resourceBase">Resource Base</label>
+                        <div className="col-25">
+                            <label htmlFor="resourceBase">Resource Base</label>
                         </div>
-                        <div class="col-75">
+                        <div className="col-75">
                             <input type="text"
                                     id="resourceBase"
                                     name="resourceBase"
-                                    value={this.state.server.resourceBase.originalValue}
+                                    defaultValue={this.state.server.resourceBase.originalValue}
                                     onChange={this.handleInputChange} />
                         </div>
                     </div>
@@ -78,7 +87,7 @@ class ServerEdit extends React.Component {
                                     checked={this.state.server.showIndex}
                                     onChange={this.handleInputChange}
                                     />
-                            <label for="showIndex">show directory index</label>
+                            <label htmlFor="showIndex">show directory index</label>
                         </div>
                     </div>
 
@@ -89,11 +98,13 @@ class ServerEdit extends React.Component {
                     </div>
                 </form>
 
-                <h3>Proxy List</h3>
+                <h3>Proxies</h3>
 
-                <ProxyEdit serverId={this.state.server.id} proxyType='Proxy' />
+                <ProxyEdit key={selectedProxyKey}
+                        serverId={this.state.server.id}
+                        proxyId={this.state.selectedProxy ? this.state.selectedProxy.id : 0} proxyType='Proxy' />
 
-                <ProxyList serverId={this.state.server.id} key={this.state.server.id} />
+                <ProxyList serverId={this.state.server.id} key={this.state.server.id} callback={this.proxySelected} />
             </div>
         )
     }
@@ -147,6 +158,10 @@ class ServerEdit extends React.Component {
                     //TODO: notify listener that server changed
                 })
                 .catch(console.log);
+    }
+
+    proxySelected = item => {
+        this.setState({selectedProxy: item});
     }
 }
 

@@ -5,11 +5,13 @@ import PropTypes from 'prop-types';
 
 class ProxyList extends React.Component {
     static propTypes = {
-        serverId: PropTypes.number.isRequired
+        serverId: PropTypes.number.isRequired,
+        callback: PropTypes.func.isRequired
     };
 
     state = {
-        serverId: this.props.serverId
+        serverId: this.props.serverId,
+        callback: this.props.callback
     }
 
     constructor(props) {
@@ -39,6 +41,8 @@ class ProxyList extends React.Component {
 
                         <span className="enable-cache">{proxy.enableCache}</span>
                         <span className="cache-duration">{proxy.cacheDuration}</span>
+
+                        <span onClick={() => this.itemSelected(proxy)}>edit</span>
                     </li>
                 ))}
                 </ul>
@@ -61,7 +65,6 @@ class ProxyList extends React.Component {
     }
 
     itemSelected = item => {
-        console.log("item selected on ProxyList", item);
         this.state.callback(item);
     }
 }

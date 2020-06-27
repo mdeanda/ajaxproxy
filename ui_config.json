@@ -32,7 +32,7 @@
       "port":8081,
       "proxy":[
         {
-          "cache":false,
+          "cache":true,
           "cacheDuration":10,
           "host":"localhost",
           "hostHeader":"",
@@ -50,7 +50,7 @@
           "protocol":"http"
         },
         {
-          "cache":false,
+          "cache":true,
           "cacheDuration":10,
           "host":"localhost",
           "hostHeader":"",

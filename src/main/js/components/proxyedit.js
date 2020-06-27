@@ -8,7 +8,7 @@ class ProxyRequestEdit extends React.Component {
     };
 
     state = {
-        serverId: this.props.serverId
+        proxy: null
     };
 
     constructor(props) {
@@ -16,104 +16,135 @@ class ProxyRequestEdit extends React.Component {
     };
 
     render() {
+        var label = <h4>Proxy Edit</h4>;
+        if (this.state.proxy == null) {
+            label = <h4>Add Proxy</h4>;
+        }
+
+        let proxy = {
+            path: {
+                originalValue: null
+            }
+        };
+
+        if (this.state.proxy != null) {
+            proxy = this.state.proxy;
+            console.log("edit proxy: ", proxy);
+        }
+
         return (
             <div>
-                proxy request editor goes here
+                {label}
 
                 <form onSubmit={this.handleSave}>
-                    <label>local port</label>
-                    <input type="text"
-                            name="port"
-                            value={this.state.serverId}
-                            onChange={this.handleInputChange} />
+                    <div className="row">
+                        <div className="col-25">
+                            <label htmlFor="proxyPort">Port</label>
+                        </div>
+                        <div className="col-75">
+                            <input type="text"
+                                    name="port"
+                                    defaultValue={proxy.port}
+                                    onChange={this.handleInputChange} />
+                        </div>
+                    </div>
 
-                    <label>resource base</label>
-                    <input type="text"
-                            name="resourceBase"
-                            value={this.state.serverId}
-                            onChange={this.handleInputChange} />
+                    <div className="row">
+                        <div className="col-25">
+                            <label>Path</label>
+                        </div>
+                        <div className="col-75">
+                            <input type="text"
+                                    name="path"
+                                    defaultValue={proxy.path.originalValue}
+                                    onChange={this.handleInputChange} />
+                        </div>
+                    </div>
 
-                    <label>show directory index</label>
-                    <input type="checkbox"
-                            name="showIndex"
-                            checked={this.state.serverId}
-                            onChange={this.handleInputChange}
-                            />
 
-                    <input type="submit"/>
+                    <div className="row">
+                        <div className="col-25 skip-25">
+                            <input type="checkbox"
+                                    id="enableCache"
+                                    name="enableCache"
+                                    checked={proxy.enableCache}
+                                    onChange={this.handleInputChange}
+                                    />
+                            <label htmlFor="enableCache">Enable Cache</label>
+                        </div>
+                    </div>
+
+                    <div className="row submit-row">
+                        <div className="col-25 skip-25">
+                            <input type="submit"/>
+                        </div>
+                    </div>
                 </form>
             </div>
         )
     }
-}
 
-class ProxyEdit extends React.Component {
-    static propTypes = {
-        serverId: PropTypes.number.isRequired,
-        proxyType: PropTypes.string.isRequired,
-    };
+    componentDidMount() {
+        if (!this.props.proxyId) return;
 
-    state = {
-        serverId: this.props.serverId,
-        proxyType: this.props.proxyType
-    }
-
-    constructor(props) {
-        super(props);
-    }
-
-    render() {
-        if (this.state.proxyType.toUpperCase() == 'PROXY') {
-            return (
-                <ProxyRequestEdit serverId={this.state.serverId} />
-            )
-        }
-
-        return (
-            <div>
-                <h2>Editor not available yet</h2>
-            </div>
-        )
-    }
-
-    setServer = item => {
-        //TODO: maybe just use id instead and reload
-        this.setState({server:item})
+        fetch('/api/config/server/' + this.props.serverId + "/proxy/" + this.props.proxyId)
+        .then(res => res.json())
+        .then((data) => {
+            console.log("data", data);
+            this.setState({proxy:data});
+        })
+        .catch(console.log)
     }
 
     handleInputChange = event => {
         const target = event.target;
-        const value = target.name === 'showIndex' ? target.checked : target.value;
+        const value = target.name === 'enableCache' ? target.checked : target.value;
         const name = target.name;
 
-        var server = this.state.server;
+        var proxy = this.state.proxy;
+        if (proxy == null) {
+            proxy = {
+                path: {},
+                host: {}
+            };
+        }
         switch(name) {
             case 'port':
-                server.port.originalValue = value;
+                proxy.port = value;
                 break;
-            case 'resourceBase':
-                server.resourceBase.originalValue = value;
+            case 'protocol':
+                proxy.protocol = value;
                 break;
-            case 'showIndex':
-                server.showIndex = value;
+            case 'hostHeader':
+                proxy.hostHeader = value;
+                break;
+            case 'path':
+                proxy.path.originalValue = value;
+                break;
+            case 'host':
+                proxy.host.originalValue = value;
+                break;
+            case 'enableCache':
+                proxy.enableCache = value;
                 break;
         }
 
-        this.setState({server: server});
-
-        console.log("state", this.state);
+        this.setState({proxy: proxy});
     }
 
     handleSave = event => {
         event.preventDefault();
 
+        var uri = '/api/config/server/' + this.props.serverId + "/proxy/" + this.props.proxyId;
+        var payload = this.state.proxy;
+
         //TODO: edit vs add differences
         const requestOptions = {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(this.state.server)
+            body: JSON.stringify(payload)
         };
-        fetch('/api/config/server/' + this.state.server.id, requestOptions)
+        fetch(uri, requestOptions)
                 .then(res => {
                     if (res.ok)
                         return res;
@@ -125,6 +156,41 @@ class ProxyEdit extends React.Component {
                     //TODO: notify listener that server changed
                 })
                 .catch(console.log);
+    }
+
+
+
+}
+
+
+class ProxyEdit extends React.Component {
+    static propTypes = {
+        serverId: PropTypes.number.isRequired,
+//        proxy: PropTypes.object.isRequired,
+        proxyType: PropTypes.string.isRequired,
+    };
+
+    state = {
+    }
+
+    constructor(props) {
+        super(props);
+    }
+
+    render() {
+        if (this.props.proxyType.toUpperCase() == 'PROXY') {
+            return (
+                <ProxyRequestEdit
+                        serverId={this.props.serverId}
+                        proxyId={this.props.proxyId} />
+            )
+        }
+
+        return (
+            <div>
+                <h2>Editor not available yet</h2>
+            </div>
+        )
     }
 }
 
