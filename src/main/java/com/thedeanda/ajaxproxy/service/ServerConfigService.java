@@ -1,6 +1,7 @@
 package com.thedeanda.ajaxproxy.service;
 
 import com.thedeanda.ajaxproxy.api.ProxyConfigDto;
+import com.thedeanda.ajaxproxy.api.ProxyConfigRequestDto;
 import com.thedeanda.ajaxproxy.api.ServerConfigDto;
 import com.thedeanda.ajaxproxy.config.ConfigFileService;
 import com.thedeanda.ajaxproxy.config.model.Config;
@@ -95,5 +96,19 @@ public class ServerConfigService {
 
         //TODO: save
         configFileService.save();
+    }
+
+    public void updateProxy(int id, int proxyId, ProxyConfigDto dto) {
+        ServerConfig server = getServer(id).orElseThrow(() -> new IllegalArgumentException("Invalid ID: " + id));
+
+        ProxyConfig proxyConfig = server.getProxyConfig().stream()
+                .filter(pc -> pc.getId() == proxyId)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Invalid Proxy ID: " + proxyId));
+
+        serverConfigMapper.merge((ProxyConfigRequestDto) dto, (ProxyConfigRequest) proxyConfig);
+
+        configFileService.save();
+        //TODO: update "value" from proxy to interpret variables
     }
 }

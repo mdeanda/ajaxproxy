@@ -24,7 +24,9 @@ class ProxyRequestEdit extends React.Component {
         let proxy = {
             path: {
                 originalValue: null
-            }
+            },
+            enableCache: false,
+            port: 80
         };
 
         if (this.state.proxy != null) {
@@ -135,7 +137,9 @@ class ProxyRequestEdit extends React.Component {
     handleSave = event => {
         event.preventDefault();
 
-        var uri = '/api/config/server/' + this.props.serverId + "/proxy/" + this.props.proxyId;
+        var uri = '/api/config/server/' + this.props.serverId
+                + "/proxy/" + this.props.proxyId
+                + "/type/request";
         var payload = this.state.proxy;
 
         //TODO: edit vs add differences
@@ -178,7 +182,7 @@ class ProxyEdit extends React.Component {
     }
 
     render() {
-        if (this.props.proxyType.toUpperCase() == 'PROXY') {
+        if (this.props.proxyType.toUpperCase() == 'REQUEST') {
             return (
                 <ProxyRequestEdit
                         serverId={this.props.serverId}

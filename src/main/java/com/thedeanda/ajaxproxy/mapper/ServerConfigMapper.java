@@ -10,6 +10,7 @@ import com.thedeanda.ajaxproxy.service.StoredResource;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
@@ -30,6 +31,8 @@ public interface ServerConfigMapper {
     @Mapping(source = "object", target = "type", qualifiedByName = "addProxyType")
     public ProxyConfigFileDto toDto(ProxyConfigFile object);
 
+    public void merge(ProxyConfigRequestDto dto, @MappingTarget ProxyConfigRequest target);
+
     @Named("addBaseUrls")
     default String[] addBaseUrls(ServerConfig object) {
         String url = "http://localhost:" + object.getPort().getValue();
@@ -43,7 +46,7 @@ public interface ServerConfigMapper {
         if (config instanceof ProxyConfigFile) {
             return ProxyConfigDto.ProxyType.File;
         } else if (config instanceof ProxyConfigRequest) {
-            return ProxyConfigDto.ProxyType.Proxy;
+            return ProxyConfigDto.ProxyType.Request;
         } else {
             return ProxyConfigDto.ProxyType.Logger;
         }

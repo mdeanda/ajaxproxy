@@ -1,6 +1,7 @@
 package com.thedeanda.ajaxproxy.resources;
 
 import com.thedeanda.ajaxproxy.api.ProxyConfigDto;
+import com.thedeanda.ajaxproxy.api.ProxyConfigRequestDto;
 import com.thedeanda.ajaxproxy.service.ServerConfigService;
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,13 +32,18 @@ public class ServerProxyResource {
         return serverConfigService.getProxy(id, proxyId);
     }
 
-    /*
-    @GET
-    @Path("/{id}")
-    public ServerConfigDto get(@PathParam("id") int id) {
-        return serverConfigService.get(id);
+    @PUT
+    @Path("/{id}/proxy/{pid}/type/request")
+    public void update(@PathParam("id") int id, @PathParam("pid") int proxyId, ProxyConfigRequestDto dto) {
+        //TODO verify id's match
+        if (dto.getId() != proxyId) {
+            throw new IllegalArgumentException("Invalid Proxy ID: " + proxyId);
+        }
+        serverConfigService.updateProxy(id, proxyId, dto);
+        log.warn("dto: {}", dto);
     }
 
+    /*
     @POST
     public void create(ServerConfigDto config) {
         //ServerConfig it = ServerConfigMapper.INSTANCE.fromDto(config);

@@ -102,16 +102,18 @@ class ServerEdit extends React.Component {
 
                 <ProxyEdit key={selectedProxyKey}
                         serverId={this.state.server.id}
-                        proxyId={this.state.selectedProxy ? this.state.selectedProxy.id : 0} proxyType='Proxy' />
+                        proxyId={this.state.selectedProxy ? this.state.selectedProxy.id : 0} proxyType='Request' />
 
-                <ProxyList serverId={this.state.server.id} key={this.state.server.id} callback={this.proxySelected} />
+                <ProxyList key={this.state.server.id}
+                        serverId={this.state.server.id}
+                        callback={this.proxySelected} />
             </div>
         )
     }
 
     setServer = item => {
         //TODO: maybe just use id instead and reload
-        this.setState({server:item})
+        this.setState({server:item, selectedProxy:null});
     }
 
     handleInputChange = event => {

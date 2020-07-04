@@ -12,7 +12,7 @@ import lombok.experimental.SuperBuilder;
 public class ProxyConfigDto {
 
 	public enum ProxyType {
-		Proxy, File, Logger
+		Request, File, Logger
 	}
 
 	private int id;
