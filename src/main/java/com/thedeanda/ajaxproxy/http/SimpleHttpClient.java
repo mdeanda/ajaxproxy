@@ -1,14 +1,13 @@
 package com.thedeanda.ajaxproxy.http;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URL;
-import java.util.UUID;
-
+import com.thedeanda.ajaxproxy.http.HttpClient.RequestMethod;
 import org.apache.http.Header;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.thedeanda.ajaxproxy.http.HttpClient.RequestMethod;
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.util.UUID;
 
 public class SimpleHttpClient {
 	private static final Logger log = LoggerFactory

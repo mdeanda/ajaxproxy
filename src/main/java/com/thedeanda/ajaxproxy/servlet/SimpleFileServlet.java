@@ -1,12 +1,11 @@
 package com.thedeanda.ajaxproxy.servlet;
 
-import java.io.File;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.File;
 
 public class SimpleFileServlet extends AbstractFileServlet {
 	private static final Logger log = LoggerFactory.getLogger(SimpleFileServlet.class);

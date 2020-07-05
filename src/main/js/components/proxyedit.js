@@ -16,40 +16,21 @@ class ProxyRequestEdit extends React.Component {
     };
 
     render() {
-        var label = <h4>Proxy Edit</h4>;
         if (this.state.proxy == null) {
+            return '';
+        }
+
+        var label = <h4>Proxy Edit</h4>;
+        if (this.props.proxyId == null) {
             label = <h4>Add Proxy</h4>;
         }
-
-        let proxy = {
-            path: {
-                originalValue: null
-            },
-            enableCache: false,
-            port: 80
-        };
-
-        if (this.state.proxy != null) {
-            proxy = this.state.proxy;
-            console.log("edit proxy: ", proxy);
-        }
+        var proxy = this.state.proxy;
 
         return (
             <div>
                 {label}
 
                 <form onSubmit={this.handleSave}>
-                    <div className="row">
-                        <div className="col-25">
-                            <label htmlFor="proxyPort">Port</label>
-                        </div>
-                        <div className="col-75">
-                            <input type="text"
-                                    name="port"
-                                    defaultValue={proxy.port}
-                                    onChange={this.handleInputChange} />
-                        </div>
-                    </div>
 
                     <div className="row">
                         <div className="col-25">
@@ -59,6 +40,30 @@ class ProxyRequestEdit extends React.Component {
                             <input type="text"
                                     name="path"
                                     defaultValue={proxy.path.originalValue}
+                                    onChange={this.handleInputChange} />
+                        </div>
+                    </div>
+
+                    <div className="row">
+                        <div className="col-25">
+                            <label>Host</label>
+                        </div>
+                        <div className="col-75">
+                            <input type="text"
+                                    name="host"
+                                    defaultValue={proxy.host.originalValue}
+                                    onChange={this.handleInputChange} />
+                        </div>
+                    </div>
+
+                    <div className="row">
+                        <div className="col-25">
+                            <label htmlFor="proxyPort">Port</label>
+                        </div>
+                        <div className="col-75">
+                            <input type="text"
+                                    name="port"
+                                    defaultValue={proxy.port}
                                     onChange={this.handleInputChange} />
                         </div>
                     </div>
@@ -87,15 +92,33 @@ class ProxyRequestEdit extends React.Component {
     }
 
     componentDidMount() {
-        if (!this.props.proxyId) return;
+        console.log("proxy id: ", this.props.proxyId);
+        if (this.props.proxyId === null) {
+            this.setState({proxy: {
+                path: {
+                    originalValue: ''
+                },
+                host: {
+                    originalValue: ''
+                },
+                enableCache: false,
+                port: 80
+            }});
+            return;
+        }
 
-        fetch('/api/config/server/' + this.props.serverId + "/proxy/" + this.props.proxyId)
-        .then(res => res.json())
-        .then((data) => {
-            console.log("data", data);
-            this.setState({proxy:data});
-        })
-        .catch(console.log)
+        //TODO: set a loading flag
+
+        var proxyId = this.props.proxyId;
+        fetch('/api/config/server/' + this.props.serverId + "/proxy/" + proxyId)
+                .then(res => res.json())
+                .then((data) => {
+                    if (this.props.proxyId == proxyId) {
+                        console.log("data", data);
+                        this.setState({proxy:data});
+                    }
+                })
+                .catch(console.log)
     }
 
     handleInputChange = event => {
@@ -104,12 +127,7 @@ class ProxyRequestEdit extends React.Component {
         const name = target.name;
 
         var proxy = this.state.proxy;
-        if (proxy == null) {
-            proxy = {
-                path: {},
-                host: {}
-            };
-        }
+
         switch(name) {
             case 'port':
                 proxy.port = value;
@@ -137,14 +155,24 @@ class ProxyRequestEdit extends React.Component {
     handleSave = event => {
         event.preventDefault();
 
-        var uri = '/api/config/server/' + this.props.serverId
-                + "/proxy/" + this.props.proxyId
-                + "/type/request";
+        var uri;
+        var method;
+        if (this.props.proxyId) {
+            method = 'PUT';
+            uri = '/api/config/server/' + this.props.serverId
+                    + "/proxy/" + this.props.proxyId
+                    + "/type/request";
+        } else {
+            method = 'POST';
+            uri = '/api/config/server/' + this.props.serverId
+                    + "/proxy"
+                    + "/type/request";
+        }
         var payload = this.state.proxy;
 
         //TODO: edit vs add differences
         const requestOptions = {
-            method: 'PUT',
+            method: method,
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         };

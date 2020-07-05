@@ -1,10 +1,7 @@
 package com.thedeanda.ajaxproxy.mapper;
 
-import com.thedeanda.ajaxproxy.api.*;
-import com.thedeanda.ajaxproxy.config.model.ServerConfig;
-import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigFile;
-import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigLogger;
-import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigRequest;
+import com.thedeanda.ajaxproxy.api.RequestDto;
+import com.thedeanda.ajaxproxy.api.RequestDtoListItem;
 import com.thedeanda.ajaxproxy.service.StoredResource;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.Mapper;

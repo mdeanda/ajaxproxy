@@ -1,11 +1,10 @@
 package com.thedeanda.ajaxproxy.cache.model;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.http.Header;
-
 import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.Header;
 
 @DatabaseTable(tableName = "cache")
 public class CachedResponse {

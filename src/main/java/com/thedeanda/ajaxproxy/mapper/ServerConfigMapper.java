@@ -6,15 +6,10 @@ import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfig;
 import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigFile;
 import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigLogger;
 import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigRequest;
-import com.thedeanda.ajaxproxy.service.StoredResource;
-import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
-import org.mapstruct.factory.Mappers;
-
-import java.util.List;
 
 @Mapper
 public interface ServerConfigMapper {

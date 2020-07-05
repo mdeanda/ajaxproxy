@@ -15,7 +15,7 @@ public class ProxyConfigDto {
 		Request, File, Logger
 	}
 
-	private int id;
+	private Integer id;
 	private StringVariableDto path;
 	private boolean enableCache;
 	private int cacheDuration;

@@ -1,13 +1,12 @@
 package com.thedeanda.ajaxproxy.model;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import com.thedeanda.ajaxproxy.cache.ProxyCache;
 import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfig;
 import com.thedeanda.ajaxproxy.filter.handler.RequestHandler;
-
 import lombok.Data;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Data
 public class ProxyContainer {

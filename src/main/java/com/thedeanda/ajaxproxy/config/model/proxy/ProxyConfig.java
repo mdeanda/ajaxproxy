@@ -8,7 +8,7 @@ public abstract class ProxyConfig {
 
 	@Getter
 	@Setter
-	private int id;
+	private Integer id;
 
 
 	abstract public StringVariable getPath();

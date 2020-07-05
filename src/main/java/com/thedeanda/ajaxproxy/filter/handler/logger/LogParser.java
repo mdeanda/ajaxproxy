@@ -1,15 +1,14 @@
 package com.thedeanda.ajaxproxy.filter.handler.logger;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.thedeanda.javajson.JsonArray;
 import com.thedeanda.javajson.JsonException;
 import com.thedeanda.javajson.JsonObject;
 import com.thedeanda.javajson.JsonValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 
 public class LogParser implements Runnable {
 	private static final Logger log = LoggerFactory.getLogger(LogParser.class);

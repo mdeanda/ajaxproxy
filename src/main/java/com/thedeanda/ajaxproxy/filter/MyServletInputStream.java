@@ -1,10 +1,9 @@
 package com.thedeanda.ajaxproxy.filter;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class MyServletInputStream extends ServletInputStream {
 	private InputStream is;

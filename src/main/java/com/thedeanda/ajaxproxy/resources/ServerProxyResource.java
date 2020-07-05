@@ -32,9 +32,22 @@ public class ServerProxyResource {
         return serverConfigService.getProxy(id, proxyId);
     }
 
+    @POST
+    @Path("/{id}/proxy/type/request")
+    public ProxyConfigDto createProxyRequest(@PathParam("id") int id, ProxyConfigRequestDto dto) {
+        //TODO verify id's match
+        if (dto.getId() != null) {
+            throw new IllegalArgumentException("Invalid Proxy ID: (not null)");
+        }
+        ProxyConfigDto outputDto = serverConfigService.createProxy(id, dto);
+        log.warn("dto: {}", dto);
+
+        return outputDto;
+    }
+
     @PUT
     @Path("/{id}/proxy/{pid}/type/request")
-    public void update(@PathParam("id") int id, @PathParam("pid") int proxyId, ProxyConfigRequestDto dto) {
+    public void updateProxyRequest(@PathParam("id") int id, @PathParam("pid") int proxyId, ProxyConfigRequestDto dto) {
         //TODO verify id's match
         if (dto.getId() != proxyId) {
             throw new IllegalArgumentException("Invalid Proxy ID: " + proxyId);

@@ -1,14 +1,13 @@
 package com.thedeanda.ajaxproxy.cache;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
+import com.thedeanda.ajaxproxy.cache.model.CachedResponse;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.thedeanda.ajaxproxy.cache.model.CachedResponse;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * in memory implementation of cache, this should be replaced by a file/db based

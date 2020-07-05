@@ -1,27 +1,21 @@
 package com.thedeanda.ajaxproxy.filter.handler.logger;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.StringWriter;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.thedeanda.ajaxproxy.cache.LruCache;
+import com.thedeanda.ajaxproxy.filter.handler.RequestHandler;
+import com.thedeanda.ajaxproxy.http.RequestListener;
+import com.thedeanda.ajaxproxy.model.ProxyContainer;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.thedeanda.ajaxproxy.cache.LruCache;
-import com.thedeanda.ajaxproxy.filter.handler.RequestHandler;
-import com.thedeanda.ajaxproxy.http.RequestListener;
-import com.thedeanda.ajaxproxy.model.ProxyContainer;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class LoggerRequestHandler implements RequestHandler {
 	private static final Logger log = LoggerFactory.getLogger(LoggerRequestHandler.class);

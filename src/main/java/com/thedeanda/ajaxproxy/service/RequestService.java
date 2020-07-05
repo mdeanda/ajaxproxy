@@ -3,7 +3,6 @@ package com.thedeanda.ajaxproxy.service;
 import com.thedeanda.ajaxproxy.api.RequestDto;
 import com.thedeanda.ajaxproxy.api.RequestDtoListItem;
 import com.thedeanda.ajaxproxy.mapper.RequestMapper;
-import com.thedeanda.ajaxproxy.mapper.ServerConfigMapper;
 
 import java.util.List;
 import java.util.stream.Collectors;

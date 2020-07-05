@@ -102,7 +102,7 @@ class ServerEdit extends React.Component {
 
                 <ProxyEdit key={selectedProxyKey}
                         serverId={this.state.server.id}
-                        proxyId={this.state.selectedProxy ? this.state.selectedProxy.id : 0} proxyType='Request' />
+                        proxyId={this.state.selectedProxy ? this.state.selectedProxy.id : null} proxyType='Request' />
 
                 <ProxyList key={this.state.server.id}
                         serverId={this.state.server.id}

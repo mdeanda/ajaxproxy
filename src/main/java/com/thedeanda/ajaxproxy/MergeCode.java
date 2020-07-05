@@ -1,25 +1,17 @@
 package com.thedeanda.ajaxproxy;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.List;
-
+import com.thedeanda.ajaxproxy.config.model.MergeMode;
+import com.thedeanda.javajson.JsonObject;
+import com.yahoo.platform.yui.compressor.CssCompressor;
+import com.yahoo.platform.yui.compressor.JavaScriptCompressor;
 import org.apache.commons.io.FileUtils;
 import org.mozilla.javascript.ErrorReporter;
 import org.mozilla.javascript.EvaluatorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.thedeanda.ajaxproxy.config.model.MergeMode;
-import com.thedeanda.javajson.JsonObject;
-import com.yahoo.platform.yui.compressor.CssCompressor;
-import com.yahoo.platform.yui.compressor.JavaScriptCompressor;
+import java.io.*;
+import java.util.List;
 
 public class MergeCode {
 	private static final Logger log = LoggerFactory.getLogger(MergeCode.class);

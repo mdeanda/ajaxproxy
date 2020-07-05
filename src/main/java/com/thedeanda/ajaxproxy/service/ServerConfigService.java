@@ -11,10 +11,16 @@ import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigFile;
 import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigLogger;
 import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigRequest;
 import com.thedeanda.ajaxproxy.mapper.ServerConfigMapper;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class ServerConfigService {
 
     private final ConfigFileService configFileService;
@@ -65,7 +71,8 @@ public class ServerConfigService {
                 .orElse(null);
         if (proxies != null) {
             return proxies.stream()
-                    .filter(p -> p.getId() == proxyId)
+                    .filter(p -> Objects.nonNull(p.getId()))
+                    .filter(p -> p.getId().intValue() == proxyId)
                     .map(this::map)
                     .findFirst()
                     .orElse(null);
@@ -98,11 +105,39 @@ public class ServerConfigService {
         configFileService.save();
     }
 
-    public void updateProxy(int id, int proxyId, ProxyConfigDto dto) {
-        ServerConfig server = getServer(id).orElseThrow(() -> new IllegalArgumentException("Invalid ID: " + id));
+    public ProxyConfigDto createProxy(int serverId, ProxyConfigDto dto) {
+        log.debug("create proxy: {}, {}", serverId, dto);
+
+        ServerConfig server = getServer(serverId).orElseThrow(() -> new IllegalArgumentException("Invalid ID: " + serverId));
+        Integer nextId = server.getProxyConfig().stream()
+                .map(ProxyConfig::getId)
+                .mapToInt(i -> i)
+                .map(i -> i + 1)
+                .max()
+                .orElse(0);
+        ProxyConfigRequest proxy = ProxyConfigRequest.builder()
+                .build();
+
+        serverConfigMapper.merge((ProxyConfigRequestDto) dto, proxy);
+
+        if (StringUtils.isBlank(proxy.getProtocol())) {
+            //TODO: use enum
+            proxy.setProtocol("https");
+        }
+        proxy.setId(nextId);
+
+        server.getProxyConfig().add(proxy);
+        configFileService.save();
+
+        return serverConfigMapper.toDto(proxy);
+    }
+
+    public void updateProxy(int serverId, int proxyId, ProxyConfigDto dto) {
+        ServerConfig server = getServer(serverId).orElseThrow(() -> new IllegalArgumentException("Invalid ID: " + serverId));
 
         ProxyConfig proxyConfig = server.getProxyConfig().stream()
-                .filter(pc -> pc.getId() == proxyId)
+                .filter(p -> Objects.nonNull(p.getId()))
+                .filter(p -> p.getId().intValue() == proxyId)
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Invalid Proxy ID: " + proxyId));
 

@@ -1,9 +1,9 @@
 package com.thedeanda.ajaxproxy.http;
 
+import org.apache.http.Header;
+
 import java.net.URL;
 import java.util.UUID;
-
-import org.apache.http.Header;
 
 public interface RequestListener {
 	public void newRequest(UUID id, String url, String method);
