@@ -4,8 +4,8 @@ import PropTypes from 'prop-types';
 import styles from '../stylesheets/servertab.scss';
 
 
-import ServerList from '../components/serverlist';
-import ServerEdit from '../components/serveredit';
+import ServerList from 'components/serverlist';
+import ServerEdit from 'components/serveredit';
 
 class ServerTab extends React.Component {
     constructor(props) {

@@ -1,9 +1,15 @@
 const React = require('react');
 import PropTypes from 'prop-types';
 
+import { connect } from "react-redux";
+
 //import ServerItem from '../components/serveritem';
 
-class RequestList extends React.Component {
+const mapStateToProps = state => {
+  return { requests: state.requests };
+};
+
+class ConnectedRequestList extends React.Component {
     static propTypes = {
         callback: PropTypes.func.isRequired
     };
@@ -11,7 +17,7 @@ class RequestList extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            requests: null,
+            //requests: null,
             callback: props.callback,
             selectedItem: null
         };
@@ -20,6 +26,8 @@ class RequestList extends React.Component {
     }
 
     render() {
+        console.log("render request list: ", this.state);
+
         if (this.state == null || this.state.requests == null) {
             return '';
         }
@@ -67,20 +75,6 @@ class RequestList extends React.Component {
             return 'dur-0';
     }
 
-    componentDidMount() {
-        this.loadData();
-    }
-
-    loadData() {
-        fetch('/api/requests')
-        .then(res => res.json())
-        .then((data) => {
-            console.log("data", data);
-            this.setState({requests:data})
-        })
-        .catch(console.log)
-    }
-
     selected = item => {
         this.setState({selectedItem: item});
         this.state.callback(item);
@@ -88,5 +82,7 @@ class RequestList extends React.Component {
 
 }
 
-export default RequestList
+const RequestList = connect(mapStateToProps)(ConnectedRequestList);
+
+export default RequestList;
 

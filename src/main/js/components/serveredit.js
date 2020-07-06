@@ -4,8 +4,8 @@ import PropTypes from 'prop-types';
 import styles from '../stylesheets/serveredit.scss';
 
 
-import ProxyEdit from '../components/proxyedit';
-import ProxyList from '../components/proxylist';
+import ProxyEdit from 'components/proxyedit';
+import ProxyList from 'components/proxylist';
 
 
 class ServerEdit extends React.Component {

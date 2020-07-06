@@ -48,7 +48,9 @@ module.exports = (env, argv) => ({
     resolve:{
         alias:{
             src: path.resolve(__dirname, "src"),
-            components: path.resolve(__dirname, "src", "components")
+            components: path.resolve(__dirname, "src", "main", "js", "components"),
+            store: path.resolve(__dirname, "src", "main", "js", "store"),
+            reducers: path.resolve(__dirname, "src", "main", "js", "reducers")
         }
     },
     module: {

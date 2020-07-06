@@ -1,7 +1,7 @@
 const React = require('react');
 import PropTypes from 'prop-types';
 
-import ServerItem from '../components/serveritem';
+import ServerItem from 'components/serveritem';
 
 class ServerList extends React.Component {
     static propTypes = {

@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 
 import styles from '../stylesheets/requesttab.scss';
 
-import RequestList from '../components/requestlist';
-import RequestView from '../components/requestview';
+import RequestList from 'components/requestlist';
+import RequestView from 'components/requestview';
 
 class RequestTab extends React.Component {
     state = {
@@ -16,7 +16,7 @@ class RequestTab extends React.Component {
     }
 
     render() {
-        var selectedId = null;
+        var selectedId = "";
         if (this.state.selectedItem != null) {
             selectedId = this.state.selectedItem.id;
         }
