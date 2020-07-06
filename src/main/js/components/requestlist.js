@@ -17,7 +17,7 @@ class ConnectedRequestList extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            //requests: null,
+            requests: null,
             callback: props.callback,
             selectedItem: null
         };

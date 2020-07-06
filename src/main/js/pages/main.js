@@ -24,7 +24,8 @@ function loadData() {
         .then(res => res.json())
         .then((data) => {
             //this.setState({requests:data})
-            data.forEach(a => {
+            var temp = data.splice(0, 10);
+            temp.forEach(a => {
                 console.log("request data", a);
                 store.dispatch(addRequest(a));
             });
