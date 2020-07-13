@@ -4,14 +4,9 @@ import com.thedeanda.ajaxproxy.config.ConfigFileService;
 import com.thedeanda.ajaxproxy.health.SampleHealthCheck;
 import com.thedeanda.ajaxproxy.mapper.RequestMapper;
 import com.thedeanda.ajaxproxy.mapper.ServerConfigMapper;
-import com.thedeanda.ajaxproxy.resources.AjaxProxyResource;
-import com.thedeanda.ajaxproxy.resources.RequestResource;
-import com.thedeanda.ajaxproxy.resources.ServerProxyResource;
-import com.thedeanda.ajaxproxy.resources.ServerResource;
-import com.thedeanda.ajaxproxy.service.AjaxProxyService;
-import com.thedeanda.ajaxproxy.service.RequestService;
-import com.thedeanda.ajaxproxy.service.ResourceService;
-import com.thedeanda.ajaxproxy.service.ServerConfigService;
+import com.thedeanda.ajaxproxy.mapper.VariableMapper;
+import com.thedeanda.ajaxproxy.resources.*;
+import com.thedeanda.ajaxproxy.service.*;
 import com.thedeanda.ajaxproxy.ui.ConfigService;
 import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
@@ -52,20 +47,6 @@ public class AjaxProxyApplication extends Application<AjaxProxyConfiguration> {
     @Override
     public void run(final AjaxProxyConfiguration config,
                     final Environment environment) {
-        // TODO: implement application
-
-        /*
-        try {
-            runLiquibase(config, environment);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        //*/
-
-        //final DBIFactory factory = new DBIFactory();
-        //final DBI jdbi = factory.build(environment, config.getDataSourceFactory(), "datasource");
-        // jdbi.installPlugin(new SqlObjectPlugin());
-
 
         ConfigFileService configFileService;
         try {
@@ -76,6 +57,7 @@ public class AjaxProxyApplication extends Application<AjaxProxyConfiguration> {
 
         final ServerConfigMapper serverConfigMapper = Mappers.getMapper(ServerConfigMapper.class);
         final RequestMapper requestMapper = Mappers.getMapper(RequestMapper.class);
+        final VariableMapper variableMapper = Mappers.getMapper(VariableMapper.class);
 
         //services
         File dbFile = ConfigService.get().getResourceHistoryDb();
@@ -85,6 +67,7 @@ public class AjaxProxyApplication extends Application<AjaxProxyConfiguration> {
         final ServerConfigService serverConfigService = new ServerConfigService(configFileService, serverConfigMapper);
         final AjaxProxyService ajaxProxyService = new AjaxProxyService(configFileService, resourceService);
         final RequestService requestService = new RequestService(resourceService, requestMapper);
+        final VariableService variableService = new VariableService(configFileService, variableMapper);
 
 
         //resources
@@ -93,6 +76,7 @@ public class AjaxProxyApplication extends Application<AjaxProxyConfiguration> {
         resources.add(new ServerProxyResource(serverConfigService));
         resources.add(new AjaxProxyResource(ajaxProxyService));
         resources.add(new RequestResource(requestService));
+        resources.add(new VariableResource(variableService));
 
         environment.jersey().setUrlPattern("/api/*");
 
@@ -103,14 +87,4 @@ public class AjaxProxyApplication extends Application<AjaxProxyConfiguration> {
 
     }
 
-    /*
-    private void runLiquibase(final AjaxProxyConfiguration config, final Environment environment) throws Exception {
-        DataSource dataSource = config.getDataSourceFactory().build(environment.metrics(), "mydatasource");
-
-        Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(dataSource.getConnection()));
-        Liquibase liquibase = new liquibase.Liquibase("migrations.xml", new ClassLoaderResourceAccessor(), database);
-        liquibase.update(new Contexts(), new LabelExpression());
-        liquibase.close();
-
-    }//*/
 }
