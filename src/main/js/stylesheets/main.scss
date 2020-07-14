@@ -67,7 +67,7 @@ body {
     }
     .ap-control {
         flex: 1 1 auto;
-        padding: 0 0 0 10px;
+        padding: 0 0 0 25px;
         display: flex;
 
         .buttons {
@@ -76,17 +76,17 @@ body {
             padding-top: 0.4em;
 
             span {
-                padding-right: 0.3em;
+                padding-right: 0.5em;
             }
 
             .play {
                 color: green;
             }
             .stop {
-                color: red;
+                color: firebrick;
             }
             .refresh {
-                color: blue;
+                color: darkblue;
             }
             .active {
                 color: dimgrey;

@@ -7,7 +7,6 @@ import styles from '../stylesheets/main.scss';
 import { HashRouter as Router, Route, Link, NavLink, Switch } from "react-router-dom";
 
 import store from "store/index";
-import Test from 'components/test';
 import ConfigTab from 'components/configtab';
 import ApControl from 'components/apcontrol';
 import RequestTab from 'components/requesttab';
@@ -50,7 +49,6 @@ class App extends React.Component {
                         <nav>
                             <NavLink to='/config' className='tab'>Configuration</NavLink>
                             <NavLink to='/requests' className='tab'>Requests</NavLink>
-                            <NavLink to='/variables' className='tab'>Variables</NavLink>
                             <NavLink to='/logger' className='tab'>Logger</NavLink>
                         </nav>
                         <ApControl />
@@ -58,10 +56,14 @@ class App extends React.Component {
                 </div>
 
                 <div className="tabs-container">
-                    <Route path="/config"><ConfigTab /></Route>
-                    <Route path="/requests"><RequestTab /></Route>
-                    <Route path="/variables"><Test /></Route>
-                    <Route path="/logger"><p>logger</p></Route>
+                    <Switch>
+                        <Route path="/config"><ConfigTab /></Route>
+                        <Route path="/requests"><RequestTab /></Route>
+                        <Route path="/logger"><p>logger</p></Route>
+                        <Route>
+                            <p>Welcome to this here place</p>
+                        </Route>
+                    </Switch>
                 </div>
             </Router>
         )

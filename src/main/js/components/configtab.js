@@ -20,11 +20,17 @@ class ConfigTab extends React.Component {
                     <ServerList callback={this.itemSelected}/>
                 </div>
                 <div className="content">
-                    <Route exact path="/config/server/:serverId" component={ServerEdit} />
-                    <Route path="/config/variables"><p>variables stuffs</p></Route>
+                    <Switch>
+                        <Route exact path="/config/server/:serverId" component={ServerEdit} />
+                        <Route path="/config/variables"><p>variables stuffs</p></Route>
+                        <Route>
+                            <p>no match content</p>
+                        </Route>
+                    </Switch>
                 </div>
             </div>
         )
+
     }
 
     itemSelected = item => {
