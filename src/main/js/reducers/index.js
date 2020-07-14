@@ -1,11 +1,12 @@
-import { ADD_REQUEST } from "../constants/action-types";
+import { REQUEST_ADD } from "../constants/action-types";
 
 const initialState = {
-  requests: []
+  requests: [],
+  variables: []
 };
 
 function rootReducer(state = initialState, action) {
-  if (action.type === ADD_REQUEST) {
+  if (action.type === REQUEST_ADD) {
     return Object.assign({}, state, {
       requests: state.requests.concat(action.payload)
     });

@@ -1,16 +1,16 @@
 const React = require('react');
 import PropTypes from 'prop-types';
 
-import styles from '../stylesheets/servertab.scss';
+import styles from '../stylesheets/configtab.scss';
 
+import { HashRouter as Router, Route, Link, NavLink, Switch } from "react-router-dom";
 
 import ServerList from 'components/serverlist';
 import ServerEdit from 'components/serveredit';
 
-class ServerTab extends React.Component {
+class ConfigTab extends React.Component {
     constructor(props) {
         super(props);
-        this.editRef = React.createRef();
     }
 
     render() {
@@ -20,20 +20,18 @@ class ServerTab extends React.Component {
                     <ServerList callback={this.itemSelected}/>
                 </div>
                 <div className="content">
-                    <ServerEdit ref={this.editRef}/>
+                    <Route exact path="/config/server/:serverId" component={ServerEdit} />
+                    <Route path="/config/variables"><p>variables stuffs</p></Route>
                 </div>
             </div>
         )
     }
 
     itemSelected = item => {
-        console.log("item selected", item);
 
-        const node = this.editRef.current;
-        node.setServer(JSON.parse(JSON.stringify(item)));
     }
 
 }
 
-export default ServerTab
+export default ConfigTab
 

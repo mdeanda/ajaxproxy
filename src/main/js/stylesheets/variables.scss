@@ -2,3 +2,9 @@ $border: 1px solid #c0c0c0;
 $row-margin-top: .3em;
 $button-color: DarkOliveGreen;
 $selected-color: FloralWhite;
+
+@mixin text_link() {
+    text-decoration: none;
+    color: DarkOliveGreen;
+    font-weight: bold;
+}

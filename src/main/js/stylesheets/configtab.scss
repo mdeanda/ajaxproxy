@@ -8,7 +8,6 @@
     .list {
         flex: 0 0 auto;
         overflow: auto;
-        xxbackground: limegreen;
         width: 15em;
         border-right: $border;
 
@@ -18,8 +17,13 @@
             padding: 0;
 
             li {
-                padding: .3em 1em;
                 border-bottom: $border;
+                a {
+                    display: block;
+                    padding: .3em 1em;
+
+                    @include text_link();
+                }
             }
             li:first-child {
                 border-top: $border;

@@ -1,6 +1,8 @@
 const React = require('react');
 import PropTypes from 'prop-types';
 
+import { HashRouter as Router, Route, Link, NavLink, Switch } from "react-router-dom";
+
 import ServerItem from 'components/serveritem';
 
 class ServerList extends React.Component {
@@ -31,11 +33,15 @@ class ServerList extends React.Component {
 
                 <ul>
                 {this.state.servers.map((server) => (
-                    <ServerItem server={server}
-                            key={server.id + '-' + this.state.selected}
-                            callback={this.itemSelected}
-                            selected={this.state.selected == server.id}/>
+
+                    <li key={server.id} className={this.state.selected==server.id?'selected':'not-selected'}>
+                        <Link to={'/config/server/' + server.id}>Server {server.id}</Link>
+                    </li>
                 ))}
+
+                    <li className={this.state.selected=='variables'?'selected':'not-selected'}>
+                        <Link to="/config/variables">Variables</Link>
+                    </li>
                 </ul>
             </div>
         )
@@ -53,7 +59,7 @@ class ServerList extends React.Component {
             this.setState({servers:data});
 
             if (this.state.selected == null && data.length > 0) {
-                this.itemSelected(data[0]);
+                //this.itemSelected(data[0]);
             }
         })
         .catch(console.log)
@@ -63,6 +69,10 @@ class ServerList extends React.Component {
         this.setState({selected: item.id});
         console.log("item selected on serverlist", item);
         this.state.callback(item);
+    }
+
+    selectVariables = () => {
+        this.setState({selected: 'variables'});
     }
 }
 

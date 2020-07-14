@@ -3,6 +3,9 @@ import PropTypes from 'prop-types';
 
 import styles from '../stylesheets/serveredit.scss';
 
+import {
+  useParams
+} from "react-router-dom";
 
 import ProxyEdit from 'components/proxyedit';
 import ProxyList from 'components/proxylist';
@@ -10,10 +13,12 @@ import ProxyList from 'components/proxylist';
 
 class ServerEdit extends React.Component {
     static propTypes = {
+        //serverId: PropTypes.number.isRequired
     };
 
     state = {
-        server: this.props.server,
+        serverId: null,
+        server: null,
         selectedProxy: null
     };
 
@@ -22,8 +27,8 @@ class ServerEdit extends React.Component {
     }
 
     render() {
-        if (this.state.server == null) {
-            return '';
+        if (this.state.server == null || this.state.serverId == null) {
+            return 'empty';
         }
 
         let urls;
@@ -48,7 +53,7 @@ class ServerEdit extends React.Component {
 
         return (
             <div className="server-edit">
-                <h3>Server {this.state.server.id}</h3>
+                <h3>Server {this.state.serverId}</h3>
 
                 {urls}
 
@@ -111,9 +116,34 @@ class ServerEdit extends React.Component {
         )
     }
 
-    setServer = item => {
-        //TODO: maybe just use id instead and reload
-        this.setState({server:item, selectedProxy:null});
+    componentDidUpdate = (prevProps, prevState, snapshot) => {
+        let serverId = this.props.match.params.serverId;
+        if (prevProps.match.params.serverId != this.props.match.params.serverId) {
+            console.log("update to: " + serverId);
+            this.setState({server:null, serverId:serverId});
+            this.loadData(serverId);
+        }
+    }
+
+    componentDidMount() {
+        this.loadData(this.props.match.params.serverId);
+    }
+
+    loadData(serverId) {
+        console.log("loading server edit: ", serverId);
+        if (serverId === null) return;
+
+        fetch('/api/config/server/' + serverId)
+        .then(res => res.json())
+        .then((data) => {
+            console.log("data", data);
+            this.setState({serverId:serverId, server:data, selectedProxy:null});
+
+            if (this.state.selected == null && data.length > 0) {
+                //this.itemSelected(data[0]);
+            }
+        })
+        .catch(console.log)
     }
 
     handleInputChange = event => {

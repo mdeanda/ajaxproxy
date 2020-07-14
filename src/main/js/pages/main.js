@@ -8,14 +8,14 @@ import { HashRouter as Router, Route, Link, NavLink, Switch } from "react-router
 
 import store from "store/index";
 import Test from 'components/test';
-import ServerTab from 'components/servertab';
+import ConfigTab from 'components/configtab';
 import ApControl from 'components/apcontrol';
 import RequestTab from 'components/requesttab';
 
-import { addRequest } from "../actions/index";
+import { requestAdd } from "../actions/index";
 
 window.store = store;
-window.addRequest = addRequest;
+window.requestAdd = requestAdd;
 //
 
 
@@ -27,7 +27,7 @@ function loadData() {
             var temp = data.splice(0, 10);
             temp.forEach(a => {
                 console.log("request data", a);
-                store.dispatch(addRequest(a));
+                store.dispatch(requestAdd(a));
             });
         })
         .catch(console.log)
@@ -48,7 +48,7 @@ class App extends React.Component {
 
                     <div className="bottom-bar">
                         <nav>
-                            <NavLink to='/servers' className='tab'>Servers</NavLink>
+                            <NavLink to='/config' className='tab'>Configuration</NavLink>
                             <NavLink to='/requests' className='tab'>Requests</NavLink>
                             <NavLink to='/variables' className='tab'>Variables</NavLink>
                             <NavLink to='/logger' className='tab'>Logger</NavLink>
@@ -58,7 +58,7 @@ class App extends React.Component {
                 </div>
 
                 <div className="tabs-container">
-                    <Route path="/servers"><ServerTab /></Route>
+                    <Route path="/config"><ConfigTab /></Route>
                     <Route path="/requests"><RequestTab /></Route>
                     <Route path="/variables"><Test /></Route>
                     <Route path="/logger"><p>logger</p></Route>

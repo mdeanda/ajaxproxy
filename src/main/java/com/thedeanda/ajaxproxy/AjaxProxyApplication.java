@@ -46,7 +46,7 @@ public class AjaxProxyApplication extends Application<AjaxProxyConfiguration> {
 
     @Override
     public void run(final AjaxProxyConfiguration config,
-                    final Environment environment) {
+                    final Environment environment) throws Exception {
 
         ConfigFileService configFileService;
         try {
@@ -84,6 +84,10 @@ public class AjaxProxyApplication extends Application<AjaxProxyConfiguration> {
         resources.forEach(service ->
                 environment.jersey().register(service)
         );
+
+
+        //automatically start server on startup
+        ajaxProxyService.startServer();
 
     }
 
