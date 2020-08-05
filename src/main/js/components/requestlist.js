@@ -22,20 +22,18 @@ class ConnectedRequestList extends React.Component {
             selectedItem: null
         };
 
-        console.log("props", props);
+        //console.log("props", props);
     }
 
     render() {
-        console.log("render request list: ", this.state);
-
-        if (this.state == null || this.state.requests == null) {
+        if (this.props.requests == null) {
             return '';
         }
 
         return (
             <div className="request-list">
                 <ul>
-                {this.state.requests.map((request) => (
+                {this.props.requests.map((request) => (
                     <li key={request.id} className={this.getDurationClass(request.duration) + ' ' + this.getActiveClass(request) }
                             onClick={() => this.selected(request)}>
                         <p className="row-1">

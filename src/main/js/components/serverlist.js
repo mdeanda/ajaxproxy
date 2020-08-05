@@ -22,7 +22,8 @@ class ServerList extends React.Component {
     }
 
     render() {
-        console.log("render serverlist");
+        //selection no longer working after switching to router/link here since it doesn't render again
+        console.log("render serverlist", this.state.selected);
         if (this.state == null || this.state.servers == null) {
             return '';
         }
@@ -35,12 +36,12 @@ class ServerList extends React.Component {
                 {this.state.servers.map((server) => (
 
                     <li key={server.id} className={this.state.selected==server.id?'selected':'not-selected'}>
-                        <Link to={'/config/server/' + server.id}>Server {server.id}</Link>
+                        <NavLink to={'/config/server/' + server.id} activeClassName="selected">Server {server.id}</NavLink>
                     </li>
                 ))}
 
                     <li className={this.state.selected=='variables'?'selected':'not-selected'}>
-                        <Link to="/config/variables">Variables</Link>
+                        <NavLink to="/config/variables" activeClassName="selected">Variables</NavLink>
                     </li>
                 </ul>
             </div>

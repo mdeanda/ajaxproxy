@@ -19,11 +19,11 @@ window.requestAdd = requestAdd;
 
 
 function loadData() {
-    fetch('/api/requests')
+    fetch('/api/requests/first')
         .then(res => res.json())
         .then((data) => {
             //this.setState({requests:data})
-            var temp = data.splice(0, 10);
+            var temp = data;// data.splice(0, 10);
             temp.forEach(a => {
                 console.log("request data", a);
                 store.dispatch(requestAdd(a));
@@ -31,7 +31,7 @@ function loadData() {
         })
         .catch(console.log)
 }
-setTimeout(loadData, 10000);
+setTimeout(loadData, 100);
 
 class App extends React.Component {
 

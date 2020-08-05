@@ -21,6 +21,13 @@ public class RequestResource {
     }
 
     @GET
+    @Path("/first")
+    public List<RequestDtoListItem> findFirst(Long limit) {
+        if (limit == null) limit = 10L;
+        return requestService.findFirst(limit);
+    }
+
+    @GET
     public List<RequestDtoListItem> find() {
         return requestService.find();
     }

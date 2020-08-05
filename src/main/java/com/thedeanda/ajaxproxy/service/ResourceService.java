@@ -2,11 +2,15 @@ package com.thedeanda.ajaxproxy.service;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
+import com.j256.ormlite.field.SqlType;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
+import com.j256.ormlite.stmt.QueryBuilder;
+import com.j256.ormlite.stmt.SelectArg;
 import com.j256.ormlite.table.TableUtils;
 import com.thedeanda.ajaxproxy.cache.LruCache;
 import com.thedeanda.ajaxproxy.http.NetworkUtil;
 import com.thedeanda.ajaxproxy.http.RequestListener;
+import de.huxhorn.sulky.ulid.ULID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.Header;
 
@@ -25,6 +29,7 @@ public class ResourceService implements RequestListener {
 	private Dao<StoredResource, String> dao;
 	private File dbFile;
 	private List<RequestListener> listeners = new ArrayList<>();
+	private ULID ulid = new ULID();
 
 	public ResourceService(int cacheSize, File dbFile) {
 		cache = new LruCache<String, StoredResource>(cacheSize);
@@ -61,7 +66,7 @@ public class ResourceService implements RequestListener {
 	private void verifyTable() throws SQLException {
 		// check if we can save/load/delete an empty record, if not, recreate
 		// table
-		String id = UUID.randomUUID().toString();
+		String id = ulid.nextULID();// UUID.randomUUID().toString();
 		try {
 			StoredResource r = StoredResource.builder()
 					.contentEncoding("test")
@@ -239,6 +244,39 @@ public class ResourceService implements RequestListener {
 	public List<StoredResource> find() {
 		try {
 			return dao.queryForAll();
+		} catch (SQLException e) {
+			log.warn(e.getMessage(), e);
+			return Collections.emptyList();
+		}
+	}
+
+	public List<StoredResource> getFirstPage(long limit) {
+		QueryBuilder<StoredResource, String> qBuilder = dao.queryBuilder();
+
+		//Set column name
+		String column = "testColumn";
+
+		// qBuilder.reset();
+
+		//Create select arg
+		SelectArg selectArg = new SelectArg(SqlType.STRING, column);
+
+		/* JavaDoc for orderByRaw: "args Optional arguments that correspond to any ? specified in the rawSql.
+		 * Each of the arguments must have the sql-type set."
+		 *
+		 * passing "? IS NULL ASC" as a rawSql and selectArg as an argument should, based on the javadocs, produce
+		 * the query below:
+		 * "SELECT `testColumn` FROM `testobject` GROUP BY `testColumn` ORDER BY `testColumn` IS NULL ASC"
+		 *
+		 * Instead the query still contains the ? character:
+		 * SELECT `testColumn` FROM `testobject` GROUP BY `testColumn` ORDER BY ? IS NULL ASC
+		 */
+
+		try {
+			return qBuilder//.selectColumns(column).groupBy(column)
+					.orderBy("id", false)
+					.limit(limit)
+					.query();
 		} catch (SQLException e) {
 			log.warn(e.getMessage(), e);
 			return Collections.emptyList();

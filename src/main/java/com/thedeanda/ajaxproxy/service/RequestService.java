@@ -16,6 +16,14 @@ public class RequestService {
         this.mapper = mapper;
     }
 
+    public List<RequestDtoListItem> findFirst(long limit) {
+        return resourceService.getFirstPage(limit)
+                .stream()
+                .map(mapper::toListItem)
+                .collect(Collectors.toList());
+
+    }
+
     public List<RequestDtoListItem> find() {
         return resourceService.find()
                 .stream()

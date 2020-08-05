@@ -15,7 +15,7 @@ class ConfigTab extends React.Component {
 
     render() {
         return (
-            <div className="server-tab">
+            <div className="config-tab">
                 <div className="list">
                     <ServerList callback={this.itemSelected}/>
                 </div>

@@ -1,6 +1,6 @@
 @import "variables";
 
-.server-tab {
+.config-tab {
     display: flex;
     flex-direction: row;
     height: 100%;
@@ -19,17 +19,19 @@
             li {
                 border-bottom: $border;
                 a {
+                    border-left: 4px solid white;
                     display: block;
                     padding: .3em 1em;
 
                     @include text_link();
                 }
+                .selected {
+                    background: floralwhite;
+                    border-left: 4px solid DarkOliveGreen;
+                }
             }
             li:first-child {
                 border-top: $border;
-            }
-            li.selected {
-                background: floralwhite;
             }
         }
     }
