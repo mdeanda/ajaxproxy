@@ -11,27 +11,13 @@ import ConfigTab from 'components/configtab';
 import ApControl from 'components/apcontrol';
 import RequestTab from 'components/requesttab';
 
+/*
 import { requestAdd } from "../actions/index";
-
 window.store = store;
 window.requestAdd = requestAdd;
-//
+//*/
 
 
-function loadData() {
-    fetch('/api/requests/first')
-        .then(res => res.json())
-        .then((data) => {
-            //this.setState({requests:data})
-            var temp = data;// data.splice(0, 10);
-            temp.forEach(a => {
-                console.log("request data", a);
-                store.dispatch(requestAdd(a));
-            });
-        })
-        .catch(console.log)
-}
-setTimeout(loadData, 100);
 
 class App extends React.Component {
 

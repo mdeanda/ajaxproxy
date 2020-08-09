@@ -106,13 +106,15 @@ class RequestView extends React.Component {
     }
 
     loadData = itemId => {
-        fetch('/api/requests/' + itemId)
-        .then(res => res.json())
-        .then((data) => {
-            console.log("data", data);
-            this.setState({item:data})
-        })
-        .catch(console.log)
+        if (itemId != null) {
+            fetch('/api/requests/' + itemId)
+                .then(res => res.json())
+                .then((data) => {
+                    console.log("data", data);
+                    this.setState({item:data})
+                })
+                .catch(console.log)
+        }
     }
 }
 

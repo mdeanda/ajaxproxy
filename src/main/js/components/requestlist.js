@@ -5,6 +5,8 @@ import { connect } from "react-redux";
 
 //import ServerItem from '../components/serveritem';
 
+import ResourceDataSource from "../datasource/resourcedatasource"
+
 const mapStateToProps = state => {
   return { requests: state.requests };
 };
@@ -46,9 +48,14 @@ class ConnectedRequestList extends React.Component {
                         </p>
                     </li>
                 ))}
+                    <li onClick={() => this.loadOlder()}>Load More</li>
                 </ul>
             </div>
         )
+    }
+
+    loadOlder = () => {
+        ResourceDataSource.loadMore();
     }
 
     getActiveClass = request => {

@@ -15,6 +15,7 @@ import java.util.List;
 @Consumes(MediaType.APPLICATION_JSON)
 public class RequestResource {
     private final RequestService requestService;
+    private static final Long DEFAULT_PAGE_SIZE = 100L;
 
     public RequestResource(RequestService requestService) {
         this.requestService = requestService;
@@ -23,7 +24,7 @@ public class RequestResource {
     @GET
     @Path("/first")
     public List<RequestDtoListItem> findFirst(Long limit) {
-        if (limit == null) limit = 10L;
+        if (limit == null) limit = DEFAULT_PAGE_SIZE;
         return requestService.findFirst(limit);
     }
 
