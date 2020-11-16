@@ -7,6 +7,7 @@ import { HashRouter as Router, Route, Link, NavLink, Switch } from "react-router
 
 import ServerList from 'components/serverlist';
 import ServerEdit from 'components/serveredit';
+import VariablePanel from 'components/variablepanel';
 
 class ConfigTab extends React.Component {
     constructor(props) {
@@ -22,9 +23,9 @@ class ConfigTab extends React.Component {
                 <div className="content">
                     <Switch>
                         <Route exact path="/config/server/:serverId" component={ServerEdit} />
-                        <Route path="/config/variables"><p>variables stuffs</p></Route>
+                        <Route path="/config/variables"><VariablePanel /></Route>
                         <Route>
-                            <p>no match content</p>
+                            <p>Configure AjaxProxy here!</p>
                         </Route>
                     </Switch>
                 </div>

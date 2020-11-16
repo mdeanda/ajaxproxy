@@ -28,7 +28,7 @@ class ServerEdit extends React.Component {
 
     render() {
         if (this.state.server == null || this.state.serverId == null) {
-            return 'empty';
+            return '';
         }
 
         let urls;
