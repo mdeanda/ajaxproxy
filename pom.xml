@@ -17,7 +17,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jetty.version>9.4.10.v20180503</jetty.version>
         <ormlite.version>4.48</ormlite.version>
-        <h2db.version>1.4.197</h2db.version>
+        <h2db.version>2.0.206</h2db.version>
         <lombok.version>1.18.4</lombok.version>
         <slf4j.version>1.7.25</slf4j.version>
         <flexmark.version>0.40.0</flexmark.version>
