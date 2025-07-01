@@ -12,13 +12,16 @@
 
     <properties>
         <timestamp>${maven.build.timestamp}</timestamp>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <java.version>21</java.version>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
         <jetty.version>9.4.10.v20180503</jetty.version>
         <ormlite.version>4.48</ormlite.version>
         <h2db.version>1.4.197</h2db.version>
-        <lombok.version>1.18.4</lombok.version>
+        <lombok.version>1.18.38</lombok.version>
         <slf4j.version>1.7.25</slf4j.version>
         <flexmark.version>0.40.0</flexmark.version>
     </properties>
@@ -31,11 +34,17 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.thedeanda.javajson</groupId>
+            <groupId>com.thedeanda</groupId>
             <artifactId>javajson-parser</artifactId>
-            <version>1.0.3</version>
+            <version>1.0.5-SNAPSHOT</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/javax.activation/activation -->
+        <dependency>
+            <groupId>javax.activation</groupId>
+            <artifactId>activation</artifactId>
+            <version>1.1.1</version>
+        </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
