@@ -1,17 +1,16 @@
 package com.thedeanda.ajaxproxy.ui.rest;
 
-import java.io.File;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 import com.thedeanda.ajaxproxy.ui.ConfigService;
+
+import java.io.File;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class HistoryItemService {
 	private static final HistoryItemService instance = new HistoryItemService();
@@ -48,7 +47,7 @@ public class HistoryItemService {
 	private void closeConnection() {
 		try {
 			connectionSource.close();
-		} catch (IOException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
