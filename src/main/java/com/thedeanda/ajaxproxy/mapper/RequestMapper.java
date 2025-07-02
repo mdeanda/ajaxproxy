@@ -46,6 +46,7 @@ public interface RequestMapper {
 
     @Named("input")
     default byte[] getInput(StoredResource storedResource) {
+        if (storedResource == null) return null;
         return storedResource.getInput();
     }
 
