@@ -3,10 +3,9 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.thedeanda</groupId>
   <artifactId>ajaxproxy</artifactId>
-  <name>Archetype - ajaxproxy</name>
+  <name>ajaxproxy</name>
   <version>2.4.1-SNAPSHOT</version>
   <description>ajaxproxy</description>
-  <url>http://maven.apache.org</url>
   <build>
     <resources>
       <resource>
@@ -26,6 +25,7 @@
     <plugins>
       <plugin>
         <artifactId>maven-shade-plugin</artifactId>
+        <version>3.6.0</version>
         <executions>
           <execution>
             <phase>package</phase>
@@ -39,6 +39,16 @@
                   <mainClass>com.thedeanda.ajaxproxy.AjaxProxy</mainClass>
                 </transformer>
               </transformers>
+              <filters>
+                <filter>
+                  <artifact>*:*</artifact>
+                  <excludes>
+                    <exclude>META-INF/*.SF</exclude>
+                    <exclude>META-INF/*.DSA</exclude>
+                    <exclude>META-INF/*.RSA</exclude>
+                  </excludes>
+                </filter>
+              </filters>
             </configuration>
           </execution>
         </executions>
@@ -55,13 +65,13 @@
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
-      <version>3.11.1</version>
+      <version>3.15.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.12</version>
+      <version>4.13.1</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
@@ -71,18 +81,17 @@
       </exclusions>
     </dependency>
   </dependencies>
-  <dependencyManagement />
   <properties>
-    <jetty.version>9.4.10.v20180503</jetty.version>
-    <h2db.version>1.4.197</h2db.version>
-    <slf4j.version>1.7.25</slf4j.version>
+    <jetty.version>9.4.57.v20241219</jetty.version>
+    <h2db.version>2.3.232</h2db.version>
+    <slf4j.version>1.7.28</slf4j.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <timestamp>${maven.build.timestamp}</timestamp>
-    <ormlite.version>4.48</ormlite.version>
+    <ormlite.version>6.1</ormlite.version>
     <java.version>21</java.version>
     <maven.compiler.source>21</maven.compiler.source>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <flexmark.version>0.40.0</flexmark.version>
+    <flexmark.version>0.42.12</flexmark.version>
     <lombok.version>1.18.38</lombok.version>
     <maven.compiler.target>21</maven.compiler.target>
   </properties>
