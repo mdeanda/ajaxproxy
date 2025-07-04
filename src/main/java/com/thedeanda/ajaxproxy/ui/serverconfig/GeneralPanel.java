@@ -195,26 +195,9 @@ public class GeneralPanel extends JPanel implements ChangeListener,
 	}
 
 	private JSlider createCustomSlider(List<OptionValue> delayOptionValues) {
-		int max = delayOptionValues.size() - 1;
-		int major = 1;
-		int minor = 1;
-		JSlider ret = new JSlider();
-		Dictionary<Integer, JLabel> labels = new Hashtable<>();
-		for (OptionValue value : delayOptionValues) {
-			labels.put(value.getSliderValue(), new JLabel(value.getLabel()));
-		}
-
-		ret.setLabelTable(labels);
-		ret.setMinimum(0);
-		ret.setMaximum(max);
-		ret.setValue(0);
-		ret.setMajorTickSpacing(major);
-		ret.setMinorTickSpacing(minor);
-		ret.setSnapToTicks(true);
-		ret.setPaintTicks(true);
-		ret.setPaintLabels(true);
-		ret.addChangeListener(this);
-		return ret;
+		JSlider slider = SwingUtils.createCustomSlider(delayOptionValues);
+		slider.addChangeListener(this);
+		return slider;
 	}
 
 	public String getResourceBase() {

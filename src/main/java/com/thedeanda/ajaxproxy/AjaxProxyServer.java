@@ -108,8 +108,6 @@ public class AjaxProxyServer implements Runnable, LoggerMessageListener {
 		this.workingDir = workingDir;
 
 		throttleFilter = new ThrottleFilter();
-
-		getRequestListener();
 	}
 
 	public void addProxyListener(ProxyListener pl) {
@@ -182,7 +180,7 @@ public class AjaxProxyServer implements Runnable, LoggerMessageListener {
 		if (port > 0) {
 			ServerConnector http = new ServerConnector(jettyServer, new HttpConnectionFactory(http_config));
 			http.setPort(port);
-			http.setIdleTimeout(30000);
+			http.setIdleTimeout(60000);
 			jettyServer.addConnector(http);
 		}
 		if (httpsPort > 0 && !StringUtils.isBlank(keystoreFile)) {
@@ -253,6 +251,7 @@ public class AjaxProxyServer implements Runnable, LoggerMessageListener {
 			root.addFilter(proxyFilterHolder, "/*", dispatches);
 			proxyFilter.reset();
 
+			//TODO: allow a way to disable root file server
 			ServletHolder servlet;
 			DefaultServlet defaultServlet = new DefaultServlet();
 			servlet = new ServletHolder(defaultServlet);

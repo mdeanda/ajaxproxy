@@ -1,14 +1,12 @@
 package com.thedeanda.ajaxproxy.ui.serverconfig.proxy;
 
 import java.awt.Dimension;
+import java.util.ArrayList;
+import java.util.List;
 
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.SpringLayout;
+import javax.swing.*;
 
+import com.thedeanda.ajaxproxy.ui.options.OptionValue;
 import org.apache.commons.lang3.StringUtils;
 
 import com.thedeanda.ajaxproxy.config.model.StringVariable;
@@ -18,6 +16,7 @@ import com.thedeanda.ajaxproxy.ui.util.SwingUtils;
 public class RequestProxyEditorPanel extends JPanel implements EditorPanel<ProxyConfigRequest> {
 	private static final long serialVersionUID = 5379224168584631339L;
 	private static final String[] protocolList = { "http", "https" };
+	private final List<OptionValue> cacheValues;
 
 	private SpringLayout layout;
 	private JLabel domainLabel;
@@ -31,8 +30,11 @@ public class RequestProxyEditorPanel extends JPanel implements EditorPanel<Proxy
 	private JCheckBox cacheCheckbox;
 	private JComboBox<String> protocols;
 	private JLabel protLabel;
+	private JSlider cacheSlider;
 
 	public RequestProxyEditorPanel() {
+		cacheValues = initCacheOptionValues();
+
 		layout = new SpringLayout();
 		setLayout(layout);
 
@@ -68,9 +70,43 @@ public class RequestProxyEditorPanel extends JPanel implements EditorPanel<Proxy
 		protocols = new JComboBox<String>(protocolList);
 		add(protocols);
 
+		cacheSlider = SwingUtils.createCustomSlider(cacheValues);
+		//slider.addChangeListener(this);
+		add(cacheSlider);
+
+
 		initLayout();
-		setPreferredSize(new Dimension(450, 240));
+		initListeners();
+		setPreferredSize(new Dimension(450, 275));
 		setMinimumSize(new Dimension(300, 120));
+	}
+
+	private List<OptionValue> initCacheOptionValues() {
+		List<OptionValue> values = new ArrayList<>();
+
+		values.add(new OptionValue("0", 0, 0));
+		values.add(new OptionValue("10s", 1, 10));
+		values.add(new OptionValue("30s", 2, 30));
+		values.add(new OptionValue("1m", 3, 60));
+		values.add(new OptionValue("5m", 4, 300));
+		values.add(new OptionValue("10m", 5, 600));
+		values.add(new OptionValue("60m", 6, 3600));
+
+		return values;
+	}
+
+	private int mapToCacheValue(int value) {
+		return cacheValues.stream()
+				.filter(v -> v.getSliderValue() == value)
+				.map(OptionValue::getRealValue)
+				.findFirst()
+				.orElse(0);
+	}
+
+	private void initListeners() {
+		cacheCheckbox.addChangeListener(l -> {
+			cacheSlider.setEnabled(cacheCheckbox.isSelected());
+		});
 	}
 
 	private void initLayout() {
@@ -112,6 +148,11 @@ public class RequestProxyEditorPanel extends JPanel implements EditorPanel<Proxy
 		layout.putConstraint(SpringLayout.NORTH, cacheCheckbox, 5, SpringLayout.SOUTH, hostHeaderField);
 		layout.putConstraint(SpringLayout.WEST, cacheCheckbox, 0, SpringLayout.WEST, hostHeaderLabel);
 
+		layout.putConstraint(SpringLayout.NORTH, cacheSlider, 5, SpringLayout.SOUTH, cacheCheckbox);
+		layout.putConstraint(SpringLayout.WEST, cacheSlider, 10, SpringLayout.WEST, this);
+		layout.putConstraint(SpringLayout.EAST, cacheSlider, -10, SpringLayout.EAST, this);
+
+
 	}
 
 	@Override
@@ -128,7 +169,9 @@ public class RequestProxyEditorPanel extends JPanel implements EditorPanel<Proxy
 		}
 		String path = pathField.getText();
 
-		ProxyConfigRequest config = new ProxyConfigRequest();
+		ProxyConfigRequest config = ProxyConfigRequest.builder()
+				.cacheDuration(mapToCacheValue(cacheSlider.getValue()))
+				.build();
 		config.setHost(StringVariable.builder().originalValue(host).build());
 		config.setPort(port);
 		config.setPath(StringVariable.builder().originalValue(path).build());

@@ -26,8 +26,9 @@ public class ProxyTableModel extends AbstractTableModel implements Reorderable {
 	private final static String DOMAIN = "domain";
 	private final static String PORT = "port";
 	private final static String PATH = "path";
+	private final static String CACHE_DUR = "cache_dur";
 	// private final static String NEW_PROXY = "newProxy";
-	private final static String[] COLS = { PROTOCOL, DOMAIN, PORT, PATH };
+	private final static String[] COLS = { PROTOCOL, DOMAIN, PORT, PATH, CACHE_DUR };
 
 	public ProxyTableModel() {
 		log.debug("new table model");
@@ -105,6 +106,8 @@ public class ProxyTableModel extends AbstractTableModel implements Reorderable {
 			return config.getPath().getOriginalValue();
 		case 4:
 			return config.isEnableCache();
+		case 5:
+			return config.getCacheDuration();
 		}
 		return null;
 	}

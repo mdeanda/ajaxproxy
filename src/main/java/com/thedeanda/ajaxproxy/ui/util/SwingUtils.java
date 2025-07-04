@@ -3,6 +3,9 @@ package com.thedeanda.ajaxproxy.ui.util;
 import java.awt.*;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.util.Dictionary;
+import java.util.Hashtable;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Pattern;
@@ -15,6 +18,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 
+import com.thedeanda.ajaxproxy.ui.options.OptionValue;
 import com.thedeanda.ajaxproxy.ui.util.CaretMovingKeyListener;
 import org.apache.commons.lang3.StringUtils;
 
@@ -182,6 +186,29 @@ public class SwingUtils {
 		});
 		jSplitPane.setBorder(null);
 		// */
+	}
+
+	public static JSlider createCustomSlider(List<OptionValue> delayOptionValues) {
+		int max = delayOptionValues.size() - 1;
+		int major = 1;
+		int minor = 1;
+		JSlider ret = new JSlider();
+		Dictionary<Integer, JLabel> labels = new Hashtable<>();
+		for (OptionValue value : delayOptionValues) {
+			labels.put(value.getSliderValue(), new JLabel(value.getLabel()));
+		}
+
+		ret.setLabelTable(labels);
+		ret.setMinimum(0);
+		ret.setMaximum(max);
+		ret.setValue(0);
+		ret.setMajorTickSpacing(major);
+		ret.setMinorTickSpacing(minor);
+		ret.setSnapToTicks(true);
+		ret.setPaintTicks(true);
+		ret.setPaintLabels(true);
+		//ret.addChangeListener(this);
+		return ret;
 	}
 
 	public static void executNonUi(Runnable runnable) {

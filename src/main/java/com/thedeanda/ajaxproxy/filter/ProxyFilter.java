@@ -72,11 +72,9 @@ public class ProxyFilter implements Filter {
 		boolean doChain = true;
 		if (request instanceof HttpServletRequest && response instanceof HttpServletResponse) {
 			ProxyContainer proxy = getProxy((HttpServletRequest) request);
-			if (proxy != null) {
-				if (proxy.getRequestHandler() != null) {
-					doChain = !proxy.getRequestHandler().handleRequest((HttpServletRequest) request,
-							(HttpServletResponse) response, proxy, listener);
-				}
+			if (proxy != null && proxy.getRequestHandler() != null) {
+				doChain = !proxy.getRequestHandler().handleRequest((HttpServletRequest) request,
+						(HttpServletResponse) response, proxy, listener);
 			}
 		}
 
