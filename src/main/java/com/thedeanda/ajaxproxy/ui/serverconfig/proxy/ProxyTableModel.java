@@ -19,6 +19,7 @@ import com.thedeanda.javajson.JsonArray;
 import com.thedeanda.javajson.JsonValue;
 
 public class ProxyTableModel extends AbstractTableModel implements Reorderable {
+	private static final int MIN_ROWS = 1;
 	private static final Logger log = LoggerFactory.getLogger(ProxyTableModel.class);
 	private static final long serialVersionUID = 1L;
 	private List<ProxyConfig> data;
@@ -77,7 +78,7 @@ public class ProxyTableModel extends AbstractTableModel implements Reorderable {
 	@Override
 	public int getRowCount() {
 		int count = data.size() + 1;
-		count = Math.max(2, count);
+		count = Math.max(MIN_ROWS, count);
 		return count;
 	}
 
@@ -145,7 +146,11 @@ public class ProxyTableModel extends AbstractTableModel implements Reorderable {
 	}
 
 	public int addValue(ProxyConfig updatedValue) {
+		int sizeBefore = getRowCount();
 		data.add(updatedValue);
+		if (data.size() >= sizeBefore) {
+			fireTableRowsInserted(data.size(), data.size()+1);
+		}
 		return data.size();
 	}
 
