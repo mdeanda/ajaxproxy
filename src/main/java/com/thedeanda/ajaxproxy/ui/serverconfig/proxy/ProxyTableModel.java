@@ -47,14 +47,14 @@ public class ProxyTableModel extends AbstractTableModel implements Reorderable {
 		return String.class;
 	}
 
-	public JsonArray getConfig(final int cacheTime) {
+	public JsonArray getConfig() {
 		// normalizeData();
 		JsonArray arr = new JsonArray();
 		Convertor converter = Convertor.get();
 		for (ProxyConfig config : data) {
 			if (config instanceof ProxyConfigRequest) {
 				ProxyConfigRequest proxyConfigRequest = (ProxyConfigRequest) config;
-				proxyConfigRequest.setCacheDuration(cacheTime);
+				//proxyConfigRequest.setCacheDuration(cacheTime);
 				arr.add(converter.toJson(proxyConfigRequest));
 			} else if (config instanceof ProxyConfigFile) {
 				ProxyConfigFile proxyConfigRequest = (ProxyConfigFile) config;

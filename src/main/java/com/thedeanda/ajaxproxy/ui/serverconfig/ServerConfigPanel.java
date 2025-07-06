@@ -95,7 +95,7 @@ public class ServerConfigPanel extends JPanel implements SettingsChangedListener
     }
 
     public void updateConfig(JsonObject config) {
-        config.put("proxy", proxyModel.getConfig(generalPanel.getCacheTime()));
+        config.put("proxy", proxyModel.getConfig());
         config.put("merge", mergeModel.getConfig());
         //config.put("tamper", tamperPanel.getConfig());
         generalPanel.updateConfig(config);

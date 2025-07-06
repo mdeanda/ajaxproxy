@@ -44,8 +44,6 @@ public class GeneralPanel extends JPanel implements ChangeListener,
 	private List<OptionValue> delayOptionValues;
 	private JButton folderButton;
 	final JFileChooser fileChooser;
-	private List<OptionValue> cacheOptionsValues;
-	private JSlider cacheSlider;
 
 	public GeneralPanel(final SettingsChangedListener listener) {
 		SpringLayout layout = new SpringLayout();
@@ -97,14 +95,6 @@ public class GeneralPanel extends JPanel implements ChangeListener,
 		add(forcedLabel);
 		add(forcedLatency);
 
-		cacheOptionsValues = initCacheOptionValues();
-		cacheSlider = createCustomSlider(cacheOptionsValues);
-		cacheSlider
-				.setToolTipText("Cacheded proxy entries will be cached for the amount of time specified here");
-		JLabel cacheLabel = new JLabel("Cache Time");
-		add(cacheLabel);
-		add(cacheSlider);
-
 		layout.putConstraint(SpringLayout.WEST, portLabel, 10,
 				SpringLayout.WEST, this);
 		layout.putConstraint(SpringLayout.WEST, port, 5, SpringLayout.EAST,
@@ -150,18 +140,6 @@ public class GeneralPanel extends JPanel implements ChangeListener,
 		layout.putConstraint(SpringLayout.EAST, forcedLatency, -10,
 				SpringLayout.EAST, this);
 
-		layout.putConstraint(SpringLayout.NORTH, cacheLabel, 40,
-				SpringLayout.SOUTH, forcedLatency);
-		layout.putConstraint(SpringLayout.EAST, cacheLabel, 0,
-				SpringLayout.EAST, baseLabel);
-
-		layout.putConstraint(SpringLayout.VERTICAL_CENTER, cacheSlider, 0,
-				SpringLayout.VERTICAL_CENTER, cacheLabel);
-		layout.putConstraint(SpringLayout.WEST, cacheSlider, 5,
-				SpringLayout.EAST, cacheLabel);
-		layout.putConstraint(SpringLayout.EAST, cacheSlider, -10,
-				SpringLayout.EAST, this);
-
 	}
 
 	private List<OptionValue> initDelayOptionValues() {
@@ -176,20 +154,6 @@ public class GeneralPanel extends JPanel implements ChangeListener,
 		values.add(new OptionValue("5s", 6, 5000));
 		values.add(new OptionValue("10s", 7, 10000));
 		values.add(new OptionValue("30s", 8, 30000));
-
-		return values;
-	}
-
-	private List<OptionValue> initCacheOptionValues() {
-		List<OptionValue> values = new ArrayList<>();
-
-		values.add(new OptionValue("0", 0, 0));
-		values.add(new OptionValue("10s", 1, 10));
-		values.add(new OptionValue("30s", 2, 30));
-		values.add(new OptionValue("1m", 3, 60));
-		values.add(new OptionValue("5m", 4, 300));
-		values.add(new OptionValue("10m", 5, 600));
-		values.add(new OptionValue("60m", 6, 3600));
 
 		return values;
 	}
@@ -265,7 +229,6 @@ public class GeneralPanel extends JPanel implements ChangeListener,
 
 		//TODO: map to ui values instead
 		forcedLatency.setValue(serverConfig.getForcedLatencyMs());
-		cacheSlider.setValue(serverConfig.getCacheTimeSec());
 	}
 
 	/** update values from current ui state into config object */
@@ -280,13 +243,8 @@ public class GeneralPanel extends JPanel implements ChangeListener,
 			config.put("options", options);
 		}
 		options.put("forcedLatency", forcedLatency.getValue());
-		options.put("cacheTime", cacheSlider.getValue());
 	}
 	
-	public int getCacheTime() {
-		return cacheOptionsValues.get(cacheSlider.getValue()).getRealValue();
-	}
-
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		Object source = e.getSource();

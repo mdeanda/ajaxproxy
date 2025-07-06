@@ -71,6 +71,8 @@ public class RequestProxyEditorPanel extends JPanel implements EditorPanel<Proxy
 		add(protocols);
 
 		cacheSlider = SwingUtils.createCustomSlider(cacheValues);
+		cacheSlider
+				.setToolTipText("Cacheded proxy entries will be cached for the amount of time specified here");
 		//slider.addChangeListener(this);
 		add(cacheSlider);
 
