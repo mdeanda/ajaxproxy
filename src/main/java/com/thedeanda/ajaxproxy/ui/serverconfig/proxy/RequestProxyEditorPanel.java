@@ -74,6 +74,7 @@ public class RequestProxyEditorPanel extends JPanel implements EditorPanel<Proxy
 		cacheSlider
 				.setToolTipText("Cacheded proxy entries will be cached for the amount of time specified here");
 		//slider.addChangeListener(this);
+		cacheSlider.setEnabled(false);
 		add(cacheSlider);
 
 
@@ -173,9 +174,9 @@ public class RequestProxyEditorPanel extends JPanel implements EditorPanel<Proxy
 
 		ProxyConfigRequest config = ProxyConfigRequest.builder()
 				.cacheDuration(mapToCacheValue(cacheSlider.getValue()))
+				.host(StringVariable.builder().originalValue(host).build())
+				.port(port)
 				.build();
-		config.setHost(StringVariable.builder().originalValue(host).build());
-		config.setPort(port);
 		config.setPath(StringVariable.builder().originalValue(path).build());
 		config.setHostHeader(hostHeaderField.getText());
 		config.setEnableCache(cacheCheckbox.isSelected());
@@ -210,6 +211,16 @@ public class RequestProxyEditorPanel extends JPanel implements EditorPanel<Proxy
 
 		this.pathField.setText(config.getPath().getOriginalValue());
 		this.cacheCheckbox.setSelected(config.isEnableCache());
+		this.cacheSlider.setValue(findNearestCacheOption(config.getCacheDuration()));
+	}
 
+	private int findNearestCacheOption(int duration) {
+		for (int i=0; i< cacheValues.size(); i++) {
+			OptionValue val = cacheValues.get(i);
+			if (val.getRealValue() == duration) {
+				return i;
+			}
+		}
+		return 0;
 	}
 }
