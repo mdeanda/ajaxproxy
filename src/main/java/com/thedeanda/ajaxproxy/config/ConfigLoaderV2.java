@@ -70,14 +70,18 @@ public class ConfigLoaderV2 implements Loader {
 			StringVariable resourceBase = handler.varForString(sResourceBase);
 			boolean showIndex = config.getBoolean("showIndex");
 			int forcedLatencyMs = getLatency(config.getJsonObject("options"));
-			int cacheTimeSec = getCacheTime(config.getJsonObject("options"));
 
 			List<MergeConfig> mergeConfig = loadMergeConfig(handler, config);
 			List<ProxyConfig> proxyConfig = loadProxyConfig(handler, config);
 
-			ServerConfig server = ServerConfig.builder().port(portVar).resourceBase(resourceBase).showIndex(showIndex)
-					.mergeConfig(mergeConfig).forcedLatencyMs(forcedLatencyMs).cacheTimeSec(cacheTimeSec)
-					.proxyConfig(proxyConfig).build();
+			ServerConfig server = ServerConfig.builder()
+					.port(portVar)
+					.resourceBase(resourceBase)
+					.showIndex(showIndex)
+					.mergeConfig(mergeConfig)
+					.forcedLatencyMs(forcedLatencyMs)
+					.proxyConfig(proxyConfig)
+					.build();
 			ret.add(server);
 		}
 		return ret;
@@ -122,28 +126,6 @@ public class ConfigLoaderV2 implements Loader {
 			return 10000;
 		case 8:
 			return 30000;
-		default:
-			return 0;
-		}
-	}
-
-	private int getCacheTime(JsonObject json) {
-		if (json == null)
-			return 0;
-		int val = json.getInt("cacheTime");
-		switch (val) {
-		case 1:
-			return 10;
-		case 2:
-			return 30;
-		case 3:
-			return 60;
-		case 4:
-			return 300;
-		case 5:
-			return 600;
-		case 6:
-			return 3600;
 		default:
 			return 0;
 		}
