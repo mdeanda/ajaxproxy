@@ -80,7 +80,7 @@ public class RequestProxyEditorPanel extends JPanel implements EditorPanel<Proxy
 
 		initLayout();
 		initListeners();
-		setPreferredSize(new Dimension(450, 275));
+		setPreferredSize(new Dimension(450, 310));
 		setMinimumSize(new Dimension(300, 120));
 	}
 
@@ -93,7 +93,9 @@ public class RequestProxyEditorPanel extends JPanel implements EditorPanel<Proxy
 		values.add(new OptionValue("1m", 3, 60));
 		values.add(new OptionValue("5m", 4, 300));
 		values.add(new OptionValue("10m", 5, 600));
-		values.add(new OptionValue("60m", 6, 3600));
+		values.add(new OptionValue("1hr", 6, 3600));
+		values.add(new OptionValue("12hr", 7, 43200));
+		values.add(new OptionValue("24hr", 8, 86400));
 
 		return values;
 	}

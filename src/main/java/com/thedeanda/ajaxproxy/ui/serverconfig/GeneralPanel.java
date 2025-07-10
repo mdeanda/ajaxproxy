@@ -1,36 +1,23 @@
 package com.thedeanda.ajaxproxy.ui.serverconfig;
 
-import java.awt.Dimension;
+import com.thedeanda.ajaxproxy.AjaxProxyServer;
+import com.thedeanda.ajaxproxy.config.model.ServerConfig;
+import com.thedeanda.ajaxproxy.filter.ThrottleFilter;
+import com.thedeanda.ajaxproxy.ui.SettingsChangedListener;
+import com.thedeanda.ajaxproxy.ui.options.OptionValue;
+import com.thedeanda.ajaxproxy.ui.util.SwingUtils;
+import com.thedeanda.javajson.JsonObject;
+import org.apache.commons.lang3.StringUtils;
+
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Dictionary;
-import java.util.Hashtable;
 import java.util.List;
-
-import javax.swing.ButtonModel;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JSlider;
-import javax.swing.JTextField;
-import javax.swing.SpringLayout;
-import javax.swing.SwingConstants;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
-import com.thedeanda.ajaxproxy.config.model.ServerConfig;
-import com.thedeanda.ajaxproxy.ui.SettingsChangedListener;
-import com.thedeanda.ajaxproxy.ui.util.SwingUtils;
-import org.apache.commons.lang3.StringUtils;
-
-import com.thedeanda.ajaxproxy.AjaxProxyServer;
-import com.thedeanda.ajaxproxy.filter.ThrottleFilter;
-import com.thedeanda.ajaxproxy.ui.options.OptionValue;
-import com.thedeanda.javajson.JsonObject;
 
 public class GeneralPanel extends JPanel implements ChangeListener,
 		ActionListener {
@@ -140,6 +127,9 @@ public class GeneralPanel extends JPanel implements ChangeListener,
 		layout.putConstraint(SpringLayout.EAST, forcedLatency, -10,
 				SpringLayout.EAST, this);
 
+		Dimension panelSize = new Dimension(500, 300);
+		this.setPreferredSize(panelSize);
+		this.setMinimumSize(panelSize);
 	}
 
 	private List<OptionValue> initDelayOptionValues() {
