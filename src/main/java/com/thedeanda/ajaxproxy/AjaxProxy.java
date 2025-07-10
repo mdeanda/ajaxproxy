@@ -13,6 +13,7 @@ import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
+import com.formdev.flatlaf.FlatLightLaf;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
@@ -101,6 +102,7 @@ public class AjaxProxy {
 
 	private static void showUi(final String config, final boolean runui,
 			final Map<String, String> vars) {
+
 		System.setProperty("apple.laf.useScreenMenuBar", "true");
 		System.setProperty("com.apple.mrj.application.apple.menu.about.name",
 				"AjaxProxy");
@@ -109,8 +111,12 @@ public class AjaxProxy {
 				try {
 					// Set System L&F
 
+					/*
 					UIManager.setLookAndFeel(UIManager
 							.getSystemLookAndFeelClassName());
+					//*/
+
+					FlatLightLaf.setup();
 
 				} catch (Exception ex) {
 
