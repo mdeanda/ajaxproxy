@@ -84,7 +84,7 @@ public class ResourceCellRenderer extends JPanel implements
 		layout.putConstraint(SpringLayout.EAST, dur, -4, SpringLayout.EAST,
 				this);
 
-		this.setPreferredSize(new Dimension(50, 30));
+		this.setPreferredSize(new Dimension(50, 50));
 	}
 
 	@Override

@@ -7,12 +7,10 @@ import com.thedeanda.ajaxproxy.config.ConfigLoader;
 import com.thedeanda.ajaxproxy.config.model.Config;
 import com.thedeanda.ajaxproxy.config.model.Variable;
 import com.thedeanda.ajaxproxy.service.ResourceService;
-import com.thedeanda.ajaxproxy.ui.border.TopBorder;
 import com.thedeanda.ajaxproxy.ui.json.JsonViewer;
 import com.thedeanda.ajaxproxy.ui.logger.LoggerPanel;
 import com.thedeanda.ajaxproxy.ui.resourceviewer.ResourceViewerPanel;
 import com.thedeanda.ajaxproxy.ui.serverconfig.ServerConfigPanel;
-import com.thedeanda.ajaxproxy.ui.util.SwingUtils;
 import com.thedeanda.ajaxproxy.ui.variable.controller.VariableController;
 import com.thedeanda.ajaxproxy.ui.variable.VariablesPanel;
 import com.thedeanda.javajson.JsonException;
@@ -31,7 +29,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -70,11 +67,11 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 	private JButton variablesToolbarButton;
 	private JButton jsonToolbarButton;
 
-	public MainPanel() {
+	public MainPanel(ConfigFileService configFileService) {
 		SpringLayout layout = new SpringLayout();
 		setLayout(new BorderLayout());
 
-		configFileService = new ConfigFileService();
+		this.configFileService = configFileService;
 
 		File dbFile = ConfigService.get().getResourceHistoryDb();
 		resourceService = new ResourceService(CACHE_SIZE, dbFile);
@@ -100,7 +97,7 @@ public class MainPanel extends JPanel implements ProxyListener, SettingsChangedL
 		resourceViewerPanel = new ResourceViewerPanel(resourceService);
 		cardPanel.add(resourceViewerPanel, CARD_RESOURCE_VIEWER);
 
-        variableController = new VariableController(configFileService);
+        variableController = new VariableController(this.configFileService);
         variableController.addListener(this);
 		variablePanel = new VariablesPanel(variableController);
 		cardPanel.add(variablePanel, CARD_VARIABLES);

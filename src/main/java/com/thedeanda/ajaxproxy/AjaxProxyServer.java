@@ -312,7 +312,8 @@ public class AjaxProxyServer implements Runnable, LoggerMessageListener {
 	// TODO: needs to reset or add a reset to clear all listener lists to avoid
 	// memory leak from ui
 	public void stop() {
-		for (Server jettyServer : jettyServers) {
+		ArrayList<Server> servers = new ArrayList<>(jettyServers);
+		for (Server jettyServer : servers) {
 			try {
 				if (jettyServer != null) {
 					jettyServer.stop();

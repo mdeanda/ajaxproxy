@@ -1,6 +1,7 @@
 package com.thedeanda.ajaxproxy.ui;
 
 import com.thedeanda.ajaxproxy.ProxyListener;
+import com.thedeanda.ajaxproxy.config.ConfigFileService;
 import com.thedeanda.ajaxproxy.ui.help.HelpAbout;
 import com.thedeanda.ajaxproxy.ui.help.HelpUpdates;
 import com.thedeanda.ajaxproxy.ui.windows.*;
@@ -24,6 +25,8 @@ import java.util.*;
 public class MainFrame extends JFrame implements ProxyListener, WindowListListener {
 	private static final long serialVersionUID = 1L;
 	private static final Logger log = LoggerFactory.getLogger(MainFrame.class);
+
+	private final ConfigFileService configFileService;
 	private MainPanel panel;
 	final JFileChooser fc = new JFileChooser();
 	private List<File> recentFiles;
@@ -40,7 +43,9 @@ public class MainFrame extends JFrame implements ProxyListener, WindowListListen
 
 
 	public MainFrame() {
-		this.panel = new MainPanel();
+		configFileService = new ConfigFileService();
+
+		this.panel = new MainPanel(configFileService);
 		updateTitle();
 		recentFiles = new ArrayList<File>();
 		this.initWindow();
