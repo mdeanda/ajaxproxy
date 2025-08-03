@@ -15,6 +15,8 @@ import javax.swing.JPanel;
 import javax.swing.ListCellRenderer;
 import javax.swing.SpringLayout;
 
+import com.thedeanda.ajaxproxy.filter.handler.ProxyRequestHandler;
+import com.thedeanda.ajaxproxy.filter.handler.RequestHandler;
 import com.thedeanda.ajaxproxy.ui.model.Resource;
 import com.thedeanda.ajaxproxy.ui.util.FontUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +26,7 @@ import org.apache.commons.collections4.CollectionUtils;
 public class ResourceCellRenderer extends JPanel implements
 		ListCellRenderer<Resource> {
 	private static final long serialVersionUID = -3020786707630237791L;
+	private JLabel proxyId;
 	private JLabel path;
 	private JLabel status;
 	private JLabel method;
@@ -43,6 +46,7 @@ public class ResourceCellRenderer extends JPanel implements
 		setLayout(layout);
 		setBorder(BorderFactory.createEmptyBorder());
 
+		proxyId = new JLabel("0");
 		path = new JLabel("path");
 		status = new JLabel("status");
 		method = new JLabel("method");
@@ -51,12 +55,13 @@ public class ResourceCellRenderer extends JPanel implements
 		Font pathFont = FontUtils.getFont(path.getFont(), "Verdana", 10.0f);
 		Font detailsFont = FontUtils.getFont(path.getFont(), "Verdana", 9.0f);
 
+		proxyId.setFont(pathFont);
 		path.setFont(pathFont);
 		status.setFont(detailsFont);
 		method.setFont(detailsFont);
 		dur.setFont(detailsFont);
 
-
+		add(proxyId);
 		add(path);
 		add(status);
 		add(method);
@@ -68,6 +73,14 @@ public class ResourceCellRenderer extends JPanel implements
 				this);
 		layout.putConstraint(SpringLayout.EAST, path, -4, SpringLayout.EAST,
 				this);
+
+		layout.putConstraint(SpringLayout.NORTH, proxyId, 1, SpringLayout.NORTH,
+				this);
+		//layout.putConstraint(SpringLayout.WEST, proxyId, 4, SpringLayout.WEST,
+		//		this);
+		layout.putConstraint(SpringLayout.EAST, proxyId, -4, SpringLayout.EAST,
+				this);
+
 
 		layout.putConstraint(SpringLayout.NORTH, method, 1, SpringLayout.SOUTH,
 				path);
@@ -127,6 +140,18 @@ public class ResourceCellRenderer extends JPanel implements
 			durText = String.valueOf(resource.getDuration()) + "ms";
 		}
 		dur.setText(durText);
+
+		int proxyIndex = 0;
+		if (resource.getRequestHandler() != null) {
+			//TODO: get request index, info here
+			RequestHandler rh = resource.getRequestHandler();
+			if (rh instanceof ProxyRequestHandler) {
+				ProxyRequestHandler prh = (ProxyRequestHandler) rh;
+				proxyIndex = prh.getProxyConfig().getIndex();
+			}
+		}
+		//TODO: perhaps hide/show if index is 0
+		proxyId.setText(String.valueOf(proxyIndex));
 
 		for (int i = 0; i < durForSlow.length; i++) {
 			if (requestDuration > durForSlow[i]) {

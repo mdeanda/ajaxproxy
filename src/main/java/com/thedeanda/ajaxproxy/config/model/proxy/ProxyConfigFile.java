@@ -12,6 +12,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProxyConfigFile implements ProxyConfig {
+	private int index;
+
 	@Builder.Default
 	private StringVariable path = new StringVariable();
 	@Builder.Default

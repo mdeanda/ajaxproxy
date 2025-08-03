@@ -18,6 +18,7 @@ import javax.swing.SpringLayout;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import com.thedeanda.ajaxproxy.filter.handler.RequestHandler;
 import org.apache.http.Header;
 
 import com.thedeanda.ajaxproxy.http.RequestListener;
@@ -181,8 +182,8 @@ public class ResourceListPanel extends JPanel implements ActionListener, Request
 	}
 
 	@Override
-	public void newRequest(UUID id, String url, String method) {
-		final Resource resource = new Resource(id, url, method);
+	public void newRequest(UUID id, String url, String method, RequestHandler requestHandler) {
+		final Resource resource = new Resource(id, requestHandler, url, method);
 		model.add(resource);
 	}
 

@@ -3,12 +3,13 @@ package com.thedeanda.ajaxproxy.http;
 import java.net.URL;
 import java.util.UUID;
 
+import com.thedeanda.ajaxproxy.filter.handler.RequestHandler;
 import org.apache.http.Header;
 
 public class EmptyRequestListener implements RequestListener {
 
 	@Override
-	public void newRequest(UUID id, String url, String method) {
+	public void newRequest(UUID id, String url, String method, RequestHandler requestHandler) {
 		// TODO Auto-generated method stub
 		
 	}

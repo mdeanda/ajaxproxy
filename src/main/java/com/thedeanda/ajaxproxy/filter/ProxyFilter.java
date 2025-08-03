@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.thedeanda.ajaxproxy.AjaxProxyServer;
+import com.thedeanda.ajaxproxy.http.RequestListenerHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,7 +75,7 @@ public class ProxyFilter implements Filter {
 			ProxyContainer proxy = getProxy((HttpServletRequest) request);
 			if (proxy != null && proxy.getRequestHandler() != null) {
 				doChain = !proxy.getRequestHandler().handleRequest((HttpServletRequest) request,
-						(HttpServletResponse) response, proxy, listener);
+						(HttpServletResponse) response, proxy, new RequestListenerHelper(listener, proxy));
 			}
 		}
 
@@ -107,12 +108,14 @@ public class ProxyFilter implements Filter {
 
 	public void reset() {
 		proxyContainers = new ArrayList<ProxyContainer>();
+		int index = 0;
 		for (ProxyConfig proxyConfig : server.getProxyConfig()) {
-			loadProxyConfigRequest(proxyConfig);
+			loadProxyConfigRequest(proxyConfig, index);
+			index++;
 		}
 	}
 
-	private void loadProxyConfigRequest(ProxyConfig proxyConfig) {
+	private void loadProxyConfigRequest(ProxyConfig proxyConfig, int index) {
 		try {
 			Pattern pattern = Pattern.compile(proxyConfig.getPath().getValue());
 			ProxyContainer proxyContainer = new ProxyContainer();

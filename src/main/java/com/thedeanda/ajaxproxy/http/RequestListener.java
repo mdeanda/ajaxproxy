@@ -3,10 +3,11 @@ package com.thedeanda.ajaxproxy.http;
 import java.net.URL;
 import java.util.UUID;
 
+import com.thedeanda.ajaxproxy.filter.handler.RequestHandler;
 import org.apache.http.Header;
 
 public interface RequestListener {
-	public void newRequest(UUID id, String url, String method);
+	public void newRequest(UUID id, String url, String method, RequestHandler requestHandler);
 	
 	public void startRequest(UUID id, URL url, Header[] requestHeaders,
 			byte[] data);

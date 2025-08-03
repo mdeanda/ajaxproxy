@@ -172,6 +172,7 @@ public class ProxyPanel extends JPanel {
 
 		if (updatedValue != null) {
 			proxyModel.setValue(row, updatedValue);
+			updatedValue.setIndex(row + 1);
 			proxyTable.changeSelection(row, 0, false, true);
 		}
 	}
@@ -180,6 +181,7 @@ public class ProxyPanel extends JPanel {
 		ProxyConfig updatedValue = ProxyEditorDialog.showAddProxyDialog(scroll);
 		if (updatedValue != null) {
 			int row = proxyModel.addValue(updatedValue);
+			updatedValue.setIndex(row);
 			proxyTable.changeSelection(row - 1, 0, false, true);
 		}
 	}
@@ -188,6 +190,7 @@ public class ProxyPanel extends JPanel {
 		ProxyConfig updatedValue = ProxyEditorDialog.showAddFileDialog(scroll);
 		if (updatedValue != null) {
 			int row = proxyModel.addValue(updatedValue);
+			updatedValue.setIndex(row);
 			proxyTable.changeSelection(row - 1, 0, false, true);
 		}
 	}

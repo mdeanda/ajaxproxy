@@ -8,6 +8,7 @@ import java.net.URL;
 import java.util.UUID;
 import java.util.concurrent.locks.ReentrantLock;
 
+import com.thedeanda.ajaxproxy.filter.handler.RequestHandler;
 import org.apache.http.Header;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -86,7 +87,7 @@ public class TestHeaders {
 
 							@Override
 							public void newRequest(UUID id, String url,
-									String method) {
+									String method, RequestHandler requestHandler) {
 
 							}
 

@@ -19,6 +19,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 
+import com.thedeanda.ajaxproxy.filter.handler.RequestHandler;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 import org.slf4j.Logger;
@@ -195,7 +196,7 @@ public class RestClientFrame extends JFrame implements RequestListener,
 	}
 
 	@Override
-	public void newRequest(UUID id, String url, String method) {
+	public void newRequest(UUID id, String url, String method, RequestHandler requestHandler) {
 		busy();
 	}
 

@@ -20,7 +20,11 @@ import javax.swing.text.Document;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 
+import com.thedeanda.ajaxproxy.config.model.proxy.ProxyConfigRequest;
+import com.thedeanda.ajaxproxy.filter.handler.ProxyRequestHandler;
+import com.thedeanda.ajaxproxy.filter.handler.RequestHandler;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -168,6 +172,8 @@ public class ResourcePanel extends JPanel implements ActionListener {
 
 		output.append("<html><body>");
 
+		writeHeading(output, "Request Info");
+		output.append("<div class=\"items\">");
 		writeField(output, "Request URL", resource.getUrl());
 		if (resource.getUrlObject() != null) {
 			URL uo = resource.getUrlObject();
@@ -182,7 +188,10 @@ public class ResourcePanel extends JPanel implements ActionListener {
 		writeField(output, "Date", new Date(storedResource.getStartTime()).toString());
 
 		writeField(output, "Status", String.valueOf(storedResource.getStatus()));
-		output.append("<h1>Request Headers</h1><div class=\"items\">");
+		output.append("</div>");
+
+		writeHeading(output, "Request Headers");
+		output.append("<div class=\"items\">");
 		Header[] reqHeaders = resource.getRequestHeaders();
 		if (reqHeaders != null) {
 			for (Header hdr : reqHeaders) {
@@ -191,7 +200,8 @@ public class ResourcePanel extends JPanel implements ActionListener {
 		}
 		output.append("</div>");
 
-		output.append("<h1>Response Headers</h1><div class=\"items\">");
+		writeHeading(output, "Response Headers");
+		output.append("<div class=\"items\">");
 		Header[] respHeaders = resource.getResponseHeaders();
 		if (respHeaders != null) {
 			for (Header hdr : respHeaders) {
@@ -199,6 +209,29 @@ public class ResourcePanel extends JPanel implements ActionListener {
 			}
 		}
 		output.append("</div>");
+
+		if (resource.getRequestHandler() != null) {
+			RequestHandler rh = resource.getRequestHandler();
+			if (rh instanceof ProxyRequestHandler) {
+				ProxyRequestHandler prh = (ProxyRequestHandler) rh;
+				ProxyConfigRequest config = prh.getProxyConfig();
+
+				writeHeading(output, "Proxy Config");
+				output.append("<div class=\"items\">");
+				writeField(output, "Index", String.valueOf(config.getIndex()));
+				writeField(output, "Protocol", config.getProtocol());
+				writeField(output, "Host", config.getHost().getValue());
+				writeField(output, "Port", String.valueOf(config.getPort()));
+				writeField(output, "Path", config.getPath().getValue());
+
+				if (StringUtils.isNotBlank(config.getHostHeader())) {
+					writeField(output, "Host Header", config.getHostHeader());
+				}
+
+
+				output.append("</div>");
+			}
+		}
 
 		/*
 		 * Exception ex = resource.getFilterException(); if (ex != null) {
@@ -213,6 +246,10 @@ public class ResourcePanel extends JPanel implements ActionListener {
 
 		output.append("</body></html>");
 		return output.toString();
+	}
+
+	private void writeHeading(StringBuilder output, String name) {
+		output.append("<h1>" + name + "</h1>");
 	}
 
 	private void writeField(StringBuilder output, String name, String value) {

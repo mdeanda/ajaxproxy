@@ -23,13 +23,14 @@ public class ProxyTableModel extends AbstractTableModel implements Reorderable {
 	private static final Logger log = LoggerFactory.getLogger(ProxyTableModel.class);
 	private static final long serialVersionUID = 1L;
 	private List<ProxyConfig> data;
+	private final static String INDEX = "index";
 	private final static String PROTOCOL = "protocol";
 	private final static String DOMAIN = "domain";
 	private final static String PORT = "port";
 	private final static String PATH = "path";
 	private final static String CACHE_DUR = "cache_dur";
 	// private final static String NEW_PROXY = "newProxy";
-	private final static String[] COLS = { PROTOCOL, DOMAIN, PORT, PATH, CACHE_DUR };
+	private final static String[] COLS = { INDEX, PROTOCOL, DOMAIN, PORT, PATH, CACHE_DUR };
 
 	public ProxyTableModel() {
 		log.debug("new table model");
@@ -98,16 +99,18 @@ public class ProxyTableModel extends AbstractTableModel implements Reorderable {
 
 		switch (col) {
 		case 0:
-			return config.getProtocol();
+			return config.getIndex();
 		case 1:
-			return config.getHost().getOriginalValue();
+			return config.getProtocol();
 		case 2:
-			return config.getPort();
+			return config.getHost().getOriginalValue();
 		case 3:
-			return config.getPath().getOriginalValue();
+			return config.getPort();
 		case 4:
-			return config.isEnableCache();
+			return config.getPath().getOriginalValue();
 		case 5:
+			return config.isEnableCache();
+		case 6:
 			return config.getCacheDuration();
 		}
 		return null;
@@ -116,8 +119,10 @@ public class ProxyTableModel extends AbstractTableModel implements Reorderable {
 	public Object getValueForFile(ProxyConfigFile file, int col) {
 		switch (col) {
 		case 0:
-			return "file";
+			return file.getIndex();
 		case 1:
+			return "file";
+		case 2:
 			return file.getBasePath().getOriginalValue();
 		case 3:
 			return file.getPath().getOriginalValue();
@@ -207,5 +212,9 @@ public class ProxyTableModel extends AbstractTableModel implements Reorderable {
 			toIndex--;
 		}
 		data.add(toIndex, item);
+
+		for (int i=0; i<data.size(); i++) {
+			data.get(i).setIndex(i+1);
+		}
 	}
 }

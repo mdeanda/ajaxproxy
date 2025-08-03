@@ -10,6 +10,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import lombok.Getter;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -28,6 +29,7 @@ import com.thedeanda.ajaxproxy.model.ProxyContainer;
 
 public class ProxyRequestHandler implements RequestHandler {
 	private static final Logger log = LoggerFactory.getLogger(ProxyRequestHandler.class);
+	@Getter
 	private ProxyConfigRequest proxyConfig;
 	private HttpClient client;
 
@@ -98,7 +100,7 @@ public class ProxyRequestHandler implements RequestHandler {
 		}
 		if (cachedResponse == null || cachedResponse.getData() == null) {
 			cachedResponse = makeRequest(request, response, proxyUrl.toString(), inputHeaders, inputData,
-					requestListener);
+					requestListener, proxy.getRequestHandler());
 			cachedResponse.setRequestPath(requestPath);
 			cachedResponse.setQueryString(queryString);
 			if (cachedResponse.getStatus() > 0 && cachedResponse.getStatus() < 300
@@ -125,14 +127,14 @@ public class ProxyRequestHandler implements RequestHandler {
 	}
 
 	private CachedResponse makeRequest(HttpServletRequest request, final HttpServletResponse response, String proxyUrl,
-			List<HttpHeader> inputHeaders, byte[] inputData, final RequestListener listener) {
+			List<HttpHeader> inputHeaders, byte[] inputData, final RequestListener listener, final RequestHandler requestHandler) {
 		final CachedResponse cachedResponse = new CachedResponse();
 		client.makeRequest(RequestMethod.valueOf(request.getMethod()), proxyUrl, inputHeaders, inputData,
 				new RequestListener() {
 
 					@Override
-					public void newRequest(UUID id, String url, String method) {
-						listener.newRequest(id, url, method);
+					public void newRequest(UUID id, String url, String method, RequestHandler requestHandler) {
+						listener.newRequest(id, url, method, requestHandler);
 						cachedResponse.setUrl(url);
 					}
 
@@ -246,7 +248,7 @@ public class ProxyRequestHandler implements RequestHandler {
 		UUID id = UUID.randomUUID();
 		String url = cachedResponse.getUrl();
 		Header[] responseHeaders = cachedResponse.getHeaders();
-		listener.newRequest(id, url, "GET");
+		listener.newRequest(id, url, "GET", this);
 		listener.startRequest(id, new URL(url), requestHeaders, new byte[] {});
 		listener.requestComplete(id, cachedResponse.getStatus(), cachedResponse.getReason(), 0, responseHeaders,
 				cachedResponse.getData());

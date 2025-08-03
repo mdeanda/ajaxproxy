@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProxyConfigRequest implements ProxyConfig {
+	private int index;
 	@Builder.Default
 	private String protocol = "http";
 	@Builder.Default

@@ -122,7 +122,7 @@ public class HttpClient {
 	private void fireNewRequest(UUID uuid, String url, String method, RequestListener... listeners) {
 		if (listeners != null) {
 			for (RequestListener listener : listeners) {
-				listener.newRequest(uuid, url, method);
+				listener.newRequest(uuid, url, method, null);
 			}
 		}
 	}

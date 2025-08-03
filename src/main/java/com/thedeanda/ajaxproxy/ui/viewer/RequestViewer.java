@@ -19,6 +19,7 @@ import javax.swing.SpringLayout;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import com.thedeanda.ajaxproxy.filter.handler.RequestHandler;
 import org.apache.http.Header;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
@@ -312,7 +313,7 @@ public class RequestViewer extends JPanel implements RequestListener {
 	}
 
 	@Override
-	public void newRequest(UUID id, String url, String method) {
+	public void newRequest(UUID id, String url, String method, RequestHandler requestHandler) {
 		clear();
 	}
 }

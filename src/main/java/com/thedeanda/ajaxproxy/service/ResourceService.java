@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.thedeanda.ajaxproxy.filter.handler.RequestHandler;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 
@@ -139,7 +140,7 @@ public class ResourceService implements RequestListener {
 	}
 
 	@Override
-	public void newRequest(UUID id, String url, String method) {
+	public void newRequest(UUID id, String url, String method, final RequestHandler requestHandler) {
 		log.debug("new request: {} {} {}", id, url, method);
 		StoredResource sr = StoredResource.builder()
                 .id(id.toString())
@@ -151,7 +152,7 @@ public class ResourceService implements RequestListener {
 
 		listeners.forEach(l -> {
 			try {
-				l.newRequest(id, url, method);
+				l.newRequest(id, url, method, requestHandler);
 			} catch (Exception e) {
 				log.warn(e.getMessage(), e);
 			}

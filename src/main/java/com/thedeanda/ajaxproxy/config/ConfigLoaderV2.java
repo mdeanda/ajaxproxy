@@ -159,19 +159,22 @@ public class ConfigLoaderV2 implements Loader {
 	private List<ProxyConfig> loadProxyConfig(VariableHandler handler, JsonObject config) {
 		List<ProxyConfig> proxyConfig = new ArrayList<>();
 		JsonArray configs = config.getJsonArray("proxy");
+		int index = 1;
 		for (JsonValue v : configs) {
-			ProxyConfig cfg = readProxyConfig(handler, v.getJsonObject());
+			ProxyConfig cfg = readProxyConfig(handler, v.getJsonObject(), index);
 			if (cfg != null) {
 				proxyConfig.add(cfg);
+				index++;
 			}
 		}
 
 		return proxyConfig;
 	}
 
-	private ProxyConfig readProxyConfig(VariableHandler handler, JsonObject json) {
+	private ProxyConfig readProxyConfig(VariableHandler handler, JsonObject json, int index) {
 		if (json.hasKey(PROXY_BASE_PATH)) {
 			ProxyConfigFile config = new ProxyConfigFile();
+			config.setIndex(index);
 			StringVariable pathVar = handler.varForString(json.getString(PROXY_PATH));
 			StringVariable basePathVar = handler.varForString(json.getString(PROXY_BASE_PATH));
 			config.setPath(pathVar);
@@ -180,6 +183,7 @@ public class ConfigLoaderV2 implements Loader {
 			return config;
 		} else {
 			ProxyConfigRequest config = new ProxyConfigRequest();
+			config.setIndex(index);
 
 			if (json.hasKey(PROXY_PROTOCOL)) {
 				config.setProtocol(json.getString(PROXY_PROTOCOL));

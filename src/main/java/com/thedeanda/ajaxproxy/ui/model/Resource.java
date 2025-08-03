@@ -5,6 +5,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.UUID;
 
+import com.thedeanda.ajaxproxy.filter.handler.RequestHandler;
+import lombok.Getter;
 import org.apache.http.Header;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,15 +31,19 @@ public class Resource implements Serializable, Comparable<Resource> {
 	private String exception;
 	private long startTime = System.currentTimeMillis();
 
+	@Getter
+	private RequestHandler requestHandler;
+
 	/**
 	 * calculated fields
 	 */
 	private String path;
 
-	public Resource(UUID id, String url, String method) {
+	public Resource(UUID id, RequestHandler requestHandler, String url, String method) {
 		this.id = id;
 		this.url = url;
 		this.method = method;
+		this.requestHandler = requestHandler;
 
 		// TODO: calculate path from url
 		try {

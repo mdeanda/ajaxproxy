@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.UUID;
 
+import com.thedeanda.ajaxproxy.filter.handler.RequestHandler;
 import org.apache.http.Header;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +38,7 @@ public class SimpleHttpClient {
 		client.makeRequest(RequestMethod.GET, url, null, nodata,
 				new RequestListener() {
 					@Override
-					public void newRequest(UUID id, String url, String method) {
+					public void newRequest(UUID id, String url, String method, RequestHandler requestHandler) {
 					}
 
 					@Override

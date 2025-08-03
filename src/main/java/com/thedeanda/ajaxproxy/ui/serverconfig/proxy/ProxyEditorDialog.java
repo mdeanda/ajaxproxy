@@ -14,6 +14,9 @@ public class ProxyEditorDialog {
 		panel.setValue(value);
 
 		String[] options = new String[] { "OK", "Cancel" };
+		if (value != null) {
+			title = String.format(title, value.getIndex());
+		}
 		int option = JOptionPane.showOptionDialog(SwingUtilities.getWindowAncestor(parent), panel, title, JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
 				null, options, options[0]);
 
@@ -28,7 +31,7 @@ public class ProxyEditorDialog {
 	public static ProxyConfig showEditDialog(ProxyConfigRequest config, Component parent) {
 		if (config != null) {
 			RequestProxyEditorPanel panel = new RequestProxyEditorPanel();
-			ProxyConfig result = showDialog(panel, config, "Edit Proxy", parent);
+			ProxyConfig result = showDialog(panel, config, "Edit Proxy - %d", parent);
 
 			return result;
 		} else
@@ -38,7 +41,7 @@ public class ProxyEditorDialog {
 	public static ProxyConfig showEditDialog(ProxyConfigFile config, Component parent) {
 		if (config != null) {
 			FileProxyEditorPanel panel = new FileProxyEditorPanel();
-			ProxyConfig result = showDialog(panel, config, "Edit Proxy", parent);
+			ProxyConfig result = showDialog(panel, config, "Edit Proxy - %d", parent);
 
 			return result;
 		} else
