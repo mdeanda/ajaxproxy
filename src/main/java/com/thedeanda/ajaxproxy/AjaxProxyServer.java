@@ -316,6 +316,7 @@ public class AjaxProxyServer implements Runnable, LoggerMessageListener {
 		for (Server jettyServer : servers) {
 			try {
 				if (jettyServer != null) {
+					jettyServer.setStopTimeout(1000);
 					jettyServer.stop();
 					fireEvent(ProxyEvent.STOP);
 				}
